@@ -8,6 +8,11 @@
     <link rel="stylesheet" type="text/css" href="bootstrap-2.3.2/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="DataTables-1.9.4/media/css/DT_bootstrap.css">
 
+    <!-- workaround for navbar overlapping site by 40 pixels -->
+    <style>
+        body { padding-top: 40px; }
+    </style>
+
     <script src="jquery-ui-1.10.3/jquery-1.9.1.js"></script>
 	<script src="jquery-ui-1.10.3/ui/jquery-ui.js"></script>
     <script src="bootstrap-2.3.2/js/bootstrap.min.js"></script>
@@ -34,11 +39,97 @@
         <div class="span3">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
-                    <li class="nav-header">Sidebar</li>
-                    <li class="active"><a href="#">Link</a></li>
-                    <li><a href="#">Link</a></li>
-                    <li><a href="#">Link</a></li>
-                    <li><a href="#">Link</a></li>
+                    <div class="nav-header"><h4>You Searched For</h4></div>
+                    <table class="table-bordered">
+                        <tr>
+                            <th></th>
+                            <th>Filter</th>
+                            <th>Variants</th>
+                            <th>Genes</th>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>All Variants</td>
+                            <td>75,342</td>
+                            <td>7,600</td>
+                        </tr>
+                        <tr>
+                            <td><button type="button" class="btn-mini"><i class="icon-minus"></i></button></td>
+                            <td>Min AC=6</td>
+                            <td>14,321</td>
+                            <td>2,005</td>
+                        </tr>
+                        <tr>
+                            <td><button type="button" class="btn-mini"><i class="icon-minus"></i></button></td>
+                            <td>Min # Samples=4</td>
+                            <td>3,619</td>
+                            <td>548</td>
+                        </tr>
+                    </table>
+                </ul>
+            </div><!--/.well -->
+            <div class="well sidebar-nav">
+                <ul class="nav nav-list">
+                    <div class="nav-header"><h4>Narrow Your Search</h4></div>
+                    <div class="accordion" id="accordion2">
+                        <div class="accordion-group">
+                            <div class="accordion-heading">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                                    Sample Filters
+                                </a>
+                            </div>
+                            <div id="collapseOne" class="accordion-body collapse in">
+                                <div class="accordion-inner">
+                                    <form>
+                                        <table>
+                                            <tr>
+                                                <td><button type="button" class="btn-mini"><i class="icon-plus"></i></button></td>
+                                                <td>Min Alt Reads</td>
+                                                <td><input class="input-mini" type="text" name="min_alt_reads"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><button type="button" class="btn-mini"><i class="icon-plus"></i></button></td>
+                                                <td>Min # Samples</td>
+                                                <td><input class="input-mini" type="text" name="min_num_samples"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><button type="button" class="btn-mini"><i class="icon-plus"></i></button></td>
+                                                <td>Max # Samples</td>
+                                                <td><input class="input-mini" type="text" name="max_alt_reads"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><button type="button" class="btn-mini"><i class="icon-plus"></i></button></td>
+                                                <td>Min AC</td>
+                                                <td><input class="input-mini" type="text" name="min_ac"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><button type="button" class="btn-mini"><i class="icon-plus"></i></button></td>
+                                                <td>Max AC</td>
+                                                <td><input class="input-mini" type="text" name="max_ac"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><button type="button" class="btn-mini"><i class="icon-plus"></i></button></td>
+                                                <td>Min Phred</td>
+                                                <td><input class="input-mini" type="text" name="min_pred"/></td>
+                                            </tr>
+                                        </table>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-group">
+                            <div class="accordion-heading">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+                                    INFO Filters
+                                </a>
+                            </div>
+                            <div id="collapseTwo" class="accordion-body collapse">
+                                <div class="accordion-inner">
+                                    Anim pariatur cliche...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </ul>
             </div><!--/.well -->
         </div><!--/span-->
