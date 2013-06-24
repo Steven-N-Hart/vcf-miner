@@ -6,11 +6,11 @@
  * To change this template use File | Settings | File Templates.
  */
 
+// GLOBAL: contains the column names to display
+var displayCols = new Array();
+
 $( document ).ready(function()
 {
-    // contains the column names to display
-    var displayCols = new Array();
-
     // 1ST 7 VCF columns displayed by default
     displayCols.push("CHROM");
     displayCols.push("POS");
@@ -28,8 +28,6 @@ $( document ).ready(function()
     addRowToConfigColumnsTable(true, "QUAL",   "Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).");
     addRowToConfigColumnsTable(true, "FILTER", "PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.");
 
-    var infoFilterTable = document.getElementById('info_filter_table');
-    var columnTable = document.getElementById('column_table');
     var metadataRequest = $.ajax({
         url: "/ve/meta/workspace/wf1c80c3721da2e536a53f16b4bc47aca7ef6e681", // TODO: hardcoded workspace
         dataType: "json",
@@ -42,48 +40,7 @@ $( document ).ready(function()
                 {
                     displayCols.push(key);
 
-                    //insert a new row at the bottom
-                    var newRow = infoFilterTable.insertRow(infoFilterTable.rows.length);
-
-                    //create new cells
-                    var newCell1 = newRow.insertCell(0);
-                    var newCell2 = newRow.insertCell(1);
-                    var newCell3 = newRow.insertCell(2);
-
-                    //set the cell text
-                    newCell1.innerHTML = "<button title='Add to your search' type=\"button\" class=\"btn-mini\"><i class=\"icon-plus\"></i></button>";
-                    newCell2.innerHTML = key;
-
-                    var type = info[key].type;
-                    if (type === 'Flag')
-                    {
-                        newCell3.innerHTML = "<input class=\"input-mini\" type=\"checkbox\" checked=\"true\" name=\"min_alt_reads\"/>";
-                    }
-                    else if ((type === 'Integer') || (type === 'Float'))
-                    {
-                        var defaultTextValue;
-                        if (type === 'Integer')
-                            defaultTextValue = '0';
-                        else
-                            defaultTextValue = '0.0';
-
-                        newCell3.innerHTML =
-                            "<table><tr>"
-                                + "<td><select style='width:50px;' tabindex='1'>"
-                                + "<option value='eq'>=</option>"
-                                + "<option value='gt'>&gt;</option>"
-                                + "<option value='gteq'>&gt;=</option>"
-                                + "<option value='lt'>&lt;</option>"
-                                + "<option value='lteq'>&lt;=</option>"
-                                + "</select></td>"
-                                + "<td><input class=\"input-mini\" type=\"text\" value='"+defaultTextValue+"' name=\"min_alt_reads\"/></td>"
-                                +"</tr></table>";
-                    }
-                    else
-                    {
-                        newCell3.innerHTML = "<input class=\"input-mini\" type=\"text\" name=\"min_alt_reads\"/>";
-                    }
-
+                    addRowToInfoFilterTable(key, info[key].type);
 
                     addRowToConfigColumnsTable(false, key, info[key].Description);
                 }
@@ -117,9 +74,61 @@ $( document ).ready(function()
 });
 
 /**
+ * Adds a row to the INFO Filter table.
+ *
+ * @param name The name of the INFO field.
+ * @param type The type of the INFO field.
+ */
+function addRowToInfoFilterTable(name, type)
+{
+    var infoFilterTable = document.getElementById('info_filter_table');
+
+    //insert a new row at the bottom
+    var newRow = infoFilterTable.insertRow(infoFilterTable.rows.length);
+
+    //create new cells
+    var newCell1 = newRow.insertCell(0);
+    var newCell2 = newRow.insertCell(1);
+    var newCell3 = newRow.insertCell(2);
+
+    //set the cell text
+    newCell1.innerHTML = "<button title='Add to your search' type=\"button\" class=\"btn-mini\"><i class=\"icon-plus\"></i></button>";
+    newCell2.innerHTML = name;
+
+    if (type === 'Flag')
+    {
+        newCell3.innerHTML = "<input class=\"input-mini\" type=\"checkbox\" checked=\"true\" name=\"min_alt_reads\"/>";
+    }
+    else if ((type === 'Integer') || (type === 'Float'))
+    {
+        var defaultTextValue;
+        if (type === 'Integer')
+            defaultTextValue = '0';
+        else
+            defaultTextValue = '0.0';
+
+        newCell3.innerHTML =
+            "<table><tr>"
+                + "<td><select style='width:50px;' tabindex='1'>"
+                + "<option value='eq'>=</option>"
+                + "<option value='gt'>&gt;</option>"
+                + "<option value='gteq'>&gt;=</option>"
+                + "<option value='lt'>&lt;</option>"
+                + "<option value='lteq'>&lt;=</option>"
+                + "</select></td>"
+                + "<td><input class=\"input-mini\" type=\"text\" value='"+defaultTextValue+"' name=\"min_alt_reads\"/></td>"
+                +"</tr></table>";
+    }
+    else
+    {
+        newCell3.innerHTML = "<input class=\"input-mini\" type=\"text\" name=\"min_alt_reads\"/>";
+    }
+}
+
+/**
  * Initializes the DataTable widget for variants.
  *
- * @param displayCols
+ * @param displayCols An array of strings, each representing the column title.
  */
 function initVariantTable(displayCols)
 {
@@ -149,7 +158,8 @@ function initVariantTable(displayCols)
 /**
  * Adds 0 or more rows to the Variant Table.
  *
- * @param variants
+ * @param variants An array of variant objects.  Each is rendered as a single DataTable row.
+ * @param displayCols An array of strings, each representing the column title.
  */
 function addRowsToVariantTable(variants, displayCols)
 {
@@ -189,6 +199,9 @@ function addRowsToVariantTable(variants, displayCols)
     $('#variant_table').dataTable().fnAddData(aaData);
 }
 
+/**
+ * Shows or hides Variant Table columns based on the Config Columns table checkboxes.
+ */
 function toggleDisplayColumns()
 {
     var oTable = $('#variant_table').dataTable();
