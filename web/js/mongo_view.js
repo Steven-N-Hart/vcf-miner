@@ -57,6 +57,9 @@ $( document ).ready(function()
         // setup the variant table
         initVariantTable(displayCols);
 
+        var pleaseWaitDiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h3>Running Query.  Please wait...</h3></div><div class="modal-body"></div></div>');
+        pleaseWaitDiv.modal();
+
         // populate the variant table
         $.ajax({
             url: "/ve/q/wf1c80c3721da2e536a53f16b4bc47aca7ef6e681/page/99", // TODO: hardcoded query
@@ -68,6 +71,10 @@ $( document ).ready(function()
             error: function(jqXHR, textStatus)
             {
                 alert( JSON.stringify(jqXHR) );
+            },
+            complete: function(jqXHR, textStatus)
+            {
+                pleaseWaitDiv.modal('hide');
             }
         });
     });
