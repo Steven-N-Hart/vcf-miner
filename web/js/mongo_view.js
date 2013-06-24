@@ -1,0 +1,245 @@
+/**
+ * Created with IntelliJ IDEA.
+ * User: duffp
+ * Date: 6/24/13
+ * Time: 9:21 AM
+ * To change this template use File | Settings | File Templates.
+ */
+
+$( document ).ready(function()
+{
+    // contains the column names to display
+    var displayCols = new Array();
+
+    // 1ST 7 VCF columns displayed by default
+    displayCols.push("CHROM");
+    displayCols.push("POS");
+    displayCols.push("ID");
+    displayCols.push("REF");
+    displayCols.push("ALT");
+    displayCols.push("QUAL");
+    displayCols.push("FILTER");
+
+    addRowToConfigColumnsTable(true, "CHROM",  "The chromosome.");
+    addRowToConfigColumnsTable(true, "POS",    "The reference position, with the 1st base having position 1.");
+    addRowToConfigColumnsTable(true, "ID",     "Semi-colon separated list of unique identifiers.");
+    addRowToConfigColumnsTable(true, "REF",    "The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).");
+    addRowToConfigColumnsTable(true, "ALT",    "Comma separated list of alternate non-reference alleles called on at least one of the samples");
+    addRowToConfigColumnsTable(true, "QUAL",   "Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).");
+    addRowToConfigColumnsTable(true, "FILTER", "PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.");
+
+    var infoFilterTable = document.getElementById('info_filter_table');
+    var columnTable = document.getElementById('column_table');
+    var metadataRequest = $.ajax({
+        url: "/ve/meta/workspace/wf1c80c3721da2e536a53f16b4bc47aca7ef6e681", // TODO: hardcoded workspace
+        dataType: "json",
+        success: function(json)
+        {
+            var info = json.INFO;
+            for (var key in info)
+            {
+                if (info.hasOwnProperty(key))
+                {
+                    displayCols.push(key);
+
+                    //insert a new row at the bottom
+                    var newRow = infoFilterTable.insertRow(infoFilterTable.rows.length);
+
+                    //create new cells
+                    var newCell1 = newRow.insertCell(0);
+                    var newCell2 = newRow.insertCell(1);
+                    var newCell3 = newRow.insertCell(2);
+
+                    //set the cell text
+                    newCell1.innerHTML = "<button title='Add to your search' type=\"button\" class=\"btn-mini\"><i class=\"icon-plus\"></i></button>";
+                    newCell2.innerHTML = key;
+
+                    var type = info[key].type;
+                    if (type === 'Flag')
+                    {
+                        newCell3.innerHTML = "<input class=\"input-mini\" type=\"checkbox\" checked=\"true\" name=\"min_alt_reads\"/>";
+                    }
+                    else if ((type === 'Integer') || (type === 'Float'))
+                    {
+                        var defaultTextValue;
+                        if (type === 'Integer')
+                            defaultTextValue = '0';
+                        else
+                            defaultTextValue = '0.0';
+
+                        newCell3.innerHTML =
+                            "<table><tr>"
+                                + "<td><select style='width:50px;' tabindex='1'>"
+                                + "<option value='eq'>=</option>"
+                                + "<option value='gt'>&gt;</option>"
+                                + "<option value='gteq'>&gt;=</option>"
+                                + "<option value='lt'>&lt;</option>"
+                                + "<option value='lteq'>&lt;=</option>"
+                                + "</select></td>"
+                                + "<td><input class=\"input-mini\" type=\"text\" value='"+defaultTextValue+"' name=\"min_alt_reads\"/></td>"
+                                +"</tr></table>";
+                    }
+                    else
+                    {
+                        newCell3.innerHTML = "<input class=\"input-mini\" type=\"text\" name=\"min_alt_reads\"/>";
+                    }
+
+
+                    addRowToConfigColumnsTable(false, key, info[key].Description);
+                }
+            }
+        },
+        error: function(jqXHR, textStatus)
+        {
+            alert( JSON.stringify(jqXHR) );
+        }
+    });
+
+    metadataRequest.done(function(msg)
+    {
+        // setup the variant table
+        initVariantTable(displayCols);
+
+        // populate the variant table
+        $.ajax({
+            url: "/ve/q/wf1c80c3721da2e536a53f16b4bc47aca7ef6e681/page/99", // TODO: hardcoded query
+            dataType: "json",
+            success: function(json)
+            {
+                addRowsToVariantTable(json.results, displayCols);
+            },
+            error: function(jqXHR, textStatus)
+            {
+                alert( JSON.stringify(jqXHR) );
+            }
+        });
+    });
+});
+
+/**
+ * Initializes the DataTable widget for variants.
+ *
+ * @param displayCols
+ */
+function initVariantTable(displayCols)
+{
+    var aoColumns = new Array();
+    for (var i = 0; i < displayCols.length; i++)
+    {
+        var isVisible = false;
+
+        // only 1st 7 columns visible by default
+        if (i <= 6)
+        {
+            isVisible = true;
+        }
+
+        aoColumns.push(
+            {
+                "sTitle":   displayCols[i],
+                "bVisible": isVisible
+            }
+        );
+    }
+    $('#variant_table').dataTable( {
+        "aoColumns": aoColumns
+    });
+}
+
+/**
+ * Adds 0 or more rows to the Variant Table.
+ *
+ * @param variants
+ */
+function addRowsToVariantTable(variants, displayCols)
+{
+    var aaData = new Array();
+
+    for (var i = 0; i < variants.length; i++)
+    {
+        var variant = variants[i];
+
+        var aaDataRow = new Array();
+        aaDataRow.push(variant['CHROM']);
+        aaDataRow.push(variant['POS']);
+        aaDataRow.push(variant['ID']);
+        aaDataRow.push(variant['REF']);
+        aaDataRow.push(variant['ALT']);
+        aaDataRow.push(variant['QUAL']);
+        aaDataRow.push(variant['FILTER']);
+        var variantInfo = variant['INFO'];
+        for (var disIdx=7; disIdx < displayCols.length; disIdx++)
+        {
+            var infoFieldName = displayCols[disIdx];
+
+            if(variantInfo[infoFieldName] !== undefined)
+            {
+                aaDataRow.push(variantInfo[infoFieldName]);
+            }
+            else
+            {
+                aaDataRow.push("");
+            }
+        }
+
+        aaData.push(aaDataRow);
+    }
+
+    // update DataTable
+    $('#variant_table').dataTable().fnAddData(aaData);
+}
+
+function toggleDisplayColumns()
+{
+    var oTable = $('#variant_table').dataTable();
+
+    for (i=0; i < displayCols.length; i++)
+    {
+        // lookup checkbox widget (toggle_[displayCol])
+        var checkbox = $('#toggle_'+displayCols[i]);
+        if (checkbox.is(':checked'))
+        {
+            oTable.fnSetColumnVis( i, true);
+        }
+        else
+        {
+            oTable.fnSetColumnVis( i, false);
+        }
+    }
+
+    // resize columns
+    oTable.width("100%");
+
+    // close dialog
+    $("#column_dialog_close").click();
+}
+
+/**
+ * Add a row to the Config Columns Table.
+ *
+ * @param table
+ * @param checked
+ * @param key
+ * @param description
+ */
+function addRowToConfigColumnsTable(checked, key, description)
+{
+    var table = document.getElementById('config_columns_table');
+
+    //insert a new row at the bottom
+    var newCTableRow = table.insertRow(table.rows.length);
+
+    //create new cells
+    var newCTableCell1 = newCTableRow.insertCell(0);
+    var newCTableCell2 = newCTableRow.insertCell(1);
+    var newCTableCell3 = newCTableRow.insertCell(2);
+
+    //set the cell text
+    if (checked)
+        newCTableCell1.innerHTML = "<input class=\"input-mini\" type=\"checkbox\" checked=\"true\" id=\"toggle_"+key+"\"/>";
+    else
+        newCTableCell1.innerHTML = "<input class=\"input-mini\" type=\"checkbox\" id=\"toggle_"+key+"\"/>";
+
+    newCTableCell2.innerHTML = key;
+    newCTableCell3.innerHTML = description;
+}
