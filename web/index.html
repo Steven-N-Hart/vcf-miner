@@ -21,21 +21,33 @@
     <script src="DataTables-1.9.4/media/js/DT_bootstrap.js"></script>
 
     <script type="text/javascript">
+        // contains the column names to display
+        var displayCols = new Array();
+
+        // 1ST 7 VCF columns displayed by default
+        displayCols.push("CHROM");
+        displayCols.push("POS");
+        displayCols.push("ID");
+        displayCols.push("REF");
+        displayCols.push("ALT");
+        displayCols.push("QUAL");
+        displayCols.push("FILTER");
+
         $( document ).ready(function()
         {
             var infoFilterTable = document.getElementById('info_filter_table');
-            $.ajax({
-                url: "/metadata",
+            var columnTable = document.getElementById('column_table');
+            var metadataRequest = $.ajax({
+                url: "/ve/meta/workspace/wf1c80c3721da2e536a53f16b4bc47aca7ef6e681", // TODO: hardcoded workspace
                 dataType: "json",
                 success: function(json)
                 {
-                    console.log(json);
                     var info = json['INFO'];
                     for (var key in info)
                     {
                         if (info.hasOwnProperty(key))
                         {
-                            console.log(info[key]);
+                            displayCols.push(key);
 
                             //insert a new row at the bottom
                             var newRow = infoFilterTable.insertRow(infoFilterTable.rows.length);
@@ -78,6 +90,19 @@
                             {
                                 newCell3.innerHTML = "<input class=\"input-mini\" type=\"text\" name=\"min_alt_reads\"/>";
                             }
+
+                            //insert a new row at the bottom
+                            var newCTableRow = columnTable.insertRow(columnTable.rows.length);
+
+                            //create new cells
+                            var newCTableCell1 = newCTableRow.insertCell(0);
+                            var newCTableCell2 = newCTableRow.insertCell(1);
+                            var newCTableCell3 = newCTableRow.insertCell(2);
+
+                            //set the cell text
+                            newCTableCell1.innerHTML = "<input class=\"input-mini\" type=\"checkbox\" checked=\"false\" id=\"toggle_"+key+"\"/>";
+                            newCTableCell2.innerHTML = key;
+                            newCTableCell3.innerHTML = info[key]['Description'];
                         }
                     }
                 },
@@ -87,8 +112,92 @@
                 }
             });
 
-//            var variantTable = document.getElementById('variant_table');
+            metadataRequest.done(function(msg)
+            {
+                // setup the variant table
+                var aoColumns = new Array();
+                for (var i = 0; i < displayCols.length; i++)
+                {
+                    var isVisible = false;
+
+                    // only 1st 7 columns visible by default
+                    if (i <= 6)
+                    {
+                        isVisible = true;
+                    }
+
+                    aoColumns.push(
+                        {
+                            "sTitle":   displayCols[i],
+                            "bVisible": isVisible
+                        }
+                    );
+                }
+                $('#variant_table').dataTable( {
+                    "aoColumns": aoColumns
+                });
+
+                // populate the variant table
+                $.ajax({
+                    url: "/ve/q/wf1c80c3721da2e536a53f16b4bc47aca7ef6e681/page/99", // TODO: hardcoded query
+                    dataType: "json",
+                    success: function(json)
+                    {
+                        var aaData = new Array();
+
+                        var variants = json['results'];
+                        for (var i = 0; i < variants.length; i++)
+                        {
+                            var variant = variants[i];
+
+                            var aaDataRow = new Array();
+                            aaDataRow.push(variant['CHROM']);
+                            aaDataRow.push(variant['POS']);
+                            aaDataRow.push(variant['ID']);
+                            aaDataRow.push(variant['REF']);
+                            aaDataRow.push(variant['ALT']);
+                            aaDataRow.push(variant['QUAL']);
+                            aaDataRow.push(variant['FILTER']);
+                            var variantInfo = variant['INFO'];
+                            for (var disIdx=7; disIdx < displayCols.length; disIdx++)
+                            {
+                                var infoFieldName = displayCols[disIdx];
+
+                                if(variantInfo[infoFieldName] !== undefined)
+                                {
+                                    aaDataRow.push(variantInfo[infoFieldName]);
+                                }
+                                else
+                                {
+                                    aaDataRow.push("");
+                                }
+                            }
+
+                            aaData.push(aaDataRow);
+                        }
+
+                        // update DataTable
+                        $('#variant_table').dataTable().fnAddData(aaData);
+                    },
+                    error: function(jqXHR, textStatus)
+                    {
+                        alert( JSON.stringify(jqXHR) );
+                    }
+                });
+            });
         });
+
+        function toggleDisplayColumns()
+        {
+            var oTable = $('#variant_table').dataTable();
+
+            for (i=0; i < displayCols.length; i++)
+            {
+                // lookup checkbox widget (toggle_[displayCol])
+                var checkbox = $('#toggle_'+displayCols[i]);
+                oTable.fnSetColumnVis( iCol, true);
+            }
+        }
     </script>
 
 </head>
@@ -209,66 +318,36 @@
         </div><!--/span-->
         <div class="span9">
             <div class="hero-unit">
-                <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="variant_table">
-                    <thead>
-                        <tr>
-                            <th>CHROM</th>
-                            <th>POS</th>
-                            <th>ID</th>
-                            <th>REF</th>
-                            <th>ALT</th>
-                            <th>QUAL</th>
-                            <th>FILTER</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>20</td>
-                            <td>14370</td>
-                            <td>rs6054257</td>
-                            <td>G</td>
-                            <td>A</td>
-                            <td>29</td>
-                            <td>PASS</td>
-                        </tr>
-                        <tr>
-                            <td>20</td>
-                            <td>17330</td>
-                            <td>.</td>
-                            <td>T</td>
-                            <td>A</td>
-                            <td>3</td>
-                            <td>q10</td>
-                        </tr>
-                        <tr>
-                            <td>20</td>
-                            <td>1110696</td>
-                            <td>rs6040355</td>
-                            <td>A</td>
-                            <td>G,T</td>
-                            <td>67</td>
-                            <td>PASS</td>
-                        </tr>
-                        <tr>
-                            <td>20</td>
-                            <td>1230237</td>
-                            <td>.</td>
-                            <td>T</td>
-                            <td>.</td>
-                            <td>47</td>
-                            <td>PASS</td>
-                        </tr>
-                        <tr>
-                            <td>20</td>
-                            <td>1234567</td>
-                            <td>microsat1</td>
-                            <td>GTC</td>
-                            <td>G,GTCT</td>
-                            <td>50</td>
-                            <td>PASS</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="row-fluid">
+                    <div class="span6">
+                    </div>
+                    <div class="span6">
+                        <div class="pull-right">
+                            <div id="buttonPlaceholder">
+                                <!-- Button to trigger modal -->
+                                <a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">Columns</a>
+
+                                <!-- Modal -->
+                                <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                        <h3 id="myModalLabel">Customize Columns</h3>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="column_table"></table>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                                        <button class="btn btn-primary" onclick="toggleDisplayColumns()">Save changes</button>
+                                    </div>
+                                </div>                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--<div id="buttonPlaceholder">-->
+                    <!--<button type="button" class="btn btn-primary">Columns</button>-->
+                <!--</div>-->
+                <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="variant_table"></table>
             </div>
         </div><!--/span-->
     </div><!--/row-->
