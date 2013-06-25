@@ -77,6 +77,34 @@ $( document ).ready(function()
                 pleaseWaitDiv.modal('hide');
             }
         });
+
+        var query = new Object();
+        query.numberResults = 100;
+        query.minAltReads   = 0.1;
+        query.minNumSample  = 0.2;
+        query.maxNumSample  = 0.3;
+        query.minAC         = 0.4;
+        query.maxAC         = 0.5;
+        query.minPHRED      = 0.6;
+
+        console.debug("Sending query to server:" + JSON.stringify(query));
+
+        var req = $.ajax({
+            type: "POST",
+            url: "/ve/eq",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(query),
+            dataType: "json",
+            success: function(json)
+            {
+                // TODO: implement this
+                //addRowsToVariantTable(json.results, displayCols);
+            },
+            error: function(jqXHR, textStatus)
+            {
+                alert( JSON.stringify(jqXHR) );
+            }
+        });
     });
 });
 
