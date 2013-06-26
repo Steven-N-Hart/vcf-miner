@@ -9,6 +9,30 @@
 // GLOBAL: contains the column names to display
 var displayCols = new Array();
 
+// MODEL
+var Filter = Backbone.Model.extend({
+    defaults: function()
+    {
+        return {
+            name:     "NA",
+            operator: "NA",
+            value:    "NA"
+        };
+    }
+});
+
+// COLLECTION of Filters
+var FilterList = Backbone.Collection.extend({
+    model: Filter,
+    localStorage: new Backbone.LocalStorage("todos-backbone"),
+    nextOrder: function() {
+        if (!this.length) return 1;
+        return this.last().get('order') + 1;
+    },
+    comparator: 'order'
+});
+var searchedFilterList = new FilterList;
+
 $( document ).ready(function()
 {
     // 1ST 7 VCF columns displayed by default
@@ -27,6 +51,8 @@ $( document ).ready(function()
     addRowToConfigColumnsTable(true, "ALT",    "Comma separated list of alternate non-reference alleles called on at least one of the samples");
     addRowToConfigColumnsTable(true, "QUAL",   "Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).");
     addRowToConfigColumnsTable(true, "FILTER", "PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.");
+
+    backboneSetup();
 
     var metadataRequest = $.ajax({
         url: "/ve/meta/workspace/wf1c80c3721da2e536a53f16b4bc47aca7ef6e681", // TODO: hardcoded workspace
@@ -107,6 +133,82 @@ $( document ).ready(function()
         });
     });
 });
+
+function addToQuery(filter)
+{
+    console.debug("addToQuery called");
+    searchedFilterList.add(
+        [filter]
+    );
+}
+
+function backboneSetup()
+{
+
+
+    // VIEW
+    var SearchedFilterView = Backbone.View.extend({
+        tagName:  "tr",
+
+        template: _.template($('#searched-filter-template').html()),
+
+        initialize: function() {
+            this.listenTo(this.model, 'change', this.render);
+            this.listenTo(this.model, 'destroy', this.remove);
+        },
+
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            return this;
+        },
+
+        clear: function() {
+            this.model.destroy();
+        }
+    });
+
+    var SearchedView = Backbone.View.extend({
+        el: $("#searched_view"),
+
+        initialize: function() {
+
+            this.listenTo(searchedFilterList, 'add', this.addOne);
+//            this.listenTo(Todos, 'reset', this.addAll);
+//            this.listenTo(Todos, 'all', this.render);
+
+            searchedFilterList.fetch();
+        },
+
+        render: function() {
+            // remove all rows from table except for header header
+            this.$('tr:has(td)').remove();
+
+            // loop through filter collection
+            _.each(searchedFilterList.models, function(filter)
+            {
+                // each filter becomes a row in the table
+                var view = new SearchedFilterView({model: filter});
+                this.$("#searched_table").append(view.render().el);
+            });
+        },
+
+        addOne: function(filter) {
+            this.render();
+        }
+    });
+
+    var searchedView = new SearchedView();
+
+    searchedFilterList.add(
+        [{name: "foo", operator: "=", value: "bar"}]
+    );
+    searchedFilterList.add(
+        [{name: "abc", operator: "=", value: "def"}]
+    );
+    searchedFilterList.add(
+        [{name: "num", operator: ">", value: "3"}]
+    );
+}
 
 /**
  * Adds a row to the INFO Filter table.
