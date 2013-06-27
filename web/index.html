@@ -34,14 +34,14 @@
 
     <!-- underscorejs templates -->
     <script id="searched-filter-template" type="text/template">
-        <span class="label"><td><%= name %></td></span>
-        <span class="label"><td><%= operator %></td></span>
-        <span class="label"><td><%= value %></td></span>
-        <td><span class="badge badge-info"><%= numMatches %></span></td>
+        <span class="label"><td><%=name%></td></span>
+        <span class="label"><td><%=operator%></td></span>
+        <span class="label"><td><%=value%></td></span>
+        <td><span class="badge badge-info"><%=numMatches%></span></td>
     </script>
     <script id="pallet-filter-template" type="text/template">
-        <td><label for="<%=id%>_add_button" class="checkbox"><input id="<%=id%>_add_button" class="input-mini" type="checkbox"/><%- name %></label></td>
-        <td><input id="<%=id%>_value_field" class="input-mini" type="text" value="<%= value %>"></td>
+        <td><label for="<%=id%>_add_button" class="checkbox"><input id="<%=id%>_add_button" type="checkbox"/><%=name%></label></td>
+        <td><input id="<%=id%>_value_field" class="input-mini" type="text" value="<%=value%>"></td>
     </script>
     <script id="info-message-template" type="text/template">
         <div class="alert alert-info">

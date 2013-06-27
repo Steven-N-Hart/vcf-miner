@@ -218,7 +218,6 @@ function backboneSetup()
 
         initialize: function() {
             this.listenTo(this.model, 'change', this.render);
-            this.listenTo(this.model, 'destroy', this.remove);
         },
 
         render: function() {
@@ -281,8 +280,6 @@ function backboneSetup()
         template: _.template($('#pallet-filter-template').html()),
 
         initialize: function() {
-            this.listenTo(this.model, 'change', this.render);
-            this.listenTo(this.model, 'destroy', this.remove);
         },
 
         render: function() {
@@ -296,15 +293,11 @@ function backboneSetup()
                 var textfieldSelector =  "#" + filter.get("id") + "_value_field";
                 if (checkbox.is(':checked'))
                 {
-                    // force it to be checked
-                    checkbox.attr("checked", "checked");
-
                     // use 'live query' plugin to select dynamically added textfield
                     $(textfieldSelector).livequery(
                         function()
                         {
                             var textfield = this;
-
                             textfield.disabled = true;
 
                             // update filter's value based on textfield value
@@ -323,13 +316,14 @@ function backboneSetup()
                         {
                             var textfield = this;
 
-                            textfield.disabled =false;
+                            console.debug("checkbox unchecked");
+
+                            textfield.disabled = false;
 
                             searchedFilterList.remove(filter);
                         }
                     );
                 }
-
             });
 
             return this;
