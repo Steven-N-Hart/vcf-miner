@@ -6,6 +6,11 @@
  * To change this template use File | Settings | File Templates.
  */
 
+// GLOBAL: templates for showing messages to user in designated message area
+var INFO_TEMPLATE;
+var WARNING_TEMPLATE;
+var ERROR_TEMPLATE;
+
 // GLOBAL: contains the column names to display
 var displayCols = new Array();
 
@@ -49,6 +54,8 @@ var palletFilterList = new FilterList;
 
 $( document ).ready(function()
 {
+    initTemplates();
+
     // 1ST 7 VCF columns displayed by default
     displayCols.push("CHROM");
     displayCols.push("POS");
@@ -88,7 +95,7 @@ $( document ).ready(function()
         },
         error: function(jqXHR, textStatus)
         {
-            alert( JSON.stringify(jqXHR) );
+            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
         }
     });
 
@@ -112,7 +119,7 @@ $( document ).ready(function()
             },
             error: function(jqXHR, textStatus)
             {
-                alert( JSON.stringify(jqXHR) );
+                $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
             },
             complete: function(jqXHR, textStatus)
             {
@@ -121,6 +128,16 @@ $( document ).ready(function()
         });
     });
 });
+
+/**
+ * Initializes the underscorejs templates.
+ */
+function initTemplates()
+{
+    INFO_TEMPLATE = $("#warning-message-template").html();
+    WARNING_TEMPLATE = $("#warning-message-template").html();
+    ERROR_TEMPLATE   = $("#error-message-template").html();
+}
 
 /**
  * Builds a query object.
@@ -276,28 +293,38 @@ function backboneSetup()
             $('body').on('click', selector, function()
             {
                 var checkbox = $(this);
+                var textfieldSelector =  "#" + filter.get("id") + "_value_field";
                 if (checkbox.is(':checked'))
                 {
                     // use 'live query' plugin to select dynamically added textfield
-                    $("#" + filter.get("id") + "_value_field").livequery(
+                    $(textfieldSelector).livequery(
                         function()
                         {
                             var textfield = this;
+
+                            textfield.disabled = true;
 
                             // update filter's value based on textfield value
                             filter.set("value", textfield.value);
 
                             // update query with modified filter
-                            console.debug("adding filter to searchedFilterList");
-                            searchedFilterList.add(
-                                [filter]
-                            );
+                            searchedFilterList.add([filter]);
                         }
                     );
                 }
                 else
                 {
-                    searchedFilterList.remove(filter);
+                    // use 'live query' plugin to select dynamically added textfield
+                    $(textfieldSelector).livequery(
+                        function()
+                        {
+                            var textfield = this;
+
+                            textfield.disabled =false;
+
+                            searchedFilterList.remove(filter);
+                        }
+                    );
                 }
 
             });

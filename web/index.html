@@ -12,6 +12,13 @@
     <!-- workaround for navbar overlapping site by 40 pixels -->
     <style>
         body { padding-top: 40px; }
+
+        body .wide-modal {
+            /* new custom width */
+            width: 1024px;
+            /* must be half of the width, minus scrollbar on the left (30px) */
+            margin-left: -512px;
+        }
     </style>
 
     <script src="jquery-ui-1.10.3/jquery-1.9.1.js"></script>
@@ -25,15 +32,36 @@
 
     <script src="js/mongo_view.js" type="text/javascript"></script>
 
+    <!-- underscorejs templates -->
     <script id="searched-filter-template" type="text/template">
-\       <td><%= name %></td>
-        <td><%= operator %></td>
-        <td><%= value %></td>
-        <td><%= numMatches %></td>
+        <span class="label"><td><%= name %></td></span>
+        <span class="label"><td><%= operator %></td></span>
+        <span class="label"><td><%= value %></td></span>
+        <td><span class="badge badge-info"><%= numMatches %></span></td>
     </script>
     <script id="pallet-filter-template" type="text/template">
         <td><label for="<%=id%>_add_button" class="checkbox"><input id="<%=id%>_add_button" class="input-mini" type="checkbox"/><%- name %></label></td>
         <td><input id="<%=id%>_value_field" class="input-mini" type="text" value="<%= value %>"></td>
+    </script>
+    <script id="info-message-template" type="text/template">
+        <div class="alert alert-info">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <%=message%>
+        </div>
+    </script>
+    <script id="warning-message-template" type="text/template">
+        <div class="alert alert-block">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Warning!</h4>
+            <%=message%>
+        </div>
+    </script>
+    <script id="error-message-template" type="text/template">
+        <div class="alert alert-error">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h4>Error</h4>
+            <%=message%>
+        </div>
     </script>
 </head>
 <body>
@@ -51,6 +79,11 @@
     </div>
 </div>
 <div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span12" id="message_area">
+            <!-- populated by underscorejs template as needed -->
+        </div>
+    </div>
     <div class="row-fluid">
         <div class="span3">
             <div class="well sidebar-nav">
@@ -114,7 +147,7 @@
                                 <a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">Columns</a>
 
                                 <!-- Modal -->
-                                <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div id="myModal" class="modal hide fade wide-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                     <div class="modal-header">
                                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                         <h3 id="myModalLabel">Customize Columns</h3>
@@ -134,7 +167,6 @@
             </div>
         </div><!--/span-->
     </div><!--/row-->
-
     <hr>
 </div>
 </body>
