@@ -16,10 +16,19 @@ var Filter = Backbone.Model.extend({
         return {
             name:     "NA",
             operator: "NA",
-            value:    "NA"
+            value:    "NA",
+            id: guid()
         };
     }
 });
+
+// specific filters
+var FILTER_MIN_ALT_READS   = {name: 'Min Alt Reads', operator: '=', value: '0'};
+var FILTER_MIN_NUM_SAMPLES = {name: 'Min # Samples', operator: '=', value: '0'};
+var FILTER_MAX_NUM_SAMPLES = {name: 'Max # Samples', operator: '=', value: '0'};
+var FILTER_MIN_AC          = {name: 'Min AC',        operator: '=', value: '0'};
+var FILTER_MAX_AC          = {name: 'Max AC',        operator: '=', value: '0'};
+var FILTER_MIN_PHRED       = {name: 'Min Phred',     operator: '=', value: '0'};
 
 // COLLECTION of Filters
 var FilterList = Backbone.Collection.extend({
@@ -31,7 +40,9 @@ var FilterList = Backbone.Collection.extend({
     },
     comparator: 'order'
 });
+
 var searchedFilterList = new FilterList;
+var palletFilterList = new FilterList;
 
 $( document ).ready(function()
 {
@@ -103,49 +114,88 @@ $( document ).ready(function()
                 pleaseWaitDiv.modal('hide');
             }
         });
-
-        var query = new Object();
-        query.numberResults = 100;
-        query.minAltReads   = 0.1;
-        query.minNumSample  = 0.2;
-        query.maxNumSample  = 0.3;
-        query.minAC         = 0.4;
-        query.maxAC         = 0.5;
-        query.minPHRED      = 0.6;
-
-        console.debug("Sending query to server:" + JSON.stringify(query));
-
-        var req = $.ajax({
-            type: "POST",
-            url: "/ve/eq",
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify(query),
-            dataType: "json",
-            success: function(json)
-            {
-                // TODO: implement this
-                //addRowsToVariantTable(json.results, displayCols);
-            },
-            error: function(jqXHR, textStatus)
-            {
-                alert( JSON.stringify(jqXHR) );
-            }
-        });
     });
 });
 
 function addToQuery(filter)
 {
-    console.debug("addToQuery called");
+    console.debug("addToQuery() called");
     searchedFilterList.add(
         [filter]
     );
 }
 
+/**
+ * Builds a query object.
+ *
+ * @param filterList Backbone collection of filter models.
+ * @returns {Object} Query object
+ */
+function buildQuery(filterList)
+{
+    // build query from FILTER model
+    var query = new Object();
+    query.numberResults = 100;
+
+    // loop through filter collection
+    _.each(filterList.models, function(filter)
+    {
+        // assign filter value to correct query object attribute
+        switch (filter.get("name"))
+        {
+            case FILTER_MIN_ALT_READS.name:
+                query.minAltReads = filter.get("value");
+                break;
+            case FILTER_MIN_NUM_SAMPLES.name:
+                query.minNumSample = filter.get("value");
+                break;
+            case FILTER_MAX_NUM_SAMPLES.name:
+                query.maxNumSample = filter.get("value");
+                break;
+            case FILTER_MIN_AC.name:
+                query.minAC = filter.get("value");
+                break;
+            case FILTER_MAX_AC.name:
+                query.maxAC = filter.get("value");
+                break;
+            case FILTER_MIN_PHRED.name:
+                query.minPHED = filter.get("value");
+                break;
+        }
+    });
+
+    return query;
+}
+
+/**
+ * Sends query to server via AJAX.
+ *
+ * @param query
+ */
+function sendQuery(query)
+{
+    console.debug("Sending query to server:" + JSON.stringify(query));
+
+    var req = $.ajax({
+        type: "POST",
+        url: "/ve/eq",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(query),
+        dataType: "json",
+        success: function(json)
+        {
+            // TODO: implement this
+            //addRowsToVariantTable(json.results, displayCols);
+        },
+        error: function(jqXHR, textStatus)
+        {
+            alert( JSON.stringify(jqXHR) );
+        }
+    });
+}
+
 function backboneSetup()
 {
-
-
     // VIEW
     var SearchedFilterView = Backbone.View.extend({
         tagName:  "tr",
@@ -173,14 +223,12 @@ function backboneSetup()
         initialize: function() {
 
             this.listenTo(searchedFilterList, 'add', this.addOne);
-//            this.listenTo(Todos, 'reset', this.addAll);
-//            this.listenTo(Todos, 'all', this.render);
 
             searchedFilterList.fetch();
         },
 
         render: function() {
-            // remove all rows from table except for header header
+            // remove all rows from table except for header
             this.$('tr:has(td)').remove();
 
             // loop through filter collection
@@ -193,21 +241,93 @@ function backboneSetup()
         },
 
         addOne: function(filter) {
+            // send query request to server
+            var query = buildQuery(searchedFilterList);
+            sendQuery(query);
+
             this.render();
         }
     });
 
     var searchedView = new SearchedView();
 
-    searchedFilterList.add(
-        [{name: "foo", operator: "=", value: "bar"}]
-    );
-    searchedFilterList.add(
-        [{name: "abc", operator: "=", value: "def"}]
-    );
-    searchedFilterList.add(
-        [{name: "num", operator: ">", value: "3"}]
-    );
+    // VIEW
+    var PalletFilterView = Backbone.View.extend({
+        tagName:  "tr",
+
+        template: _.template($('#pallet-filter-template').html()),
+
+        initialize: function() {
+            this.listenTo(this.model, 'change', this.render);
+            this.listenTo(this.model, 'destroy', this.remove);
+        },
+
+        render: function() {
+            var filter = this.model;
+            this.$el.html(this.template(filter.toJSON()));
+
+            var selector = '#' + filter.get("id") + "_add_button";
+            $('body').on('click', selector, function()
+            {
+                // use 'live query' plugin to select dynamically added textfield
+                $("#" + filter.get("id") + "_value_field").livequery(
+                    function()
+                    {
+                        var textfield = this;
+
+                        // update filter's value based on textfield value
+                        filter.set("value", textfield.value);
+
+                        // update query with modified filter
+                        addToQuery(filter);
+                    }
+                );
+            });
+
+            return this;
+        },
+
+        clear: function() {
+            this.model.destroy();
+        }
+    });
+
+    var PalletView = Backbone.View.extend({
+        el: $("#pallet_view"),
+
+        initialize: function() {
+
+            this.listenTo(palletFilterList, 'add', this.addOne);
+
+            palletFilterList.fetch();
+        },
+
+        render: function() {
+            // TODO: understand why this can't be in global space
+            palletFilterList.add([
+                FILTER_MIN_ALT_READS,
+                FILTER_MIN_NUM_SAMPLES,
+                FILTER_MAX_NUM_SAMPLES,
+                FILTER_MIN_AC,
+                FILTER_MAX_AC,
+                FILTER_MIN_PHRED
+            ]);
+
+            // loop through filter collection
+            _.each(palletFilterList.models, function(filter)
+            {
+                // each filter becomes a row in the table
+                var view = new PalletFilterView({model: filter});
+                this.$("#sample_filter_table").append(view.render().el);
+            });
+        },
+
+        addOne: function(filter) {
+        }
+    });
+
+    var palletView = new PalletView();
+    palletView.render();
 }
 
 /**
@@ -392,4 +512,15 @@ function addRowToConfigColumnsTable(checked, key, description)
 
     newCTableCell2.innerHTML = key;
     newCTableCell3.innerHTML = description;
+}
+
+function S4() {
+    return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+}
+/**
+ * Generates a GUID.
+ * @returns {string}
+ */
+function guid() {
+    return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
 }
