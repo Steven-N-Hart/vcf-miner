@@ -203,7 +203,7 @@ function sendQuery(query)
         },
         error: function(jqXHR, textStatus)
         {
-            alert( JSON.stringify(jqXHR) );
+            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
         }
     });
 }
@@ -296,6 +296,9 @@ function backboneSetup()
                 var textfieldSelector =  "#" + filter.get("id") + "_value_field";
                 if (checkbox.is(':checked'))
                 {
+                    // force it to be checked
+                    checkbox.attr("checked", "checked");
+
                     // use 'live query' plugin to select dynamically added textfield
                     $(textfieldSelector).livequery(
                         function()
