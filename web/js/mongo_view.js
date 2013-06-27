@@ -17,10 +17,13 @@ var Filter = Backbone.Model.extend({
             name:     "NA",
             operator: "NA",
             value:    "NA",
+            numMatches: 0,
             id: guid()
         };
     }
 });
+
+var FILTER_NONE   = {name: 'none', operator: '', value: ''};
 
 // specific filters
 var FILTER_MIN_ALT_READS   = {name: 'Min Alt Reads', operator: '=', value: '0'};
@@ -103,6 +106,8 @@ $( document ).ready(function()
             dataType: "json",
             success: function(json)
             {
+                FILTER_NONE.numMatches=json.results.length;
+                searchedFilterList.add(FILTER_NONE);
                 addRowsToVariantTable(json.results, displayCols);
             },
             error: function(jqXHR, textStatus)
@@ -116,14 +121,6 @@ $( document ).ready(function()
         });
     });
 });
-
-function addToQuery(filter)
-{
-    console.debug("addToQuery() called");
-    searchedFilterList.add(
-        [filter]
-    );
-}
 
 /**
  * Builds a query object.
@@ -222,7 +219,8 @@ function backboneSetup()
 
         initialize: function() {
 
-            this.listenTo(searchedFilterList, 'add', this.addOne);
+            this.listenTo(searchedFilterList, 'add',    this.addOne);
+            this.listenTo(searchedFilterList, 'remove', this.removeOne);
 
             searchedFilterList.fetch();
         },
@@ -241,6 +239,14 @@ function backboneSetup()
         },
 
         addOne: function(filter) {
+            // send query request to server
+            var query = buildQuery(searchedFilterList);
+            sendQuery(query);
+
+            this.render();
+        },
+
+        removeOne: function(filter) {
             // send query request to server
             var query = buildQuery(searchedFilterList);
             sendQuery(query);
@@ -269,19 +275,31 @@ function backboneSetup()
             var selector = '#' + filter.get("id") + "_add_button";
             $('body').on('click', selector, function()
             {
-                // use 'live query' plugin to select dynamically added textfield
-                $("#" + filter.get("id") + "_value_field").livequery(
-                    function()
-                    {
-                        var textfield = this;
+                var checkbox = $(this);
+                if (checkbox.is(':checked'))
+                {
+                    // use 'live query' plugin to select dynamically added textfield
+                    $("#" + filter.get("id") + "_value_field").livequery(
+                        function()
+                        {
+                            var textfield = this;
 
-                        // update filter's value based on textfield value
-                        filter.set("value", textfield.value);
+                            // update filter's value based on textfield value
+                            filter.set("value", textfield.value);
 
-                        // update query with modified filter
-                        addToQuery(filter);
-                    }
-                );
+                            // update query with modified filter
+                            console.debug("adding filter to searchedFilterList");
+                            searchedFilterList.add(
+                                [filter]
+                            );
+                        }
+                    );
+                }
+                else
+                {
+                    searchedFilterList.remove(filter);
+                }
+
             });
 
             return this;
@@ -303,6 +321,9 @@ function backboneSetup()
         },
 
         render: function() {
+
+            console.debug("PalletView.render() called");
+
             // TODO: understand why this can't be in global space
             palletFilterList.add([
                 FILTER_MIN_ALT_READS,
