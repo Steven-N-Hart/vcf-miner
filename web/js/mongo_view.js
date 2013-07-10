@@ -15,6 +15,32 @@ var ERROR_TEMPLATE;
 var displayCols = new Array();
 
 // MODEL
+var Workspace = Backbone.Model.extend({
+    defaults: function()
+    {
+        return {
+            key:     "NA",
+            alias:   "NA",
+            id: guid()
+        };
+    }
+});
+
+// COLLECTION of Workspaces
+var WorkspaceList = Backbone.Collection.extend({
+    model: Workspace,
+    localStorage: new Backbone.LocalStorage("todos-backbone"),
+    nextOrder: function() {
+        if (!this.length) return 1;
+        return this.last().get('order') + 1;
+    },
+    comparator: 'order'
+});
+
+var workspaceList = new WorkspaceList;
+var currentWorkspace = new WorkspaceList;
+
+// MODEL
 var Filter = Backbone.Model.extend({
     defaults: function()
     {
@@ -54,6 +80,35 @@ var palletFilterList = new FilterList;
 
 $( document ).ready(function()
 {
+    // get workspace information from server
+    var workspaceRequest = $.ajax({
+        url: "/mongo_svr/ve/q/owner/list_workspaces/steve",
+        dataType: "json",
+        success: function(json)
+        {
+            // each workspace object has an increment num as the attr name
+            for (var attr in json) {
+                if (json.hasOwnProperty(attr)) {
+                    // translate into Workspace model
+                    var workspace = new Workspace();
+                    workspace.set("key", json[attr].key);
+                    workspace.set("alias", json[attr].alias);
+                    workspaceList.add(workspace);
+
+                    // by default, the 1st workspace is selected
+                    if (currentWorkspace.length == 0)
+                    {
+                        currentWorkspace.add(workspace);
+                    }
+                }
+            }
+        },
+        error: function(jqXHR, textStatus)
+        {
+            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+        }
+    });
+
     initTemplates();
 
     // 1ST 7 VCF columns displayed by default
@@ -75,58 +130,8 @@ $( document ).ready(function()
 
     backboneSetup();
 
-    var metadataRequest = $.ajax({
-        url: "/ve/meta/workspace/wf1c80c3721da2e536a53f16b4bc47aca7ef6e681", // TODO: hardcoded workspace
-        dataType: "json",
-        success: function(json)
-        {
-            var info = json.INFO;
-            for (var key in info)
-            {
-                if (info.hasOwnProperty(key))
-                {
-                    displayCols.push(key);
-
-                    addRowToInfoFilterTable(key, info[key].type);
-
-                    addRowToConfigColumnsTable(false, key, info[key].Description);
-                }
-            }
-        },
-        error: function(jqXHR, textStatus)
-        {
-            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-        }
-    });
-
-    metadataRequest.done(function(msg)
-    {
-        // setup the variant table
-        initVariantTable(displayCols);
-
-        var pleaseWaitDiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h3>Running Query.  Please wait...</h3></div><div class="modal-body"></div></div>');
-        pleaseWaitDiv.modal();
-
-        // populate the variant table
-        $.ajax({
-            url: "/ve/q/wf1c80c3721da2e536a53f16b4bc47aca7ef6e681/page/99", // TODO: hardcoded query
-            dataType: "json",
-            success: function(json)
-            {
-                FILTER_NONE.numMatches=json.results.length;
-                searchedFilterList.add(FILTER_NONE);
-                addRowsToVariantTable(json.results, displayCols);
-            },
-            error: function(jqXHR, textStatus)
-            {
-                $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-            },
-            complete: function(jqXHR, textStatus)
-            {
-                pleaseWaitDiv.modal('hide');
-            }
-        });
-    });
+    // setup the variant table
+    initVariantTable(displayCols);
 });
 
 /**
@@ -143,13 +148,17 @@ function initTemplates()
  * Builds a query object.
  *
  * @param filterList Backbone collection of filter models.
+ * @param workspace
  * @returns {Object} Query object
  */
-function buildQuery(filterList)
+function buildQuery(filterList, workspace)
 {
     // build query from FILTER model
     var query = new Object();
     query.numberResults = 100;
+
+    // TODO: hardcoded workspace
+    query.workspace = workspace.get("key");
 
     // loop through filter collection
     _.each(filterList.models, function(filter)
@@ -188,28 +197,102 @@ function buildQuery(filterList)
  */
 function sendQuery(query)
 {
+    var pleaseWaitDiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h3>Running Query.  Please wait...</h3></div><div class="modal-body"></div></div>');
+    pleaseWaitDiv.modal();
+
     console.debug("Sending query to server:" + JSON.stringify(query));
+
+//    contentType: "application/json; charset=utf-8",
 
     var req = $.ajax({
         type: "POST",
-        url: "/ve/eq",
-        contentType: "application/json; charset=utf-8",
+        url: "/mongo_svr/ve/eq",
+        contentType: "application/json",
         data: JSON.stringify(query),
         dataType: "json",
         success: function(json)
         {
-            // TODO: implement this
-            //addRowsToVariantTable(json.results, displayCols);
+            // populate the variant table
+            addRowsToVariantTable(json.results, displayCols);
+
+            // update count on Filter
+            // loop through filter collection
+            var lastFilter = _.last(searchedFilterList.models);
+            lastFilter.set("numMatches", json.totalResults);
+//            _.each(searchedFilterList.models, function(filter)
+//            {
+//                filter.set("numMatches", json.totalResults);
+//            });
         },
         error: function(jqXHR, textStatus)
         {
             $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+        },
+        complete: function(jqXHR, textStatus)
+        {
+            pleaseWaitDiv.modal('hide');
         }
     });
 }
 
 function backboneSetup()
 {
+    var VcfFileView = Backbone.View.extend({
+        el: $("#vcf_file_dropdown"),
+
+        initialize: function() {
+
+            this.listenTo(workspaceList, 'add',    this.addOne);
+
+            workspaceList.fetch();
+        },
+
+        render: function() {
+            var dropdownList = this.$("ul");
+
+            // clear out list
+            dropdownList.empty();
+
+            // loop through collection
+            _.each(workspaceList.models, function(workspace)
+            {
+                // id of anchor in dropdown is the workspace key
+                dropdownList.append("<li><a href='#' id='"+workspace.get("key")+"'>"+workspace.get("alias")+"</a></li>");
+
+                // setup event handling for anchor clicks
+                jQuery("#"+workspace.get("key")).click(function(e)
+                {
+                    currentWorkspace.pop(); // remove old
+                    currentWorkspace.add(workspace);
+                    e.preventDefault();
+                });
+            });
+        },
+
+        addOne: function(workspace) {
+            this.render();
+        }
+    });
+    var vcfFileView = new VcfFileView();
+    vcfFileView.render();
+
+    var WorkspaceView = Backbone.View.extend({
+
+        initialize: function() {
+            this.listenTo(currentWorkspace, 'add',    this.workspaceChange);
+            currentWorkspace.fetch();
+        },
+
+        render: function() {
+        },
+
+        workspaceChange: function() {
+            console.debug("Workspace changed " + currentWorkspace.first().get("alias") );
+            setWorkspace(currentWorkspace.first());
+        }
+    });
+    var workspaceView = new WorkspaceView();
+
     // VIEW
     var SearchedFilterView = Backbone.View.extend({
         tagName:  "tr",
@@ -256,7 +339,7 @@ function backboneSetup()
 
         addOne: function(filter) {
             // send query request to server
-            var query = buildQuery(searchedFilterList);
+            var query = buildQuery(searchedFilterList, currentWorkspace.first());
             sendQuery(query);
 
             this.render();
@@ -264,7 +347,7 @@ function backboneSetup()
 
         removeOne: function(filter) {
             // send query request to server
-            var query = buildQuery(searchedFilterList);
+            var query = buildQuery(searchedFilterList, currentWorkspace.first());
             sendQuery(query);
 
             this.render();
@@ -315,11 +398,12 @@ function backboneSetup()
                         function()
                         {
                             var textfield = this;
-
-                            console.debug("checkbox unchecked");
-
                             textfield.disabled = false;
 
+                            var filterIdx = searchedFilterList.indexOf(filter);
+                            console.debug("Filter index: " + filterIdx);
+
+                            console.debug("Removing filter with id: " + filter.get("id"));
                             searchedFilterList.remove(filter);
                         }
                     );
@@ -498,6 +582,7 @@ function addRowsToVariantTable(variants, displayCols)
     }
 
     // update DataTable
+    $('#variant_table').dataTable().fnClearTable();
     $('#variant_table').dataTable().fnAddData(aaData);
 }
 
@@ -568,4 +653,45 @@ function S4() {
  */
 function guid() {
     return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+}
+
+function setWorkspace(workspace)
+{
+    var dropdownAnchor = $("#vcf_file_dropdown_anchor");
+    dropdownAnchor.html(workspace.get("alias")+"<b class='caret'></b>");
+
+    var metadataRequest = $.ajax({
+        url: "/mongo_svr/ve/meta/workspace/" + workspace.get("key"),
+        dataType: "json",
+        success: function(json)
+        {
+            // clear tables
+//            var table = document.getElementById('config_columns_table');
+//            table.remove("td");
+
+            var info = json.INFO;
+            for (var key in info)
+            {
+                if (info.hasOwnProperty(key))
+                {
+                    displayCols.push(key);
+
+                    addRowToInfoFilterTable(key, info[key].type);
+
+                    addRowToConfigColumnsTable(false, key, info[key].Description);
+                }
+            }
+        },
+        error: function(jqXHR, textStatus)
+        {
+            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+        }
+    });
+
+    metadataRequest.done(function(msg)
+    {
+        // backbone MVC will send query request based on adding this filter
+        searchedFilterList.reset();
+        searchedFilterList.add(FILTER_NONE);
+    });
 }
