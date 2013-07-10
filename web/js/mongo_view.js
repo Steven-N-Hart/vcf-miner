@@ -111,27 +111,7 @@ $( document ).ready(function()
 
     initTemplates();
 
-    // 1ST 7 VCF columns displayed by default
-    displayCols.push("CHROM");
-    displayCols.push("POS");
-    displayCols.push("ID");
-    displayCols.push("REF");
-    displayCols.push("ALT");
-    displayCols.push("QUAL");
-    displayCols.push("FILTER");
-
-    addRowToConfigColumnsTable(true, "CHROM",  "The chromosome.");
-    addRowToConfigColumnsTable(true, "POS",    "The reference position, with the 1st base having position 1.");
-    addRowToConfigColumnsTable(true, "ID",     "Semi-colon separated list of unique identifiers.");
-    addRowToConfigColumnsTable(true, "REF",    "The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).");
-    addRowToConfigColumnsTable(true, "ALT",    "Comma separated list of alternate non-reference alleles called on at least one of the samples");
-    addRowToConfigColumnsTable(true, "QUAL",   "Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).");
-    addRowToConfigColumnsTable(true, "FILTER", "PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.");
-
     backboneSetup();
-
-    // setup the variant table
-    initVariantTable(displayCols);
 });
 
 /**
@@ -182,7 +162,7 @@ function buildQuery(filterList, workspace)
                 query.maxAC = filter.get("value");
                 break;
             case FILTER_MIN_PHRED.name:
-                query.minPHED = filter.get("value");
+                query.minPHRED = filter.get("value");
                 break;
         }
     });
@@ -519,6 +499,39 @@ function addRowToInfoFilterTable(name, type)
 function initVariantTable(displayCols)
 {
     var aoColumns = new Array();
+//    for (var i = 0; i < displayCols.length; i++)
+//    {
+//        var isVisible = false;
+//
+//        // only 1st 7 columns visible by default
+//        if (i <= 6)
+//        {
+//            isVisible = true;
+//        }
+//
+//        aoColumns.push(
+//            {
+//                "sTitle":   displayCols[i],
+//                "bVisible": isVisible
+//            }
+//        );
+//    }
+//    $('#variant_table').dataTable( {
+//        "aoColumns": aoColumns,
+//        "bDestroy": true
+//    });
+
+    for (var i = 0; i < displayCols.length; i++)
+    {
+        aoColumns.push({ "sTitle": displayCols[i] });
+    }
+
+    $('#variant_table').dataTable( {
+        "aoColumns": aoColumns,
+        "bDestroy": true
+    });
+
+    // set visibility
     for (var i = 0; i < displayCols.length; i++)
     {
         var isVisible = false;
@@ -529,16 +542,9 @@ function initVariantTable(displayCols)
             isVisible = true;
         }
 
-        aoColumns.push(
-            {
-                "sTitle":   displayCols[i],
-                "bVisible": isVisible
-            }
-        );
+        $('#variant_table').dataTable().fnSetColumnVis(i, isVisible);
     }
-    $('#variant_table').dataTable( {
-        "aoColumns": aoColumns
-    });
+    $('#variant_table').dataTable().fnDraw();
 }
 
 /**
@@ -584,6 +590,10 @@ function addRowsToVariantTable(variants, displayCols)
     // update DataTable
     $('#variant_table').dataTable().fnClearTable();
     $('#variant_table').dataTable().fnAddData(aaData);
+
+    // resize columns
+    $('#variant_table').dataTable().fnAdjustColumnSizing();
+    $('#variant_table').dataTable().width("100%");
 }
 
 /**
@@ -617,7 +627,6 @@ function toggleDisplayColumns()
 /**
  * Add a row to the Config Columns Table.
  *
- * @param table
  * @param checked
  * @param key
  * @param description
@@ -666,8 +675,25 @@ function setWorkspace(workspace)
         success: function(json)
         {
             // clear tables
-//            var table = document.getElementById('config_columns_table');
-//            table.remove("td");
+            $("#config_columns_table").empty();
+
+            // 1ST 7 VCF columns displayed by default
+            displayCols = new Array();
+            displayCols.push("CHROM");
+            displayCols.push("POS");
+            displayCols.push("ID");
+            displayCols.push("REF");
+            displayCols.push("ALT");
+            displayCols.push("QUAL");
+            displayCols.push("FILTER");
+
+            addRowToConfigColumnsTable(true, "CHROM",  "The chromosome.");
+            addRowToConfigColumnsTable(true, "POS",    "The reference position, with the 1st base having position 1.");
+            addRowToConfigColumnsTable(true, "ID",     "Semi-colon separated list of unique identifiers.");
+            addRowToConfigColumnsTable(true, "REF",    "The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).");
+            addRowToConfigColumnsTable(true, "ALT",    "Comma separated list of alternate non-reference alleles called on at least one of the samples");
+            addRowToConfigColumnsTable(true, "QUAL",   "Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).");
+            addRowToConfigColumnsTable(true, "FILTER", "PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.");
 
             var info = json.INFO;
             for (var key in info)
@@ -690,6 +716,9 @@ function setWorkspace(workspace)
 
     metadataRequest.done(function(msg)
     {
+        // setup the variant table
+        initVariantTable(displayCols);
+
         // backbone MVC will send query request based on adding this filter
         searchedFilterList.reset();
         searchedFilterList.add(FILTER_NONE);
