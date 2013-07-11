@@ -517,8 +517,9 @@ function initVariantTable(displayCols)
         );
     }
     $('#variant_table').dataTable( {
-        "aoColumns": aoColumns
-//        "bDestroy": true
+        "aoColumns": aoColumns,
+        'aaData': [],
+        "bDestroy": true
     });
 }
 
