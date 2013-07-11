@@ -12,7 +12,7 @@ var WARNING_TEMPLATE;
 var ERROR_TEMPLATE;
 
 // GLOBAL: contains the column names to display
-var displayCols = new Array();
+var DISPLAY_COLS;
 
 // MODEL
 var Workspace = Backbone.Model.extend({
@@ -37,8 +37,8 @@ var WorkspaceList = Backbone.Collection.extend({
     comparator: 'order'
 });
 
-var workspaceList = new WorkspaceList;
-var currentWorkspace = new WorkspaceList;
+var WORKSPACE_LIST = new WorkspaceList;
+var CURRENT_WORKSPACE = new WorkspaceList;
 
 // MODEL
 var Filter = Backbone.Model.extend({
@@ -75,8 +75,8 @@ var FilterList = Backbone.Collection.extend({
     comparator: 'order'
 });
 
-var searchedFilterList = new FilterList;
-var palletFilterList = new FilterList;
+var SEARCHED_FILTER_LIST = new FilterList;
+var PALLET_FILTER_LIST = new FilterList;
 
 $( document ).ready(function()
 {
@@ -93,12 +93,12 @@ $( document ).ready(function()
                     var workspace = new Workspace();
                     workspace.set("key", json[attr].key);
                     workspace.set("alias", json[attr].alias);
-                    workspaceList.add(workspace);
+                    WORKSPACE_LIST.add(workspace);
 
                     // by default, the 1st workspace is selected
-                    if (currentWorkspace.length == 0)
+                    if (CURRENT_WORKSPACE.length == 0)
                     {
-                        currentWorkspace.add(workspace);
+                        CURRENT_WORKSPACE.add(workspace);
                     }
                 }
             }
@@ -193,13 +193,13 @@ function sendQuery(query)
         success: function(json)
         {
             // populate the variant table
-            addRowsToVariantTable(json.results, displayCols);
+            addRowsToVariantTable(json.results, DISPLAY_COLS);
 
             // update count on Filter
             // loop through filter collection
-            var lastFilter = _.last(searchedFilterList.models);
+            var lastFilter = _.last(SEARCHED_FILTER_LIST.models);
             lastFilter.set("numMatches", json.totalResults);
-//            _.each(searchedFilterList.models, function(filter)
+//            _.each(SEARCHED_FILTER_LIST.models, function(filter)
 //            {
 //                filter.set("numMatches", json.totalResults);
 //            });
@@ -222,9 +222,9 @@ function backboneSetup()
 
         initialize: function() {
 
-            this.listenTo(workspaceList, 'add',    this.addOne);
+            this.listenTo(WORKSPACE_LIST, 'add',    this.addOne);
 
-            workspaceList.fetch();
+            WORKSPACE_LIST.fetch();
         },
 
         render: function() {
@@ -234,7 +234,7 @@ function backboneSetup()
             dropdownList.empty();
 
             // loop through collection
-            _.each(workspaceList.models, function(workspace)
+            _.each(WORKSPACE_LIST.models, function(workspace)
             {
                 // id of anchor in dropdown is the workspace key
                 dropdownList.append("<li><a href='#' id='"+workspace.get("key")+"'>"+workspace.get("alias")+"</a></li>");
@@ -242,8 +242,8 @@ function backboneSetup()
                 // setup event handling for anchor clicks
                 jQuery("#"+workspace.get("key")).click(function(e)
                 {
-                    currentWorkspace.pop(); // remove old
-                    currentWorkspace.add(workspace);
+                    CURRENT_WORKSPACE.pop(); // remove old
+                    CURRENT_WORKSPACE.add(workspace);
                     e.preventDefault();
                 });
             });
@@ -259,16 +259,16 @@ function backboneSetup()
     var WorkspaceView = Backbone.View.extend({
 
         initialize: function() {
-            this.listenTo(currentWorkspace, 'add',    this.workspaceChange);
-            currentWorkspace.fetch();
+            this.listenTo(CURRENT_WORKSPACE, 'add',    this.workspaceChange);
+            CURRENT_WORKSPACE.fetch();
         },
 
         render: function() {
         },
 
         workspaceChange: function() {
-            console.debug("Workspace changed " + currentWorkspace.first().get("alias") );
-            setWorkspace(currentWorkspace.first());
+            console.debug("Workspace changed " + CURRENT_WORKSPACE.first().get("alias") );
+            setWorkspace(CURRENT_WORKSPACE.first());
         }
     });
     var workspaceView = new WorkspaceView();
@@ -298,10 +298,10 @@ function backboneSetup()
 
         initialize: function() {
 
-            this.listenTo(searchedFilterList, 'add',    this.addOne);
-            this.listenTo(searchedFilterList, 'remove', this.removeOne);
+            this.listenTo(SEARCHED_FILTER_LIST, 'add',    this.addOne);
+            this.listenTo(SEARCHED_FILTER_LIST, 'remove', this.removeOne);
 
-            searchedFilterList.fetch();
+            SEARCHED_FILTER_LIST.fetch();
         },
 
         render: function() {
@@ -309,7 +309,7 @@ function backboneSetup()
             this.$('tr:has(td)').remove();
 
             // loop through filter collection
-            _.each(searchedFilterList.models, function(filter)
+            _.each(SEARCHED_FILTER_LIST.models, function(filter)
             {
                 // each filter becomes a row in the table
                 var view = new SearchedFilterView({model: filter});
@@ -319,7 +319,7 @@ function backboneSetup()
 
         addOne: function(filter) {
             // send query request to server
-            var query = buildQuery(searchedFilterList, currentWorkspace.first());
+            var query = buildQuery(SEARCHED_FILTER_LIST, CURRENT_WORKSPACE.first());
             sendQuery(query);
 
             this.render();
@@ -327,7 +327,7 @@ function backboneSetup()
 
         removeOne: function(filter) {
             // send query request to server
-            var query = buildQuery(searchedFilterList, currentWorkspace.first());
+            var query = buildQuery(SEARCHED_FILTER_LIST, CURRENT_WORKSPACE.first());
             sendQuery(query);
 
             this.render();
@@ -367,7 +367,7 @@ function backboneSetup()
                             filter.set("value", textfield.value);
 
                             // update query with modified filter
-                            searchedFilterList.add([filter]);
+                            SEARCHED_FILTER_LIST.add([filter]);
                         }
                     );
                 }
@@ -380,11 +380,11 @@ function backboneSetup()
                             var textfield = this;
                             textfield.disabled = false;
 
-                            var filterIdx = searchedFilterList.indexOf(filter);
+                            var filterIdx = SEARCHED_FILTER_LIST.indexOf(filter);
                             console.debug("Filter index: " + filterIdx);
 
                             console.debug("Removing filter with id: " + filter.get("id"));
-                            searchedFilterList.remove(filter);
+                            SEARCHED_FILTER_LIST.remove(filter);
                         }
                     );
                 }
@@ -403,9 +403,9 @@ function backboneSetup()
 
         initialize: function() {
 
-            this.listenTo(palletFilterList, 'add', this.addOne);
+            this.listenTo(PALLET_FILTER_LIST, 'add', this.addOne);
 
-            palletFilterList.fetch();
+            PALLET_FILTER_LIST.fetch();
         },
 
         render: function() {
@@ -413,7 +413,7 @@ function backboneSetup()
             console.debug("PalletView.render() called");
 
             // TODO: understand why this can't be in global space
-            palletFilterList.add([
+            PALLET_FILTER_LIST.add([
                 FILTER_MIN_ALT_READS,
                 FILTER_MIN_NUM_SAMPLES,
                 FILTER_MAX_NUM_SAMPLES,
@@ -423,7 +423,7 @@ function backboneSetup()
             ]);
 
             // loop through filter collection
-            _.each(palletFilterList.models, function(filter)
+            _.each(PALLET_FILTER_LIST.models, function(filter)
             {
                 // each filter becomes a row in the table
                 var view = new PalletFilterView({model: filter});
@@ -499,40 +499,7 @@ function addRowToInfoFilterTable(name, type)
 function initVariantTable(displayCols)
 {
     var aoColumns = new Array();
-//    for (var i = 0; i < displayCols.length; i++)
-//    {
-//        var isVisible = false;
-//
-//        // only 1st 7 columns visible by default
-//        if (i <= 6)
-//        {
-//            isVisible = true;
-//        }
-//
-//        aoColumns.push(
-//            {
-//                "sTitle":   displayCols[i],
-//                "bVisible": isVisible
-//            }
-//        );
-//    }
-//    $('#variant_table').dataTable( {
-//        "aoColumns": aoColumns,
-//        "bDestroy": true
-//    });
-
-    for (var i = 0; i < displayCols.length; i++)
-    {
-        aoColumns.push({ "sTitle": displayCols[i] });
-    }
-
-    $('#variant_table').dataTable( {
-        "aoColumns": aoColumns,
-        "bDestroy": true
-    });
-
-    // set visibility
-    for (var i = 0; i < displayCols.length; i++)
+    for (var i = 0; i < DISPLAY_COLS.length; i++)
     {
         var isVisible = false;
 
@@ -542,9 +509,17 @@ function initVariantTable(displayCols)
             isVisible = true;
         }
 
-        $('#variant_table').dataTable().fnSetColumnVis(i, isVisible);
+        aoColumns.push(
+            {
+                "sTitle":   DISPLAY_COLS[i],
+                "bVisible": isVisible
+            }
+        );
     }
-    $('#variant_table').dataTable().fnDraw();
+    $('#variant_table').dataTable( {
+        "aoColumns": aoColumns
+//        "bDestroy": true
+    });
 }
 
 /**
@@ -601,24 +576,24 @@ function addRowsToVariantTable(variants, displayCols)
  */
 function toggleDisplayColumns()
 {
-    var oTable = $('#variant_table').dataTable();
+    var table = $('#variant_table').dataTable();
 
-    for (i=0; i < displayCols.length; i++)
+    for (i=0; i < DISPLAY_COLS.length; i++)
     {
         // lookup checkbox widget (toggle_[displayCol])
-        var checkbox = $('#toggle_'+displayCols[i]);
+        var checkbox = $('#toggle_'+DISPLAY_COLS[i]);
         if (checkbox.is(':checked'))
         {
-            oTable.fnSetColumnVis( i, true);
+            table.fnSetColumnVis( i, true);
         }
         else
         {
-            oTable.fnSetColumnVis( i, false);
+            table.fnSetColumnVis( i, false);
         }
     }
 
     // resize columns
-    oTable.width("100%");
+    table.width("100%");
 
     // close dialog
     $("#column_dialog_close").click();
@@ -675,17 +650,18 @@ function setWorkspace(workspace)
         success: function(json)
         {
             // clear tables
-            $("#config_columns_table").empty();
+            $('#config_columns_table').empty();
+            $('#info_filter_table').empty();
 
             // 1ST 7 VCF columns displayed by default
-            displayCols = new Array();
-            displayCols.push("CHROM");
-            displayCols.push("POS");
-            displayCols.push("ID");
-            displayCols.push("REF");
-            displayCols.push("ALT");
-            displayCols.push("QUAL");
-            displayCols.push("FILTER");
+            DISPLAY_COLS = new Array();
+            DISPLAY_COLS.push("CHROM");
+            DISPLAY_COLS.push("POS");
+            DISPLAY_COLS.push("ID");
+            DISPLAY_COLS.push("REF");
+            DISPLAY_COLS.push("ALT");
+            DISPLAY_COLS.push("QUAL");
+            DISPLAY_COLS.push("FILTER");
 
             addRowToConfigColumnsTable(true, "CHROM",  "The chromosome.");
             addRowToConfigColumnsTable(true, "POS",    "The reference position, with the 1st base having position 1.");
@@ -700,7 +676,7 @@ function setWorkspace(workspace)
             {
                 if (info.hasOwnProperty(key))
                 {
-                    displayCols.push(key);
+                    DISPLAY_COLS.push(key);
 
                     addRowToInfoFilterTable(key, info[key].type);
 
@@ -717,10 +693,10 @@ function setWorkspace(workspace)
     metadataRequest.done(function(msg)
     {
         // setup the variant table
-        initVariantTable(displayCols);
+        initVariantTable(DISPLAY_COLS);
 
         // backbone MVC will send query request based on adding this filter
-        searchedFilterList.reset();
-        searchedFilterList.add(FILTER_NONE);
+        SEARCHED_FILTER_LIST.reset();
+        SEARCHED_FILTER_LIST.add(FILTER_NONE);
     });
 }
