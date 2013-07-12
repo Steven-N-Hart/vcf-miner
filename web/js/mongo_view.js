@@ -111,6 +111,7 @@ $( document ).ready(function()
         }
     });
 
+    backboneSearchedView();
     backboneSetup();
 });
 
@@ -214,6 +215,121 @@ function sendQuery(query)
     });
 }
 
+/**
+ * Displays dialog box so that user can add a new filter.
+ */
+function addNewFilter()
+{
+    var addFilterDiv = $('#add_filter_modal');
+
+    //var table = document.getElementById('add_filter_table');
+
+    $('#add_filter_tabs a').click(function (e)
+    {
+        e.preventDefault();
+        $(this).tab('show');
+    })
+    // display
+    addFilterDiv.modal();
+}
+
+/**
+ *
+ * @param filterID
+ */
+function uncheckFilter(filterID)
+{
+    var checkbox = $('#' + filterID + "_add_button");
+
+    // enable
+    checkbox.prop( "disabled", false );
+
+    // click to uncheck
+    checkbox.click();
+}
+
+function backboneSearchedView()
+{
+    // VIEW
+    var SearchedFilterView = Backbone.View.extend({
+        tagName:  "tr",
+
+        template: _.template($('#searched-filter-template').html()),
+
+        initialize: function() {
+            this.listenTo(this.model, 'change', this.render);
+        },
+
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            return this;
+        },
+
+        clear: function() {
+            this.model.destroy();
+        }
+    });
+
+    var SearchedView = Backbone.View.extend({
+        el: $("#searched_view"),
+
+        initialize: function() {
+
+            this.listenTo(SEARCHED_FILTER_LIST, 'add',    this.addOne);
+            this.listenTo(SEARCHED_FILTER_LIST, 'remove', this.removeOne);
+
+            SEARCHED_FILTER_LIST.fetch();
+        },
+
+        render: function() {
+            // remove all rows from table except for header
+            this.$('tr:has(td)').remove();
+
+            // loop through filter collection
+            var idx = 0;
+            var numModels = _.size(SEARCHED_FILTER_LIST.models);
+            _.each(SEARCHED_FILTER_LIST.models, function(filter)
+            {
+                // each filter becomes a row in the table
+                if ((idx == 0) || (idx < (numModels-1)))
+                {
+                    var view = new SearchedFilterView({model: filter});
+                    this.$("#searched_table").append(view.render().el);
+                }
+                else
+                {
+                    var addLastTemplate = _.template($('#searched-last-filter-template').html());
+                    this.$("#searched_table").append("<tr>" + addLastTemplate(filter.toJSON()) + "</tr>");
+                }
+                idx++;
+            });
+
+            // add filter link is always last
+            var addTemplate = _.template($('#searched-add-filter-template').html());
+            var addRow = "<tr>" + addTemplate() + "</tr>";
+            this.$("#searched_table").append(addRow);
+        },
+
+        addOne: function(filter) {
+            // send query request to server
+            var query = buildQuery(SEARCHED_FILTER_LIST, CURRENT_WORKSPACE.first());
+            sendQuery(query);
+
+            this.render();
+        },
+
+        removeOne: function(filter) {
+            // send query request to server
+            var query = buildQuery(SEARCHED_FILTER_LIST, CURRENT_WORKSPACE.first());
+            sendQuery(query);
+
+            this.render();
+        }
+    });
+
+    var searchedView = new SearchedView();
+}
+
 function backboneSetup()
 {
     var VcfFileView = Backbone.View.extend({
@@ -273,69 +389,6 @@ function backboneSetup()
     var workspaceView = new WorkspaceView();
 
     // VIEW
-    var SearchedFilterView = Backbone.View.extend({
-        tagName:  "tr",
-
-        template: _.template($('#searched-filter-template').html()),
-
-        initialize: function() {
-            this.listenTo(this.model, 'change', this.render);
-        },
-
-        render: function() {
-            this.$el.html(this.template(this.model.toJSON()));
-            return this;
-        },
-
-        clear: function() {
-            this.model.destroy();
-        }
-    });
-
-    var SearchedView = Backbone.View.extend({
-        el: $("#searched_view"),
-
-        initialize: function() {
-
-            this.listenTo(SEARCHED_FILTER_LIST, 'add',    this.addOne);
-            this.listenTo(SEARCHED_FILTER_LIST, 'remove', this.removeOne);
-
-            SEARCHED_FILTER_LIST.fetch();
-        },
-
-        render: function() {
-            // remove all rows from table except for header
-            this.$('tr:has(td)').remove();
-
-            // loop through filter collection
-            _.each(SEARCHED_FILTER_LIST.models, function(filter)
-            {
-                // each filter becomes a row in the table
-                var view = new SearchedFilterView({model: filter});
-                this.$("#searched_table").append(view.render().el);
-            });
-        },
-
-        addOne: function(filter) {
-            // send query request to server
-            var query = buildQuery(SEARCHED_FILTER_LIST, CURRENT_WORKSPACE.first());
-            sendQuery(query);
-
-            this.render();
-        },
-
-        removeOne: function(filter) {
-            // send query request to server
-            var query = buildQuery(SEARCHED_FILTER_LIST, CURRENT_WORKSPACE.first());
-            sendQuery(query);
-
-            this.render();
-        }
-    });
-
-    var searchedView = new SearchedView();
-
-    // VIEW
     var PalletFilterView = Backbone.View.extend({
         tagName:  "tr",
 
@@ -355,6 +408,10 @@ function backboneSetup()
                 var textfieldSelector =  "#" + filter.get("id") + "_value_field";
                 if (checkbox.is(':checked'))
                 {
+                    // disable checkbox, we want to control the order they can remove
+                    // filters via the remove button
+                    checkbox.prop( "disabled", true );
+
                     // use 'live query' plugin to select dynamically added textfield
                     $(textfieldSelector).livequery(
                         function()
@@ -367,6 +424,9 @@ function backboneSetup()
 
                             // update query with modified filter
                             SEARCHED_FILTER_LIST.add([filter]);
+
+                            //$('').click();
+                            $("#add_filter_close").click();
                         }
                     );
                 }
