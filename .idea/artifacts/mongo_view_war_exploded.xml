@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="exploded-war" name="mongo_view:war exploded">
+  <artifact type="exploded-war" build-on-make="true" name="mongo_view:war exploded">
     <output-path>$PROJECT_DIR$/out/artifacts/mongo_view_war_exploded</output-path>
     <root id="root">
       <element id="javaee-facet-resources" facet="mongo_view/web/Web" />

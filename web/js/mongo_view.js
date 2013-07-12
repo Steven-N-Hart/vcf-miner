@@ -80,6 +80,8 @@ var PALLET_FILTER_LIST = new FilterList;
 
 $( document ).ready(function()
 {
+    initTemplates();
+
     // get workspace information from server
     var workspaceRequest = $.ajax({
         url: "/mongo_svr/ve/q/owner/list_workspaces/steve",
@@ -109,8 +111,6 @@ $( document ).ready(function()
         }
     });
 
-    initTemplates();
-
     backboneSetup();
 });
 
@@ -119,7 +119,7 @@ $( document ).ready(function()
  */
 function initTemplates()
 {
-    INFO_TEMPLATE = $("#warning-message-template").html();
+    INFO_TEMPLATE    = $("#warning-message-template").html();
     WARNING_TEMPLATE = $("#warning-message-template").html();
     ERROR_TEMPLATE   = $("#error-message-template").html();
 }
@@ -182,8 +182,6 @@ function sendQuery(query)
 
     console.debug("Sending query to server:" + JSON.stringify(query));
 
-//    contentType: "application/json; charset=utf-8",
-
     var req = $.ajax({
         type: "POST",
         url: "/mongo_svr/ve/eq",
@@ -192,6 +190,11 @@ function sendQuery(query)
         dataType: "json",
         success: function(json)
         {
+            if (typeof json.mongoQuery !== "undefined")
+            {
+                console.debug("Mongo Query: " + json.mongoQuery);
+            }
+
             // populate the variant table
             addRowsToVariantTable(json.results, DISPLAY_COLS);
 
@@ -199,10 +202,6 @@ function sendQuery(query)
             // loop through filter collection
             var lastFilter = _.last(SEARCHED_FILTER_LIST.models);
             lastFilter.set("numMatches", json.totalResults);
-//            _.each(SEARCHED_FILTER_LIST.models, function(filter)
-//            {
-//                filter.set("numMatches", json.totalResults);
-//            });
         },
         error: function(jqXHR, textStatus)
         {
@@ -501,6 +500,18 @@ function initVariantTable(displayCols)
     var aoColumns = new Array();
     for (var i = 0; i < DISPLAY_COLS.length; i++)
     {
+        aoColumns.push({ "sTitle":   DISPLAY_COLS[i] });
+    }
+
+    $('#variant_table').dataTable( {
+        "aoColumns": aoColumns,
+        'aaData':    [],
+        "bDestroy":  true
+    });
+
+    // set visibility
+    for (var i = 0; i < DISPLAY_COLS.length; i++)
+    {
         var isVisible = false;
 
         // only 1st 7 columns visible by default
@@ -509,18 +520,8 @@ function initVariantTable(displayCols)
             isVisible = true;
         }
 
-        aoColumns.push(
-            {
-                "sTitle":   DISPLAY_COLS[i],
-                "bVisible": isVisible
-            }
-        );
+        $('#variant_table').dataTable().fnSetColumnVis(i, isVisible);
     }
-    $('#variant_table').dataTable( {
-        "aoColumns": aoColumns,
-        'aaData': [],
-        "bDestroy": true
-    });
 }
 
 /**
@@ -563,13 +564,14 @@ function addRowsToVariantTable(variants, displayCols)
         aaData.push(aaDataRow);
     }
 
-    // update DataTable
-    $('#variant_table').dataTable().fnClearTable();
-    $('#variant_table').dataTable().fnAddData(aaData);
+    var table = $('#variant_table').dataTable();
 
-    // resize columns
-    $('#variant_table').dataTable().fnAdjustColumnSizing();
-    $('#variant_table').dataTable().width("100%");
+    // update DataTable
+    table.fnClearTable();
+    table.fnAddData(aaData);
+
+    // resize to fill browser nicely
+    table.width("100%");
 }
 
 /**
@@ -684,6 +686,9 @@ function setWorkspace(workspace)
                     addRowToConfigColumnsTable(false, key, info[key].Description);
                 }
             }
+
+            // rebuild the DataTables widget since columns have changed
+            initVariantTable(DISPLAY_COLS);
         },
         error: function(jqXHR, textStatus)
         {
@@ -693,9 +698,6 @@ function setWorkspace(workspace)
 
     metadataRequest.done(function(msg)
     {
-        // setup the variant table
-        initVariantTable(DISPLAY_COLS);
-
         // backbone MVC will send query request based on adding this filter
         SEARCHED_FILTER_LIST.reset();
         SEARCHED_FILTER_LIST.add(FILTER_NONE);
