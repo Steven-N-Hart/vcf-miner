@@ -45,10 +45,10 @@
         <span class="label"><td><%=operator%></td></span>
         <span class="label"><td><%=value%></td></span>
         <td><span class="badge badge-info"><%=numMatches%></span></td>
-        <td><button title="Remove from your search" type="button" class="btn btn-primary" onclick="uncheckFilter('<%=id%>')">x</button></td>
+        <td><button title="Remove filter from your search" type="button" class="btn" onclick="uncheckFilter('<%=id%>')">x</button></td>
     </script>
     <script id="searched-add-filter-template" type="text/template">
-        <span class="label"><td colspan="3"><button class="btn btn-primary" onclick="addNewFilter()">Add Filter</button></td></span>
+        <span class="label"><td colspan="3"><button title="Add filter to your search" class="btn" onclick="addNewFilter()"><i class="icon-plus"/> Add Filter</button></td></span>
         <td></td>
         <td></td>
     </script>
@@ -214,7 +214,7 @@
                         <div class="pull-right">
                             <div id="buttonPlaceholder">
                                 <!-- Button to trigger modal -->
-                                <a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">Columns</a>
+                                <a href="#myModal" role="button" class="btn" data-toggle="modal">Columns</a>
 
                                 <!-- Modal -->
                                 <div id="myModal" class="modal hide fade wide-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

@@ -112,6 +112,7 @@ $( document ).ready(function()
     });
 
     backboneSearchedView();
+    backbonePalletView();
     backboneSetup();
 });
 
@@ -330,64 +331,8 @@ function backboneSearchedView()
     var searchedView = new SearchedView();
 }
 
-function backboneSetup()
+function backbonePalletView()
 {
-    var VcfFileView = Backbone.View.extend({
-        el: $("#vcf_file_dropdown"),
-
-        initialize: function() {
-
-            this.listenTo(WORKSPACE_LIST, 'add',    this.addOne);
-
-            WORKSPACE_LIST.fetch();
-        },
-
-        render: function() {
-            var dropdownList = this.$("ul");
-
-            // clear out list
-            dropdownList.empty();
-
-            // loop through collection
-            _.each(WORKSPACE_LIST.models, function(workspace)
-            {
-                // id of anchor in dropdown is the workspace key
-                dropdownList.append("<li><a href='#' id='"+workspace.get("key")+"'>"+workspace.get("alias")+"</a></li>");
-
-                // setup event handling for anchor clicks
-                jQuery("#"+workspace.get("key")).click(function(e)
-                {
-                    CURRENT_WORKSPACE.pop(); // remove old
-                    CURRENT_WORKSPACE.add(workspace);
-                    e.preventDefault();
-                });
-            });
-        },
-
-        addOne: function(workspace) {
-            this.render();
-        }
-    });
-    var vcfFileView = new VcfFileView();
-    vcfFileView.render();
-
-    var WorkspaceView = Backbone.View.extend({
-
-        initialize: function() {
-            this.listenTo(CURRENT_WORKSPACE, 'add',    this.workspaceChange);
-            CURRENT_WORKSPACE.fetch();
-        },
-
-        render: function() {
-        },
-
-        workspaceChange: function() {
-            console.debug("Workspace changed " + CURRENT_WORKSPACE.first().get("alias") );
-            setWorkspace(CURRENT_WORKSPACE.first());
-        }
-    });
-    var workspaceView = new WorkspaceView();
-
     // VIEW
     var PalletFilterView = Backbone.View.extend({
         tagName:  "tr",
@@ -498,6 +443,65 @@ function backboneSetup()
     palletView.render();
 }
 
+function backboneSetup()
+{
+    var VcfFileView = Backbone.View.extend({
+        el: $("#vcf_file_dropdown"),
+
+        initialize: function() {
+
+            this.listenTo(WORKSPACE_LIST, 'add',    this.addOne);
+
+            WORKSPACE_LIST.fetch();
+        },
+
+        render: function() {
+            var dropdownList = this.$("ul");
+
+            // clear out list
+            dropdownList.empty();
+
+            // loop through collection
+            _.each(WORKSPACE_LIST.models, function(workspace)
+            {
+                // id of anchor in dropdown is the workspace key
+                dropdownList.append("<li><a href='#' id='"+workspace.get("key")+"'>"+workspace.get("alias")+"</a></li>");
+
+                // setup event handling for anchor clicks
+                jQuery("#"+workspace.get("key")).click(function(e)
+                {
+                    CURRENT_WORKSPACE.pop(); // remove old
+                    CURRENT_WORKSPACE.add(workspace);
+                    e.preventDefault();
+                });
+            });
+        },
+
+        addOne: function(workspace) {
+            this.render();
+        }
+    });
+    var vcfFileView = new VcfFileView();
+    vcfFileView.render();
+
+    var WorkspaceView = Backbone.View.extend({
+
+        initialize: function() {
+            this.listenTo(CURRENT_WORKSPACE, 'add',    this.workspaceChange);
+            CURRENT_WORKSPACE.fetch();
+        },
+
+        render: function() {
+        },
+
+        workspaceChange: function() {
+            console.debug("Workspace changed " + CURRENT_WORKSPACE.first().get("alias") );
+            setWorkspace(CURRENT_WORKSPACE.first());
+        }
+    });
+    var workspaceView = new WorkspaceView();
+}
+
 /**
  * Adds a row to the INFO Filter table.
  *
@@ -516,6 +520,8 @@ function addRowToInfoFilterTable(name, type)
     var newCell2 = newRow.insertCell(1);
     var newCell3 = newRow.insertCell(2);
 
+//    var rowHTML;
+////    rowHTML = "<label for='"<%=id%>_add_button" class="checkbox"><input id="<%=id%>_add_button" type="checkbox"/><%=name%></label>";
     //set the cell text
     newCell1.innerHTML = "<button title='Add to your search' type=\"button\" class=\"btn-mini\"><i class=\"icon-plus\"></i></button>";
     newCell2.innerHTML = name;
