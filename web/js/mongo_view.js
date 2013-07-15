@@ -17,31 +17,8 @@ var DISPLAY_COLS;
 // GLOBAL:
 var MAX_RESULTS = 1000;
 
-// MODEL
-var Workspace = Backbone.Model.extend({
-    defaults: function()
-    {
-        return {
-            key:     "NA",
-            alias:   "NA",
-            id: guid()
-        };
-    }
-});
-
-// COLLECTION of Workspaces
-var WorkspaceList = Backbone.Collection.extend({
-    model: Workspace,
-    localStorage: new Backbone.LocalStorage("todos-backbone"),
-    nextOrder: function() {
-        if (!this.length) return 1;
-        return this.last().get('order') + 1;
-    },
-    comparator: 'order'
-});
-
-var WORKSPACE_LIST = new WorkspaceList;
-var CURRENT_WORKSPACE = new WorkspaceList;
+// GLOBAL:
+var CURRENT_WORKSPACE_KEY;
 
 // MODEL
 var Filter = Backbone.Model.extend({
@@ -92,6 +69,7 @@ $( document ).ready(function()
 {
     initTemplates();
 
+    // TODO: user hardcoded to 'steve'
     // get workspace information from server
     var workspaceRequest = $.ajax({
         url: "/mongo_svr/ve/q/owner/list_workspaces/steve",
@@ -101,17 +79,16 @@ $( document ).ready(function()
             // each workspace object has an increment num as the attr name
             for (var attr in json) {
                 if (json.hasOwnProperty(attr)) {
-                    // translate into Workspace model
-                    var workspace = new Workspace();
-                    workspace.set("key", json[attr].key);
-                    workspace.set("alias", json[attr].alias);
-                    WORKSPACE_LIST.add(workspace);
+                    var key = json[attr].key;
+                    var alias = json[attr].alias;
 
-                    // by default, the 1st workspace is selected
-                    if (CURRENT_WORKSPACE.length == 0)
-                    {
-                        CURRENT_WORKSPACE.add(workspace);
-                    }
+                    var vcfList = $('#vcf_list');
+
+                    // id of anchor in dropdown is the workspace key
+                    vcfList.append("<option value='"+key+"'>"+alias+"</option>");
+
+                    // user must select a VCF
+                    $('#select_vcf_modal').modal({"keyboard":false});
                 }
             }
         },
@@ -123,7 +100,6 @@ $( document ).ready(function()
 
     backboneSearchedView();
     backbonePalletView();
-    backboneSetup();
 });
 
 /**
@@ -140,16 +116,16 @@ function initTemplates()
  * Builds a query object.
  *
  * @param filterList Backbone collection of filter models.
- * @param workspace
+ * @param workspaceKey
  * @returns {Object} Query object
  */
-function buildQuery(filterList, workspace)
+function buildQuery(filterList, workspaceKey)
 {
     // build query from FILTER model
     var query = new Object();
     query.numberResults = MAX_RESULTS;
 
-    query.workspace = workspace.get("key");
+    query.workspace = workspaceKey;
 
     // loop through filter collection
     _.each(filterList.models, function(filter)
@@ -301,8 +277,6 @@ function backboneSearchedView()
         },
 
         render: function() {
-            console.debug("SearchedFilterView.render() called");
-
             // set id
             $(this.el).attr('id', this.model.get("id"));
 
@@ -334,7 +308,7 @@ function backboneSearchedView()
 
         addOne: function(filter) {
             // send query request to server
-            var query = buildQuery(SEARCHED_FILTER_LIST, CURRENT_WORKSPACE.first());
+            var query = buildQuery(SEARCHED_FILTER_LIST, CURRENT_WORKSPACE_KEY);
             sendQuery(query);
 
             var view = new SearchedFilterView({model: filter});
@@ -345,7 +319,7 @@ function backboneSearchedView()
 
         removeOne: function(filter) {
             // send query request to server
-            var query = buildQuery(SEARCHED_FILTER_LIST, CURRENT_WORKSPACE.first());
+            var query = buildQuery(SEARCHED_FILTER_LIST, CURRENT_WORKSPACE_KEY);
             sendQuery(query);
 
             // remove TR with corresponding filter ID from DOM
@@ -440,9 +414,6 @@ function backbonePalletView()
         },
 
         render: function() {
-
-            console.debug("PalletView.render() called");
-
             // TODO: understand why this can't be in global space
             PALLET_FILTER_LIST.add([
                 FILTER_MIN_ALT_READS,
@@ -468,65 +439,6 @@ function backbonePalletView()
 
     var palletView = new PalletView();
     palletView.render();
-}
-
-function backboneSetup()
-{
-    var VcfFileView = Backbone.View.extend({
-        el: $("#vcf_file_dropdown"),
-
-        initialize: function() {
-
-            this.listenTo(WORKSPACE_LIST, 'add',    this.addOne);
-
-            WORKSPACE_LIST.fetch();
-        },
-
-        render: function() {
-            var dropdownList = this.$("ul");
-
-            // clear out list
-            dropdownList.empty();
-
-            // loop through collection
-            _.each(WORKSPACE_LIST.models, function(workspace)
-            {
-                // id of anchor in dropdown is the workspace key
-                dropdownList.append("<li><a href='#' id='"+workspace.get("key")+"'>"+workspace.get("alias")+"</a></li>");
-
-                // setup event handling for anchor clicks
-                jQuery("#"+workspace.get("key")).click(function(e)
-                {
-                    CURRENT_WORKSPACE.pop(); // remove old
-                    CURRENT_WORKSPACE.add(workspace);
-                    e.preventDefault();
-                });
-            });
-        },
-
-        addOne: function(workspace) {
-            this.render();
-        }
-    });
-    var vcfFileView = new VcfFileView();
-    vcfFileView.render();
-
-    var WorkspaceView = Backbone.View.extend({
-
-        initialize: function() {
-            this.listenTo(CURRENT_WORKSPACE, 'add',    this.workspaceChange);
-            CURRENT_WORKSPACE.fetch();
-        },
-
-        render: function() {
-        },
-
-        workspaceChange: function() {
-            console.debug("Workspace changed " + CURRENT_WORKSPACE.first().get("alias") );
-            setWorkspace(CURRENT_WORKSPACE.first());
-        }
-    });
-    var workspaceView = new WorkspaceView();
 }
 
 /**
@@ -736,13 +648,18 @@ function guid() {
     return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
 }
 
-function setWorkspace(workspace)
+function setWorkspace()
 {
-    var dropdownAnchor = $("#vcf_file_dropdown_anchor");
-    dropdownAnchor.html(workspace.get("alias")+"<b class='caret'></b>");
+    var workspaceKey   = $('#vcf_list').val();
+    var workspaceAlias = $('#vcf_list option:selected').text();
+
+    console.debug("User selected workspace: " + workspaceKey);
+    CURRENT_WORKSPACE_KEY = workspaceKey;
+
+    $("#vcf_file").html("VCF File: " + workspaceAlias);
 
     var metadataRequest = $.ajax({
-        url: "/mongo_svr/ve/meta/workspace/" + workspace.get("key"),
+        url: "/mongo_svr/ve/meta/workspace/" + workspaceKey,
         dataType: "json",
         success: function(json)
         {

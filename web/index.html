@@ -68,6 +68,19 @@
 <body>
 
 <!-- Modal -->
+<div id="select_vcf_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="select_vcf_label" aria-hidden="true">
+    <div class="modal-header">
+        <h3 id="select_vcf_label">Select a VCF File</h3>
+    </div>
+    <div class="modal-body">
+        <select id="vcf_list"></select>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true" id="select_vcf_close" onclick="setWorkspace()">Select</button>
+    </div>
+</div>
+
+<!-- Modal -->
 <div id="add_filter_modal" class="modal hide fade wide-modal" tabindex="-1" role="dialog" aria-labelledby="add_filter_label" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -119,17 +132,7 @@
             <a class="brand" href="#">Mongo View</a>
             <img src="img/bull-graphic.png" width="60" height="50">
             <ul class="nav pull-right">
-                <li class="navbar-text">VCF File:</li>
-                <li id="vcf_file_dropdown" class="dropdown">
-                    <a href="#" id="vcf_file_dropdown_anchor" role="button" class="dropdown-toggle" data-toggle="dropdown"></a>
-                    <ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>
-                        <li role="presentation" class="divider"></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Separated link</a></li>
-                    </ul>
-                </li>
+                <li id="vcf_file" class="navbar-text">VCF File:</li>
             </ul>
         </div>
     </div>
