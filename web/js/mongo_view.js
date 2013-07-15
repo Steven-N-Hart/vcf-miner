@@ -669,31 +669,31 @@ function addRowsToVariantTable(variants, displayCols)
 }
 
 /**
- * Shows or hides Variant Table columns based on the Config Columns table checkboxes.
+ * Shows or hides Variant Table column.
+ *
+ * @param colName name of column to toggle visibility
  */
-function toggleDisplayColumns()
+function toggleDisplayColumn(colName)
 {
-    var table = $('#variant_table').dataTable();
-
+    // translate column name to column index
     for (i=0; i < DISPLAY_COLS.length; i++)
     {
-        // lookup checkbox widget (toggle_[displayCol])
-        var checkbox = $('#toggle_'+DISPLAY_COLS[i]);
-        if (checkbox.is(':checked'))
+        if (DISPLAY_COLS[i] == colName)
         {
-            table.fnSetColumnVis( i, true);
-        }
-        else
-        {
-            table.fnSetColumnVis( i, false);
+            var colIdx = i;
+            var table = $('#variant_table').dataTable();
+            var isVisible = table.fnSettings().aoColumns[colIdx].bVisible;
+
+            // flip visibility
+            table.fnSetColumnVis(colIdx, !isVisible);
+
+            // resize columns
+            table.width("100%");
+
+            return;
         }
     }
 
-    // resize columns
-    table.width("100%");
-
-    // close dialog
-    $("#column_dialog_close").click();
 }
 
 /**
@@ -717,9 +717,9 @@ function addRowToConfigColumnsTable(checked, key, description)
 
     //set the cell text
     if (checked)
-        newCTableCell1.innerHTML = "<input class=\"input-mini\" type=\"checkbox\" checked=\"true\" id=\"toggle_"+key+"\"/>";
+        newCTableCell1.innerHTML = "<input class=\"input-mini\" type=\"checkbox\" checked=\"true\" onclick=\"toggleDisplayColumn('"+key+"')\"/>";
     else
-        newCTableCell1.innerHTML = "<input class=\"input-mini\" type=\"checkbox\" id=\"toggle_"+key+"\"/>";
+        newCTableCell1.innerHTML = "<input class=\"input-mini\" type=\"checkbox\" onclick=\"toggleDisplayColumn('"+key+"')\"/>";
 
     newCTableCell2.innerHTML = key;
     newCTableCell3.innerHTML = description;
