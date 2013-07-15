@@ -38,19 +38,7 @@
         <span class="label"><td><%=operator%></td></span>
         <span class="label"><td><%=value%></td></span>
         <td><span class="badge badge-info"><%=numMatches%></span></td>
-        <td></td>
-    </script>
-    <script id="searched-last-filter-template" type="text/template">
-        <span class="label"><td><%=name%></td></span>
-        <span class="label"><td><%=operator%></td></span>
-        <span class="label"><td><%=value%></td></span>
-        <td><span class="badge badge-info"><%=numMatches%></span></td>
-        <td><button title="Remove filter from your search" type="button" class="btn" onclick="uncheckFilter('<%=id%>')">x</button></td>
-    </script>
-    <script id="searched-add-filter-template" type="text/template">
-        <span class="label"><td colspan="3"><button title="Add filter to your search" class="btn" onclick="addNewFilter()"><i class="icon-plus"/> Add Filter</button></td></span>
-        <td></td>
-        <td></td>
+        <td><button id="<%=id%>_remove_button" title="Remove filter from your search" type="button" class="btn" onclick="uncheckFilter('<%=id%>')">x</button></td>
     </script>
     <script id="pallet-filter-template" type="text/template">
         <td><label for="<%=id%>_add_button" class="checkbox"><input id="<%=id%>_add_button" type="checkbox"/><%=name%></label></td>
@@ -164,46 +152,15 @@
                                 <th>Variants</th>
                                 <th></th>
                             </tr>
+                            <tr id="add_filter_row">
+                                <span class="label"><td colspan="3"><button title="Add filter to your search" class="btn" onclick="addNewFilter()"><i class="icon-plus"/> Add Filter</button></td></span>
+                                <td></td>
+                                <td></td>
+                            </tr>
                         </table>
                     </div>
                 </ul>
             </div><!--/.well -->
-
-            <!--<div class="well sidebar-nav">-->
-                <!--<ul class="nav nav-list">-->
-                    <!--<div class="nav-header"><h4>Narrow Your Search</h4></div>-->
-                    <!--<div id="pallet_view">-->
-                        <!--<div class="accordion" id="accordion2">-->
-                            <!--<div class="accordion-group">-->
-                                <!--<div class="accordion-heading">-->
-                                    <!--<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">-->
-                                        <!--Sample Filters-->
-                                    <!--</a>-->
-                                <!--</div>-->
-                                <!--<div id="collapseOne" class="accordion-body collapse in">-->
-                                    <!--<div class="accordion-inner">-->
-                                        <!--<form>-->
-                                            <!--<table id="sample_filter_table"></table>-->
-                                        <!--</form>-->
-                                    <!--</div>-->
-                                <!--</div>-->
-                            <!--</div>-->
-                            <!--<div class="accordion-group">-->
-                                <!--<div class="accordion-heading">-->
-                                    <!--<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">-->
-                                        <!--INFO Filters [TODO]-->
-                                    <!--</a>-->
-                                <!--</div>-->
-                                <!--<div id="collapseTwo" class="accordion-body collapse">-->
-                                    <!--<div class="accordion-inner">-->
-                                        <!--<table id="info_filter_table"></table>-->
-                                    <!--</div>-->
-                                <!--</div>-->
-                            <!--</div>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                <!--</ul>-->
-            <!--</div>&lt;!&ndash;/.well &ndash;&gt;-->
         </div><!--/span-->
         <div class="span9">
             <div class="hero-unit">

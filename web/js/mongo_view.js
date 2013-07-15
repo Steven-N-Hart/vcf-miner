@@ -14,6 +14,9 @@ var ERROR_TEMPLATE;
 // GLOBAL: contains the column names to display
 var DISPLAY_COLS;
 
+// GLOBAL:
+var MAX_RESULTS = 1000;
+
 // MODEL
 var Workspace = Backbone.Model.extend({
     defaults: function()
@@ -54,15 +57,22 @@ var Filter = Backbone.Model.extend({
     }
 });
 
-var FILTER_NONE   = {name: 'none', operator: '', value: ''};
-
 // specific filters
-var FILTER_MIN_ALT_READS   = {name: 'Min Alt Reads', operator: '=', value: '0'};
-var FILTER_MIN_NUM_SAMPLES = {name: 'Min # Samples', operator: '=', value: '0'};
-var FILTER_MAX_NUM_SAMPLES = {name: 'Max # Samples', operator: '=', value: '0'};
-var FILTER_MIN_AC          = {name: 'Min AC',        operator: '=', value: '0'};
-var FILTER_MAX_AC          = {name: 'Max AC',        operator: '=', value: '0'};
-var FILTER_MIN_PHRED       = {name: 'Min Phred',     operator: '=', value: '0'};
+var FILTER_NONE            = new Filter();
+var FILTER_MIN_ALT_READS   = new Filter();
+var FILTER_MIN_NUM_SAMPLES = new Filter();
+var FILTER_MAX_NUM_SAMPLES = new Filter();
+var FILTER_MIN_AC          = new Filter();
+var FILTER_MAX_AC          = new Filter();
+var FILTER_MIN_PHRED       = new Filter();
+
+FILTER_NONE.set(           {name: 'none',          operator: '',  value: '', id:'id-none'});
+FILTER_MIN_ALT_READS.set(  {name: 'Min Alt Reads', operator: '=', value: '0'});
+FILTER_MIN_NUM_SAMPLES.set({name: 'Min # Samples', operator: '=', value: '0'});
+FILTER_MAX_NUM_SAMPLES.set({name: 'Max # Samples', operator: '=', value: '0'});
+FILTER_MIN_AC.set(         {name: 'Min AC',        operator: '=', value: '0'});
+FILTER_MAX_AC.set(         {name: 'Max AC',        operator: '=', value: '0'});
+FILTER_MIN_PHRED.set(      {name: 'Min Phred',     operator: '=', value: '0'});
 
 // COLLECTION of Filters
 var FilterList = Backbone.Collection.extend({
@@ -137,9 +147,8 @@ function buildQuery(filterList, workspace)
 {
     // build query from FILTER model
     var query = new Object();
-    query.numberResults = 100;
+    query.numberResults = MAX_RESULTS;
 
-    // TODO: hardcoded workspace
     query.workspace = workspace.get("key");
 
     // loop through filter collection
@@ -148,22 +157,22 @@ function buildQuery(filterList, workspace)
         // assign filter value to correct query object attribute
         switch (filter.get("name"))
         {
-            case FILTER_MIN_ALT_READS.name:
+            case FILTER_MIN_ALT_READS.get("name"):
                 query.minAltReads = filter.get("value");
                 break;
-            case FILTER_MIN_NUM_SAMPLES.name:
+            case FILTER_MIN_NUM_SAMPLES.get("name"):
                 query.minNumSample = filter.get("value");
                 break;
-            case FILTER_MAX_NUM_SAMPLES.name:
+            case FILTER_MAX_NUM_SAMPLES.get("name"):
                 query.maxNumSample = filter.get("value");
                 break;
-            case FILTER_MIN_AC.name:
+            case FILTER_MIN_AC.get("name"):
                 query.minAC = filter.get("value");
                 break;
-            case FILTER_MAX_AC.name:
+            case FILTER_MAX_AC.get("name"):
                 query.maxAC = filter.get("value");
                 break;
-            case FILTER_MIN_PHRED.name:
+            case FILTER_MIN_PHRED.get("name"):
                 query.minPHRED = filter.get("value");
                 break;
         }
@@ -204,6 +213,12 @@ function sendQuery(query)
             // loop through filter collection
             var lastFilter = _.last(SEARCHED_FILTER_LIST.models);
             lastFilter.set("numMatches", json.totalResults);
+
+            if (json.totalResults > MAX_RESULTS)
+            {
+                var m = 'Showing only ' + MAX_RESULTS + ' out of ' + json.totalResults;
+                $("#message_area").html(_.template(WARNING_TEMPLATE,{message: m}));
+            }
         },
         error: function(jqXHR, textStatus)
         {
@@ -249,11 +264,35 @@ function uncheckFilter(filterID)
     checkbox.click();
 }
 
+function setRemoveFilterButtonVisibility()
+{
+    var lastFilter = _.last(SEARCHED_FILTER_LIST.models);
+
+    // loop through filter collection
+    // remove button should ONLY be visible if it's
+    // 1.) not the NONE filter
+    // 2.) is the last filter in the list
+    _.each(SEARCHED_FILTER_LIST.models, function(filter)
+    {
+        var button =  $("#" + filter.get("id") + "_remove_button");
+        if ((filter.get("id") != FILTER_NONE.get("id")) &&
+            (filter.get("id") == lastFilter.get("id")))
+        {
+            button.toggle(true);
+        }
+        else
+        {
+            button.toggle(false);
+        }
+    });
+}
+
 function backboneSearchedView()
 {
     // VIEW
     var SearchedFilterView = Backbone.View.extend({
-        tagName:  "tr",
+
+        tagName: "tr",
 
         template: _.template($('#searched-filter-template').html()),
 
@@ -262,7 +301,15 @@ function backboneSearchedView()
         },
 
         render: function() {
+            console.debug("SearchedFilterView.render() called");
+
+            // set id
+            $(this.el).attr('id', this.model.get("id"));
+
             this.$el.html(this.template(this.model.toJSON()));
+
+            setRemoveFilterButtonVisibility();
+
             return this;
         },
 
@@ -283,32 +330,6 @@ function backboneSearchedView()
         },
 
         render: function() {
-            // remove all rows from table except for header
-            this.$('tr:has(td)').remove();
-
-            // loop through filter collection
-            var idx = 0;
-            var numModels = _.size(SEARCHED_FILTER_LIST.models);
-            _.each(SEARCHED_FILTER_LIST.models, function(filter)
-            {
-                // each filter becomes a row in the table
-                if ((idx == 0) || (idx < (numModels-1)))
-                {
-                    var view = new SearchedFilterView({model: filter});
-                    this.$("#searched_table").append(view.render().el);
-                }
-                else
-                {
-                    var addLastTemplate = _.template($('#searched-last-filter-template').html());
-                    this.$("#searched_table").append("<tr>" + addLastTemplate(filter.toJSON()) + "</tr>");
-                }
-                idx++;
-            });
-
-            // add filter link is always last
-            var addTemplate = _.template($('#searched-add-filter-template').html());
-            var addRow = "<tr>" + addTemplate() + "</tr>";
-            this.$("#searched_table").append(addRow);
         },
 
         addOne: function(filter) {
@@ -316,7 +337,10 @@ function backboneSearchedView()
             var query = buildQuery(SEARCHED_FILTER_LIST, CURRENT_WORKSPACE.first());
             sendQuery(query);
 
-            this.render();
+            var view = new SearchedFilterView({model: filter});
+
+            // add right before the Add Filter button row
+            this.$("#add_filter_row").before(view.render().el);
         },
 
         removeOne: function(filter) {
@@ -324,7 +348,10 @@ function backboneSearchedView()
             var query = buildQuery(SEARCHED_FILTER_LIST, CURRENT_WORKSPACE.first());
             sendQuery(query);
 
-            this.render();
+            // remove TR with corresponding filter ID from DOM
+            this.$("#" + filter.get("id")).remove();
+
+            setRemoveFilterButtonVisibility();
         }
     });
 
