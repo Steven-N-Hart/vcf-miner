@@ -81,7 +81,7 @@
 </div>
 
 <!-- Modal -->
-<div id="add_filter_modal" class="modal hide fade wide-modal" tabindex="-1" role="dialog" aria-labelledby="add_filter_label" aria-hidden="true">
+<div id="add_filter_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="add_filter_label" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="add_filter_label">Add Filter</h3>
@@ -103,7 +103,29 @@
                             <table id="sample_filter_table"></table>
                         </div>
                         <div class="tab-pane" id="tab_content_gene">
-                            gene
+                            <div class="container-fluid">
+                                <div class="row-fluid">
+                                    <div class="span1">
+                                        <label for="<%=id%>_add_button" class="checkbox"><input id="<%=id%>_add_button" type="checkbox"/></label>
+                                    </div>
+                                    <div class="span11">
+                                        <input id="gene_typeahead" type="text" data-provide="typeahead" autocomplete="off" placeholder="<Enter Gene Name>">
+                                    </div>
+                                </div>
+                                <div class="row-fluid">
+                                    <div class="span1"></div>
+                                    <div class="span11">
+                                        <select id="gene_list" size="10" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="row-fluid">
+                                    <div class="span1"></div>
+                                    <div class="span11">
+                                        <button id="remove_gene_list" title="Remove selected rows">Remove</button>
+                                        <button id="reset_gene_list" title="Remove all rows">Reset</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="tab-pane" id="tab_content_group">
                             group

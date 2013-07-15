@@ -112,6 +112,29 @@ function initTemplates()
     ERROR_TEMPLATE   = $("#error-message-template").html();
 }
 
+function initGeneTab(workspaceKey)
+{
+    var req = $.ajax({
+        type: "GET",
+        url: "/mongo_svr/ve/gene/getGenes/w/" + workspaceKey,
+        dataType: "json",
+        success: function(json)
+        {
+            $('#gene_typeahead').typeahead({
+                source: json,
+                updater: function (selection)
+                {
+                    $('#gene_list').append("<option value='"+selection+"'>"+selection+"</option>");
+                }
+            });
+        },
+        error: function(jqXHR, textStatus)
+        {
+            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+        }
+    });
+}
+
 /**
  * Builds a query object.
  *
@@ -700,6 +723,8 @@ function setWorkspace()
 
             // rebuild the DataTables widget since columns have changed
             initVariantTable(DISPLAY_COLS);
+
+            initGeneTab(workspaceKey);
         },
         error: function(jqXHR, textStatus)
         {
