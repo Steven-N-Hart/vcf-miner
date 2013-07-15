@@ -216,7 +216,7 @@ function sendQuery(query)
 
             if (json.totalResults > MAX_RESULTS)
             {
-                var m = 'Showing only ' + MAX_RESULTS + ' out of ' + json.totalResults;
+                var m = 'Loaded only ' + MAX_RESULTS + ' out of ' + json.totalResults + " entries.";
                 $("#message_area").html(_.template(WARNING_TEMPLATE,{message: m}));
             }
         },
