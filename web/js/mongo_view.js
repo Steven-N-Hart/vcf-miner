@@ -597,6 +597,7 @@ function initVariantTable(displayCols)
     }
 
     $('#variant_table').dataTable( {
+        "sDom": "<'row'<'span6'l><'span6'>r>t<'row'<'span6'i><'span6'p>>",
         "aoColumns": aoColumns,
         'aaData':    [],
         "bDestroy":  true
