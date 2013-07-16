@@ -112,11 +112,14 @@ function initGeneTab(workspaceKey)
     });
 
     // change ID to be consistent with all other checkboxes
-    $('#genes_add_button').prop("id", FILTER_GENE.get("ID") + "_add_button");
+    $('#genes_add_button').prop("id", FILTER_GENE.get("id") + "_add_button");
 
-    $('#' + FILTER_GENE.get("ID") + "_add_button").click(function (e)
+    var selector = '#' + FILTER_GENE.get("id") + "_add_button";
+    $('body').on('click', selector, function()
     {
-        //e.preventDefault();
+
+//    $('#' + FILTER_GENE.get("id") + "_add_button").click(function (e)
+//    {
         var checkbox = $(this);
         if (checkbox.is(':checked'))
         {
