@@ -28,23 +28,6 @@ var Filter = Backbone.Model.extend({
     }
 });
 
-// specific filters
-var FILTER_NONE            = new Filter();
-var FILTER_MIN_ALT_READS   = new Filter();
-var FILTER_MIN_NUM_SAMPLES = new Filter();
-var FILTER_MAX_NUM_SAMPLES = new Filter();
-var FILTER_MIN_AC          = new Filter();
-var FILTER_MAX_AC          = new Filter();
-var FILTER_MIN_PHRED       = new Filter();
-
-FILTER_NONE.set(           {name: 'none',          operator: '',  value: '', id:'id-none'});
-FILTER_MIN_ALT_READS.set(  {name: 'Min Alt Reads', operator: '=', value: '0'});
-FILTER_MIN_NUM_SAMPLES.set({name: 'Min # Samples', operator: '=', value: '0'});
-FILTER_MAX_NUM_SAMPLES.set({name: 'Max # Samples', operator: '=', value: '0'});
-FILTER_MIN_AC.set(         {name: 'Min AC',        operator: '=', value: '0'});
-FILTER_MAX_AC.set(         {name: 'Max AC',        operator: '=', value: '0'});
-FILTER_MIN_PHRED.set(      {name: 'Min Phred',     operator: '=', value: '0'});
-
 // COLLECTION of Filters
 var FilterList = Backbone.Collection.extend({
     model: Filter,
@@ -55,6 +38,25 @@ var FilterList = Backbone.Collection.extend({
     },
     comparator: 'order'
 });
+
+// specific filters
+var FILTER_NONE            = new Filter();
+var FILTER_MIN_ALT_READS   = new Filter();
+var FILTER_MIN_NUM_SAMPLES = new Filter();
+var FILTER_MAX_NUM_SAMPLES = new Filter();
+var FILTER_MIN_AC          = new Filter();
+var FILTER_MAX_AC          = new Filter();
+var FILTER_MIN_PHRED       = new Filter();
+var FILTER_GENE            = new Filter();
+
+FILTER_NONE.set(           {name: 'none',          operator: '',  value: '', id:'id-none'});
+FILTER_MIN_ALT_READS.set(  {name: 'Min Alt Reads', operator: '=', value: '0'});
+FILTER_MIN_NUM_SAMPLES.set({name: 'Min # Samples', operator: '=', value: '0'});
+FILTER_MAX_NUM_SAMPLES.set({name: 'Max # Samples', operator: '=', value: '0'});
+FILTER_MIN_AC.set(         {name: 'Min AC',        operator: '=', value: '0'});
+FILTER_MAX_AC.set(         {name: 'Max AC',        operator: '=', value: '0'});
+FILTER_MIN_PHRED.set(      {name: 'Min Phred',     operator: '=', value: '0'});
+FILTER_GENE.set(           {name: 'Gene',          operator: '=', value: ''});
 
 var SEARCHED_FILTER_LIST = new FilterList;
 var PALLET_FILTER_LIST = new FilterList;
@@ -104,42 +106,44 @@ function initTemplates()
 
 function initGeneTab(workspaceKey)
 {
-//    $('#genes_add_button').on('click', selector, function()
-//    {
-//        var checkbox = $(this);
-//        if (checkbox.is(':checked'))
-//        {
-//            // disable checkbox, we want to control the order they can remove
-//            // filters via the remove button
-//            checkbox.prop( "disabled", true );
-//
-//            // update filter's value based on textfield value
-//            filter.set("value", textfield.value);
-//
-//            // update query with modified filter
-//            SEARCHED_FILTER_LIST.add([filter]);
-//
-//            //$('').click();
-//            $("#add_filter_close").click();
-//        }
-//        else
-//        {
-//            // use 'live query' plugin to select dynamically added textfield
-//            $(textfieldSelector).livequery(
-//                function()
-//                {
-//                    var textfield = this;
-//                    textfield.disabled = false;
-//
-//                    var filterIdx = SEARCHED_FILTER_LIST.indexOf(filter);
-//                    console.debug("Filter index: " + filterIdx);
-//
-//                    console.debug("Removing filter with id: " + filter.get("id"));
-//                    SEARCHED_FILTER_LIST.remove(filter);
-//                }
-//            );
-//        }
-//    });
+    $('#reset_gene_list').click(function (e)
+    {
+        $('#gene_list').empty();
+    });
+
+    // change ID to be consistent with all other checkboxes
+    $('#genes_add_button').prop("id", FILTER_GENE.get("ID") + "_add_button");
+
+    $('#' + FILTER_GENE.get("ID") + "_add_button").click(function (e)
+    {
+        //e.preventDefault();
+        var checkbox = $(this);
+        if (checkbox.is(':checked'))
+        {
+            // disable checkbox, we want to control the order they can remove
+            // filters via the remove button
+            checkbox.prop( "disabled", true );
+            $('#reset_gene_list').prop( "disabled", true );
+
+            var geneArray = new Array();
+            $("#gene_list option").each(function()
+            {
+                geneArray.push($(this).val());
+            });
+
+            FILTER_GENE.set("value", geneArray);
+
+            SEARCHED_FILTER_LIST.add(FILTER_GENE);
+
+            $("#add_filter_close").click();
+        }
+        else
+        {
+            checkbox.prop( "disabled", false );
+            $('#reset_gene_list').prop( "disabled", false );
+            SEARCHED_FILTER_LIST.remove(FILTER_GENE);
+        }
+    })
 
     var req = $.ajax({
         type: "GET",
@@ -200,6 +204,9 @@ function buildQuery(filterList, workspaceKey)
                 break;
             case FILTER_MIN_PHRED.get("name"):
                 query.minPHRED = filter.get("value");
+                break;
+            case FILTER_GENE.get("name"):
+                query.genes = filter.get("value");
                 break;
         }
     });
@@ -317,7 +324,6 @@ function initBackbone(workspaceKey, displayCols)
 {
     backboneSearchedView(workspaceKey, displayCols);
     backbonePalletView(workspaceKey);
-
 }
 
 function backboneSearchedView(workspaceKey, displayCols)
@@ -516,8 +522,6 @@ function addRowToInfoFilterTable(name, type)
     var newCell2 = newRow.insertCell(1);
     var newCell3 = newRow.insertCell(2);
 
-//    var rowHTML;
-////    rowHTML = "<label for='"<%=id%>_add_button" class="checkbox"><input id="<%=id%>_add_button" type="checkbox"/><%=name%></label>";
     //set the cell text
     newCell1.innerHTML = "<button title='Add to your search' type=\"button\" class=\"btn-mini\"><i class=\"icon-plus\"></i></button>";
     newCell2.innerHTML = name;
