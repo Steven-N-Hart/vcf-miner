@@ -36,7 +36,7 @@
     <script id="searched-filter-template" type="text/template">
         <span class="label"><td><%=name%></td></span>
         <span class="label"><td><%=operator%></td></span>
-        <span class="label"><td><%=value%></td></span>
+        <span id="<%=id%>_display_value_label" class="label"><td><%=displayValue%></td></span>
         <td><span class="badge badge-info"><%=numMatches%></span></td>
         <td><button id="<%=id%>_remove_button" title="Remove filter from your search" type="button" class="btn" onclick="uncheckFilter('<%=id%>')">x</button></td>
     </script>

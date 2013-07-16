@@ -22,6 +22,7 @@ var Filter = Backbone.Model.extend({
             name:     "NA",
             operator: "NA",
             value:    "NA",
+            displayValue: "NA", // may be abbreviated
             numMatches: 0,
             id: guid()
         };
@@ -49,14 +50,14 @@ var FILTER_MAX_AC          = new Filter();
 var FILTER_MIN_PHRED       = new Filter();
 var FILTER_GENE            = new Filter();
 
-FILTER_NONE.set(           {name: 'none',          operator: '',  value: '', id:'id-none'});
-FILTER_MIN_ALT_READS.set(  {name: 'Min Alt Reads', operator: '=', value: '0'});
-FILTER_MIN_NUM_SAMPLES.set({name: 'Min # Samples', operator: '=', value: '0'});
-FILTER_MAX_NUM_SAMPLES.set({name: 'Max # Samples', operator: '=', value: '0'});
-FILTER_MIN_AC.set(         {name: 'Min AC',        operator: '=', value: '0'});
-FILTER_MAX_AC.set(         {name: 'Max AC',        operator: '=', value: '0'});
-FILTER_MIN_PHRED.set(      {name: 'Min Phred',     operator: '=', value: '0'});
-FILTER_GENE.set(           {name: 'Gene',          operator: '=', value: ''});
+FILTER_NONE.set(           {name: 'none',          operator: '',  value: '' , displayValue: '', id:'id-none'});
+FILTER_MIN_ALT_READS.set(  {name: 'Min Alt Reads', operator: '=', value: '0', displayValue: '0'});
+FILTER_MIN_NUM_SAMPLES.set({name: 'Min # Samples', operator: '=', value: '0', displayValue: '0'});
+FILTER_MAX_NUM_SAMPLES.set({name: 'Max # Samples', operator: '=', value: '0', displayValue: '0'});
+FILTER_MIN_AC.set(         {name: 'Min AC',        operator: '=', value: '0', displayValue: '0'});
+FILTER_MAX_AC.set(         {name: 'Max AC',        operator: '=', value: '0', displayValue: '0'});
+FILTER_MIN_PHRED.set(      {name: 'Min Phred',     operator: '=', value: '0', displayValue: '0'});
+FILTER_GENE.set(           {name: 'Gene',          operator: '=', value: '' , displayValue: '0'});
 
 var SEARCHED_FILTER_LIST = new FilterList;
 var PALLET_FILTER_LIST = new FilterList;
@@ -104,6 +105,38 @@ function initTemplates()
     ERROR_TEMPLATE   = $("#error-message-template").html();
 }
 
+/**
+ * Looks at the filter's current value and tries to be smart about
+ * how display value should look.
+ *
+ * @param filter
+ */
+function setFilterDisplayValue(filter)
+{
+    var value = filter.get("value");
+    var displayValue = '';
+
+    if (value instanceof Array)
+    {
+        for (var i = 0; i < value.length; i++)
+        {
+            displayValue += value[i] + ' ';
+        }
+    }
+    else
+    {
+        if (value.length > 5)
+        {
+            displayValue = value.substr(0, 5) + "...";
+        }
+        else
+        {
+            displayValue = value;
+        }
+    }
+    filter.set("displayValue", $.trim(displayValue));
+}
+
 function initGeneTab(workspaceKey)
 {
     $('#reset_gene_list').click(function (e)
@@ -114,12 +147,8 @@ function initGeneTab(workspaceKey)
     // change ID to be consistent with all other checkboxes
     $('#genes_add_button').prop("id", FILTER_GENE.get("id") + "_add_button");
 
-    var selector = '#' + FILTER_GENE.get("id") + "_add_button";
-    $('body').on('click', selector, function()
+    $('#' + FILTER_GENE.get("id") + "_add_button").click(function (e)
     {
-
-//    $('#' + FILTER_GENE.get("id") + "_add_button").click(function (e)
-//    {
         var checkbox = $(this);
         if (checkbox.is(':checked'))
         {
@@ -131,10 +160,12 @@ function initGeneTab(workspaceKey)
             var geneArray = new Array();
             $("#gene_list option").each(function()
             {
-                geneArray.push($(this).val());
+                var gene = $(this).val();
+                geneArray.push(gene);
             });
 
             FILTER_GENE.set("value", geneArray);
+            setFilterDisplayValue(FILTER_GENE);
 
             SEARCHED_FILTER_LIST.add(FILTER_GENE);
 
@@ -348,6 +379,14 @@ function backboneSearchedView(workspaceKey, displayCols)
 
             this.$el.html(this.template(this.model.toJSON()));
 
+//            $('#display_value_label').tooltip(
+//                {
+////                    html: this.model.get("value"),
+//                    html: "Testing 1 2 3",
+//                    placement: 'top',
+//                    trigger: 'hover'
+//                });
+
             setRemoveFilterButtonVisibility();
 
             return this;
@@ -433,6 +472,7 @@ function backbonePalletView(workspaceKey)
 
                             // update filter's value based on textfield value
                             filter.set("value", textfield.value);
+                            setFilterDisplayValue(filter);
 
                             // update query with modified filter
                             SEARCHED_FILTER_LIST.add([filter]);
