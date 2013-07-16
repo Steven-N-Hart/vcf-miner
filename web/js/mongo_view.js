@@ -11,14 +11,8 @@ var INFO_TEMPLATE;
 var WARNING_TEMPLATE;
 var ERROR_TEMPLATE;
 
-// GLOBAL: contains the column names to display
-var DISPLAY_COLS;
-
-// GLOBAL:
+// GLOBAL CONSTANT
 var MAX_RESULTS = 1000;
-
-// GLOBAL:
-var CURRENT_WORKSPACE_KEY;
 
 // MODEL
 var Filter = Backbone.Model.extend({
@@ -70,9 +64,11 @@ $( document ).ready(function()
     initTemplates();
 
     // TODO: user hardcoded to 'steve'
+    var user = 'steve';
+
     // get workspace information from server
     var workspaceRequest = $.ajax({
-        url: "/mongo_svr/ve/q/owner/list_workspaces/steve",
+        url: "/mongo_svr/ve/q/owner/list_workspaces/" + user,
         dataType: "json",
         success: function(json)
         {
@@ -82,10 +78,7 @@ $( document ).ready(function()
                     var key = json[attr].key;
                     var alias = json[attr].alias;
 
-                    var vcfList = $('#vcf_list');
-
-                    // id of anchor in dropdown is the workspace key
-                    vcfList.append("<option value='"+key+"'>"+alias+"</option>");
+                    $('#vcf_list').append("<option value='"+key+"'>"+alias+"</option>");
 
                     // user must select a VCF
                     $('#select_vcf_modal').modal({"keyboard":false});
@@ -97,9 +90,6 @@ $( document ).ready(function()
             $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
         }
     });
-
-    backboneSearchedView();
-    backbonePalletView();
 });
 
 /**
@@ -114,6 +104,43 @@ function initTemplates()
 
 function initGeneTab(workspaceKey)
 {
+//    $('#genes_add_button').on('click', selector, function()
+//    {
+//        var checkbox = $(this);
+//        if (checkbox.is(':checked'))
+//        {
+//            // disable checkbox, we want to control the order they can remove
+//            // filters via the remove button
+//            checkbox.prop( "disabled", true );
+//
+//            // update filter's value based on textfield value
+//            filter.set("value", textfield.value);
+//
+//            // update query with modified filter
+//            SEARCHED_FILTER_LIST.add([filter]);
+//
+//            //$('').click();
+//            $("#add_filter_close").click();
+//        }
+//        else
+//        {
+//            // use 'live query' plugin to select dynamically added textfield
+//            $(textfieldSelector).livequery(
+//                function()
+//                {
+//                    var textfield = this;
+//                    textfield.disabled = false;
+//
+//                    var filterIdx = SEARCHED_FILTER_LIST.indexOf(filter);
+//                    console.debug("Filter index: " + filterIdx);
+//
+//                    console.debug("Removing filter with id: " + filter.get("id"));
+//                    SEARCHED_FILTER_LIST.remove(filter);
+//                }
+//            );
+//        }
+//    });
+
     var req = $.ajax({
         type: "GET",
         url: "/mongo_svr/ve/gene/getGenes/w/" + workspaceKey,
@@ -185,7 +212,7 @@ function buildQuery(filterList, workspaceKey)
  *
  * @param query
  */
-function sendQuery(query)
+function sendQuery(query, displayCols)
 {
     var pleaseWaitDiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h3>Running Query.  Please wait...</h3></div><div class="modal-body"></div></div>');
     pleaseWaitDiv.modal();
@@ -206,7 +233,7 @@ function sendQuery(query)
             }
 
             // populate the variant table
-            addRowsToVariantTable(json.results, DISPLAY_COLS);
+            addRowsToVariantTable(json.results, displayCols);
 
             // update count on Filter
             // loop through filter collection
@@ -286,7 +313,14 @@ function setRemoveFilterButtonVisibility()
     });
 }
 
-function backboneSearchedView()
+function initBackbone(workspaceKey, displayCols)
+{
+    backboneSearchedView(workspaceKey, displayCols);
+    backbonePalletView(workspaceKey);
+
+}
+
+function backboneSearchedView(workspaceKey, displayCols)
 {
     // VIEW
     var SearchedFilterView = Backbone.View.extend({
@@ -331,8 +365,8 @@ function backboneSearchedView()
 
         addOne: function(filter) {
             // send query request to server
-            var query = buildQuery(SEARCHED_FILTER_LIST, CURRENT_WORKSPACE_KEY);
-            sendQuery(query);
+            var query = buildQuery(SEARCHED_FILTER_LIST, workspaceKey);
+            sendQuery(query, displayCols);
 
             var view = new SearchedFilterView({model: filter});
 
@@ -342,8 +376,8 @@ function backboneSearchedView()
 
         removeOne: function(filter) {
             // send query request to server
-            var query = buildQuery(SEARCHED_FILTER_LIST, CURRENT_WORKSPACE_KEY);
-            sendQuery(query);
+            var query = buildQuery(SEARCHED_FILTER_LIST, workspaceKey);
+            sendQuery(query, displayCols);
 
             // remove TR with corresponding filter ID from DOM
             this.$("#" + filter.get("id")).remove();
@@ -355,7 +389,7 @@ function backboneSearchedView()
     var searchedView = new SearchedView();
 }
 
-function backbonePalletView()
+function backbonePalletView(workspaceKey)
 {
     // VIEW
     var PalletFilterView = Backbone.View.extend({
@@ -526,9 +560,9 @@ function addRowToInfoFilterTable(name, type)
 function initVariantTable(displayCols)
 {
     var aoColumns = new Array();
-    for (var i = 0; i < DISPLAY_COLS.length; i++)
+    for (var i = 0; i < displayCols.length; i++)
     {
-        aoColumns.push({ "sTitle":   DISPLAY_COLS[i] });
+        aoColumns.push({ "sTitle":   displayCols[i] });
     }
 
     $('#variant_table').dataTable( {
@@ -539,7 +573,7 @@ function initVariantTable(displayCols)
     });
 
     // set visibility
-    for (var i = 0; i < DISPLAY_COLS.length; i++)
+    for (var i = 0; i < displayCols.length; i++)
     {
         var isVisible = false;
 
@@ -610,17 +644,18 @@ function addRowsToVariantTable(variants, displayCols)
  */
 function toggleDisplayColumn(colName)
 {
-    // translate column name to column index
-    for (i=0; i < DISPLAY_COLS.length; i++)
+    var table = $('#variant_table').dataTable();
+    var aoColumns = table.fnSettings().aoColumns;
+
+    // translate column name to DataTables column
+    for (i=0; i < aoColumns.length; i++)
     {
-        if (DISPLAY_COLS[i] == colName)
+        if (aoColumns[i].sTitle == colName)
         {
-            var colIdx = i;
-            var table = $('#variant_table').dataTable();
-            var isVisible = table.fnSettings().aoColumns[colIdx].bVisible;
+            var isVisible = aoColumns[i].bVisible;
 
             // flip visibility
-            table.fnSetColumnVis(colIdx, !isVisible);
+            table.fnSetColumnVis(i, !isVisible);
 
             // resize columns
             table.width("100%");
@@ -628,7 +663,6 @@ function toggleDisplayColumn(colName)
             return;
         }
     }
-
 }
 
 /**
@@ -677,7 +711,6 @@ function setWorkspace()
     var workspaceAlias = $('#vcf_list option:selected').text();
 
     console.debug("User selected workspace: " + workspaceKey);
-    CURRENT_WORKSPACE_KEY = workspaceKey;
 
     $("#vcf_file").html("VCF File: " + workspaceAlias);
 
@@ -691,14 +724,14 @@ function setWorkspace()
             $('#info_filter_table').empty();
 
             // 1ST 7 VCF columns displayed by default
-            DISPLAY_COLS = new Array();
-            DISPLAY_COLS.push("CHROM");
-            DISPLAY_COLS.push("POS");
-            DISPLAY_COLS.push("ID");
-            DISPLAY_COLS.push("REF");
-            DISPLAY_COLS.push("ALT");
-            DISPLAY_COLS.push("QUAL");
-            DISPLAY_COLS.push("FILTER");
+            var displayCols = new Array();
+            displayCols.push("CHROM");
+            displayCols.push("POS");
+            displayCols.push("ID");
+            displayCols.push("REF");
+            displayCols.push("ALT");
+            displayCols.push("QUAL");
+            displayCols.push("FILTER");
 
             addRowToConfigColumnsTable(true, "CHROM",  "The chromosome.");
             addRowToConfigColumnsTable(true, "POS",    "The reference position, with the 1st base having position 1.");
@@ -713,7 +746,7 @@ function setWorkspace()
             {
                 if (info.hasOwnProperty(key))
                 {
-                    DISPLAY_COLS.push(key);
+                    displayCols.push(key);
 
                     addRowToInfoFilterTable(key, info[key].type);
 
@@ -722,8 +755,9 @@ function setWorkspace()
             }
 
             // rebuild the DataTables widget since columns have changed
-            initVariantTable(DISPLAY_COLS);
+            initVariantTable(displayCols);
 
+            initBackbone(workspaceKey, displayCols);
             initGeneTab(workspaceKey);
         },
         error: function(jqXHR, textStatus)
