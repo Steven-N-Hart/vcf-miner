@@ -83,8 +83,12 @@ $( document ).ready(function()
 
                     $('#vcf_list').append("<option value='"+key+"'>"+alias+"</option>");
 
+
                     // user must select a VCF
                     $('#select_vcf_modal').modal({"keyboard":false});
+
+                    // set focus on choicebox
+                    $('#vcf_list').focus();
                 }
             }
         },

@@ -87,17 +87,19 @@
         <h3 id="add_filter_label">Add Filter</h3>
     </div>
     <div class="modal-body">
-        <table cellpadding="0" cellspacing="0" border="0" class="table" id="add_filter_table">
-            <tr>
-                <td>
-                    <ul class="nav nav-tabs nav-stacked" id="add_filter_tabs">
+        <div class="container-fluid">
+            <div class="row-fluid"> <!-- tabs -->
+                <div class="span12">
+                    <ul class="nav nav-tabs" id="add_filter_tabs">
                         <li class="active"><a href="#tab_content_sample">Sample</a></li>
                         <li><a href="#tab_content_gene">Gene</a></li>
                         <li><a href="#tab_content_group">Group</a></li>
                         <li><a href="#tab_content_info">Info</a></li>
                     </ul>
-                </td>
-                <td>
+                </div>
+            </div>
+            <div class="row-fluid"> <!-- tab content pane -->
+                <div class="span12">
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab_content_sample">
                             <table id="sample_filter_table"></table>
@@ -127,15 +129,66 @@
                             </div>
                         </div>
                         <div class="tab-pane" id="tab_content_group">
-                            group
+                            <div class="row-fluid">
+                                <div class="span5"> <!-- column that holds group -->
+                                    <div class="row-fluid">
+                                        <div class="span2">
+                                            <input id="group_add_button" type="checkbox" class="span2"/>
+                                        </div>
+                                        <div class="span10">
+                                            <select id="group_list" size="10" class="span12"></select>
+                                        </div>
+                                    </div>
+                                    <div class="row-fluid">
+                                        <div class="span2"></div>
+                                        <div class="span10">
+                                            <button id="new_group_button" title="Create a new group">New</button>
+                                            <button id="remove_group_botton" title="Remove selected group">Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="span7"> <!-- column that holds group details -->
+                                    <div class="row-fluid">
+                                        <div class="span4">
+                                            Name
+                                        </div>
+                                        <div class="span8">
+                                            <input id="group_name_field" type="text" class="span12"/>
+                                        </div>
+                                    </div>
+                                    <div class="row-fluid">
+                                        <div class="span4">
+                                            Description
+                                        </div>
+                                        <div class="span8">
+                                            <textarea id="group_desc_field" rows="3" class="span12"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="row-fluid">
+                                        <div class="span4">
+                                            Samples
+                                        </div>
+                                        <div class="span8">
+                                            <select id="group_sample_list" size="5" class="span12"></select>
+                                        </div>
+                                    </div>
+                                    <div class="row-fluid">
+                                        <div class="span4">
+                                        </div>
+                                        <div class="span8">
+                                            <button id="edit_group_samples_button" title="Edit samples in group">Edit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="tab-pane" id="tab_content_info">
                             <table id="info_filter_table"></table>
                         </div>
                     </div>
-                </td>
-            </tr>
-        </table>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true" id="add_filter_close">Close</button>
