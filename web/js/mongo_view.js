@@ -15,6 +15,32 @@ var ERROR_TEMPLATE;
 var MAX_RESULTS = 1000;
 
 // MODEL
+var SampleGroup = Backbone.Model.extend({
+    defaults: function()
+    {
+        return {
+            name:        "NA",
+            description: "NA",
+            sampleNames: [],
+            id: guid()
+        };
+    }
+});
+
+// COLLECTION of SampleGroups
+var SampleGroupList = Backbone.Collection.extend({
+    model: SampleGroup,
+    localStorage: new Backbone.LocalStorage("mongo-backbone"),
+    nextOrder: function() {
+        if (!this.length) return 1;
+        return this.last().get('order') + 1;
+    },
+    comparator: 'order'
+});
+
+var SAMPLE_GROUP_LIST = new SampleGroupList();
+
+// MODEL
 var Filter = Backbone.Model.extend({
     defaults: function()
     {
@@ -32,7 +58,7 @@ var Filter = Backbone.Model.extend({
 // COLLECTION of Filters
 var FilterList = Backbone.Collection.extend({
     model: Filter,
-    localStorage: new Backbone.LocalStorage("todos-backbone"),
+    localStorage: new Backbone.LocalStorage("mongo-backbone"),
     nextOrder: function() {
         if (!this.length) return 1;
         return this.last().get('order') + 1;
@@ -139,6 +165,66 @@ function setFilterDisplayValue(filter)
         }
     }
     filter.set("displayValue", $.trim(displayValue));
+}
+
+function initGroupTab(workspaceKey)
+{
+    $('#new_group_button').click(function (e)
+    {
+        console.debug("add group button clicked");
+        var group = new SampleGroup();
+        // TODO: append 1, 2, 3 if already exists
+        group.set("name",        'New Group');
+        group.set("description", '');
+
+        SAMPLE_GROUP_LIST.add(group);
+
+        // tell server about new sample group
+        saveSampleGroup(workspaceKey, group);
+
+        // TODO: set focus to name field
+    });
+
+    $('#remove_group_botton').click(function (e)
+    {
+        console.debug("remove group button clicked");
+
+        var group = getSelectedGroup();
+
+        SAMPLE_GROUP_LIST.remove(group);
+
+        // tell server about removed sample group
+        removeSampleGroup(workspaceKey, group);
+    });
+
+    // selection in group list selection has changed or clicked on
+    $('#group_list').click(function()
+    {
+        console.debug("group_list clicked");
+    });
+
+    loadSampleGroups(workspaceKey);
+}
+
+/**
+ * Gets the currently selected group.
+ */
+function getSelectedGroup()
+{
+    // get selected option from select
+    var groupOption = $('#group_list option:selected');
+
+    var id = groupOption.val();
+
+    for (var i = 0; i < SAMPLE_GROUP_LIST.models.length; i++)
+    {
+        var group = SAMPLE_GROUP_LIST.models[i];
+        if (id == group.get("id"))
+        {
+            console.debug("user selected group with id=" + id + " name=" + group.get("name"));
+            return group;
+        }
+    }
 }
 
 function initGeneTab(workspaceKey)
@@ -362,6 +448,7 @@ function initBackbone(workspaceKey, displayCols)
 {
     backboneSearchedView(workspaceKey, displayCols);
     backbonePalletView(workspaceKey);
+    backboneSampleGroupView(workspaceKey);
 }
 
 function backboneSearchedView(workspaceKey, displayCols)
@@ -410,6 +497,8 @@ function backboneSearchedView(workspaceKey, displayCols)
             this.listenTo(SEARCHED_FILTER_LIST, 'remove', this.removeOne);
 
             SEARCHED_FILTER_LIST.fetch();
+
+
         },
 
         render: function() {
@@ -439,6 +528,59 @@ function backboneSearchedView(workspaceKey, displayCols)
     });
 
     var searchedView = new SearchedView();
+}
+
+function backboneSampleGroupView(workspaceKey)
+{
+    var SampleGroupView = Backbone.View.extend({
+
+        tagName: "option",
+
+        initialize: function() {
+            this.listenTo(this.model, 'change', this.render);
+        },
+
+        render: function() {
+            // TODO: tell server that group has changed
+
+            this.$el.text(this.model.get("name"));
+            this.$el.attr( 'id', this.model.get("id"));
+            this.$el.attr( 'value', this.model.get("id"));
+
+            return this;
+        },
+
+        clear: function() {
+            this.model.destroy();
+        }
+    });
+
+    var GroupListView = Backbone.View.extend({
+        el: $("#group_list"),
+
+        initialize: function() {
+            this.listenTo(SAMPLE_GROUP_LIST, 'add',    this.addOne);
+            this.listenTo(SAMPLE_GROUP_LIST, 'remove', this.removeOne);
+            SAMPLE_GROUP_LIST.fetch();
+        },
+
+        render: function() {
+        },
+
+        addOne: function(group) {
+            var view = new SampleGroupView({model: group});
+            this.$el.html(view.render().el);
+        },
+
+        removeOne: function(group) {
+            // remove element with corresponding group ID from DOM
+            this.$("#" + group.get("id")).remove();
+
+            //setRemoveFilterButtonVisibility();
+        }
+    });
+
+    var groupListView = new GroupListView();
 }
 
 function backbonePalletView(workspaceKey)
@@ -549,6 +691,89 @@ function backbonePalletView(workspaceKey)
 
     var palletView = new PalletView();
     palletView.render();
+}
+
+function toSampleGroupPOJO(workspaceKey, groupModel)
+{
+    var pojo = new Object();
+    pojo.workspace   = workspaceKey;
+    pojo.alias       = groupModel.get("name");
+    pojo.description = groupModel.get("description");
+    pojo.samples     = groupModel.get("sampleNames");
+    pojo.inSample    = true; // TODO: pull this from UI
+    return pojo;
+}
+
+function saveSampleGroup(workspaceKey, group)
+{
+    // translate backbone model to pojo expected by server
+    var pojo = toSampleGroupPOJO(workspaceKey, group);
+
+    $.ajax({
+        type: "POST",
+        url: "/mongo_svr/ve/samples/savegroup",
+        contentType: "application/json",
+        data: JSON.stringify(pojo),
+        dataType: "json",
+        success: function(json)
+        {
+            console.debug("saved group: " + pojo.alias);
+        },
+        error: function(jqXHR, textStatus)
+        {
+            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+        }
+    });
+}
+
+function removeSampleGroup(workspaceKey, group)
+{
+    // translate backbone model to pojo expected by server
+    var pojo = toSampleGroupPOJO(workspaceKey, group);
+
+    $.ajax({
+        type: "POST",
+        url: "/mongo_svr/ve/samples/deletegroup",
+        contentType: "application/json",
+        data: JSON.stringify(pojo),
+        dataType: "json",
+        success: function(json)
+        {
+            console.debug("deleted group: " + pojo.alias);
+        },
+        error: function(jqXHR, textStatus)
+        {
+            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+        }
+    });
+}
+
+function loadSampleGroups(workspaceKey)
+{
+    $.ajax({
+        url: "/mongo_svr/ve/samples/groups/w/" + workspaceKey,
+        dataType: "json",
+        success: function(json)
+        {
+            var groupArray = json.sampleGroups;
+            console.debug(json);
+            console.debug("Number of groups: " + groupArray.length);
+            for (var i = 0; i < groupArray.length; i++)
+            {
+                // translate to SampleGroup model
+                var group = new SampleGroup();
+                group.set("name",        groupArray[i].alias);
+                group.set("description", groupArray[i].description);
+                group.set("sampleNames", groupArray[i].samples);
+
+                SAMPLE_GROUP_LIST.add(group);
+            }
+        },
+        error: function(jqXHR, textStatus)
+        {
+            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+        }
+    });
 }
 
 /**
@@ -810,6 +1035,7 @@ function setWorkspace()
 
             initBackbone(workspaceKey, displayCols);
             initGeneTab(workspaceKey);
+            initGroupTab(workspaceKey);
         },
         error: function(jqXHR, textStatus)
         {
