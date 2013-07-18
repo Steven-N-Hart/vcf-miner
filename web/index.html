@@ -147,7 +147,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="span7"> <!-- column that holds group details -->
+                                <div class="span7" id="group_details_pane"> <!-- column that holds group details -->
                                     <div class="row-fluid">
                                         <div class="span4">
                                             Name
@@ -192,6 +192,77 @@
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true" id="add_filter_close">Close</button>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="group_samples_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="select_vcf_label" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>Edit Group Samples</h3>
+    </div>
+    <div class="modal-body">
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span5"> <!-- available samples column -->
+                    <div class="row-fluid">
+                        <div class="span12">
+                            Available Samples
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <select id="available_samples_list" size="15" multiple="multiple" class="span12"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="span2"> <!-- button column -->
+                    <div class="container-fluid">
+                        <div class="row-fluid">
+                            <div class="span12"></div>
+                        </div>
+                        <div class="row-fluid">
+                            <div class="span12"></div>
+                        </div>
+                        <div class="row-fluid">
+                            <div class="span12"></div>
+                        </div>
+                        <div class="row-fluid">
+                            <div class="span12"></div>
+                        </div>
+                        <div class="row-fluid">
+                            <div class="span12">
+                                <button class="btn" id="add_sample_to_group_button"><i class="icon-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="row-fluid">
+                            <div class="span12"></div>
+                        </div>
+                        <div class="row-fluid">
+                            <div class="span12">
+                                <button class="btn" id="remove_sample_from_group_button"><i class="icon-chevron-left"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="span5"> <!-- group samples column -->
+                    <div class="row-fluid">
+                        <div class="span12">
+                            Group Samples
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <select id="group_samples_list" size="15" multiple="multiple" class="span12"></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true" id="group_samples_close" onclick="">Cancel</button>
+        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true" id="group_samples_apply" onclick="">Apply</button>
     </div>
 </div>
 

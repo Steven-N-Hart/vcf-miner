@@ -75,6 +75,7 @@ var FILTER_MIN_AC          = new Filter();
 var FILTER_MAX_AC          = new Filter();
 var FILTER_MIN_PHRED       = new Filter();
 var FILTER_GENE            = new Filter();
+var FILTER_GROUP           = new Filter();
 
 FILTER_NONE.set(           {name: 'none',          operator: '',  value: '' , displayValue: '', id:'id-none'});
 FILTER_MIN_ALT_READS.set(  {name: 'Min Alt Reads', operator: '=', value: '0', displayValue: '0'});
@@ -84,6 +85,7 @@ FILTER_MIN_AC.set(         {name: 'Min AC',        operator: '=', value: '0', di
 FILTER_MAX_AC.set(         {name: 'Max AC',        operator: '=', value: '0', displayValue: '0'});
 FILTER_MIN_PHRED.set(      {name: 'Min Phred',     operator: '=', value: '0', displayValue: '0'});
 FILTER_GENE.set(           {name: 'Gene',          operator: '=', value: '' , displayValue: '0'});
+FILTER_GROUP.set(          {name: 'Group',         operator: '=', value: '' , displayValue: '0'});
 
 var SEARCHED_FILTER_LIST = new FilterList;
 var PALLET_FILTER_LIST = new FilterList;
@@ -167,8 +169,46 @@ function setFilterDisplayValue(filter)
     filter.set("displayValue", $.trim(displayValue));
 }
 
-function initGroupTab(workspaceKey)
+function selectLastGroup()
 {
+    $("#group_list option :last").click();
+}
+
+function initGroupTab(workspaceKey, allSampleNames)
+{
+
+    // change ID to be consistent with all other checkboxes
+    $('#group_add_button').prop("id", FILTER_GROUP.get("id") + "_add_button");
+
+    $('#' + FILTER_GROUP.get("id") + "_add_button").click(function (e)
+    {
+        var checkbox = $(this);
+        if (checkbox.is(':checked'))
+        {
+            // disable checkbox, we want to control the order they can remove
+            // filters via the remove button
+            checkbox.prop( "disabled", true );
+
+            // TODO: disable tab widgets
+//            $('#reset_gene_list').prop( "disabled", true );
+
+            var group = getSelectedGroup();
+
+            FILTER_GROUP.set("value", group.get("name"));
+            setFilterDisplayValue(FILTER_GROUP);
+
+            SEARCHED_FILTER_LIST.add(FILTER_GROUP);
+
+            $("#add_filter_close").click();
+        }
+        else
+        {
+            checkbox.prop( "disabled", false );
+//            $('#reset_gene_list').prop( "disabled", false );
+            SEARCHED_FILTER_LIST.remove(FILTER_GROUP);
+        }
+    })
+
     $('#new_group_button').click(function (e)
     {
         console.debug("add group button clicked");
@@ -182,7 +222,7 @@ function initGroupTab(workspaceKey)
         // tell server about new sample group
         saveSampleGroup(workspaceKey, group);
 
-        // TODO: set focus to name field
+        selectLastGroup();
     });
 
     $('#remove_group_botton').click(function (e)
@@ -195,19 +235,140 @@ function initGroupTab(workspaceKey)
 
         // tell server about removed sample group
         removeSampleGroup(workspaceKey, group);
+
+        updateGroupDetailsPane();
+    });
+
+
+    var availableSamplesList = $('#available_samples_list');
+    var groupSamplesList = $('#group_samples_list');
+
+    $('#add_sample_to_group_button').click(function (e)
+    {
+        $('#available_samples_list option:selected').each(function()
+        {
+            var sampleName = $(this).val();
+            groupSamplesList.append("<option>" + sampleName + "</option>");
+
+            // remove option from available list
+            $(this).remove();
+        });
+    });
+
+    $('#remove_sample_from_group_button').click(function (e)
+    {
+        $('#group_samples_list option:selected').each(function()
+        {
+            var sampleName = $(this).val();
+            availableSamplesList.append("<option value='"+sampleName+"'>" + sampleName + "</option>");
+
+            // remove option from available list
+            $(this).remove();
+        });
+    });
+
+    $('#group_samples_apply').click(function (e)
+    {
+        var group = getSelectedGroup();
+
+        var sampleNames = $.map($('#group_samples_list option'), function(e) { return e.value; });
+
+        group.set("sampleNames", sampleNames);
+        updateGroupDetailsPane(group);
+        saveSampleGroup(workspaceKey, group);
+    });
+
+    $('#edit_group_samples_button').click(function (e)
+    {
+        var group = getSelectedGroup();
+
+        availableSamplesList.empty();
+        for (var i=0; i < allSampleNames.length; i++)
+        {
+            var sampleName = allSampleNames[i];
+            // only add to list if it's not already part of the group's samples
+            if(jQuery.inArray(sampleName, group.get("sampleNames")) == -1)
+            {
+                availableSamplesList.append("<option value='"+sampleName+"'>" + sampleName + "</option>");
+            }
+        }
+
+        groupSamplesList.empty();
+        for (var i=0; i < group.get("sampleNames").length; i++)
+        {
+            var sampleName = group.get("sampleNames")[i];
+            groupSamplesList.append("<option value='"+sampleName+"'>" + sampleName + "</option>");
+        }
+
+        showEditGroupSamplesDialog();
+
+        //updateGroupDetailsPane();
+    });
+
+    // save when these lose focus
+    $('#group_name_field,#group_desc_field').blur(function()
+    {
+        var name = $('#group_name_field').val();
+        var desc = $('#group_desc_field').val();
+
+        var group = getSelectedGroup();
+        if (typeof group !== "undefined")
+        {
+            // check if name has changed
+            if (group.get("name") !=  name)
+            {
+                // must delete old one
+                removeSampleGroup(workspaceKey, group);
+            }
+
+            group.set("name", name);
+            group.set("description", desc);
+
+            saveSampleGroup(workspaceKey, group);
+        }
     });
 
     // selection in group list selection has changed or clicked on
     $('#group_list').click(function()
     {
-        console.debug("group_list clicked");
+        updateGroupDetailsPane(getSelectedGroup());
     });
 
     loadSampleGroups(workspaceKey);
 }
 
 /**
+ * Updates the details pane for the given SampleGroup model.
+ * @param group
+ */
+function updateGroupDetailsPane(group)
+{
+    var nameField  = $('#group_name_field');
+    var descField  = $('#group_desc_field');
+    var sampleList = $('#group_sample_list');
+
+    if (typeof group === "undefined")
+    {
+        nameField.val('');
+        descField.val('');
+        sampleList.empty();
+    }
+    else
+    {
+        nameField.val(group.get("name"));
+        descField.val(group.get("description"));
+        sampleList.empty();
+        for (var i=0; i < group.get("sampleNames").length; i++)
+        {
+            sampleList.append("<option>" + group.get("sampleNames")[i] + "</option>");
+        }
+    }
+}
+
+/**
  * Gets the currently selected group.
+ *
+ * @returns selected SampleGroup model
  */
 function getSelectedGroup()
 {
@@ -269,7 +430,7 @@ function initGeneTab(workspaceKey)
         }
     })
 
-    var req = $.ajax({
+    $.ajax({
         type: "GET",
         url: "/mongo_svr/ve/gene/getGenes/w/" + workspaceKey,
         dataType: "json",
@@ -305,6 +466,8 @@ function buildQuery(filterList, workspaceKey)
 
     query.workspace = workspaceKey;
 
+    var sampleGroups = new Array();
+
     // loop through filter collection
     _.each(filterList.models, function(filter)
     {
@@ -332,8 +495,21 @@ function buildQuery(filterList, workspaceKey)
             case FILTER_GENE.get("name"):
                 query.genes = filter.get("value");
                 break;
+            case FILTER_GROUP.get("name"):
+                // lookup SampleGroup model that corresponds to name
+                for (var i=0; i < SAMPLE_GROUP_LIST.models.length; i++)
+                {
+                    var group = SAMPLE_GROUP_LIST.models[i];
+                    if (group.get("name") === FILTER_GROUP.get("value"))
+                    {
+                        sampleGroups.push(toSampleGroupPOJO(workspaceKey, group));
+                    }
+                }
+                break;
         }
     });
+
+    query.sampleGroups = sampleGroups;
 
     return query;
 }
@@ -569,7 +745,7 @@ function backboneSampleGroupView(workspaceKey)
 
         addOne: function(group) {
             var view = new SampleGroupView({model: group});
-            this.$el.html(view.render().el);
+            this.$el.append(view.render().el);
         },
 
         removeOne: function(group) {
@@ -693,6 +869,25 @@ function backbonePalletView(workspaceKey)
     palletView.render();
 }
 
+/**
+ * Displays dialog box so that user can modify a group's samples.
+ */
+function showEditGroupSamplesDialog()
+{
+    var dialog = $('#group_samples_modal');
+
+    //var table = document.getElementById('add_filter_table');
+
+//    $('#add_filter_tabs a').click(function (e)
+//    {
+//        e.preventDefault();
+//        $(this).tab('show');
+//    })
+
+    // display
+    dialog.modal();
+}
+
 function toSampleGroupPOJO(workspaceKey, groupModel)
 {
     var pojo = new Object();
@@ -708,6 +903,8 @@ function saveSampleGroup(workspaceKey, group)
 {
     // translate backbone model to pojo expected by server
     var pojo = toSampleGroupPOJO(workspaceKey, group);
+
+    console.debug("Saving group: " + JSON.stringify(pojo));
 
     $.ajax({
         type: "POST",
@@ -1030,12 +1227,23 @@ function setWorkspace()
                 }
             }
 
+            var allSamples = new Array();
+            for (var key in json.SAMPLES)
+            {
+                if (json.SAMPLES.hasOwnProperty(key))
+                {
+                    allSamples.push(key);
+                }
+            }
+            // sort alphabetically
+            allSamples.sort(SortByName);
+
             // rebuild the DataTables widget since columns have changed
             initVariantTable(displayCols);
 
             initBackbone(workspaceKey, displayCols);
             initGeneTab(workspaceKey);
-            initGroupTab(workspaceKey);
+            initGroupTab(workspaceKey, allSamples);
         },
         error: function(jqXHR, textStatus)
         {
@@ -1049,4 +1257,11 @@ function setWorkspace()
         SEARCHED_FILTER_LIST.reset();
         SEARCHED_FILTER_LIST.add(FILTER_NONE);
     });
+}
+
+function SortByName(a, b)
+{
+    var aName = a.toLowerCase();
+    var bName = b.toLowerCase();
+    return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
 }
