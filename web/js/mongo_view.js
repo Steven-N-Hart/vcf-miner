@@ -114,9 +114,6 @@ $( document ).ready(function()
 
                     // user must select a VCF
                     $('#select_vcf_modal').modal({"keyboard":false});
-
-                    // set focus on choicebox
-                    $('#vcf_list').focus();
                 }
             }
         },
@@ -169,66 +166,22 @@ function setFilterDisplayValue(filter)
     filter.set("displayValue", $.trim(displayValue));
 }
 
-function selectLastGroup()
-{
-    $("#group_list option :last").click();
-}
-
 function initGroupTab(workspaceKey, allSampleNames)
 {
-
-    // change ID to be consistent with all other checkboxes
-    $('#group_add_button').prop("id", FILTER_GROUP.get("id") + "_add_button");
-
-    $('#' + FILTER_GROUP.get("id") + "_add_button").click(function (e)
+    $('#group_add_button').click(function (e)
     {
-        var checkbox = $(this);
-        if (checkbox.is(':checked'))
-        {
-            // disable checkbox, we want to control the order they can remove
-            // filters via the remove button
-            checkbox.prop( "disabled", true );
+        var group = getSelectedGroup();
 
-            // TODO: disable tab widgets
-//            $('#reset_gene_list').prop( "disabled", true );
+        FILTER_GROUP.set("value", group.get("name"));
+        setFilterDisplayValue(FILTER_GROUP);
 
-            var group = getSelectedGroup();
+        SEARCHED_FILTER_LIST.add(FILTER_GROUP);
 
-            FILTER_GROUP.set("value", group.get("name"));
-            setFilterDisplayValue(FILTER_GROUP);
-
-            SEARCHED_FILTER_LIST.add(FILTER_GROUP);
-
-            $("#add_filter_close").click();
-        }
-        else
-        {
-            checkbox.prop( "disabled", false );
-//            $('#reset_gene_list').prop( "disabled", false );
-            SEARCHED_FILTER_LIST.remove(FILTER_GROUP);
-        }
-    })
-
-    $('#new_group_button').click(function (e)
-    {
-        console.debug("add group button clicked");
-        var group = new SampleGroup();
-        // TODO: append 1, 2, 3 if already exists
-        group.set("name",        'New Group');
-        group.set("description", '');
-
-        SAMPLE_GROUP_LIST.add(group);
-
-        // tell server about new sample group
-        saveSampleGroup(workspaceKey, group);
-
-        selectLastGroup();
+        $("#add_filter_close").click();
     });
 
-    $('#remove_group_botton').click(function (e)
+    $('#remove_group_button').click(function (e)
     {
-        console.debug("remove group button clicked");
-
         var group = getSelectedGroup();
 
         SAMPLE_GROUP_LIST.remove(group);
@@ -238,7 +191,6 @@ function initGroupTab(workspaceKey, allSampleNames)
 
         updateGroupDetailsPane();
     });
-
 
     var availableSamplesList = $('#available_samples_list');
     var groupSamplesList = $('#group_samples_list');
@@ -267,74 +219,91 @@ function initGroupTab(workspaceKey, allSampleNames)
         });
     });
 
-    $('#group_samples_apply').click(function (e)
+    $('#new_group_apply').click(function (e)
     {
-        var group = getSelectedGroup();
+        var group = new SampleGroup();
+        group.set("name", $('#group_name_field').val());
+        group.set("description", '');
 
         var sampleNames = $.map($('#group_samples_list option'), function(e) { return e.value; });
-
         group.set("sampleNames", sampleNames);
+
         updateGroupDetailsPane(group);
+        SAMPLE_GROUP_LIST.add(group);
         saveSampleGroup(workspaceKey, group);
+
+        // select last Group
+        //$("#group_list option:last").attr("selected","selected");
     });
 
-    $('#edit_group_samples_button').click(function (e)
+    $('#new_group_button').click(function (e)
     {
-        var group = getSelectedGroup();
-
+        // reset widgets
+        $('#group_name_field').val('');
         availableSamplesList.empty();
+        groupSamplesList.empty();
+
         for (var i=0; i < allSampleNames.length; i++)
         {
             var sampleName = allSampleNames[i];
-            // only add to list if it's not already part of the group's samples
-            if(jQuery.inArray(sampleName, group.get("sampleNames")) == -1)
-            {
-                availableSamplesList.append("<option value='"+sampleName+"'>" + sampleName + "</option>");
-            }
+            availableSamplesList.append("<option value='"+sampleName+"'>" + sampleName + "</option>");
         }
 
-        groupSamplesList.empty();
-        for (var i=0; i < group.get("sampleNames").length; i++)
-        {
-            var sampleName = group.get("sampleNames")[i];
-            groupSamplesList.append("<option value='"+sampleName+"'>" + sampleName + "</option>");
-        }
-
-        showEditGroupSamplesDialog();
-
-        //updateGroupDetailsPane();
+        // show dialog
+        $('#create_group_modal').modal();
     });
 
-    // save when these lose focus
-    $('#group_name_field,#group_desc_field').blur(function()
-    {
-        var name = $('#group_name_field').val();
-        var desc = $('#group_desc_field').val();
-
-        var group = getSelectedGroup();
-        if (typeof group !== "undefined")
-        {
-            // check if name has changed
-            if (group.get("name") !=  name)
-            {
-                // must delete old one
-                removeSampleGroup(workspaceKey, group);
-            }
-
-            group.set("name", name);
-            group.set("description", desc);
-
-            saveSampleGroup(workspaceKey, group);
-        }
-    });
+    var groupList = $('#group_list');
 
     // selection in group list selection has changed or clicked on
-    $('#group_list').click(function()
+    groupList.change(function()
     {
+        groupList.popover('show');
         updateGroupDetailsPane(getSelectedGroup());
     });
 
+    groupList.popover(
+        {
+            animation:  true,
+            html:       true,
+            placement: 'bottom',
+            title:      getGroupPopoverTitle,
+            content:    getGroupPopoverContent
+        }
+    );
+
     loadSampleGroups(workspaceKey);
+}
+
+function getGroupPopoverTitle()
+{
+    var numSamples = getSelectedGroup().get("sampleNames").length;
+    var title =  'This group has <b>' + numSamples + '</b>';
+
+    if (numSamples == 1)
+    {
+        title += " sample";
+    } else
+    {
+        title += " samples";
+    }
+
+    return title + "<button type='button' id='close' class='close' onclick=\"$('#group_list').popover('hide');\">&times;</button>";
+}
+
+function getGroupPopoverContent()
+{
+    var group = getSelectedGroup();
+    var html = "";
+
+    html += "<select size='8'>";
+    for (var i=0; i < group.get("sampleNames").length; i++)
+    {
+        html += "<option>" + group.get("sampleNames")[i] + "</option>";
+    }
+    html += "</select>";
+
+    return html;
 }
 
 /**
@@ -343,20 +312,18 @@ function initGroupTab(workspaceKey, allSampleNames)
  */
 function updateGroupDetailsPane(group)
 {
-    var nameField  = $('#group_name_field');
-    var descField  = $('#group_desc_field');
+    var div = $('#group_sample_div');
+    var sampleCountLabel = $('#group_sample_list_count');
     var sampleList = $('#group_sample_list');
 
     if (typeof group === "undefined")
     {
-        nameField.val('');
-        descField.val('');
-        sampleList.empty();
+        div.hide();
     }
     else
     {
-        nameField.val(group.get("name"));
-        descField.val(group.get("description"));
+        div.show();
+        sampleCountLabel.text("Samples (" + group.get("sampleNames").length + ")");
         sampleList.empty();
         for (var i=0; i < group.get("sampleNames").length; i++)
         {
@@ -597,11 +564,11 @@ function setRemoveFilterButtonVisibility()
         if ((filter.get("id") != FILTER_NONE.get("id")) &&
             (filter.get("id") == lastFilter.get("id")))
         {
-            button.toggle(true);
+            button.show();
         }
         else
         {
-            button.toggle(false);
+            button.hide();
         }
     });
 }
@@ -737,8 +704,6 @@ function backboneSampleGroupView(workspaceKey)
         removeOne: function(group) {
             // remove element with corresponding group ID from DOM
             this.$("#" + group.get("id")).remove();
-
-            //setRemoveFilterButtonVisibility();
         }
     });
 
@@ -829,25 +794,6 @@ function backbonePalletView(workspaceKey)
 
     var palletView = new PalletView();
     palletView.render();
-}
-
-/**
- * Displays dialog box so that user can modify a group's samples.
- */
-function showEditGroupSamplesDialog()
-{
-    var dialog = $('#group_samples_modal');
-
-    //var table = document.getElementById('add_filter_table');
-
-//    $('#add_filter_tabs a').click(function (e)
-//    {
-//        e.preventDefault();
-//        $(this).tab('show');
-//    })
-
-    // display
-    dialog.modal();
 }
 
 function toSampleGroupPOJO(workspaceKey, groupModel)
