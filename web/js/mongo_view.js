@@ -583,18 +583,19 @@ function addNewFilter()
 }
 
 /**
+ * Removes filter from the collection of filters that are searched
  *
  * @param filterID
  */
-function uncheckFilter(filterID)
+function removeFilter(filterID)
 {
-    var checkbox = $('#' + filterID + "_add_button");
-
-    // enable
-    checkbox.prop( "disabled", false );
-
-    // click to uncheck
-    checkbox.click();
+    _.each(SEARCHED_FILTER_LIST.models, function(filter)
+    {
+        if (filter.get("id") == filterID)
+        {
+            SEARCHED_FILTER_LIST.remove(filter);
+        }
+    });
 }
 
 function setRemoveFilterButtonVisibility()
@@ -763,7 +764,9 @@ function backbonePalletView(workspaceKey)
 {
     // VIEW
     var PalletFilterView = Backbone.View.extend({
-        tagName:  "tr",
+        tagName:  "div",
+
+        className: "row-fluid",
 
         template: _.template($('#pallet-filter-template').html()),
 
@@ -777,50 +780,24 @@ function backbonePalletView(workspaceKey)
             var selector = '#' + filter.get("id") + "_add_button";
             $('body').on('click', selector, function()
             {
-                var checkbox = $(this);
                 var textfieldSelector =  "#" + filter.get("id") + "_value_field";
-                if (checkbox.is(':checked'))
-                {
-                    // disable checkbox, we want to control the order they can remove
-                    // filters via the remove button
-                    checkbox.prop( "disabled", true );
 
-                    // use 'live query' plugin to select dynamically added textfield
-                    $(textfieldSelector).livequery(
-                        function()
-                        {
-                            var textfield = this;
-                            textfield.disabled = true;
+                // use 'live query' plugin to select dynamically added textfield
+                $(textfieldSelector).livequery(
+                    function()
+                    {
+                        var textfield = this;
 
-                            // update filter's value based on textfield value
-                            filter.set("value", textfield.value);
-                            setFilterDisplayValue(filter);
+                        // update filter's value based on textfield value
+                        filter.set("value", textfield.value);
+                        setFilterDisplayValue(filter);
 
-                            // update query with modified filter
-                            SEARCHED_FILTER_LIST.add([filter]);
+                        // update query with modified filter
+                        SEARCHED_FILTER_LIST.add([filter]);
 
-                            //$('').click();
-                            $("#add_filter_close").click();
-                        }
-                    );
-                }
-                else
-                {
-                    // use 'live query' plugin to select dynamically added textfield
-                    $(textfieldSelector).livequery(
-                        function()
-                        {
-                            var textfield = this;
-                            textfield.disabled = false;
-
-                            var filterIdx = SEARCHED_FILTER_LIST.indexOf(filter);
-                            console.debug("Filter index: " + filterIdx);
-
-                            console.debug("Removing filter with id: " + filter.get("id"));
-                            SEARCHED_FILTER_LIST.remove(filter);
-                        }
-                    );
-                }
+                        $("#add_filter_close").click();
+                    }
+                );
             });
 
             return this;
@@ -857,7 +834,7 @@ function backbonePalletView(workspaceKey)
             {
                 // each filter becomes a row in the table
                 var view = new PalletFilterView({model: filter});
-                this.$("#sample_filter_table").append(view.render().el);
+                $('#pallet_view').append(view.render().el);
             });
         },
 
