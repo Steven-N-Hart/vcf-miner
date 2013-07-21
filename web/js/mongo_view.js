@@ -400,34 +400,19 @@ function initGeneTab(workspaceKey)
 
     $('#' + FILTER_GENE.get("id") + "_add_button").click(function (e)
     {
-        var checkbox = $(this);
-        if (checkbox.is(':checked'))
+        var geneArray = new Array();
+        $("#gene_list option").each(function()
         {
-            // disable checkbox, we want to control the order they can remove
-            // filters via the remove button
-            checkbox.prop( "disabled", true );
-            $('#reset_gene_list').prop( "disabled", true );
+            var gene = $(this).val();
+            geneArray.push(gene);
+        });
 
-            var geneArray = new Array();
-            $("#gene_list option").each(function()
-            {
-                var gene = $(this).val();
-                geneArray.push(gene);
-            });
+        FILTER_GENE.set("value", geneArray);
+        setFilterDisplayValue(FILTER_GENE);
 
-            FILTER_GENE.set("value", geneArray);
-            setFilterDisplayValue(FILTER_GENE);
+        SEARCHED_FILTER_LIST.add(FILTER_GENE);
 
-            SEARCHED_FILTER_LIST.add(FILTER_GENE);
-
-            $("#add_filter_close").click();
-        }
-        else
-        {
-            checkbox.prop( "disabled", false );
-            $('#reset_gene_list').prop( "disabled", false );
-            SEARCHED_FILTER_LIST.remove(FILTER_GENE);
-        }
+        $("#add_filter_close").click();
     })
 
     $.ajax({
