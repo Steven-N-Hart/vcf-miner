@@ -9,6 +9,7 @@
 // GLOBAL: templates for showing messages to user in designated message area
 var INFO_TEMPLATE;
 var WARNING_TEMPLATE;
+var WARNING_POPOVER_TEMPLATE;
 var ERROR_TEMPLATE;
 
 // GLOBAL CONSTANT
@@ -156,9 +157,10 @@ $( document ).ready(function()
  */
 function initTemplates()
 {
-    INFO_TEMPLATE    = $("#warning-message-template").html();
-    WARNING_TEMPLATE = $("#warning-message-template").html();
-    ERROR_TEMPLATE   = $("#error-message-template").html();
+    INFO_TEMPLATE            = $("#warning-message-template").html();
+    WARNING_TEMPLATE         = $("#warning-message-template").html();
+    WARNING_POPOVER_TEMPLATE = $("#warning-popover-template").html();
+    ERROR_TEMPLATE           = $("#error-message-template").html();
 }
 
 /**
@@ -633,8 +635,20 @@ function sendQuery(query, displayCols)
 
             if (json.totalResults > MAX_RESULTS)
             {
-                var m = 'Loaded only ' + MAX_RESULTS + ' out of ' + json.totalResults + " entries.";
-                $("#message_area").html(_.template(WARNING_TEMPLATE,{message: m}));
+                var m = 'Loaded only ' + MAX_RESULTS;
+                numMatchesLabel = $('#' + lastFilter.get("id") + "_num_matches_label");
+                numMatchesLabel.popover(
+                    {
+                        html: true,
+                        content: _.template(WARNING_POPOVER_TEMPLATE,{message: m})
+                    }
+                );
+                numMatchesLabel.popover('show');
+                // hide popover after 2 seconds
+                setTimeout(
+                    function(){numMatchesLabel.popover('hide');},
+                    2000
+                );
             }
         },
         error: function(jqXHR, textStatus)
@@ -1080,16 +1094,106 @@ function initVariantTable(displayCols)
     // set visibility
     for (var i = 0; i < displayCols.length; i++)
     {
+        // look at dialog checkbox
+        var checkbox = $('#' + hash(displayCols[i]) + "_visible_checkbox");
         var isVisible = false;
-
-        // only 1st 7 columns visible by default
-        if (i <= 6)
+        if (checkbox.is(':checked'))
         {
             isVisible = true;
         }
 
         $('#variant_table').dataTable().fnSetColumnVis(i, isVisible);
     }
+}
+
+/**
+ * Marks up obj with HTML to get a nice looking display value for a single DataTables cell.
+ *
+ * @param obj
+ */
+function getDataTablesDisplayValue(value)
+{
+    var id = guid();
+
+    if (typeof value === "undefined")
+    {
+        return '';
+    }
+
+    var displayValue = '';
+
+    if (value instanceof Array)
+    {
+        if (value.length > 0)
+        {
+            displayValue = value[0];
+        }
+        if (value.length > 1)
+        {
+            var left = value.length - 1;
+            var expandAnchor = '<a id="' + id + '_expand" title="Show remaining '+ left +'">...</a>';
+            var collapseAnchor = '<a id="' + id + '_collapse">collapse</a>';
+
+            displayValue += expandAnchor;
+
+            // expansion has each array item separated by whitespace
+            var moreText = ''
+            for (var i = 1; i < value.length; i++)
+            {
+                moreText += value[i] + ' ';
+            }
+
+            $('body').on('click', '#' + id + '_expand',
+                function()
+                {
+                    $(this).replaceWith(' <div>' + moreText + ' ' + collapseAnchor + '</div>');
+
+                    $('body').on('click', '#' + id + '_collapse',
+                        function()
+                        {
+                            // replace div with original expand anchor
+                            $(this).parent().replaceWith(expandAnchor);
+                        }
+                    );
+
+                }
+            );
+        }
+    }
+    else
+    {
+        var MAX_LENGTH = 10;
+        if (value.length > MAX_LENGTH)
+        {
+            var expandAnchor = '<a id="' + id + '_expand" title="Show remaining characters">...</a>';
+            var collapseAnchor = '<a id="' + id + '_collapse">'+value+'</a>';
+
+            displayValue = '<div>' + value.substr(0, MAX_LENGTH) + expandAnchor + "</div>";
+
+            var remainingText = value.substr(MAX_LENGTH);
+
+            $('body').on('click', '#' + id + '_expand',
+                function()
+                {
+                    $(this).parent().replaceWith('<div>' + collapseAnchor + '</div>');
+
+                    $('body').on('click', '#' + id + '_collapse',
+                        function()
+                        {
+                            // replace div with original expand anchor
+                            $(this).parent().replaceWith(displayValue);
+                        }
+                    );
+                }
+            );
+        }
+        else
+        {
+            displayValue = value;
+        }
+    }
+
+    return displayValue;
 }
 
 /**
@@ -1107,21 +1211,27 @@ function addRowsToVariantTable(variants, displayCols)
         var variant = variants[i];
 
         var aaDataRow = new Array();
-        aaDataRow.push(variant['CHROM']);
-        aaDataRow.push(variant['POS']);
-        aaDataRow.push(variant['ID']);
-        aaDataRow.push(variant['REF']);
-        aaDataRow.push(variant['ALT']);
-        aaDataRow.push(variant['QUAL']);
-        aaDataRow.push(variant['FILTER']);
+        aaDataRow.push(getDataTablesDisplayValue(variant['CHROM']));
+        aaDataRow.push(getDataTablesDisplayValue(variant['POS']));
+        aaDataRow.push(getDataTablesDisplayValue(variant['ID']));
+        aaDataRow.push(getDataTablesDisplayValue(variant['REF']));
+        aaDataRow.push(getDataTablesDisplayValue(variant['ALT']));
+        aaDataRow.push(getDataTablesDisplayValue(variant['QUAL']));
+        aaDataRow.push(getDataTablesDisplayValue(variant['FILTER']));
+
+        // # samples
+        aaDataRow.push(getDataTablesDisplayValue(variant['GenotypePostitiveCount']));
+        // sample names
+        aaDataRow.push(getDataTablesDisplayValue(variant['GenotypePositiveList']));
+
         var variantInfo = variant['INFO'];
-        for (var disIdx=7; disIdx < displayCols.length; disIdx++)
+        for (var disIdx=9; disIdx < displayCols.length; disIdx++)
         {
             var infoFieldName = displayCols[disIdx];
 
             if(variantInfo[infoFieldName] !== undefined)
             {
-                aaDataRow.push(variantInfo[infoFieldName]);
+                aaDataRow.push(getDataTablesDisplayValue(variantInfo[infoFieldName]));
             }
             else
             {
@@ -1191,9 +1301,9 @@ function addRowToConfigColumnsTable(checked, key, description)
 
     //set the cell text
     if (checked)
-        newCTableCell1.innerHTML = "<input class=\"input-mini\" type=\"checkbox\" checked=\"true\" onclick=\"toggleDisplayColumn('"+key+"')\"/>";
+        newCTableCell1.innerHTML = "<input id='" + hash(key) + "_visible_checkbox' class=\"input-mini\" type=\"checkbox\" checked=\"true\" onclick=\"toggleDisplayColumn('"+key+"')\"/>";
     else
-        newCTableCell1.innerHTML = "<input class=\"input-mini\" type=\"checkbox\" onclick=\"toggleDisplayColumn('"+key+"')\"/>";
+        newCTableCell1.innerHTML = "<input id='" + hash(key) + "_visible_checkbox' class=\"input-mini\" type=\"checkbox\" onclick=\"toggleDisplayColumn('"+key+"')\"/>";
 
     newCTableCell2.innerHTML = key;
     newCTableCell3.innerHTML = description;
@@ -1236,14 +1346,18 @@ function setWorkspace()
             displayCols.push("ALT");
             displayCols.push("QUAL");
             displayCols.push("FILTER");
-
             addRowToConfigColumnsTable(true, "CHROM",  "The chromosome.");
             addRowToConfigColumnsTable(true, "POS",    "The reference position, with the 1st base having position 1.");
             addRowToConfigColumnsTable(true, "ID",     "Semi-colon separated list of unique identifiers.");
             addRowToConfigColumnsTable(true, "REF",    "The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).");
-            addRowToConfigColumnsTable(true, "ALT",    "Comma separated list of alternate non-reference alleles called on at least one of the samples");
-            addRowToConfigColumnsTable(true, "QUAL",   "Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).");
-            addRowToConfigColumnsTable(true, "FILTER", "PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.");
+            addRowToConfigColumnsTable(true, "ALT",    "Comma separated list of alternate non-reference alleles called on at least one of the samples.");
+            addRowToConfigColumnsTable(false, "QUAL",   "Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).");
+            addRowToConfigColumnsTable(false, "FILTER", "PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.");
+
+            displayCols.push("#_Samples");
+            displayCols.push("Samples");
+            addRowToConfigColumnsTable(true, "#_Samples", "The number of samples.");
+            addRowToConfigColumnsTable(true, "Samples", "The names of samples.");
 
             var infoFilters = new FilterList();
 
@@ -1392,4 +1506,14 @@ function toInfoStringFilterPojo(filter)
     pojo.comparator = comparator;
 
     return pojo;
+}
+
+/**
+ * Produces a hash code for the given string.
+ * @param s
+ * @returns {Object}
+ */
+function hash(s)
+{
+    return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
 }

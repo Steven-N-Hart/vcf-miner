@@ -41,7 +41,7 @@
         <span class="label"><td><%=name%></td></span>
         <span class="label"><td><%=displayOperator%></td></span>
         <span id="<%=id%>_display_value_label" class="label"><td><%=displayValue%></td></span>
-        <td><span class="badge badge-info"><%=numMatches%></span></td>
+        <td><span class="badge badge-info" id="<%=id%>_num_matches_label"><%=numMatches%></span></td>
         <td><button id="<%=id%>_remove_button" title="Remove filter from your search" type="button" class="btn" onclick="removeFilter('<%=id%>')">x</button></td>
     </script>
     <script id="pallet-filter-template" type="text/template">
@@ -98,6 +98,12 @@
         <div class="alert alert-block">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4>Warning!</h4>
+            <%=message%>
+        </div>
+    </script>
+    <script id="warning-popover-template" type="text/template">
+        <div class="alert alert-block">
+            <h4>Warning!</h4>
             <%=message%>
         </div>
     </script>
