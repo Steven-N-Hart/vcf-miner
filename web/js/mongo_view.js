@@ -40,17 +40,44 @@ var SampleGroupList = Backbone.Collection.extend({
 
 var SAMPLE_GROUP_LIST = new SampleGroupList();
 
+// ENUM
+var FilterCategory =
+{
+    UNKNOWN:    0,
+    SAMPLE:     1,
+    GENE:       2,
+    GROUP:      3,
+    INFO_INT:   4,
+    INFO_FLOAT: 5,
+    INFO_FLAG:  6,
+    INFO_STR:   7
+}
+
+// ENUM
+var FilterOperator =
+{
+    UNKNOWN: 0,
+    EQ:      1,
+    LT:      2,
+    LTEQ:    3,
+    GT:      4,
+    GTEQ:    5,
+    NE:      6
+}
+
 // MODEL
 var Filter = Backbone.Model.extend({
     defaults: function()
     {
         return {
-            name:     "NA",
-            operator: "NA",
-            value:    "NA",
-            displayValue: "NA", // may be abbreviated
-            numMatches: 0,
-            id: guid()
+            name:            "NA",
+            operator:        FilterOperator.UNKNOWN,
+            displayOperator: "NA",
+            value:           "NA",
+            displayValue:    "NA", // may be abbreviated
+            numMatches:      0,
+            category:        FilterCategory.UNKNOWN,
+            id:              guid()
         };
     }
 });
@@ -77,19 +104,18 @@ var FILTER_MIN_PHRED       = new Filter();
 var FILTER_GENE            = new Filter();
 var FILTER_GROUP           = new Filter();
 
-FILTER_NONE.set(           {name: 'none',          operator: '',  value: '' , displayValue: '', id:'id-none'});
-FILTER_MIN_ALT_READS.set(  {name: 'Min Alt Reads', operator: '=', value: '0', displayValue: '0'});
-FILTER_MIN_NUM_SAMPLES.set({name: 'Min # Samples', operator: '=', value: '0', displayValue: '0'});
-FILTER_MAX_NUM_SAMPLES.set({name: 'Max # Samples', operator: '=', value: '0', displayValue: '0'});
-FILTER_MIN_AC.set(         {name: 'Min AC',        operator: '=', value: '0', displayValue: '0'});
-FILTER_MAX_AC.set(         {name: 'Max AC',        operator: '=', value: '0', displayValue: '0'});
-FILTER_MIN_PHRED.set(      {name: 'Min Phred',     operator: '=', value: '0', displayValue: '0'});
-FILTER_GENE.set(           {name: 'Gene',          operator: '=', value: '' , displayValue: '0'});
-FILTER_GROUP.set(          {name: 'Group',         operator: '=', value: '' , displayValue: '0'});
+FILTER_NONE.set(           {name: 'none',          operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'});
+FILTER_MIN_ALT_READS.set(  {name: 'Min Alt Reads', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+FILTER_MIN_NUM_SAMPLES.set({name: 'Min # Samples', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+FILTER_MAX_NUM_SAMPLES.set({name: 'Max # Samples', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+FILTER_MIN_AC.set(         {name: 'Min AC',        operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+FILTER_MAX_AC.set(         {name: 'Max AC',        operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+FILTER_MIN_PHRED.set(      {name: 'Min Phred',     operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+FILTER_GENE.set(           {name: 'Gene',          operator: FilterOperator.EQ, value: '' , displayValue: '0', category: FilterCategory.GENE});
+FILTER_GROUP.set(          {name: 'Group',         operator: FilterOperator.EQ, value: '' , displayValue: '0', category: FilterCategory.GROUP});
 
 var SEARCHED_FILTER_LIST = new FilterList;
 var PALLET_FILTER_LIST = new FilterList;
-var INFO_FILTER_LIST = new FilterList;
 
 $( document ).ready(function()
 {
@@ -136,12 +162,12 @@ function initTemplates()
 }
 
 /**
- * Looks at the filter's current value and tries to be smart about
+ * Looks at the filter's current values and tries to be smart about
  * how display value should look.
  *
  * @param filter
  */
-function setFilterDisplayValue(filter)
+function setFilterDisplay(filter)
 {
     var value = filter.get("value");
     var displayValue = '';
@@ -165,6 +191,33 @@ function setFilterDisplayValue(filter)
         }
     }
     filter.set("displayValue", $.trim(displayValue));
+
+    var displayOperator;
+    switch(filter.get("operator"))
+    {
+        case FilterOperator.UNKNOWN:
+            displayOperator='';
+            break;
+        case FilterOperator.EQ:
+            displayOperator='=';
+            break;
+        case FilterOperator.GT:
+            displayOperator='&gt;';
+            break;
+        case FilterOperator.GTEQ:
+            displayOperator='&#x2265;';
+            break;
+        case FilterOperator.LT:
+            displayOperator='&lt;';
+            break;
+        case FilterOperator.LTEQ:
+            displayOperator = '&#x2264;';
+            break;
+        case FilterOperator.NE:
+            displayOperator = '&#x2260;';
+            break;
+    }
+    filter.set("displayOperator", displayOperator);
 }
 
 function initGroupTab(workspaceKey, allSampleNames)
@@ -174,7 +227,7 @@ function initGroupTab(workspaceKey, allSampleNames)
         var group = getSelectedGroup();
 
         FILTER_GROUP.set("value", group.get("name"));
-        setFilterDisplayValue(FILTER_GROUP);
+        setFilterDisplay(FILTER_GROUP);
 
         SEARCHED_FILTER_LIST.add(FILTER_GROUP);
 
@@ -274,6 +327,65 @@ function initGroupTab(workspaceKey, allSampleNames)
     );
 
     loadSampleGroups(workspaceKey);
+}
+
+function initInfoTab(workspaceKey, infoFilters)
+{
+    addRowsToInfoFilterTable(infoFilters);
+
+    // setup add filter button listeners
+    for (var i=0; i < infoFilters.models.length; i++)
+    {
+        var filter = infoFilters.models[i];
+        var id = filter.get("id");
+        $('#' + id + "_add_button").click(function (e)
+        {
+            var filterID = this.id.substring(0, this.id.indexOf('_'));
+
+            // lookup filter model
+            var filter = infoFilters.findWhere({id: filterID});
+
+            // select corresponding input element
+            var input = $('#' + filterID + "_value_field");
+            filter.set("value", input.val());
+
+            // get selected operator
+            var operator = FilterOperator.EQ; // default
+            var selectedOperatorOpt = $('#' + filterID + "_operator_list option:selected");
+            if (typeof selectedOperatorOpt !== "undefined")
+            {
+                switch(selectedOperatorOpt.val())
+                {
+                    case 'eq':
+                        operator = FilterOperator.EQ;
+                        break;
+                    case 'gt':
+                        operator = FilterOperator.GT;
+                        break;
+                    case 'gteq':
+                        operator = FilterOperator.GTEQ;
+                        break;
+                    case 'lt':
+                        operator = FilterOperator.LT;
+                        break;
+                    case 'lteq':
+                        operator = FilterOperator.LTEQ;
+                        break;
+                    case 'ne':
+                        operator = FilterOperator.NE;
+                        break;
+                }
+            }
+            filter.set("operator", operator);
+
+            setFilterDisplay(filter);
+
+            // update query with modified filter
+            SEARCHED_FILTER_LIST.add([filter]);
+
+            $("#add_filter_close").click();
+        });
+    }
 }
 
 function getGroupPopoverTitle()
@@ -376,7 +488,7 @@ function initGeneTab(workspaceKey)
         });
 
         FILTER_GENE.set("value", geneArray);
-        setFilterDisplayValue(FILTER_GENE);
+        setFilterDisplay(FILTER_GENE);
 
         SEARCHED_FILTER_LIST.add(FILTER_GENE);
 
@@ -419,7 +531,9 @@ function buildQuery(filterList, workspaceKey)
 
     query.workspace = workspaceKey;
 
-    var sampleGroups = new Array();
+    var sampleGroups      = new Array();
+    var infoNumberFilters = new Array();
+    var infoStringFilters = new Array();
 
     // loop through filter collection
     _.each(filterList.models, function(filter)
@@ -460,9 +574,26 @@ function buildQuery(filterList, workspaceKey)
                 }
                 break;
         }
+
+        switch (filter.get("category"))
+        {
+            case FilterCategory.INFO_FLAG:
+                // TODO:
+                console.debug("TODO: flag fields not implemented");
+                break;
+            case FilterCategory.INFO_INT:
+            case FilterCategory.INFO_FLOAT:
+                infoNumberFilters.push(toInfoNumberFilterPojo(filter));
+                break;
+            case FilterCategory.INFO_STR:
+                infoStringFilters.push(toInfoStringFilterPojo(filter));
+                break;
+        }
     });
 
-    query.sampleGroups = sampleGroups;
+    query.sampleGroups      = sampleGroups;
+    query.infoNumberFilters = infoNumberFilters;
+    query.infoStringFilters = infoStringFilters;
 
     return query;
 }
@@ -741,7 +872,7 @@ function backbonePalletView(workspaceKey)
 
                         // update filter's value based on textfield value
                         filter.set("value", textfield.value);
-                        setFilterDisplayValue(filter);
+                        setFilterDisplay(filter);
 
                         // update query with modified filter
                         SEARCHED_FILTER_LIST.add([filter]);
@@ -883,12 +1014,11 @@ function loadSampleGroups(workspaceKey)
 }
 
 /**
- * Adds a row to the INFO Filter table.
+ * Add rows to the INFO Filter table.
  *
- * @param name The name of the INFO field.
- * @param type The type of the INFO field.
+ * @param infoFilters
  */
-function addRowToInfoFilterTable(filter, type)
+function addRowsToInfoFilterTable(infoFilters)
 {
     var flagTemplate = $("#info-flag-filter-template").html();
     var numTemplate  = $("#info-num-filter-template").html();
@@ -896,30 +1026,35 @@ function addRowToInfoFilterTable(filter, type)
 
     var infoFilterTable = $('#info_filter_table');
 
-    var template;
-    var obj = new Object();
-    obj.id = filter.get("id");
-    obj.name = filter.get("name");
+    for (var i=0; i < infoFilters.models.length; i++)
+    {
+        var filter = infoFilters.models[i];
 
-    if (type === 'Flag')
-    {
-        template = flagTemplate;
-    }
-    else if ((type === 'Integer') || (type === 'Float'))
-    {
-        template = numTemplate;
+        var template;
+        var obj = new Object();
+        obj.id = filter.get("id");
+        obj.name = filter.get("name");
 
-        if (type === 'Integer')
-            obj.value = '0';
-        else
-            obj.value = '0.0';
+        switch (filter.get("category"))
+        {
+            case FilterCategory.INFO_FLAG:
+                template = flagTemplate;
+                break;
+            case FilterCategory.INFO_INT:
+            case FilterCategory.INFO_FLOAT:
+                template = numTemplate;
+                if (filter.get("category") == FilterCategory.INFO_INT)
+                    obj.value = '0';
+                else
+                    obj.value = '0.0';
+                break;
+            case FilterCategory.INFO_STR:
+                template = strTemplate;
+                obj.value = '';
+                break;
+        }
+        infoFilterTable.append(_.template(template, obj));
     }
-    else
-    {
-        template = strTemplate;
-        obj.value = '';
-    }
-    infoFilterTable.append(_.template(template, obj));
 }
 
 /**
@@ -1110,6 +1245,8 @@ function setWorkspace()
             addRowToConfigColumnsTable(true, "QUAL",   "Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).");
             addRowToConfigColumnsTable(true, "FILTER", "PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.");
 
+            var infoFilters = new FilterList();
+
             var info = json.INFO;
             for (var key in info)
             {
@@ -1120,10 +1257,25 @@ function setWorkspace()
                     var infoFilter = new Filter();
                     infoFilter.set("name", key);
 
-                    INFO_FILTER_LIST.reset();
-                    INFO_FILTER_LIST.add(infoFilter);
+                    var category;
+                    switch(info[key].type)
+                    {
+                        case 'Flag':
+                            category = FilterCategory.INFO_FLAG;
+                            break;
+                        case 'Integer':
+                            category = FilterCategory.INFO_INT;
+                            break;
+                        case 'Float':
+                            category = FilterCategory.INFO_FLOAT;
+                            break;
+                        default:
+                            category = FilterCategory.INFO_STR;
+                            break;
+                    }
+                    infoFilter.set("category", category);
 
-                    addRowToInfoFilterTable(infoFilter, info[key].type);
+                    infoFilters.add(infoFilter);
 
                     addRowToConfigColumnsTable(false, key, info[key].Description);
                 }
@@ -1146,6 +1298,7 @@ function setWorkspace()
             initBackbone(workspaceKey, displayCols);
             initGeneTab(workspaceKey);
             initGroupTab(workspaceKey, allSamples);
+            initInfoTab(workspaceKey, infoFilters);
         },
         error: function(jqXHR, textStatus)
         {
@@ -1166,4 +1319,77 @@ function SortByName(a, b)
     var aName = a.toLowerCase();
     var bName = b.toLowerCase();
     return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+}
+
+/**
+ * Translates the given Filter model into a InfoNumberFilter server-side object.
+ *
+ * @param filter
+ */
+function toInfoNumberFilterPojo(filter)
+{
+    var pojo = new Object();
+
+    pojo.key = "INFO." + filter.get("name");
+
+    pojo.value = filter.get("value");
+
+    var comparator;
+    switch(filter.get("operator"))
+    {
+        case FilterOperator.UNKNOWN:
+            comparator='';
+            break;
+        case FilterOperator.EQ:
+            comparator='$all';
+            break;
+        case FilterOperator.GT:
+            comparator='$gt';
+            break;
+        case FilterOperator.GTEQ:
+            comparator='$gte';
+            break;
+        case FilterOperator.LT:
+            comparator='$lt';
+            break;
+        case FilterOperator.LTEQ:
+            comparator = '$lte';
+            break;
+        case FilterOperator.NE:
+            comparator = '$ne';
+            break;
+    }
+    pojo.comparator = comparator;
+
+    return pojo;
+}
+
+/**
+ * Translates the given Filter model into a InfoStringFilter server-side object.
+ *
+ * @param filter
+ */
+function toInfoStringFilterPojo(filter)
+{
+    var pojo = new Object();
+
+    pojo.key = "INFO." + filter.get("name");
+
+    var values = new Array();
+    values.push(filter.get("value"));
+    pojo.values = values;
+
+    var comparator;
+    switch(filter.get("operator"))
+    {
+        case FilterOperator.EQ:
+            comparator='$in';
+            break;
+        case FilterOperator.NE:
+            comparator = '$ne';
+            break;
+    }
+    pojo.comparator = comparator;
+
+    return pojo;
 }
