@@ -89,6 +89,7 @@ FILTER_GROUP.set(          {name: 'Group',         operator: '=', value: '' , di
 
 var SEARCHED_FILTER_LIST = new FilterList;
 var PALLET_FILTER_LIST = new FilterList;
+var INFO_FILTER_LIST = new FilterList;
 
 $( document ).ready(function()
 {
@@ -887,50 +888,38 @@ function loadSampleGroups(workspaceKey)
  * @param name The name of the INFO field.
  * @param type The type of the INFO field.
  */
-function addRowToInfoFilterTable(name, type)
+function addRowToInfoFilterTable(filter, type)
 {
-    var infoFilterTable = document.getElementById('info_filter_table');
+    var flagTemplate = $("#info-flag-filter-template").html();
+    var numTemplate  = $("#info-num-filter-template").html();
+    var strTemplate  = $("#info-str-filter-template").html();
 
-    //insert a new row at the bottom
-    var newRow = infoFilterTable.insertRow(infoFilterTable.rows.length);
+    var infoFilterTable = $('#info_filter_table');
 
-    //create new cells
-    var newCell1 = newRow.insertCell(0);
-    var newCell2 = newRow.insertCell(1);
-    var newCell3 = newRow.insertCell(2);
-
-    //set the cell text
-    newCell1.innerHTML = "<button title='Add to your search' type=\"button\" class=\"btn-mini\"><i class=\"icon-plus\"></i></button>";
-    newCell2.innerHTML = name;
+    var template;
+    var obj = new Object();
+    obj.id = filter.get("id");
+    obj.name = filter.get("name");
 
     if (type === 'Flag')
     {
-        newCell3.innerHTML = "<input class=\"input-mini\" type=\"checkbox\" checked=\"true\" name=\"min_alt_reads\"/>";
+        template = flagTemplate;
     }
     else if ((type === 'Integer') || (type === 'Float'))
     {
-        var defaultTextValue;
-        if (type === 'Integer')
-            defaultTextValue = '0';
-        else
-            defaultTextValue = '0.0';
+        template = numTemplate;
 
-        newCell3.innerHTML =
-            "<table><tr>"
-                + "<td><select style='width:50px;' tabindex='1'>"
-                + "<option value='eq'>=</option>"
-                + "<option value='gt'>&gt;</option>"
-                + "<option value='gteq'>&gt;=</option>"
-                + "<option value='lt'>&lt;</option>"
-                + "<option value='lteq'>&lt;=</option>"
-                + "</select></td>"
-                + "<td><input class=\"input-mini\" type=\"text\" value='"+defaultTextValue+"' name=\"min_alt_reads\"/></td>"
-                +"</tr></table>";
+        if (type === 'Integer')
+            obj.value = '0';
+        else
+            obj.value = '0.0';
     }
     else
     {
-        newCell3.innerHTML = "<input class=\"input-mini\" type=\"text\" name=\"min_alt_reads\"/>";
+        template = strTemplate;
+        obj.value = '';
     }
+    infoFilterTable.append(_.template(template, obj));
 }
 
 /**
@@ -1102,7 +1091,6 @@ function setWorkspace()
         {
             // clear tables
             $('#config_columns_table').empty();
-            $('#info_filter_table').empty();
 
             // 1ST 7 VCF columns displayed by default
             var displayCols = new Array();
@@ -1129,7 +1117,13 @@ function setWorkspace()
                 {
                     displayCols.push(key);
 
-                    addRowToInfoFilterTable(key, info[key].type);
+                    var infoFilter = new Filter();
+                    infoFilter.set("name", key);
+
+                    INFO_FILTER_LIST.reset();
+                    INFO_FILTER_LIST.add(infoFilter);
+
+                    addRowToInfoFilterTable(infoFilter, info[key].type);
 
                     addRowToConfigColumnsTable(false, key, info[key].Description);
                 }
