@@ -1353,6 +1353,18 @@ function setWorkspace()
 
             var info = json.INFO;
 
+            // delete the properties that are actually FORMAT fields, not INFO fields
+            var shouldDelete = function(obj, propName)
+            {
+                var isFormatField = (obj[propName].EntryType == "FORMAT");
+                if (isFormatField)
+                {
+                    console.debug("Ignoring field " + propName + " because it is of type FORMAT");
+                }
+                return isFormatField;
+            }
+            deleteObjectProperties(info, shouldDelete);
+
             // get the INFO field names sorted alphabetically
             var infoFieldNames = getSortedAttrNames(info);
 

@@ -54,3 +54,20 @@ function guid()
 {
     return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
 }
+
+/**
+ * Deletes properties from an object based on the specified function shouldDeleteFunc()
+ * @param object
+ * @param shouldDeleteFunc
+ *          Function that takes 2 parameters: 1. the object itself, 2. the property name
+ */
+function deleteObjectProperties(object, shouldDeleteFunc)
+{
+    for (var key in object)
+    {
+        if (shouldDeleteFunc(object, key))
+        {
+            delete object[key];
+        }
+    }
+}
