@@ -1088,7 +1088,8 @@ function initVariantTable(displayCols)
         "sDom": "<'row'<'span6'l><'span6'>r>t<'row'<'span6'i><'span6'p>>",
         "aoColumns": aoColumns,
         'aaData':    [],
-        "bDestroy":  true
+        "bDestroy":  true,
+        "iDisplayLength": 50
     });
 
     // set visibility
@@ -1365,8 +1366,6 @@ function setWorkspace()
 
             // get the INFO field names sorted alphabetically
             var infoFieldNames = getSortedAttrNames(info);
-
-            console.log(infoFieldNames);
 
             for (var i = 0; i < infoFieldNames.length; i++) {
                 var infoFieldName = infoFieldNames[i];
