@@ -1362,17 +1362,23 @@ function setWorkspace()
             var infoFilters = new FilterList();
 
             var info = json.INFO;
-            for (var key in info)
-            {
-                if (info.hasOwnProperty(key))
+
+            // get the INFO field names sorted alphabetically
+            var infoFieldNames = getSortedAttrNames(info);
+
+            console.log(infoFieldNames);
+
+            for (var i = 0; i < infoFieldNames.length; i++) {
+                var infoFieldName = infoFieldNames[i];
+                if (info.hasOwnProperty(infoFieldName))
                 {
-                    displayCols.push(key);
+                    displayCols.push(infoFieldName);
 
                     var infoFilter = new Filter();
-                    infoFilter.set("name", key);
+                    infoFilter.set("name", infoFieldName);
 
                     var category;
-                    switch(info[key].type)
+                    switch(info[infoFieldName].type)
                     {
                         case 'Flag':
                             category = FilterCategory.INFO_FLAG;
@@ -1391,7 +1397,7 @@ function setWorkspace()
 
                     infoFilters.add(infoFilter);
 
-                    addRowToConfigColumnsTable(false, key, info[key].Description);
+                    addRowToConfigColumnsTable(false, infoFieldName, info[infoFieldName].Description);
                 }
             }
 
@@ -1451,11 +1457,8 @@ function toInfoNumberFilterPojo(filter)
     var comparator;
     switch(filter.get("operator"))
     {
-        case FilterOperator.UNKNOWN:
-            comparator='';
-            break;
         case FilterOperator.EQ:
-            comparator='$all';
+            comparator='';
             break;
         case FilterOperator.GT:
             comparator='$gt';
@@ -1516,4 +1519,24 @@ function toInfoStringFilterPojo(filter)
 function hash(s)
 {
     return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
+}
+
+/**
+ * Gets attribute names for the given object sorted alphabetically
+ * in an array.
+ * @param object
+ * @returns Array of strings sorted alphabetically.
+ */
+function getSortedAttrNames(object)
+{
+    var attrNames = new Array();
+    for (var key in object)
+    {
+        attrNames.push(key);
+    }
+
+    // sort by key name alphabetically
+    attrNames.sort(function(a,b) { return a.localeCompare(b) } );
+
+    return attrNames;
 }
