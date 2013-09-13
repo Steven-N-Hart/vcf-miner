@@ -1089,7 +1089,10 @@ function initVariantTable(displayCols)
         "aoColumns": aoColumns,
         'aaData':    [],
         "bDestroy":  true,
-        "iDisplayLength": 50
+        "iDisplayLength": 50,
+        "bAutoWidth": true,
+        "sScrollX": "100%",
+        "bScrollCollapse": true
     });
 
     // set visibility
@@ -1248,9 +1251,6 @@ function addRowsToVariantTable(variants, displayCols)
     // update DataTable
     table.fnClearTable();
     table.fnAddData(aaData);
-
-    // resize to fill browser nicely
-    table.width("100%");
 }
 
 /**
@@ -1272,9 +1272,6 @@ function toggleDisplayColumn(colName)
 
             // flip visibility
             table.fnSetColumnVis(i, !isVisible);
-
-            // resize columns
-            table.width("100%");
 
             return;
         }
