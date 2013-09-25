@@ -117,6 +117,7 @@ FILTER_GROUP.set(          {name: 'Group',         operator: FilterOperator.EQ, 
 
 var SEARCHED_FILTER_LIST = new FilterList;
 var PALLET_FILTER_LIST = new FilterList;
+var INFO_FILTER_LIST = new FilterList;
 
 $( document ).ready(function()
 {
@@ -240,17 +241,17 @@ function setFilterDisplay(filter)
 
 function initGroupTab(workspaceKey, allSampleNames)
 {
-    $('#group_add_button').click(function (e)
-    {
-        var group = getSelectedGroup();
-
-        FILTER_GROUP.set("value", group.get("name"));
-        setFilterDisplay(FILTER_GROUP);
-
-        SEARCHED_FILTER_LIST.add(FILTER_GROUP);
-
-        $("#add_filter_close").click();
-    });
+//    $('#group_add_button').click(function (e)
+//    {
+//        var group = getSelectedGroup();
+//
+//        FILTER_GROUP.set("value", group.get("name"));
+//        setFilterDisplay(FILTER_GROUP);
+//
+//        SEARCHED_FILTER_LIST.add(FILTER_GROUP);
+//
+//        $("#add_filter_close").click();
+//    });
 
     $('#remove_group_button').click(function (e)
     {
@@ -351,59 +352,8 @@ function initInfoTab(workspaceKey, infoFilters)
 {
     addRowsToInfoFilterTable(workspaceKey, infoFilters);
 
-    // setup add filter button listeners
-    for (var i=0; i < infoFilters.models.length; i++)
-    {
-        var filter = infoFilters.models[i];
-        var id = filter.get("id");
-        $('#' + id + "_add_button").click(function (e)
-        {
-            var filterID = this.id.substring(0, this.id.indexOf('_'));
-
-            // lookup filter model
-            var filter = infoFilters.findWhere({id: filterID});
-
-            // select corresponding input element
-            var input = $('#' + filterID + "_value_field");
-            filter.set("value", input.val());
-
-            // get selected operator
-            var operator = FilterOperator.EQ; // default
-            var selectedOperatorOpt = $('#' + filterID + "_operator_list option:selected");
-            if (typeof selectedOperatorOpt !== "undefined")
-            {
-                switch(selectedOperatorOpt.val())
-                {
-                    case 'eq':
-                        operator = FilterOperator.EQ;
-                        break;
-                    case 'gt':
-                        operator = FilterOperator.GT;
-                        break;
-                    case 'gteq':
-                        operator = FilterOperator.GTEQ;
-                        break;
-                    case 'lt':
-                        operator = FilterOperator.LT;
-                        break;
-                    case 'lteq':
-                        operator = FilterOperator.LTEQ;
-                        break;
-                    case 'ne':
-                        operator = FilterOperator.NE;
-                        break;
-                }
-            }
-            filter.set("operator", operator);
-
-            setFilterDisplay(filter);
-
-            // update query with modified filter
-            SEARCHED_FILTER_LIST.add([filter]);
-
-            $("#add_filter_close").click();
-        });
-    }
+    // select 1st one by default
+    selectFirstRadioInput("info-filter-radio-group");
 }
 
 function getGroupPopoverTitle()
@@ -493,25 +443,25 @@ function initGeneTab(workspaceKey)
         $('#gene_list').empty();
     });
 
-    // change ID to be consistent with all other checkboxes
-    $('#genes_add_button').prop("id", FILTER_GENE.get("id") + "_add_button");
-
-    $('#' + FILTER_GENE.get("id") + "_add_button").click(function (e)
-    {
-        var geneArray = new Array();
-        $("#gene_list option").each(function()
-        {
-            var gene = $(this).val();
-            geneArray.push(gene);
-        });
-
-        FILTER_GENE.set("value", geneArray);
-        setFilterDisplay(FILTER_GENE);
-
-        SEARCHED_FILTER_LIST.add(FILTER_GENE);
-
-        $("#add_filter_close").click();
-    })
+//    // change ID to be consistent with all other checkboxes
+//    $('#genes_add_button').prop("id", FILTER_GENE.get("id") + "_add_button");
+//
+//    $('#' + FILTER_GENE.get("id") + "_add_button").click(function (e)
+//    {
+//        var geneArray = new Array();
+//        $("#gene_list option").each(function()
+//        {
+//            var gene = $(this).val();
+//            geneArray.push(gene);
+//        });
+//
+//        FILTER_GENE.set("value", geneArray);
+//        setFilterDisplay(FILTER_GENE);
+//
+//        SEARCHED_FILTER_LIST.add(FILTER_GENE);
+//
+//        $("#add_filter_close").click();
+//    })
 
     $.ajax({
         type: "GET",
@@ -681,7 +631,7 @@ function sendQuery(query, displayCols)
 /**
  * Displays dialog box so that user can add a new filter.
  */
-function addNewFilter()
+function showAddNewFilter()
 {
     var addFilterDiv = $('#add_filter_modal');
 
@@ -694,6 +644,87 @@ function addNewFilter()
     })
     // display
     addFilterDiv.modal();
+}
+
+/**
+ * Adds a filter to the collection of filters that are searched
+ */
+function addFilter()
+{
+    // determine ID of currently selected tab
+    var tabId = $("ul#add_filter_tabs li.active > a").attr("href").split("#")[1];
+
+    // construct filter object
+    var filter;
+    switch(tabId)
+    {
+        case "tab_content_sample":
+            var filterID = $("input[type=radio][name=pallet-filter-radio-group]:checked").val();
+            filter = PALLET_FILTER_LIST.findWhere({id: filterID});
+            var textfieldValue =  $("#" + filter.get("id") + "_value_field").val();
+            // update filter's value based on textfield value
+            filter.set("value", textfieldValue);
+            break;
+
+        case "tab_content_gene":
+            var geneArray = new Array();
+            $("#gene_list option").each(function()
+            {
+                var gene = $(this).val();
+                geneArray.push(gene);
+            });
+
+            FILTER_GENE.set("value", geneArray);
+            filter = FILTER_GENE;
+            break;
+
+        case "tab_content_group":
+            var group = getSelectedGroup();
+            FILTER_GROUP.set("value", group.get("name"));
+            filter = FILTER_GROUP;
+            break;
+
+        case "tab_content_info":
+            var filterID = $("input[type=radio][name=info-filter-radio-group]:checked").val();
+            filter = INFO_FILTER_LIST.findWhere({id: filterID});
+
+            // select corresponding input element
+            filter.set("value", $('#' + filterID + "_value_field").val());
+
+            // get selected operator
+            var operator = FilterOperator.EQ; // default
+            var selectedOperatorOpt = $('#' + filterID + "_operator_list option:selected");
+            if (typeof selectedOperatorOpt !== "undefined")
+            {
+                switch(selectedOperatorOpt.val())
+                {
+                    case 'eq':
+                        operator = FilterOperator.EQ;
+                        break;
+                    case 'gt':
+                        operator = FilterOperator.GT;
+                        break;
+                    case 'gteq':
+                        operator = FilterOperator.GTEQ;
+                        break;
+                    case 'lt':
+                        operator = FilterOperator.LT;
+                        break;
+                    case 'lteq':
+                        operator = FilterOperator.LTEQ;
+                        break;
+                    case 'ne':
+                        operator = FilterOperator.NE;
+                        break;
+                }
+            }
+            filter.set("operator", operator);
+            break;
+    }
+
+    setFilterDisplay(filter);
+    SEARCHED_FILTER_LIST.add(filter);
+    $("#add_filter_close").click();
 }
 
 /**
@@ -889,28 +920,28 @@ function backbonePalletView(workspaceKey)
             var filter = this.model;
             this.$el.html(this.template(filter.toJSON()));
 
-            var selector = '#' + filter.get("id") + "_add_button";
-            $('body').on('click', selector, function()
-            {
-                var textfieldSelector =  "#" + filter.get("id") + "_value_field";
-
-                // use 'live query' plugin to select dynamically added textfield
-                $(textfieldSelector).livequery(
-                    function()
-                    {
-                        var textfield = this;
-
-                        // update filter's value based on textfield value
-                        filter.set("value", textfield.value);
-                        setFilterDisplay(filter);
-
-                        // update query with modified filter
-                        SEARCHED_FILTER_LIST.add([filter]);
-
-                        $("#add_filter_close").click();
-                    }
-                );
-            });
+//            var selector = '#' + filter.get("id") + "_add_button";
+//            $('body').on('click', selector, function()
+//            {
+//                var textfieldSelector =  "#" + filter.get("id") + "_value_field";
+//
+//                // use 'live query' plugin to select dynamically added textfield
+//                $(textfieldSelector).livequery(
+//                    function()
+//                    {
+//                        var textfield = this;
+//
+//                        // update filter's value based on textfield value
+//                        filter.set("value", textfield.value);
+//                        setFilterDisplay(filter);
+//
+//                        // update query with modified filter
+//                        SEARCHED_FILTER_LIST.add([filter]);
+//
+//                        $("#add_filter_close").click();
+//                    }
+//                );
+//            });
 
             return this;
         },
@@ -956,6 +987,9 @@ function backbonePalletView(workspaceKey)
 
     var palletView = new PalletView();
     palletView.render();
+
+    // select 1st one by default
+    selectFirstRadioInput("pallet-filter-radio-group");
 }
 
 function toSampleGroupPOJO(workspaceKey, groupModel)
@@ -1435,8 +1469,6 @@ function setWorkspace()
             addRowToConfigColumnsTable(true, "#_Samples", "The number of samples.");
             addRowToConfigColumnsTable(true, "Samples", "The names of samples.");
 
-            var infoFilters = new FilterList();
-
             var info = json.INFO;
 
             // delete the properties that are actually FORMAT fields, not INFO fields
@@ -1481,7 +1513,7 @@ function setWorkspace()
                     }
                     infoFilter.set("category", category);
 
-                    infoFilters.add(infoFilter);
+                    INFO_FILTER_LIST.add(infoFilter);
 
                     addRowToConfigColumnsTable(false, infoFieldName, info[infoFieldName].Description);
                 }
@@ -1504,7 +1536,7 @@ function setWorkspace()
             initBackbone(workspaceKey, displayCols);
             initGeneTab(workspaceKey);
             initGroupTab(workspaceKey, allSamples);
-            initInfoTab(workspaceKey, infoFilters);
+            initInfoTab(workspaceKey, INFO_FILTER_LIST);
         },
         error: function(jqXHR, textStatus)
         {

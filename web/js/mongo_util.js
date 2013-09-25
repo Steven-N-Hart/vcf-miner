@@ -71,3 +71,15 @@ function deleteObjectProperties(object, shouldDeleteFunc)
         }
     }
 }
+
+/**
+ * Selects the first radio input in a group.
+ * @param groupName
+ *          The name of the radio group (e.g. name attribute)
+ */
+function selectFirstRadioInput(groupName)
+{
+    var firstRadioInput = $("input[type=radio][name="+groupName+"]:first");
+    firstRadioInput.prop('checked',true);
+
+}
