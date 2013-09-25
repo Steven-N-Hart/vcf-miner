@@ -241,18 +241,6 @@ function setFilterDisplay(filter)
 
 function initGroupTab(workspaceKey, allSampleNames)
 {
-//    $('#group_add_button').click(function (e)
-//    {
-//        var group = getSelectedGroup();
-//
-//        FILTER_GROUP.set("value", group.get("name"));
-//        setFilterDisplay(FILTER_GROUP);
-//
-//        SEARCHED_FILTER_LIST.add(FILTER_GROUP);
-//
-//        $("#add_filter_close").click();
-//    });
-
     $('#remove_group_button').click(function (e)
     {
         var group = getSelectedGroup();
@@ -442,26 +430,6 @@ function initGeneTab(workspaceKey)
     {
         $('#gene_list').empty();
     });
-
-//    // change ID to be consistent with all other checkboxes
-//    $('#genes_add_button').prop("id", FILTER_GENE.get("id") + "_add_button");
-//
-//    $('#' + FILTER_GENE.get("id") + "_add_button").click(function (e)
-//    {
-//        var geneArray = new Array();
-//        $("#gene_list option").each(function()
-//        {
-//            var gene = $(this).val();
-//            geneArray.push(gene);
-//        });
-//
-//        FILTER_GENE.set("value", geneArray);
-//        setFilterDisplay(FILTER_GENE);
-//
-//        SEARCHED_FILTER_LIST.add(FILTER_GENE);
-//
-//        $("#add_filter_close").click();
-//    })
 
     $.ajax({
         type: "GET",
@@ -919,30 +887,6 @@ function backbonePalletView(workspaceKey)
         render: function() {
             var filter = this.model;
             this.$el.html(this.template(filter.toJSON()));
-
-//            var selector = '#' + filter.get("id") + "_add_button";
-//            $('body').on('click', selector, function()
-//            {
-//                var textfieldSelector =  "#" + filter.get("id") + "_value_field";
-//
-//                // use 'live query' plugin to select dynamically added textfield
-//                $(textfieldSelector).livequery(
-//                    function()
-//                    {
-//                        var textfield = this;
-//
-//                        // update filter's value based on textfield value
-//                        filter.set("value", textfield.value);
-//                        setFilterDisplay(filter);
-//
-//                        // update query with modified filter
-//                        SEARCHED_FILTER_LIST.add([filter]);
-//
-//                        $("#add_filter_close").click();
-//                    }
-//                );
-//            });
-
             return this;
         },
 
@@ -1124,30 +1068,6 @@ function addRowsToInfoFilterTable(workspaceKey, infoFilters)
             autosearch: true,
             hideHeader: false
         });
-
-
-//        var selector = "#" + obj.id + "_value_button";
-//        $('body').on('click', selector, function()
-////        $("#" + obj.id + "_value_button").click(function (e)
-//        {
-////            var fieldValues = getInfoValues(workspaceKey, obj.name);
-//            var name = obj.name;
-//            var fieldValues = getInfoValues(workspaceKey, "SNPEFF_EFFECT");
-//            var dropdownData = new Array();
-//            for (var i = 0; i < fieldValues.length; i++)
-//            {
-//                dropdownData.push({id: i, label: fieldValues[i]});
-//            }
-//
-//            $("#info_field_dropdown_checkbox").dropdownCheckbox({
-//                autosearch: true,
-//                hideHeader: false,
-//                data: dropdownData
-//            });
-//
-//            // show dialog
-//            $('#info_field_string_values_modal').modal();
-//        });
     }
 }
 
