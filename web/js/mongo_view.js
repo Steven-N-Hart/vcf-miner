@@ -122,34 +122,7 @@ $( document ).ready(function()
 {
     initTemplates();
 
-    // TODO: user hardcoded to 'steve'
-    var user = 'steve';
-
-    // get workspace information from server
-    var workspaceRequest = $.ajax({
-        url: "/mongo_svr/ve/q/owner/list_workspaces/" + user,
-        dataType: "json",
-        success: function(json)
-        {
-            // each workspace object has an increment num as the attr name
-            for (var attr in json) {
-                if (json.hasOwnProperty(attr)) {
-                    var key = json[attr].key;
-                    var alias = json[attr].alias;
-
-                    $('#vcf_list').append("<option value='"+key+"'>"+alias+"</option>");
-
-
-                    // user must select a VCF
-                    $('#select_vcf_modal').modal({"keyboard":false});
-                }
-            }
-        },
-        error: function(jqXHR, textStatus)
-        {
-            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-        }
-    });
+    showWorkspaces();
 });
 
 /**
@@ -161,6 +134,49 @@ function initTemplates()
     WARNING_TEMPLATE         = $("#warning-message-template").html();
     WARNING_POPOVER_TEMPLATE = $("#warning-popover-template").html();
     ERROR_TEMPLATE           = $("#error-message-template").html();
+}
+
+/**
+ * Queries the server for available workspaces and displays a dialog for the user
+ * to pick one.
+ */
+function showWorkspaces()
+{
+    // TODO: users hardcoded - need authentication?
+    var users = new Array();
+    users.push('steve');
+    users.push('dan');
+
+    // perform REST call per-user
+    for (var i = 0; i < users.length; i++)
+    {
+        var user = users[i];
+        // get workspace information from server
+        var workspaceRequest = $.ajax({
+            url: "/mongo_svr/ve/q/owner/list_workspaces/" + user,
+            dataType: "json",
+            success: function(json)
+            {
+                // each workspace object has an increment num as the attr name
+                for (var attr in json) {
+                    if (json.hasOwnProperty(attr)) {
+                        var key = json[attr].key;
+                        var alias = json[attr].alias;
+
+                        $('#vcf_list').append("<option value='"+key+"'>"+alias+"</option>");
+
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus)
+            {
+                $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+            }
+        });
+
+        // user must select a VCF
+        $('#select_vcf_modal').modal({"keyboard":false});
+    }
 }
 
 /**
@@ -333,7 +349,7 @@ function initGroupTab(workspaceKey, allSampleNames)
 
 function initInfoTab(workspaceKey, infoFilters)
 {
-    addRowsToInfoFilterTable(infoFilters);
+    addRowsToInfoFilterTable(workspaceKey, infoFilters);
 
     // setup add filter button listeners
     for (var i=0; i < infoFilters.models.length; i++)
@@ -1032,7 +1048,7 @@ function loadSampleGroups(workspaceKey)
  *
  * @param infoFilters
  */
-function addRowsToInfoFilterTable(infoFilters)
+function addRowsToInfoFilterTable(workspaceKey, infoFilters)
 {
     var flagTemplate = $("#info-flag-filter-template").html();
     var numTemplate  = $("#info-num-filter-template").html();
@@ -1046,6 +1062,7 @@ function addRowsToInfoFilterTable(infoFilters)
 
         var template;
         var obj = new Object();
+        obj.workspaceKey = workspaceKey;
         obj.id = filter.get("id");
         obj.name = filter.get("name");
 
@@ -1068,7 +1085,79 @@ function addRowsToInfoFilterTable(infoFilters)
                 break;
         }
         infoFilterTable.append(_.template(template, obj));
+
+        $("#info_field_dropdown_checkbox").dropdownCheckbox({
+            autosearch: true,
+            hideHeader: false
+        });
+
+
+//        var selector = "#" + obj.id + "_value_button";
+//        $('body').on('click', selector, function()
+////        $("#" + obj.id + "_value_button").click(function (e)
+//        {
+////            var fieldValues = getInfoValues(workspaceKey, obj.name);
+//            var name = obj.name;
+//            var fieldValues = getInfoValues(workspaceKey, "SNPEFF_EFFECT");
+//            var dropdownData = new Array();
+//            for (var i = 0; i < fieldValues.length; i++)
+//            {
+//                dropdownData.push({id: i, label: fieldValues[i]});
+//            }
+//
+//            $("#info_field_dropdown_checkbox").dropdownCheckbox({
+//                autosearch: true,
+//                hideHeader: false,
+//                data: dropdownData
+//            });
+//
+//            // show dialog
+//            $('#info_field_string_values_modal').modal();
+//        });
     }
+}
+
+/**
+ * Shows a modal dialog for the user to select one or more values for
+ * an INFO string field.
+ *
+ * @param workspaceKey
+ * @param fieldName
+ */
+function showInfoFieldValuesModal(workspaceKey, fieldName)
+{
+    $.ajax({
+        url: "/mongo_svr/ve/typeahead/w/" + workspaceKey + "/f/" + fieldName,
+        dataType: "json",
+        async: false,
+        success: function(json)
+        {
+            var fieldValues = json[fieldName];
+            if (typeof fieldValues === "undefined")
+            {
+                console.warn("INFO string field " + fieldName + " has no available values.");
+                fieldValues = new Array();
+            }
+
+            // sort values
+            fieldValues.sort(function(a,b) { return a.localeCompare(b) } );
+
+            var dropdownData = new Array();
+            for (var i = 0; i < fieldValues.length; i++)
+            {
+                dropdownData.push({id: i, label: fieldValues[i]});
+            }
+
+            $("#info_field_dropdown_checkbox").dropdownCheckbox("reset", dropdownData);
+
+            // show dialog
+            $('#info_field_string_values_modal').modal();
+        },
+        error: function(jqXHR, textStatus)
+        {
+            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+        }
+    });
 }
 
 /**

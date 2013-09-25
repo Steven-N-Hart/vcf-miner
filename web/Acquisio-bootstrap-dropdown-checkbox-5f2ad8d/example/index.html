@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <title>Your Website</title>
+  <link rel="stylesheet" type="text/css" href="../dependencies/css/bootstrap.css" />
+  <link rel="stylesheet" type="text/css" href="../css/bootstrap-dropdown-checkbox.css" />
+  <link rel="stylesheet" type="text/css" href="css/main.css" />
+</head>
+
+<body>
+  <div class="navbar">
+          <div class="navbar-inner">
+            <a class="brand" href="#">Title</a>
+            <ul class="nav">
+              <li class="myDropdownCheckboxBasic dropdown-checkbox dropdown open"></li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+            </ul>
+          </div>
+        </div>
+</body>
+
+<script src="../dependencies/js/jquery.min.js"></script>
+<script src="../js/bootstrap-dropdown-checkbox.js"></script>
+<script>
+  var tab = [
+    { id: "1", label: "Forever.", isChecked: true },
+    { id: "2", label: "I love cheese.", isChecked: true },
+    { id: "3", label: "Meat for all", isChecked: false },
+    { id: "4", label: "Again and again", isChecked: true },
+    { id: "5", label: "Hey bro!", isChecked: true },
+    { id: "6", label: "It's working?", isChecked: false },
+    { id: "7", label: "Horse", isChecked: true },
+    { id: "8", label: "z-index", isChecked: true },
+    { id: "9", label: "language scala", isChecked: true },
+    { id: "10", label: "Yahoo", isChecked: true },
+    { id: "11", label: "yellow", isChecked: true },
+    { id: "12", label: "Gooooooooooogle", isChecked: true },
+    { id: "13", label: "NO WAY!", isChecked: false },
+    { id: "14", label: "2 times?", isChecked: true }
+  ];
+  $('.myDropdownCheckboxBasic').dropdownCheckbox({ 
+    data: tab, 
+    autosearch: true, 
+    title: "My Dropdown Checkbox",
+    hideHeader: false,
+    templateButton: '<a class="dropdown-checkbox-toggle" data-toggle="dropdown" href="#">Accounts<b class="caret"></b></button>'
+  });
+
+  $('.myDropdownCheckboxBasic').dropdownCheckbox("append", { id: "15", label: "added by itself", isChecked: true });
+
+
+</script>
+</html>
