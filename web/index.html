@@ -21,6 +21,27 @@
             /* must be half of the width, minus scrollbar on the left (30px) */
             margin-left: -512px;
         }
+
+        body .modal-256wide {
+            /* new custom width */
+            width: 256px;
+            /* must be half of the width, minus scrollbar on the left (30px) */
+            margin-left: -128px;
+        }
+
+        body .modal-350wide {
+            /* new custom width */
+            width: 350px;
+            /* must be half of the width, minus scrollbar on the left (30px) */
+            margin-left: -175px;
+        }
+
+        body .modal-600wide {
+            /* new custom width */
+            width: 600px;
+            /* must be half of the width, minus scrollbar on the left (30px) */
+            margin-left: -300px;
+        }
     </style>
 
     <script src="jquery-1.10.1/jquery-1.10.1.js"></script>
@@ -92,7 +113,7 @@
             </div>
             <div class="span4">
                 <div class="input-append">
-                    <input id="<%=id%>_value_field" value="<%=value%>" style="width:65%">
+                    <input id="<%=id%>_value_field" value="<%=value%>" style="width:85%">
                     <button id="<%=id%>_value_button" title="Set one or more values" type="button" onclick="showInfoFieldValuesModal('<%=workspaceKey%>', '<%=name%>', '<%=id%>')"><img class="icon-search"/></button>
                 </div>
             </div>
@@ -128,7 +149,7 @@
 <body>
 
 <!-- Modal -->
-<div id="select_vcf_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="select_vcf_label" aria-hidden="true">
+<div id="select_vcf_modal" class="modal modal-256wide hide fade" tabindex="-1" role="dialog" aria-labelledby="select_vcf_label" aria-hidden="true">
     <div class="modal-header">
         <h3 id="select_vcf_label">Select a VCF File</h3>
     </div>
@@ -141,7 +162,7 @@
 </div>
 
 <!-- Modal -->
-<div id="add_filter_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="add_filter_label" aria-hidden="true">
+<div id="add_filter_modal" class="modal modal-600wide hide fade" tabindex="-1" role="dialog" aria-labelledby="add_filter_label" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="add_filter_label">Add Filter</h3>
@@ -339,7 +360,7 @@
 </div>
 
 <!-- Modal -->
-<div id="info_field_string_values_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="set_values_label" aria-hidden="true">
+<div id="info_field_string_values_modal" class="modal modal-350wide hide fade" tabindex="-1" role="dialog" aria-labelledby="set_values_label" aria-hidden="true">
     <div class="modal-header">
         <h3 id="set_values_label">Available values</h3>
     </div>

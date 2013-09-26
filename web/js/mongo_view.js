@@ -1112,10 +1112,17 @@ function showInfoFieldValuesModal(workspaceKey, fieldName, filterID)
             {
                 var filter = INFO_FILTER_LIST.findWhere({id: filterID});
                 var checkedVals = $("#info_field_dropdown_checkbox").dropdownCheckbox("checked");
+                var valueStr = "";
                 for (var i=0; i < checkedVals.length; i++)
                 {
-                    $("#" +filterID+ "_value_field").val(checkedVals[i].label);
+                    valueStr += checkedVals[i].label;
+
+                    if ((i+1) < checkedVals.length)
+                    {
+                        valueStr += ",";
+                    }
                 }
+                $("#" +filterID+ "_value_field").val(valueStr);
             });
 
             // show dialog
