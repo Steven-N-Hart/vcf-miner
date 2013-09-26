@@ -1160,6 +1160,10 @@ function addRowsToInfoFilterTable(workspaceKey, infoFilters)
             infoFieldChanged(workspaceKey);
         });
 
+        // simulate user clicking on 1st entry
+        infoFieldChanged(workspaceKey);
+
+
 //        var template;
 //        var obj = new Object();
 //        obj.workspaceKey = workspaceKey;
