@@ -32,7 +32,9 @@
       </div>\
       <ul class="dropdown-checkbox-menu"></ul>\
     </div>'
+
     var templateOption = '<li><div class="layout"><input type="checkbox"/><label></label></div></li>'
+//    var templateOption = '<li><div class="layout"><label class="checkbox"><input type="checkbox"/></label></div></li>'
     var templateNoResult = '<li><div class="layout"><label>No results.</label></div></li>'
 
     // **********************************
@@ -209,6 +211,10 @@
             var $label = $last.find("label")
             $label.text(label)
             $label.attr("for", uuid)
+//            var labelHTML = "<input type='checkbox' id='" + uuid + "'"
+//            if (isChecked) labelHTML += "checked='checked'";
+//            labelHTML += "/>" + label;
+//            $label.html(labelHTML)
         },
 
         _append: function(elements) {

@@ -1077,8 +1077,9 @@ function addRowsToInfoFilterTable(workspaceKey, infoFilters)
  *
  * @param workspaceKey
  * @param fieldName
+ * @param filterID
  */
-function showInfoFieldValuesModal(workspaceKey, fieldName)
+function showInfoFieldValuesModal(workspaceKey, fieldName, filterID)
 {
     $.ajax({
         url: "/mongo_svr/ve/typeahead/w/" + workspaceKey + "/f/" + fieldName,
@@ -1103,6 +1104,19 @@ function showInfoFieldValuesModal(workspaceKey, fieldName)
             }
 
             $("#info_field_dropdown_checkbox").dropdownCheckbox("reset", dropdownData);
+
+            // remove any other attached event handlers
+            $('#apply_info_string_values_button').unbind();
+
+            $('#apply_info_string_values_button').click(function (e)
+            {
+                var filter = INFO_FILTER_LIST.findWhere({id: filterID});
+                var checkedVals = $("#info_field_dropdown_checkbox").dropdownCheckbox("checked");
+                for (var i=0; i < checkedVals.length; i++)
+                {
+                    $("#" +filterID+ "_value_field").val(checkedVals[i].label);
+                }
+            });
 
             // show dialog
             $('#info_field_string_values_modal').modal();

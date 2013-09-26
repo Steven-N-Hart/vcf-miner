@@ -50,9 +50,7 @@
         <td><button id="<%=id%>_remove_button" title="Remove filter from your search" type="button" class="btn" onclick="removeFilter('<%=id%>')">x</button></td>
     </script>
     <script id="pallet-filter-template" type="text/template">
-        <!-- TODO -->
         <div class="span1"><input type="radio" name="pallet-filter-radio-group" value="<%=id%>"></div>
-        <!--<div class="span3"><button id="<%=id%>_add_button" title="Add filter to your search" type="button" class="btn"><i class="icon-plus"></i> Add</button></div>-->
         <div class="span4"><%=name%></div>
         <div class="span1">=</div>
         <div class="span6"><input id="<%=id%>_value_field" class="input-mini" type="number" value="<%=value%>"></div>
@@ -89,11 +87,14 @@
             <div class="span2">
                 <select class="span12" id="<%=id%>_operator_list">
                     <option value='eq'>=</option>
-                    <!--<option value='ne'>&#x2260;</option>-->
+                    <option value='ne'>&#x2260;</option>
                 </select>
             </div>
             <div class="span4">
-                <button id="<%=id%>_value_button" title="Set one or more values" type="button" class="btn" onclick="showInfoFieldValuesModal('<%=workspaceKey%>', '<%=name%>')">Values</button>
+                <div class="input-append">
+                    <input id="<%=id%>_value_field" value="<%=value%>" style="width:65%">
+                    <button id="<%=id%>_value_button" title="Set one or more values" type="button" onclick="showInfoFieldValuesModal('<%=workspaceKey%>', '<%=name%>', '<%=id%>')"><img class="icon-search"/></button>
+                </div>
             </div>
          </div>
     </script>
@@ -226,10 +227,10 @@
                                     <div class="span2">Group</div>
                                     <div class="span1">=</div>
                                     <div class="span8">
-                                        <div class="row-fluid">
-                                            <div class="span8"><select id="group_list" class="span12"></select></div>
-                                            <div class="span2"><button id="new_group_button" title="Create a new group" type="button" class="btn"><i class="icon-plus"></i></button></div>
-                                            <div class="span2"><button id="remove_group_button" title="Remove group" type="button" class="btn"><i class="icon-minus"></i></button></div>
+                                        <div class="input-append">
+                                            <select id="group_list" class="input-large"></select>
+                                            <button id="new_group_button" title="Create a new group" type="button" class="btn"><i class="icon-plus"></i></button>
+                                            <button id="remove_group_button" title="Remove group" type="button" class="btn"><i class="icon-minus"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -352,8 +353,8 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true" id="apply_info_string_values_button">Apply</button>
         <button class="btn" data-dismiss="modal" aria-hidden="true" onclick="">Cancel</button>
-        <button class="btn" data-dismiss="modal" aria-hidden="true" onclick="">Apply</button>
     </div>
 </div>
 
@@ -392,7 +393,7 @@
                                 <th></th>
                             </tr>
                             <tr id="add_filter_row">
-                                <span class="label"><td colspan="3"><button title="Add filter to your search" class="btn btn-block" onclick="showAddNewFilter()">Add Filter</button></td></span>
+                                <span class="label"><td colspan="3"><button title="Add filter to your search" class="btn btn-primary btn-block" onclick="showAddNewFilter()">Add Filter</button></td></span>
                                 <td></td>
                                 <td></td>
                             </tr>
