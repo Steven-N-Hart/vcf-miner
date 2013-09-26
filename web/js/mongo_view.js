@@ -653,15 +653,36 @@ function addFilter()
             break;
 
         case "tab_content_info":
-            var filterID = $("input[type=radio][name=info-filter-radio-group]:checked").val();
-            filter = INFO_FILTER_LIST.findWhere({id: filterID});
+            // get selected filter
+            var filterID = $('#info_field_list').val();
+            var filter = INFO_FILTER_LIST.findWhere({id: filterID});
 
-            // select corresponding input element
-            filter.set("value", $('#' + filterID + "_value_field").val());
+            var valueDiv = $("#info_value_div");
+            switch (filter.get("category"))
+            {
+                case FilterCategory.INFO_FLAG:
+                    // TODO:
+                    break;
+                case FilterCategory.INFO_INT:
+                case FilterCategory.INFO_FLOAT:
+                    filter.set("value", $("#info_value_div input").val());
+                    break;
+                case FilterCategory.INFO_STR:
+                    var filter = INFO_FILTER_LIST.findWhere({id: filterID});
+                    var checkedVals = $("#info_field_dropdown_checkbox").dropdownCheckbox("checked");
+                    var valueStr = "";
+                    var valueArr = new Array();
+                    for (var i=0; i < checkedVals.length; i++)
+                    {
+                        valueArr.push(checkedVals[i].label);
+                    }
+                    filter.set("value", valueArr);
+                    break;
+            };
 
             // get selected operator
             var operator = FilterOperator.EQ; // default
-            var selectedOperatorOpt = $('#' + filterID + "_operator_list option:selected");
+            var selectedOperatorOpt = $('#info_operator_list');
             if (typeof selectedOperatorOpt !== "undefined")
             {
                 switch(selectedOperatorOpt.val())
@@ -1021,6 +1042,100 @@ function loadSampleGroups(workspaceKey)
     });
 }
 
+function infoFieldChanged(workspaceKey)
+{
+    // get selected filter
+    var filterID = $('#info_field_list').val();
+    var filter = INFO_FILTER_LIST.findWhere({id: filterID});
+
+    // constants for operator options
+    var OPTION_EQ   = "<option value='eq'>=</option>";
+    var OPTION_GT   = "<option value='gt'>&gt;</option>";
+    var OPTION_GTEQ = "<option value='gteq'>&#x2265;</option>";
+    var OPTION_LT   = "<option value='lt'>&lt;</option>";
+    var OPTION_LTEQ = "<option value='lteq'>&#x2264;</option>";
+    var OPTION_NE   = "<option value='ne'>&#x2260;</option>";
+
+    // value DIV area
+    var valueDiv = $("#info_value_div");
+    // clear div value area
+    valueDiv.empty();
+
+    // operator list
+    var opList = $("#info_operator_list");
+    // clear operator list
+    opList.empty();
+    switch (filter.get("category"))
+    {
+        case FilterCategory.INFO_FLAG:
+            opList.append(OPTION_EQ);
+            opList.append(OPTION_NE);
+            valueDiv.append("<input type='checkbox'/>");
+            break;
+        case FilterCategory.INFO_INT:
+            opList.append(OPTION_EQ);
+            opList.append(OPTION_GT);
+            opList.append(OPTION_GTEQ);
+            opList.append(OPTION_LT);
+            opList.append(OPTION_LTEQ);
+            opList.append(OPTION_NE);
+            valueDiv.append("<input class='input-mini' type='number' value='0'>");
+            break;
+        case FilterCategory.INFO_FLOAT:
+            opList.append(OPTION_EQ);
+            opList.append(OPTION_GT);
+            opList.append(OPTION_GTEQ);
+            opList.append(OPTION_LT);
+            opList.append(OPTION_LTEQ);
+            opList.append(OPTION_NE);
+            valueDiv.append("<input class='input-mini' type='number' step='any' value='0.0'>");
+            break;
+        case FilterCategory.INFO_STR:
+            opList.append(OPTION_EQ);
+            opList.append(OPTION_NE);
+
+            valueDiv.append("<div class='dropdown' id='info_field_dropdown_checkbox'></div>");
+
+            // dynamically query to populate dropdown
+            var fieldName = filter.get("name");
+            $.ajax({
+                url: "/mongo_svr/ve/typeahead/w/" + workspaceKey + "/f/" + fieldName,
+                dataType: "json",
+                async: false,
+                success: function(json)
+                {
+                    var fieldValues = json[fieldName];
+                    if (typeof fieldValues === "undefined")
+                    {
+                        console.warn("INFO string field " + fieldName + " has no available values.");
+                        fieldValues = new Array();
+                    }
+
+                    // sort values
+                    fieldValues.sort(function(a,b) { return a.localeCompare(b) } );
+
+                    var dropdownData = new Array();
+                    for (var i = 0; i < fieldValues.length; i++)
+                    {
+                        dropdownData.push({id: i, label: fieldValues[i]});
+                    }
+
+                    var dropdownCheckbox = $("#info_field_dropdown_checkbox");
+                    dropdownCheckbox.dropdownCheckbox({
+                        autosearch: true,
+                        hideHeader: false,
+                        data: dropdownData
+                    });
+                },
+                error: function(jqXHR, textStatus)
+                {
+                    $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+                }
+            });
+            break;
+    }
+}
+
 /**
  * Add rows to the INFO Filter table.
  *
@@ -1032,42 +1147,49 @@ function addRowsToInfoFilterTable(workspaceKey, infoFilters)
     var numTemplate  = $("#info-num-filter-template").html();
     var strTemplate  = $("#info-str-filter-template").html();
 
-    var infoFilterTable = $('#info_filter_table');
+    var infoFieldList = $('#info_field_list');
 
     for (var i=0; i < infoFilters.models.length; i++)
     {
         var filter = infoFilters.models[i];
 
-        var template;
-        var obj = new Object();
-        obj.workspaceKey = workspaceKey;
-        obj.id = filter.get("id");
-        obj.name = filter.get("name");
+        infoFieldList.append("<option value='"+filter.get("id")+"'>"+filter.get("name")+"</option>");
 
-        switch (filter.get("category"))
+        infoFieldList.change(function()
         {
-            case FilterCategory.INFO_FLAG:
-                template = flagTemplate;
-                break;
-            case FilterCategory.INFO_INT:
-            case FilterCategory.INFO_FLOAT:
-                template = numTemplate;
-                if (filter.get("category") == FilterCategory.INFO_INT)
-                    obj.value = '0';
-                else
-                    obj.value = '0.0';
-                break;
-            case FilterCategory.INFO_STR:
-                template = strTemplate;
-                obj.value = '';
-                break;
-        }
-        infoFilterTable.append(_.template(template, obj));
-
-        $("#info_field_dropdown_checkbox").dropdownCheckbox({
-            autosearch: true,
-            hideHeader: false
+            infoFieldChanged(workspaceKey);
         });
+
+//        var template;
+//        var obj = new Object();
+//        obj.workspaceKey = workspaceKey;
+//        obj.id = filter.get("id");
+//        obj.name = filter.get("name");
+//
+//        switch (filter.get("category"))
+//        {
+//            case FilterCategory.INFO_FLAG:
+//                template = flagTemplate;
+//                break;
+//            case FilterCategory.INFO_INT:
+//            case FilterCategory.INFO_FLOAT:
+//                template = numTemplate;
+//                if (filter.get("category") == FilterCategory.INFO_INT)
+//                    obj.value = '0';
+//                else
+//                    obj.value = '0.0';
+//                break;
+//            case FilterCategory.INFO_STR:
+//                template = strTemplate;
+//                obj.value = '';
+//                break;
+//        }
+//        infoFilterTable.append(_.template(template, obj));
+//
+//        $("#info_field_dropdown_checkbox").dropdownCheckbox({
+//            autosearch: true,
+//            hideHeader: false
+//        });
     }
 }
 
@@ -1544,9 +1666,19 @@ function toInfoStringFilterPojo(filter)
 
     pojo.key = "INFO." + filter.get("name");
 
-    var values = new Array();
-    values.push(filter.get("value"));
-    pojo.values = values;
+    var value = filter.get("value");
+    var displayValue = '';
+
+    if (value instanceof Array)
+    {
+        pojo.values = value;
+    }
+    else
+    {
+        var values = new Array();
+        values.push(filter.get("value"));
+        pojo.values = values;
+    }
 
     var comparator;
     switch(filter.get("operator"))

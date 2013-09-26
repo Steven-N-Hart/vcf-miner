@@ -36,6 +36,13 @@
             margin-left: -175px;
         }
 
+        body .modal-800wide {
+            /* new custom width */
+            width: 800px;
+            /* must be half of the width, minus scrollbar on the left (30px) */
+            margin-left: -400px;
+        }
+
         body .modal-600wide {
             /* new custom width */
             width: 600px;
@@ -75,49 +82,6 @@
         <div class="span4"><%=name%></div>
         <div class="span1">=</div>
         <div class="span6"><input id="<%=id%>_value_field" class="input-mini" type="number" value="<%=value%>"></div>
-    </script>
-    <script id="info-flag-filter-template" type="text/template">
-        <div class="row-fluid">
-            <div class="span1"><input type="radio" name="info-filter-radio-group" value="<%=id%>"></div>
-            <div class="span5"><small><%=name%></small></div>
-            <div class="span2">=</div>
-            <div class="span4"><input id="<%=id%>_value_field" type="checkbox"/></div>
-         </div>
-    </script>
-    <script id="info-num-filter-template" type="text/template">
-        <div class="row-fluid">
-            <div class="span1"><input type="radio" name="info-filter-radio-group" value="<%=id%>"></div>
-            <div class="span5"><small><%=name%></small></div>
-            <div class="span2">
-                <select class="span12" id="<%=id%>_operator_list">
-                    <option value='eq'  >=</option>
-                    <option value='gt'  >&gt;</option>
-                    <option value='gteq'>&#x2265;</option>
-                    <option value='lt'  >&lt;</option>
-                    <option value='lteq'>&#x2264;</option>
-                    <option value='ne'  >&#x2260;</option>
-                </select>
-            </div>
-            <div class="span4"><input id="<%=id%>_value_field" class="input-mini" type="number" value="<%=value%>"></div>
-         </div>
-    </script>
-    <script id="info-str-filter-template" type="text/template">
-        <div class="row-fluid">
-            <div class="span1"><input type="radio" name="info-filter-radio-group" value="<%=id%>"></div>
-            <div class="span5"><small><%=name%></small></div>
-            <div class="span2">
-                <select class="span12" id="<%=id%>_operator_list">
-                    <option value='eq'>=</option>
-                    <option value='ne'>&#x2260;</option>
-                </select>
-            </div>
-            <div class="span4">
-                <div class="input-append">
-                    <input id="<%=id%>_value_field" value="<%=value%>" style="width:85%">
-                    <button id="<%=id%>_value_button" title="Set one or more values" type="button" onclick="showInfoFieldValuesModal('<%=workspaceKey%>', '<%=name%>', '<%=id%>')"><img class="icon-search"/></button>
-                </div>
-            </div>
-         </div>
     </script>
     <script id="info-message-template" type="text/template">
         <div class="alert alert-info">
@@ -162,7 +126,7 @@
 </div>
 
 <!-- Modal -->
-<div id="add_filter_modal" class="modal modal-600wide hide fade" tabindex="-1" role="dialog" aria-labelledby="add_filter_label" aria-hidden="true">
+<div id="add_filter_modal" class="modal modal-800wide hide fade" tabindex="-1" role="dialog" aria-labelledby="add_filter_label" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="add_filter_label">Add Filter</h3>
@@ -198,20 +162,17 @@
                         <div class="tab-pane" id="tab_content_gene"> <!-- GENE tab -->
                             <div class="container-fluid">
                                 <div class="row-fluid"> <!-- header row -->
-                                    <div class="span1"></div>
                                     <div class="span2"><h4>Filter</h4></div>
                                     <div class="span1"></div>
-                                    <div class="span8"><h4>Value</h4></div>
+                                    <div class="span9"><h4>Value</h4></div>
                                 </div>
                                 <div class="row-fluid"> <!-- divider -->
                                     <div class="span12"><hr></div>
                                 </div>
                                 <div class="row-fluid">
-                                    <div class="span1"></div>
-                                    <!--<div class="span3"><button id="genes_add_button" title="Add filter to your search" type="button" class="btn"><i class="icon-plus"></i> Add</button></div>-->
                                     <div class="span2">Gene</div>
                                     <div class="span1">=</div>
-                                    <div class="span8">
+                                    <div class="span9">
                                         <div class="row-fluid">
                                             <div class="span12">
                                                 <input id="gene_typeahead" type="text" data-provide="typeahead" autocomplete="off" placeholder="<Enter Gene Name>">
@@ -234,20 +195,17 @@
                         <div class="tab-pane" id="tab_content_group"> <!-- GROUP tab -->
                             <div class="container-fluid">
                                 <div class="row-fluid"> <!-- header row -->
-                                    <div class="span1"></div>
                                     <div class="span2"><h4>Filter</h4></div>
                                     <div class="span1"></div>
-                                    <div class="span8"><h4>Value</h4></div>
+                                    <div class="span9"><h4>Value</h4></div>
                                 </div>
                                 <div class="row-fluid"> <!-- divider -->
                                     <div class="span12"><hr></div>
                                 </div>
                                 <div class="row-fluid">
-                                    <div class="span1"></div>
-                                    <!--<div class="span3"><button id="group_add_button" title="Add filter to your search" type="button" class="btn"><i class="icon-plus"></i> Add</button></div>-->
                                     <div class="span2">Group</div>
                                     <div class="span1">=</div>
-                                    <div class="span8">
+                                    <div class="span9">
                                         <div class="input-append">
                                             <select id="group_list" class="input-large"></select>
                                             <button id="new_group_button" title="Create a new group" type="button" class="btn"><i class="icon-plus"></i></button>
@@ -258,15 +216,28 @@
                             </div>
                         </div>
                         <div class="tab-pane" id="tab_content_info"> <!-- info tab -->
-                            <div class="container-fluid pre-scrollable" id="info_filter_table">
+                            <div class="container-fluid" id="info_filter_table">
                                 <div class="row-fluid"> <!-- header row -->
-                                    <div class="span1"></div>
                                     <div class="span5"><h4>Filter</h4></div>
-                                    <div class="span2"></div>
-                                    <div class="span4"><h4>Value</h4></div>
+                                    <div class="span1"></div>
+                                    <div class="span6"><h4>Value</h4></div>
                                 </div>
                                 <div class="row-fluid"> <!-- divider -->
                                     <div class="span12"><hr></div>
+                                </div>
+                                <div class="row-fluid">
+                                    <div class="span5">
+                                        <select class="span12" id="info_field_list">
+                                            <!-- Dynamically added by javascript -->
+                                        </select>
+                                    </div>
+                                    <div class="span1">
+                                        <select class="span12" id="info_operator_list">
+                                            <!-- Dynamically added by javascript -->
+                                        </select>
+                                    </div>
+                                    <div class="span6" id="info_value_div">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -356,26 +327,6 @@
     <div class="modal-footer">
         <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true" id="new_group_apply">Create</button>
         <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-    </div>
-</div>
-
-<!-- Modal -->
-<div id="info_field_string_values_modal" class="modal modal-350wide hide fade" tabindex="-1" role="dialog" aria-labelledby="set_values_label" aria-hidden="true">
-    <div class="modal-header">
-        <h3 id="set_values_label">Available values</h3>
-    </div>
-    <div class="modal-body">
-        <div class="container-fluid">
-            <div class="row-fluid">
-                <div class="span12">
-                    <div class="dropdown" id="info_field_dropdown_checkbox"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true" id="apply_info_string_values_button">Apply</button>
-        <button class="btn" data-dismiss="modal" aria-hidden="true" onclick="">Cancel</button>
     </div>
 </div>
 
