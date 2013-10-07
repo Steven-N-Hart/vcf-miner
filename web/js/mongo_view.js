@@ -336,12 +336,44 @@ function initGroupTab(workspaceKey, allSampleNames)
     loadSampleGroups(workspaceKey);
 }
 
+function initSampleTab(sampleFilters)
+{
+    var sampleFieldList = $('#sample_field_list');
+
+    for (var i=0; i < sampleFilters.models.length; i++)
+    {
+        var filter = sampleFilters.models[i];
+
+        sampleFieldList.append("<option value='"+filter.get("id")+"'>"+filter.get("name")+"</option>");
+
+        sampleFieldList.change(function()
+        {
+            sampleFieldChanged();
+        });
+
+        // simulate user clicking on 1st entry
+        sampleFieldChanged();
+    }
+}
+
 function initInfoTab(workspaceKey, infoFilters)
 {
-    addRowsToInfoFilterTable(workspaceKey, infoFilters);
+    var infoFieldList = $('#info_field_list');
 
-    // select 1st one by default
-    selectFirstRadioInput("info-filter-radio-group");
+    for (var i=0; i < infoFilters.models.length; i++)
+    {
+        var filter = infoFilters.models[i];
+
+        infoFieldList.append("<option value='"+filter.get("id")+"'>"+filter.get("name")+"</option>");
+
+        infoFieldList.change(function()
+        {
+            infoFieldChanged(workspaceKey);
+        });
+
+        // simulate user clicking on 1st entry
+        infoFieldChanged(workspaceKey);
+    }
 }
 
 function getGroupPopoverTitle()
@@ -627,11 +659,11 @@ function addFilter()
     switch(tabId)
     {
         case "tab_content_sample":
-            var filterID = $("input[type=radio][name=pallet-filter-radio-group]:checked").val();
+            // get selected filter
+            var filterID = $('#sample_field_list').val();
             filter = PALLET_FILTER_LIST.findWhere({id: filterID});
-            var textfieldValue =  $("#" + filter.get("id") + "_value_field").val();
             // update filter's value based on textfield value
-            filter.set("value", textfieldValue);
+            filter.set("value", $("#sample_value_div input").val());
             break;
 
         case "tab_content_gene":
@@ -758,7 +790,6 @@ function setRemoveFilterButtonVisibility()
 function initBackbone(workspaceKey, displayCols)
 {
     backboneSearchedView(workspaceKey, displayCols);
-    backbonePalletView(workspaceKey);
     backboneSampleGroupView(workspaceKey);
 }
 
@@ -890,71 +921,6 @@ function backboneSampleGroupView(workspaceKey)
     });
 
     var groupListView = new GroupListView();
-}
-
-function backbonePalletView(workspaceKey)
-{
-    // VIEW
-    var PalletFilterView = Backbone.View.extend({
-        tagName:  "div",
-
-        className: "row-fluid",
-
-        template: _.template($('#pallet-filter-template').html()),
-
-        initialize: function() {
-        },
-
-        render: function() {
-            var filter = this.model;
-            this.$el.html(this.template(filter.toJSON()));
-            return this;
-        },
-
-        clear: function() {
-            this.model.destroy();
-        }
-    });
-
-    var PalletView = Backbone.View.extend({
-        el: $("#pallet_view"),
-
-        initialize: function() {
-
-            this.listenTo(PALLET_FILTER_LIST, 'add', this.addOne);
-
-            PALLET_FILTER_LIST.fetch();
-        },
-
-        render: function() {
-            // TODO: understand why this can't be in global space
-            PALLET_FILTER_LIST.add([
-                FILTER_MIN_ALT_READS,
-                FILTER_MIN_NUM_SAMPLES,
-                FILTER_MAX_NUM_SAMPLES,
-                FILTER_MIN_AC,
-                FILTER_MAX_AC,
-                FILTER_MIN_PHRED
-            ]);
-
-            // loop through filter collection
-            _.each(PALLET_FILTER_LIST.models, function(filter)
-            {
-                // each filter becomes a row in the table
-                var view = new PalletFilterView({model: filter});
-                $('#pallet_view').append(view.render().el);
-            });
-        },
-
-        addOne: function(filter) {
-        }
-    });
-
-    var palletView = new PalletView();
-    palletView.render();
-
-    // select 1st one by default
-    selectFirstRadioInput("pallet-filter-radio-group");
 }
 
 function toSampleGroupPOJO(workspaceKey, groupModel)
@@ -1136,65 +1102,18 @@ function infoFieldChanged(workspaceKey)
     }
 }
 
-/**
- * Add rows to the INFO Filter table.
- *
- * @param infoFilters
- */
-function addRowsToInfoFilterTable(workspaceKey, infoFilters)
+function sampleFieldChanged()
 {
-    var flagTemplate = $("#info-flag-filter-template").html();
-    var numTemplate  = $("#info-num-filter-template").html();
-    var strTemplate  = $("#info-str-filter-template").html();
+    // get selected filter
+    var filterID = $('#sample_field_list').val();
+    var filter = PALLET_FILTER_LIST.findWhere({id: filterID});
 
-    var infoFieldList = $('#info_field_list');
+    // value DIV area
+    var valueDiv = $("#sample_value_div");
+    // clear div value area
+    valueDiv.empty();
 
-    for (var i=0; i < infoFilters.models.length; i++)
-    {
-        var filter = infoFilters.models[i];
-
-        infoFieldList.append("<option value='"+filter.get("id")+"'>"+filter.get("name")+"</option>");
-
-        infoFieldList.change(function()
-        {
-            infoFieldChanged(workspaceKey);
-        });
-
-        // simulate user clicking on 1st entry
-        infoFieldChanged(workspaceKey);
-
-
-//        var template;
-//        var obj = new Object();
-//        obj.workspaceKey = workspaceKey;
-//        obj.id = filter.get("id");
-//        obj.name = filter.get("name");
-//
-//        switch (filter.get("category"))
-//        {
-//            case FilterCategory.INFO_FLAG:
-//                template = flagTemplate;
-//                break;
-//            case FilterCategory.INFO_INT:
-//            case FilterCategory.INFO_FLOAT:
-//                template = numTemplate;
-//                if (filter.get("category") == FilterCategory.INFO_INT)
-//                    obj.value = '0';
-//                else
-//                    obj.value = '0.0';
-//                break;
-//            case FilterCategory.INFO_STR:
-//                template = strTemplate;
-//                obj.value = '';
-//                break;
-//        }
-//        infoFilterTable.append(_.template(template, obj));
-//
-//        $("#info_field_dropdown_checkbox").dropdownCheckbox({
-//            autosearch: true,
-//            hideHeader: false
-//        });
-    }
+    valueDiv.append("<input class='input-mini' type='number' value='0'>");
 }
 
 /**
@@ -1600,10 +1519,21 @@ function setWorkspace()
             // rebuild the DataTables widget since columns have changed
             initVariantTable(displayCols);
 
+            // TODO: understand why this can't be in global space
+            PALLET_FILTER_LIST.add([
+                FILTER_MIN_ALT_READS,
+                FILTER_MIN_NUM_SAMPLES,
+                FILTER_MAX_NUM_SAMPLES,
+                FILTER_MIN_AC,
+                FILTER_MAX_AC,
+                FILTER_MIN_PHRED
+            ]);
+
             initBackbone(workspaceKey, displayCols);
             initGeneTab(workspaceKey);
             initGroupTab(workspaceKey, allSamples);
             initInfoTab(workspaceKey, INFO_FILTER_LIST);
+            initSampleTab(PALLET_FILTER_LIST);
         },
         error: function(jqXHR, textStatus)
         {

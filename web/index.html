@@ -77,12 +77,6 @@
         <td><span class="badge badge-info" id="<%=id%>_num_matches_label"><%=numMatches%></span></td>
         <td><button id="<%=id%>_remove_button" title="Remove filter from your search" type="button" class="btn" onclick="removeFilter('<%=id%>')">x</button></td>
     </script>
-    <script id="pallet-filter-template" type="text/template">
-        <div class="span1"><input type="radio" name="pallet-filter-radio-group" value="<%=id%>"></div>
-        <div class="span4"><%=name%></div>
-        <div class="span1">=</div>
-        <div class="span6"><input id="<%=id%>_value_field" class="input-mini" type="number" value="<%=value%>"></div>
-    </script>
     <script id="info-message-template" type="text/template">
         <div class="alert alert-info">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -149,13 +143,28 @@
                         <div class="tab-pane active" id="tab_content_sample"> <!-- SAMPLE tab -->
                             <div class="container-fluid" id="pallet_view">
                                 <div class="row-fluid"> <!-- header row -->
-                                    <div class="span1"></div>
-                                    <div class="span4"><h4>Filter</h4></div>
+                                    <div class="span5"><h4>Filter</h4></div>
                                     <div class="span1"></div>
                                     <div class="span6"><h4>Value</h4></div>
                                 </div>
                                 <div class="row-fluid"> <!-- divider -->
                                     <div class="span12"><hr></div>
+                                </div>
+                                <div class="row-fluid">
+                                    <div class="span5">
+                                        <select class="span12" id="sample_field_list">
+                                            <!-- Dynamically added by javascript -->
+                                        </select>
+                                    </div>
+                                    <div class="span1">
+                                        <select class="span12" id="sample_operator_list">
+                                            <!-- always going to be equals -->
+                                            <option value='eq'>=</option>
+                                        </select>
+                                    </div>
+                                    <div class="span6" id="sample_value_div">
+                                        <!-- Dynamically added by javascript -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
