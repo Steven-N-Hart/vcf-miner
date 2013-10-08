@@ -34,7 +34,7 @@ function toggleStateManagement ( skipAlert, mode ) {
 // set EVERY 'state' here so will undo ALL layout changes
 // used by the 'Reset State' button: myLayout.loadState( stateResetSettings )
 var stateResetSettings = {
-    north__size:		"auto"
+        north__size:		"auto"
     ,	north__initClosed:	false
     ,	north__initHidden:	false
 //    ,	south__size:		"auto"
@@ -57,6 +57,11 @@ $(document).ready(function ()
         ,	slidable:					true	// when closed, pane can 'slide' open over other panes - closes on mouse-out
         ,	livePaneResizing:			true
 
+        ,	buttonClass:			"button"	// default = 'ui-layout-button'
+        ,	togglerClass:			"toggler"	// default = 'ui-layout-toggler'
+        ,	togglerLength_open:		35			// WIDTH of toggler on north/south edges - HEIGHT on east/west edges
+        ,	togglerLength_closed:	35			// "100%" OR -1 = full height
+
         //	some resizing/toggling settings
         ,	north__size:			    50	    // OVERRIDE size of header height
         ,	north__resizable:			false	    // OVERRIDE
@@ -70,6 +75,18 @@ $(document).ready(function ()
         //	some pane-size settings
         ,	west__minSize:				200
         ,	west__size: 				400
+        ,	west__spacing_closed:		21			// wider space when closed
+        ,	west__togglerLength_closed:	21			// make toggler 'square' - 21x21
+        ,	west__togglerAlign_closed:	"top"		// align to top of resizer
+        ,	west__togglerLength_open:	0			// NONE - using custom togglers INSIDE west-pane
+        ,	west__togglerTip_open:		"Close West Pane"
+        ,	west__togglerTip_closed:	"Open West Pane"
+        ,	west__resizerTip_open:		"Resize West Pane"
+        ,	west__slideTrigger_open:	"click" 	// default
+        ,	west__slideTrigger_close:	"click" 	// default
+        ,	west__initClosed:			false
+//        ,	west__fxSettings_open:		{ easing: "easeOutBounce" } //	add 'bounce' option to default 'slide' effect
+
 //        ,	east__size:					300
 //        ,	east__minSize:				200
 //        ,	east__maxSize:				.5 // 50% of layout width
@@ -79,8 +96,8 @@ $(document).ready(function ()
         ,	west__animatePaneSizing:	false
         ,	west__fxSpeed_size:			"fast"	// 'fast' animation when resizing west-pane
         ,	west__fxSpeed_open:			1000	// 1-second animation when opening west-pane
-        ,	west__fxSettings_open:		{ easing: "easeOutBounce" } // 'bounce' effect when opening
-        ,	west__fxName_close:			"none"	// NO animation when closing west-pane
+        ,	west__fxSettings_open:		{ easing: "easeOutQuint" }
+        ,	west__fxSettings_close:		{ easing: "easeInQuint" }
 
         //	enable showOverflow on west-pane so CSS popups will overlap north pane
         ,	west__showOverflowOnHover:	true
@@ -98,5 +115,22 @@ $(document).ready(function ()
     // 'Reset State' button requires updated functionality in rc29.15+
     if ($.layout.revision && $.layout.revision >= 0.032915)
         $('#btnReset').show();
+
+    /*******************************
+     ***  CUSTOM LAYOUT BUTTONS  ***
+     *******************************
+     *
+     * Add SPANs to the east/west panes for customer "close" and "pin" buttons
+     *
+     * COULD have hard-coded span, div, button, image, or any element to use as a 'button'...
+     * ... but instead am adding SPANs via script - THEN attaching the layout-events to them
+     *
+     * CSS will size and position the spans, as well as set the background-images
+     */
+    var westSelector = "body > .ui-layout-west"; // outer-west pane
+    // CREATE SPANs for close-buttons - using unique IDs as identifiers
+    $("<span></span>").attr("id", "west-closer" ).prependTo( westSelector );
+    // BIND layout events to close-buttons to make them functional
+    myLayout.addCloseBtn("#west-closer", "west");
 
 });
