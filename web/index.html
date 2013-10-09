@@ -64,6 +64,7 @@
     <script src="backbone.localStorage-1.1.5/backbone.localStorage-min.js"></script>
     <script src="bootstrap-modal-2.1/js/bootstrap-modalmanager.js"></script>
     <script src="bootstrap-modal-2.1/js/bootstrap-modal.js"></script>
+    <script src="bootstrap-filestyle-1.0.3/js/bootstrap-filestyle.min.js"></script>
     <script type="text/javascript" src="Acquisio-bootstrap-dropdown-checkbox-5f2ad8d/js/bootstrap-dropdown-checkbox.js"></script>
 
 
@@ -111,16 +112,44 @@
 
 <body>
 <!-- Modal -->
-<div id="select_vcf_modal" class="modal modal-256wide hide fade" tabindex="-1" role="dialog" aria-labelledby="select_vcf_label" aria-hidden="true">
+<div id="select_vcf_modal" class="modal modal-600wide hide fade" tabindex="-1" role="dialog" aria-labelledby="select_vcf_label" aria-hidden="true">
     <div class="modal-header">
-        <h3 id="select_vcf_label">Select a VCF File</h3>
+        <h3 id="select_vcf_label">Getting Started</h3>
     </div>
     <div class="modal-body">
-        <select id="vcf_list"></select>
+        <div class="container-fluid">
+
+            <div class="well">
+            <div class="row-fluid">
+                <div class="span3">
+                    <button class="btn" aria-hidden="true" id="?1" onclick=""><i class="icon-upload"></i> Upload</button>
+                </div>
+                <div class="span9">
+                    <p>Upload the following new VCF file into the system:</p>
+                    <div class="input-append">
+                        <input type="file" class="filestyle"/>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="well">
+                <div class="row-fluid">
+                    <div class="span3">
+                        <button class="btn" data-dismiss="modal" aria-hidden="true" id="select_vcf_close" onclick="setWorkspace()"><i class="icon-search"></i> Search</button>
+                    </div>
+                    <div class="span9">
+                        Search the following VCF file:</p><select id="vcf_list"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true" id="select_vcf_close" onclick="setWorkspace()">Select</button>
-    </div>
+    <!--<div class="modal-footer">-->
+        <!--<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true" id="select_vcf_close" onclick="setWorkspace()"><i class="icon-play"></i> Load</button>-->
+        <!--<button class="btn btn-danger" data-dismiss="modal" aria-hidden="true" id="?TODO" onclick="setWorkspace()"><i class="icon-remove"></i> Delete</button>-->
+    <!--</div>-->
 </div>
 
 <!-- Modal -->

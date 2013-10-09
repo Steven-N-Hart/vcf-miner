@@ -124,6 +124,9 @@ $( document ).ready(function()
     initTemplates();
 
     showWorkspaces();
+
+    // initialize the file input field
+    $(":file").filestyle({buttonText: ''});
 });
 
 /**
