@@ -48,7 +48,8 @@ var stateResetSettings = {
 //    ,	east__initHidden:	false
 };
 
-$(document).ready(function ()
+//$(document).ready(function ()
+function initWorkspaceScreen()
 {
     myLayout = $('#jquery-ui-container').layout({
        //	reference only - these options are NOT required because 'true' is the default
@@ -132,5 +133,5 @@ $(document).ready(function ()
     $("<span></span>").attr("id", "west-closer" ).prependTo( westSelector );
     // BIND layout events to close-buttons to make them functional
     myLayout.addCloseBtn("#west-closer", "west");
-
-});
+}
+//});

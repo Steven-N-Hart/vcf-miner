@@ -188,6 +188,9 @@ function showWorkspaces()
             dataType: "json",
             success: function(json)
             {
+                // clear out workspaces
+                removeAll(WORKSPACE_LIST);
+
                 // each workspace object has an increment num as the attr name
                 for (var attr in json) {
                     if (json.hasOwnProperty(attr)) {
@@ -1506,6 +1509,21 @@ function addRowToConfigColumnsTable(checked, key, description)
 
 function setWorkspace(workspaceKey)
 {
+    // reset collections
+    removeAll(PALLET_FILTER_LIST);
+    removeAll(INFO_FILTER_LIST);
+    removeAll(SEARCHED_FILTER_LIST);
+
+    // update screens
+    $("#getting_started").toggle();
+    $("#jquery-ui-container").toggle();
+    initWorkspaceScreen();
+
+    // move workspaces pane from getting_started screen to workspace screen
+    var workspacesPane = $("#workspaces_pane").detach();
+    var placeholder = $("#workspaces_placeholder");
+    placeholder.append(workspacesPane);
+
     var workspace = WORKSPACE_LIST.findWhere({key: workspaceKey});
 
     console.debug("User selected workspace: " + workspaceKey);
@@ -1766,6 +1784,9 @@ function addWorkspace()
         if (xhr.status == 200)
         {
             console.log("Uploaded!");
+
+            // refresh workspaces
+            showWorkspaces();
         } else
         {
             console.log("Error " + xhr.status + " occurred uploading your file.<br \/>");

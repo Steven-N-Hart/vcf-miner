@@ -83,3 +83,17 @@ function selectFirstRadioInput(groupName)
     firstRadioInput.prop('checked',true);
 
 }
+
+/**
+ * Removes all models from collection one by one.
+ *
+ * @param collection
+ */
+function removeAll(collection)
+{
+    _.each(collection.models, function(model)
+    {
+        collection.remove(model);
+    });
+
+}
