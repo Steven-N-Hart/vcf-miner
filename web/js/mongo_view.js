@@ -16,6 +16,32 @@ var ERROR_TEMPLATE;
 var MAX_RESULTS = 1000;
 
 // MODEL
+var Workspace = Backbone.Model.extend({
+    defaults: function()
+    {
+        return {
+            key:    "NA",
+            alias:  "NA",
+            user:   "NA",
+            status: "NA",
+            id:      guid()
+        };
+    }
+});
+
+// COLLECTION of Workspaces
+var WorkspaceList = Backbone.Collection.extend({
+    model: Workspace,
+    localStorage: new Backbone.LocalStorage("mongo-backbone"),
+    nextOrder: function() {
+        if (!this.length) return 1;
+        return this.last().get('order') + 1;
+    },
+    comparator: 'order'
+});
+var WORKSPACE_LIST = new WorkspaceList();
+
+// MODEL
 var SampleGroup = Backbone.Model.extend({
     defaults: function()
     {
@@ -123,6 +149,7 @@ $( document ).ready(function()
 {
     initTemplates();
 
+    backboneWorkspacesView();
     showWorkspaces();
 
     // initialize the file input field
@@ -164,11 +191,11 @@ function showWorkspaces()
                 // each workspace object has an increment num as the attr name
                 for (var attr in json) {
                     if (json.hasOwnProperty(attr)) {
-                        var key = json[attr].key;
-                        var alias = json[attr].alias;
-
-                        $('#vcf_list').append("<option value='"+key+"'>"+alias+"</option>");
-
+                        var ws = new Workspace();
+                        ws.set("key",   json[attr].key);
+                        ws.set("alias", json[attr].alias);
+                        ws.set("user",  user);
+                        WORKSPACE_LIST.add(ws);
                     }
                 }
             },
@@ -177,9 +204,6 @@ function showWorkspaces()
                 $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
             }
         });
-
-        // user must select a VCF
-        $('#select_vcf_modal').modal({"keyboard":false});
     }
 }
 
@@ -926,6 +950,67 @@ function backboneSampleGroupView(workspaceKey)
     var groupListView = new GroupListView();
 }
 
+function backboneWorkspacesView()
+{
+    // VIEW
+    var WorkspaceRowView = Backbone.View.extend({
+
+        tagName: "tr",
+
+        template: _.template($('#workspaces-template').html()),
+
+        initialize: function()
+        {
+            this.listenTo(this.model, 'change', this.render);
+        },
+
+        render: function()
+        {
+            // set id
+            $(this.el).attr('id', this.model.get("id"));
+
+            this.$el.html(this.template(this.model.toJSON()));
+            return this;
+        }
+    });
+
+    var WorkspacesView = Backbone.View.extend({
+
+        el: $("#workspaces_view"),
+
+        initialize: function()
+        {
+            this.listenTo(WORKSPACE_LIST, 'add',    this.addOne);
+            this.listenTo(WORKSPACE_LIST, 'remove', this.removeOne);
+
+            // loading any preexisting models that might be saved in localStorage
+            WORKSPACE_LIST.fetch();
+        },
+
+        render: function()
+        {
+        },
+
+        addOne: function(workspace)
+        {
+            var view = new WorkspaceRowView({model: workspace});
+
+            // add right before the Add Filter button row
+            this.$("#add_workspace_row").before(view.render().el);
+//
+//            this.$el.append(view.render().el);
+        },
+
+        removeOne: function(workspace)
+        {
+            // remove element with corresponding group ID from DOM
+            this.$("#" + workspace.get("id")).remove();
+        }
+    });
+
+    var workspacesView = new WorkspacesView();
+}
+
 function toSampleGroupPOJO(workspaceKey, groupModel)
 {
     var pojo = new Object();
@@ -1419,14 +1504,13 @@ function addRowToConfigColumnsTable(checked, key, description)
     newCTableCell3.innerHTML = description;
 }
 
-function setWorkspace()
+function setWorkspace(workspaceKey)
 {
-    var workspaceKey   = $('#vcf_list').val();
-    var workspaceAlias = $('#vcf_list option:selected').text();
+    var workspace = WORKSPACE_LIST.findWhere({key: workspaceKey});
 
     console.debug("User selected workspace: " + workspaceKey);
 
-    $("#vcf_file").html("VCF File: " + workspaceAlias);
+    $("#vcf_file").html("Workspace: " + workspace.get("alias"));
 
     var metadataRequest = $.ajax({
         url: "/mongo_svr/ve/meta/workspace/" + workspaceKey,
@@ -1630,4 +1714,96 @@ function toInfoStringFilterPojo(filter)
     pojo.comparator = comparator;
 
     return pojo;
+}
+
+/**
+ * Uploads a VCF to the server to create a new workspace.
+ */
+function addWorkspace()
+{
+    // TODO: hardcoded user
+    var user = 'steve';
+
+    var uploadFile = $( '#vcf_file_upload' )[0].files[0]
+
+    // some browsers put C:\\fakepath\\ on the front
+    var name = uploadFile.name.replace("C:\\fakepath\\", "");
+    // chomp off trailing .vcf file extension
+    name = name.split(".")[0];
+    console.debug("Adding working with name=" + name);
+
+    // progress on transfers from the server to the client (downloads)
+    function updateProgress (oEvent)
+    {
+        console.log("progress called");
+        if (oEvent.lengthComputable)
+        {
+            var percentComplete = oEvent.loaded / oEvent.total;
+            console.log('progress: ' + percentComplete);
+        }
+    }
+
+    function transferComplete(evt)
+    {
+        alert("The transfer is complete.");
+    }
+
+    function transferFailed(evt)
+    {
+        alert("An error occurred while transferring the file.");
+    }
+
+    var xhr = new XMLHttpRequest();
+//
+    xhr.addEventListener("progress", updateProgress, false);
+    xhr.addEventListener("load", transferComplete, false);
+    xhr.addEventListener("error", transferFailed, false);
+
+    xhr.open('POST', "/mongo_svr/uploadvcf/user/" + user + "/alias/" + name, true);
+
+    xhr.onload = function(oEvent)
+    {
+        if (xhr.status == 200)
+        {
+            console.log("Uploaded!");
+        } else
+        {
+            console.log("Error " + xhr.status + " occurred uploading your file.<br \/>");
+        }
+    };
+
+    var formData = new FormData;
+    formData.append('file', uploadFile);
+    xhr.send(formData);
+
+//    $.ajax({
+//        url: "/mongo_svr/uploadvcf/user/" + user + "/alias/" + name,
+//        type: "POST",
+//        data: formData,
+//        processData: false,  // tell jQuery not to process the data
+//        contentType: false   // tell jQuery not to set contentType
+//    });
+
+     // display
+    //$('#upload_vcf_progress_modal').modal();
+}
+
+function deleteWorkspace(workspaceKey)
+{
+    var workspace = WORKSPACE_LIST.findWhere({key: workspaceKey});
+
+    console.debug("Deleting working with name=" + workspace.get("alias") + " and key=" + workspaceKey);
+
+    $.ajax({
+        type: "DELETE",
+        url: "/mongo_svr/ve/delete_workspace/" + workspaceKey,
+        success: function(json)
+        {
+            WORKSPACE_LIST.remove(workspace);
+        },
+        error: function(jqXHR, textStatus)
+        {
+            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+        }
+    });
 }

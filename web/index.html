@@ -80,8 +80,18 @@
         <span class="label"><td><%=displayOperator%></td></span>
         <span id="<%=id%>_display_value_label" class="label"><td><%=displayValue%></td></span>
         <td><span class="badge badge-info" id="<%=id%>_num_matches_label"><%=numMatches%></span></td>
-        <td><button id="<%=id%>_remove_button" title="Remove filter from your search" type="button" class="btn" onclick="removeFilter('<%=id%>')">x</button></td>
+        <td><button id="<%=id%>_remove_button" title="Remove filter from your search" type="button" class="btn btn-mini" onclick="removeFilter('<%=id%>')"><i class="icon-remove"></i></button></td>
     </script>
+
+    <script id="workspaces-template" type="text/template">
+        <span class="label"><td><%=alias%></td></span>
+        <span class="label"><td><%=status%></td></span>
+        <td>
+            <button id="<%=id%>_load_button" title="Load" type="button" class="btn btn-mini" onclick="setWorkspace('<%=key%>')"><i class="icon-play"></i></button>
+            <button id="<%=id%>_delete_button" title="Delete" type="button" class="btn btn-mini" onclick="deleteWorkspace('<%=key%>')"><i class="icon-remove"></i></button>
+        </td>
+    </script>
+
     <script id="info-message-template" type="text/template">
         <div class="alert alert-info">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -111,45 +121,40 @@
 </head>
 
 <body>
+
 <!-- Modal -->
-<div id="select_vcf_modal" class="modal modal-600wide hide fade" tabindex="-1" role="dialog" aria-labelledby="select_vcf_label" aria-hidden="true">
+<div id="add_workspace_modal" class="modal modal-350wide hide fade" tabindex="-1" role="dialog"aria-hidden="true">
     <div class="modal-header">
-        <h3 id="select_vcf_label">Getting Started</h3>
+        <h3>Add Workspace</h3>
     </div>
     <div class="modal-body">
         <div class="container-fluid">
-
-            <div class="well">
             <div class="row-fluid">
-                <div class="span3">
-                    <button class="btn" aria-hidden="true" id="?1" onclick=""><i class="icon-upload"></i> Upload</button>
-                </div>
-                <div class="span9">
-                    <p>Upload the following new VCF file into the system:</p>
+                <div class="span12">
+                    <p>Import the following VCF file into a new workspace:</p>
                     <div class="input-append">
-                        <input type="file" class="filestyle"/>
-                    </div>
-                </div>
-            </div>
-            </div>
-
-            <div class="well">
-                <div class="row-fluid">
-                    <div class="span3">
-                        <button class="btn" data-dismiss="modal" aria-hidden="true" id="select_vcf_close" onclick="setWorkspace()"><i class="icon-search"></i> Search</button>
-                    </div>
-                    <div class="span9">
-                        Search the following VCF file:</p><select id="vcf_list"></select>
+                        <input id="vcf_file_upload" type="file" class="filestyle"/>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
-    <!--<div class="modal-footer">-->
-        <!--<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true" id="select_vcf_close" onclick="setWorkspace()"><i class="icon-play"></i> Load</button>-->
-        <!--<button class="btn btn-danger" data-dismiss="modal" aria-hidden="true" id="?TODO" onclick="setWorkspace()"><i class="icon-remove"></i> Delete</button>-->
-    <!--</div>-->
+    <div class="modal-footer">
+        <button class="btn btn-primary" aria-hidden="true" onclick="addWorkspace()">Add</button>
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="upload_vcf_progress_modal" class="modal modal-350wide hide fade" tabindex="-1" role="dialog" aria-labelledby="select_vcf_label" aria-hidden="true">
+    <div class="modal-header">
+        <h3 id="select_vcf_label">Uploading VCF File</h3>
+    </div>
+    <div class="modal-body">
+        <div class="progress progress-striped active">
+            <div class="bar" style="width: 40%;"></div>
+        </div>
+    </div>
 </div>
 
 <!-- Modal -->
@@ -251,7 +256,7 @@
                                         <div class="input-append">
                                             <select id="group_list" class="input-large"></select>
                                             <button id="new_group_button" title="Create a new group" type="button" class="btn"><i class="icon-plus"></i></button>
-                                            <button id="remove_group_button" title="Remove group" type="button" class="btn"><i class="icon-minus"></i></button>
+                                            <!--<button id="remove_group_button" title="Remove group" type="button" class="btn"><i class="icon-minus"></i></button>-->
                                         </div>
                                     </div>
                                 </div>
@@ -388,7 +393,7 @@
                     <a class="brand" href="#">Mongo View</a>
                     <img src="img/bull-graphic.png" width="60" height="50">
                     <ul class="nav pull-right">
-                        <li id="vcf_file" class="navbar-text">VCF File:</li>
+                        <li id="vcf_file" class="navbar-text">Workspace:</li>
                     </ul>
                 </div>
             </div>
@@ -412,7 +417,27 @@
                             <th></th>
                         </tr>
                         <tr id="add_filter_row">
-                            <span class="label"><td colspan="3"><button title="Add filter to your search" class="btn btn-primary btn-block" onclick="showAddNewFilter()">Add Filter</button></td></span>
+                            <td colspan="3"><button title="Add filter to your search" class="btn btn-primary" onclick="showAddNewFilter()">Add Filter</button></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+            </ul>
+        </div>
+
+        <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+                <div class="nav-header"><h4>Workspaces</h4></div>
+                <div id="workspaces_view">
+                    <table class="table" id="workspaces_table">
+                        <tr>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                        <tr id="add_workspace_row">
+                            <td><button title="Add" class="btn btn-primary" onclick="$('#add_workspace_modal').modal();">Add Workspace</button></td>
                             <td></td>
                             <td></td>
                         </tr>
