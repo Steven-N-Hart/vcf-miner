@@ -1739,6 +1739,8 @@ function toInfoStringFilterPojo(filter)
  */
 function addWorkspace()
 {
+    $("#progress").css('width','0%');
+
     // TODO: hardcoded user
     var user = 'steve';
 
@@ -1753,29 +1755,28 @@ function addWorkspace()
     // progress on transfers from the server to the client (downloads)
     function updateProgress (oEvent)
     {
-        console.log("progress called");
         if (oEvent.lengthComputable)
         {
-            var percentComplete = oEvent.loaded / oEvent.total;
-            console.log('progress: ' + percentComplete);
+            var percentComplete = (oEvent.loaded / oEvent.total) * 100;
+            $("#progress").css('width',percentComplete + '%');
         }
     }
 
-    function transferComplete(evt)
-    {
-        alert("The transfer is complete.");
-    }
+//    function transferComplete(evt)
+//    {
+//        alert("The transfer is complete.");
+//    }
 
-    function transferFailed(evt)
-    {
-        alert("An error occurred while transferring the file.");
-    }
+//    function transferFailed(evt)
+//    {
+//        alert("An error occurred while transferring the file.");
+//    }
 
     var xhr = new XMLHttpRequest();
 //
-    xhr.addEventListener("progress", updateProgress, false);
-    xhr.addEventListener("load", transferComplete, false);
-    xhr.addEventListener("error", transferFailed, false);
+    xhr.upload.addEventListener("progress", updateProgress, false);
+    //xhr.addEventListener("load", transferComplete, false);
+    //xhr.addEventListener("error", transferFailed, false);
 
     xhr.open('POST', "/mongo_svr/uploadvcf/user/" + user + "/alias/" + name, true);
 
@@ -1785,28 +1786,26 @@ function addWorkspace()
         {
             console.log("Uploaded!");
 
+            $("#progress").css('width','100%');
+
             // refresh workspaces
             showWorkspaces();
         } else
         {
             console.log("Error " + xhr.status + " occurred uploading your file.<br \/>");
         }
+        $('#upload_vcf_progress_modal').modal('hide');
     };
 
     var formData = new FormData;
     formData.append('file', uploadFile);
     xhr.send(formData);
 
-//    $.ajax({
-//        url: "/mongo_svr/uploadvcf/user/" + user + "/alias/" + name,
-//        type: "POST",
-//        data: formData,
-//        processData: false,  // tell jQuery not to process the data
-//        contentType: false   // tell jQuery not to set contentType
-//    });
+    // hide
+    $('#add_workspace_modal').modal('hide');
 
      // display
-    //$('#upload_vcf_progress_modal').modal();
+    $('#upload_vcf_progress_modal').modal();
 }
 
 function deleteWorkspace(workspaceKey)
