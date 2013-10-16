@@ -1284,8 +1284,14 @@ function initVariantTable(displayCols)
         aoColumns.push({ "sTitle":   displayCols[i] });
     }
 
+    var sDom =
+        "<'row'<'pull-right'<'toolbar'>>>" +
+        "<'row'<'pull-left'l><'pull-right'i>>" +
+        "<'row't>" +
+        "<'row'<'pull-left'p>>";
+
     $('#variant_table').dataTable( {
-        "sDom": "<'row'<'span6'l><'span6'>r>t<'row'<'span6'i><'span6'p>>",
+        "sDom": sDom,
         "aoColumns": aoColumns,
         'aaData':    [],
         "bDestroy":  true,
@@ -1294,6 +1300,8 @@ function initVariantTable(displayCols)
         "sScrollX": "100%",
         "bScrollCollapse": true
     });
+
+    $("div.toolbar").append($("#table_toolbar"));
 
     // set visibility
     for (var i = 0; i < displayCols.length; i++)
@@ -1366,7 +1374,7 @@ function getDataTablesDisplayValue(value)
     }
     else
     {
-        var MAX_LENGTH = 10;
+        var MAX_LENGTH = 15;
         if (value.length > MAX_LENGTH)
         {
             var expandAnchor = '<a id="' + id + '_expand" title="Show remaining characters">...</a>';
@@ -1476,6 +1484,28 @@ function toggleDisplayColumn(colName)
             return;
         }
     }
+}
+
+/**
+ * Gets an array of column names that are currently visible.
+ *
+ * @return An array of column names that are currently visible.
+ */
+function getVisibleColumns()
+{
+    var table = $('#variant_table').dataTable();
+    var aoColumns = table.fnSettings().aoColumns;
+
+    var visibleCols = new Array();
+
+    for (i=0; i < aoColumns.length; i++)
+    {
+        if(aoColumns[i].bVisible)
+        {
+            visibleCols.push(aoColumns[i].sTitle);
+        }
+    }
+    return visibleCols;
 }
 
 /**
@@ -1639,6 +1669,12 @@ function setWorkspace(workspaceKey)
             initGroupTab(workspaceKey, allSamples);
             initInfoTab(workspaceKey, INFO_FILTER_LIST);
             initSampleTab(PALLET_FILTER_LIST);
+
+            // init export button
+            $('#export_button').click(function (e)
+            {
+                download(workspaceKey, displayCols);
+            });
         },
         error: function(jqXHR, textStatus)
         {
@@ -1826,4 +1862,48 @@ function deleteWorkspace(workspaceKey)
             $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
         }
     });
+}
+
+/**
+ * Downloads data in TSV format for the given query and selected columns.
+ *
+ * @param workspaceKey
+ * @param displayCols
+ */
+function download(workspaceKey, displayCols)
+{
+    // send query request to server
+    var query = buildQuery(SEARCHED_FILTER_LIST, workspaceKey);
+
+    // add attribute returnFields
+    query.returnFields = getVisibleColumns();
+
+    var jsonStr = JSON.stringify(query)
+
+    console.debug("Sending download request to server with the following JSON:" + jsonStr);
+
+    // TODO: remove previous form
+
+    // dynamically add HTML form that is hidden
+    var form = $('<form>').attr(
+        {
+            id:      'export_form',
+            method:  'POST',
+            action:  '/mongo_svr/download',
+            enctype: 'application/x-www-form-urlencoded'
+        });
+    var input = $('<input>').attr(
+        {
+            type: 'hidden',
+            name: 'json',
+            value: jsonStr
+        });
+    form.append(input);
+    $("body").append(form);
+
+    // programmatically submit form to perform download
+    $('#export_form').submit();
+
+    // remove form
+    $('#export_form').remove();
 }
