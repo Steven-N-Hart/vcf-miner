@@ -389,7 +389,7 @@ function initSampleTab(sampleFilters)
 function initInfoTab(workspaceKey, infoFilters)
 {
     var infoFieldList = $('#info_field_list');
-
+    infoFieldList.empty();
     for (var i=0; i < infoFilters.models.length; i++)
     {
         var filter = infoFilters.models[i];
@@ -1278,6 +1278,21 @@ function showInfoFieldValuesModal(workspaceKey, fieldName, filterID)
  */
 function initVariantTable(displayCols)
 {
+    var table = $('<table>').attr(
+        {
+            id:      'variant_table',
+            class:   'table table-striped table-bordered',
+            border:   '0',
+            cellpadding: '0',
+            cellspacing: '0'
+        });
+
+    // remove previous table if present
+    $('#variant_table_div').empty();
+
+    $('#variant_table_div').append(table);
+
+
     var aoColumns = new Array();
     for (var i = 0; i < displayCols.length; i++)
     {
@@ -1545,8 +1560,8 @@ function setWorkspace(workspaceKey)
     removeAll(SEARCHED_FILTER_LIST);
 
     // update screens
-    $("#getting_started").toggle();
-    $("#jquery-ui-container").toggle();
+    $("#getting_started").toggle(false);
+    $("#jquery-ui-container").toggle(true);
     initWorkspaceScreen();
 
     // move workspaces pane from getting_started screen to workspace screen
@@ -1675,18 +1690,14 @@ function setWorkspace(workspaceKey)
             {
                 download(workspaceKey, displayCols);
             });
+
+            // backbone MVC will send query request based on adding this filter
+            SEARCHED_FILTER_LIST.add(FILTER_NONE);
         },
         error: function(jqXHR, textStatus)
         {
             $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
         }
-    });
-
-    metadataRequest.done(function(msg)
-    {
-        // backbone MVC will send query request based on adding this filter
-        SEARCHED_FILTER_LIST.reset();
-        SEARCHED_FILTER_LIST.add(FILTER_NONE);
     });
 }
 
