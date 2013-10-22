@@ -145,8 +145,13 @@ var SEARCHED_FILTER_LIST = new FilterList;
 var PALLET_FILTER_LIST = new FilterList;
 var INFO_FILTER_LIST = new FilterList;
 
+var searchedView;
+
 $( document ).ready(function()
 {
+    //searchedView.setFilters(SEARCHED_FILTER_LIST);
+    searchedView = new SearchedView(SEARCHED_FILTER_LIST);
+
     initTemplates();
 
     backboneWorkspacesView();
@@ -369,6 +374,7 @@ function initGroupTab(workspaceKey, allSampleNames)
 function initSampleTab(sampleFilters)
 {
     var sampleFieldList = $('#sample_field_list');
+    sampleFieldList.empty();
 
     for (var i=0; i < sampleFilters.models.length; i++)
     {
@@ -794,112 +800,9 @@ function removeFilter(filterID)
     });
 }
 
-function setRemoveFilterButtonVisibility()
-{
-    var lastFilter = _.last(SEARCHED_FILTER_LIST.models);
-
-    // loop through filter collection
-    // remove button should ONLY be visible if it's
-    // 1.) not the NONE filter
-    // 2.) is the last filter in the list
-    _.each(SEARCHED_FILTER_LIST.models, function(filter)
-    {
-        var button =  $("#" + filter.get("id") + "_remove_button");
-        if ((filter.get("id") != FILTER_NONE.get("id")) &&
-            (filter.get("id") == lastFilter.get("id")))
-        {
-            button.show();
-        }
-        else
-        {
-            button.hide();
-        }
-    });
-}
-
 function initBackbone(workspaceKey, displayCols)
 {
-    backboneSearchedView(workspaceKey, displayCols);
     backboneSampleGroupView(workspaceKey);
-}
-
-function backboneSearchedView(workspaceKey, displayCols)
-{
-    // VIEW
-    var SearchedFilterView = Backbone.View.extend({
-
-        tagName: "tr",
-
-        template: _.template($('#searched-filter-template').html()),
-
-        initialize: function() {
-            this.listenTo(this.model, 'change', this.render);
-        },
-
-        render: function() {
-            // set id
-            $(this.el).attr('id', this.model.get("id"));
-
-            this.$el.html(this.template(this.model.toJSON()));
-
-//            $('#display_value_label').tooltip(
-//                {
-////                    html: this.model.get("value"),
-//                    html: "Testing 1 2 3",
-//                    placement: 'top',
-//                    trigger: 'hover'
-//                });
-
-            setRemoveFilterButtonVisibility();
-
-            return this;
-        },
-
-        clear: function() {
-            this.model.destroy();
-        }
-    });
-
-    var SearchedView = Backbone.View.extend({
-        el: $("#searched_view"),
-
-        initialize: function() {
-
-            this.listenTo(SEARCHED_FILTER_LIST, 'add',    this.addOne);
-            this.listenTo(SEARCHED_FILTER_LIST, 'remove', this.removeOne);
-
-            SEARCHED_FILTER_LIST.fetch();
-
-
-        },
-
-        render: function() {
-        },
-
-        addOne: function(filter) {
-            // send query request to server
-            var query = buildQuery(SEARCHED_FILTER_LIST, workspaceKey);
-            sendQuery(query, displayCols);
-
-            var view = new SearchedFilterView({model: filter});
-
-            // add right before the Add Filter button row
-            this.$("#add_filter_row").before(view.render().el);
-        },
-
-        removeOne: function(filter) {
-            // send query request to server
-            var query = buildQuery(SEARCHED_FILTER_LIST, workspaceKey);
-            sendQuery(query, displayCols);
-
-            // remove TR with corresponding filter ID from DOM
-            this.$("#" + filter.get("id")).remove();
-
-            setRemoveFilterButtonVisibility();
-        }
-    });
-
-    var searchedView = new SearchedView();
 }
 
 function backboneSampleGroupView(workspaceKey)
@@ -1316,7 +1219,7 @@ function initVariantTable(displayCols)
         "bScrollCollapse": true
     });
 
-    $("div.toolbar").append($("#table_toolbar"));
+    $("div .toolbar").append($("#table_toolbar").clone());
 
     // set visibility
     for (var i = 0; i < displayCols.length; i++)
@@ -1678,6 +1581,9 @@ function setWorkspace(workspaceKey)
                 FILTER_MAX_AC,
                 FILTER_MIN_PHRED
             ]);
+
+            searchedView.setWorkspace(workspaceKey);
+            searchedView.setDisplayCols(displayCols);
 
             initBackbone(workspaceKey, displayCols);
             initGeneTab(workspaceKey);
