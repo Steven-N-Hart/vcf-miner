@@ -1177,9 +1177,10 @@ function showInfoFieldValuesModal(workspaceKey, fieldName, filterID)
 /**
  * Initializes the DataTable widget for variants.
  *
+ * @param workspaceKey
  * @param displayCols An array of strings, each representing the column title.
  */
-function initVariantTable(displayCols)
+function initVariantTable(workspaceKey, displayCols)
 {
     var table = $('<table>').attr(
         {
@@ -1219,7 +1220,15 @@ function initVariantTable(displayCols)
         "bScrollCollapse": true
     });
 
-    $("div .toolbar").append($("#table_toolbar").clone());
+
+    var toolbar = $("#table_toolbar").clone();
+    $("div .toolbar").append(toolbar);
+
+    // init export button
+    $('#export_button', toolbar).click(function (e)
+    {
+        download(workspaceKey, displayCols);
+    });
 
     // set visibility
     for (var i = 0; i < displayCols.length; i++)
@@ -1570,7 +1579,7 @@ function setWorkspace(workspaceKey)
             allSamples.sort(SortByName);
 
             // rebuild the DataTables widget since columns have changed
-            initVariantTable(displayCols);
+            initVariantTable(workspaceKey, displayCols);
 
             // TODO: understand why this can't be in global space
             PALLET_FILTER_LIST.add([
@@ -1590,12 +1599,6 @@ function setWorkspace(workspaceKey)
             initGroupTab(workspaceKey, allSamples);
             initInfoTab(workspaceKey, INFO_FILTER_LIST);
             initSampleTab(PALLET_FILTER_LIST);
-
-            // init export button
-            $('#export_button').click(function (e)
-            {
-                download(workspaceKey, displayCols);
-            });
 
             // backbone MVC will send query request based on adding this filter
             SEARCHED_FILTER_LIST.add(FILTER_NONE);
