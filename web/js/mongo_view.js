@@ -178,6 +178,9 @@ function initTemplates()
  */
 function showWorkspaces()
 {
+    // clear out workspaces
+    removeAll(WORKSPACE_LIST);
+
     // TODO: users hardcoded - need authentication?
     var users = new Array();
     users.push('steve');
@@ -193,9 +196,6 @@ function showWorkspaces()
             dataType: "json",
             success: function(json)
             {
-                // clear out workspaces
-                removeAll(WORKSPACE_LIST);
-
                 // each workspace object has an increment num as the attr name
                 for (var attr in json) {
                     if (json.hasOwnProperty(attr)) {
