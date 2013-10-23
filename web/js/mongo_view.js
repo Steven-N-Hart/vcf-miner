@@ -16,32 +16,6 @@ var ERROR_TEMPLATE;
 var MAX_RESULTS = 1000;
 
 // MODEL
-var Workspace = Backbone.Model.extend({
-    defaults: function()
-    {
-        return {
-            key:    "NA",
-            alias:  "NA",
-            user:   "NA",
-            status: "NA",
-            id:      guid()
-        };
-    }
-});
-
-// COLLECTION of Workspaces
-var WorkspaceList = Backbone.Collection.extend({
-    model: Workspace,
-    localStorage: new Backbone.LocalStorage("mongo-backbone"),
-    nextOrder: function() {
-        if (!this.length) return 1;
-        return this.last().get('order') + 1;
-    },
-    comparator: 'order'
-});
-var WORKSPACE_LIST = new WorkspaceList();
-
-// MODEL
 var SampleGroup = Backbone.Model.extend({
     defaults: function()
     {
@@ -151,6 +125,9 @@ var VARIANT_TABLE_COLUMN_LIST = new VariantTableColumnList();
 var configVariantTableView;
 var variantTableColumnView;
 
+var WORKSPACE_LIST = new WorkspaceList();
+var workspacesView;
+
 $( document ).ready(function()
 {
     searchedView = new SearchedView(SEARCHED_FILTER_LIST);
@@ -158,10 +135,11 @@ $( document ).ready(function()
     configVariantTableView = new ConfigVariantTableView(VARIANT_TABLE_COLUMN_LIST);
     variantTableColumnView = new VariantTableColumnView(VARIANT_TABLE_COLUMN_LIST);
 
+    workspacesView = new WorkspacesView(WORKSPACE_LIST);
+
     initTemplates();
 
-    backboneWorkspacesView();
-    showWorkspaces();
+    getWorkspaces();
 
     // initialize the file input field
     $(":file").filestyle({buttonText: ''});
@@ -179,10 +157,9 @@ function initTemplates()
 }
 
 /**
- * Queries the server for available workspaces and displays a dialog for the user
- * to pick one.
+ * Queries the server for available workspaces
  */
-function showWorkspaces()
+function getWorkspaces()
 {
     // clear out workspaces
     removeAll(WORKSPACE_LIST);
@@ -209,6 +186,7 @@ function showWorkspaces()
                         ws.set("key",   json[attr].key);
                         ws.set("alias", json[attr].alias);
                         ws.set("user",  user);
+                        ws.set("status", json[attr].ready);
                         WORKSPACE_LIST.add(ws);
                     }
                 }
@@ -861,67 +839,6 @@ function backboneSampleGroupView(workspaceKey)
     });
 
     var groupListView = new GroupListView();
-}
-
-function backboneWorkspacesView()
-{
-    // VIEW
-    var WorkspaceRowView = Backbone.View.extend({
-
-        tagName: "tr",
-
-        template: _.template($('#workspaces-template').html()),
-
-        initialize: function()
-        {
-            this.listenTo(this.model, 'change', this.render);
-        },
-
-        render: function()
-        {
-            // set id
-            $(this.el).attr('id', this.model.get("id"));
-
-            this.$el.html(this.template(this.model.toJSON()));
-            return this;
-        }
-    });
-
-    var WorkspacesView = Backbone.View.extend({
-
-        el: $("#workspaces_view"),
-
-        initialize: function()
-        {
-            this.listenTo(WORKSPACE_LIST, 'add',    this.addOne);
-            this.listenTo(WORKSPACE_LIST, 'remove', this.removeOne);
-
-            // loading any preexisting models that might be saved in localStorage
-            WORKSPACE_LIST.fetch();
-        },
-
-        render: function()
-        {
-        },
-
-        addOne: function(workspace)
-        {
-            var view = new WorkspaceRowView({model: workspace});
-
-            // add right before the Add Filter button row
-            this.$("#add_workspace_row").before(view.render().el);
-//
-//            this.$el.append(view.render().el);
-        },
-
-        removeOne: function(workspace)
-        {
-            // remove element with corresponding group ID from DOM
-            this.$("#" + workspace.get("id")).remove();
-        }
-    });
-
-    var workspacesView = new WorkspacesView();
 }
 
 function toSampleGroupPOJO(workspaceKey, groupModel)
@@ -1691,7 +1608,7 @@ function addWorkspace()
             $("#progress").css('width','100%');
 
             // refresh workspaces
-            showWorkspaces();
+            getWorkspaces();
         } else
         {
             console.log("Error " + xhr.status + " occurred uploading your file.<br \/>");
