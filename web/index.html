@@ -70,6 +70,11 @@
             <button id="<%=id%>_delete_button" title="Delete" type="button" class="btn btn-mini" onclick="deleteWorkspace('<%=key%>')"><i class="icon-remove"></i></button>
         </td>
     </script>
+    <script id="config-variant-table-col-template" type="text/template">
+        <td><input id='<%=id%>_visible_checkbox' class="input-mini" type="checkbox" onclick="toggleDisplayColumn('<%=id%>')" checked="true"/></td>
+        <span class="label"><td><%=displayName%></td></span>
+        <span class="label"><td><%=description%></td></span>
+    </script>
 
     <script id="info-message-template" type="text/template">
         <div class="alert alert-info">
@@ -112,9 +117,12 @@
     <script src="bootstrap-filestyle-1.0.3/js/bootstrap-filestyle.min.js"></script>
     <script type="text/javascript" src="Acquisio-bootstrap-dropdown-checkbox-5f2ad8d/js/bootstrap-dropdown-checkbox.js"></script>
 
-
-    <script src="js/views/SearchedFilterView.js" type="text/javascript"></script>
     <script src="js/views/SearchedView.js" type="text/javascript"></script>
+
+    <script src="js/models/VariantTableColumn.js" type="text/javascript"></script>
+    <script src="js/collections/VariantTableColumnList.js" type="text/javascript"></script>
+    <script src="js/views/ConfigVariantTableView.js" type="text/javascript"></script>
+    <script src="js/views/VariantTableColumnView.js" type="text/javascript"></script>
 
     <script src="js/splitter_layout.js" type="text/javascript"></script>
     <script src="js/mongo_util.js" type="text/javascript"></script>

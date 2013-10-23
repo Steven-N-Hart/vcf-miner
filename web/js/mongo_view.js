@@ -147,10 +147,16 @@ var INFO_FILTER_LIST = new FilterList;
 
 var searchedView;
 
+var VARIANT_TABLE_COLUMN_LIST = new VariantTableColumnList();
+var configVariantTableView;
+var variantTableColumnView;
+
 $( document ).ready(function()
 {
-    //searchedView.setFilters(SEARCHED_FILTER_LIST);
     searchedView = new SearchedView(SEARCHED_FILTER_LIST);
+
+    configVariantTableView = new ConfigVariantTableView(VARIANT_TABLE_COLUMN_LIST);
+    variantTableColumnView = new VariantTableColumnView(VARIANT_TABLE_COLUMN_LIST);
 
     initTemplates();
 
@@ -606,6 +612,7 @@ function buildQuery(filterList, workspaceKey)
  * Sends query to server via AJAX.
  *
  * @param query
+ * @param displayCols
  */
 function sendQuery(query, displayCols)
 {
@@ -800,7 +807,7 @@ function removeFilter(filterID)
     });
 }
 
-function initBackbone(workspaceKey, displayCols)
+function initBackbone(workspaceKey)
 {
     backboneSampleGroupView(workspaceKey);
 }
@@ -1178,7 +1185,7 @@ function showInfoFieldValuesModal(workspaceKey, fieldName, filterID)
  * Initializes the DataTable widget for variants.
  *
  * @param workspaceKey
- * @param displayCols An array of strings, each representing the column title.
+ * @param displayCols An array of VariantTableColumn models.
  */
 function initVariantTable(workspaceKey, displayCols)
 {
@@ -1198,10 +1205,11 @@ function initVariantTable(workspaceKey, displayCols)
 
 
     var aoColumns = new Array();
-    for (var i = 0; i < displayCols.length; i++)
+    // loop through collection
+    _.each(displayCols.models, function(displayCol)
     {
-        aoColumns.push({ "sTitle":   displayCols[i] });
-    }
+        aoColumns.push({ "sTitle":   displayCol.get("displayName") });
+    });
 
     var sDom =
         "<'row'<'pull-right'<'toolbar'>>>" +
@@ -1231,18 +1239,12 @@ function initVariantTable(workspaceKey, displayCols)
     });
 
     // set visibility
-    for (var i = 0; i < displayCols.length; i++)
+    var colIdx = 0;
+    _.each(displayCols.models, function(displayCol)
     {
-        // look at dialog checkbox
-        var checkbox = $('#' + hash(displayCols[i]) + "_visible_checkbox");
-        var isVisible = false;
-        if (checkbox.is(':checked'))
-        {
-            isVisible = true;
-        }
-
-        $('#variant_table').dataTable().fnSetColumnVis(i, isVisible);
-    }
+        var isVisible = displayCol.get("visible");
+        $('#variant_table').dataTable().fnSetColumnVis(colIdx++, isVisible);
+    });
 }
 
 /**
@@ -1339,7 +1341,7 @@ function getDataTablesDisplayValue(value)
  * Adds 0 or more rows to the Variant Table.
  *
  * @param variants An array of variant objects.  Each is rendered as a single DataTable row.
- * @param displayCols An array of strings, each representing the column title.
+ * @param displayCols An array of VariantTableColumn models.
  */
 function addRowsToVariantTable(variants, displayCols)
 {
@@ -1350,33 +1352,32 @@ function addRowsToVariantTable(variants, displayCols)
         var variant = variants[i];
 
         var aaDataRow = new Array();
-        aaDataRow.push(getDataTablesDisplayValue(variant['CHROM']));
-        aaDataRow.push(getDataTablesDisplayValue(variant['POS']));
-        aaDataRow.push(getDataTablesDisplayValue(variant['ID']));
-        aaDataRow.push(getDataTablesDisplayValue(variant['REF']));
-        aaDataRow.push(getDataTablesDisplayValue(variant['ALT']));
-        aaDataRow.push(getDataTablesDisplayValue(variant['QUAL']));
-        aaDataRow.push(getDataTablesDisplayValue(variant['FILTER']));
 
-        // # samples
-        aaDataRow.push(getDataTablesDisplayValue(variant['GenotypePostitiveCount']));
-        // sample names
-        aaDataRow.push(getDataTablesDisplayValue(variant['GenotypePositiveList']));
-
-        var variantInfo = variant['INFO'];
-        for (var disIdx=9; disIdx < displayCols.length; disIdx++)
+        // loop through collection
+        _.each(displayCols.models, function(displayCol)
         {
-            var infoFieldName = displayCols[disIdx];
+            var name = displayCol.get("name");
 
-            if(variantInfo[infoFieldName] !== undefined)
+            if (name.substring(0, 4) === 'INFO')
             {
-                aaDataRow.push(getDataTablesDisplayValue(variantInfo[infoFieldName]));
+                // INFO column
+                var infoFieldName = displayCol.get("displayName");
+                var variantInfo = variant['INFO'];
+                if(variantInfo[infoFieldName] !== undefined)
+                {
+                    aaDataRow.push(getDataTablesDisplayValue(variantInfo[infoFieldName]));
+                }
+                else
+                {
+                    aaDataRow.push("");
+                }
             }
             else
             {
-                aaDataRow.push("");
+                aaDataRow.push(getDataTablesDisplayValue(variant[name]));
             }
-        }
+
+        });
 
         aaData.push(aaDataRow);
     }
@@ -1391,77 +1392,29 @@ function addRowsToVariantTable(variants, displayCols)
 /**
  * Shows or hides Variant Table column.
  *
- * @param colName name of column to toggle visibility
+ * @param id The id of the VariantTableColumn model
  */
-function toggleDisplayColumn(colName)
+function toggleDisplayColumn(id)
 {
+    var col = VARIANT_TABLE_COLUMN_LIST.findWhere({id: id});
+
     var table = $('#variant_table').dataTable();
     var aoColumns = table.fnSettings().aoColumns;
 
     // translate column name to DataTables column
     for (i=0; i < aoColumns.length; i++)
     {
-        if (aoColumns[i].sTitle == colName)
+        if (aoColumns[i].sTitle == col.get("displayName"))
         {
             var isVisible = aoColumns[i].bVisible;
 
             // flip visibility
-            table.fnSetColumnVis(i, !isVisible);
+            isVisible = !isVisible;
 
+            col.set("visible", isVisible);
             return;
         }
     }
-}
-
-/**
- * Gets an array of column names that are currently visible.
- *
- * @return An array of column names that are currently visible.
- */
-function getVisibleColumns()
-{
-    var table = $('#variant_table').dataTable();
-    var aoColumns = table.fnSettings().aoColumns;
-
-    var visibleCols = new Array();
-
-    for (i=0; i < aoColumns.length; i++)
-    {
-        if(aoColumns[i].bVisible)
-        {
-            visibleCols.push(aoColumns[i].sTitle);
-        }
-    }
-    return visibleCols;
-}
-
-/**
- * Add a row to the Config Columns Table.
- *
- * @param checked
- * @param key
- * @param description
- */
-function addRowToConfigColumnsTable(checked, key, description)
-{
-    var table = document.getElementById('config_columns_table');
-
-    //insert a new row at the bottom
-    var newCTableRow = table.insertRow(table.rows.length);
-
-    //create new cells
-    var newCTableCell1 = newCTableRow.insertCell(0);
-    var newCTableCell2 = newCTableRow.insertCell(1);
-    var newCTableCell3 = newCTableRow.insertCell(2);
-
-    //set the cell text
-    if (checked)
-        newCTableCell1.innerHTML = "<input id='" + hash(key) + "_visible_checkbox' class=\"input-mini\" type=\"checkbox\" checked=\"true\" onclick=\"toggleDisplayColumn('"+key+"')\"/>";
-    else
-        newCTableCell1.innerHTML = "<input id='" + hash(key) + "_visible_checkbox' class=\"input-mini\" type=\"checkbox\" onclick=\"toggleDisplayColumn('"+key+"')\"/>";
-
-    newCTableCell2.innerHTML = key;
-    newCTableCell3.innerHTML = description;
 }
 
 function setWorkspace(workspaceKey)
@@ -1470,6 +1423,7 @@ function setWorkspace(workspaceKey)
     removeAll(PALLET_FILTER_LIST);
     removeAll(INFO_FILTER_LIST);
     removeAll(SEARCHED_FILTER_LIST);
+    removeAll(VARIANT_TABLE_COLUMN_LIST);
 
     // update screens
     $("#getting_started").toggle(false);
@@ -1487,36 +1441,32 @@ function setWorkspace(workspaceKey)
 
     $("#vcf_file").html("Workspace: " + workspace.get("alias"));
 
+    // standard 1st 7 VCF file columns
+    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'CHROM',  displayName:'CHROM',  description:'The chromosome.'}));
+    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'POS',    displayName:'POS',    description:'The reference position, with the 1st base having position 1.'}));
+    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'ID',     displayName:'ID',     description:'Semi-colon separated list of unique identifiers.'}));
+    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'REF',    displayName:'REF',    description:'The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).'}));
+    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'ALT',    displayName:'ALT',    description:'Comma separated list of alternate non-reference alleles called on at least one of the samples.'}));
+    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:false, name:'QUAL',   displayName:'QUAL',   description:'Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).'}));
+    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:false, name:'FILTER', displayName:'FILTER', description:'PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
+
+    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'GenotypePostitiveCount', displayName:'#_Samples', description:'The number of samples.'}));
+    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'GenotypePositiveList',  displayName:'Samples',   description:'The names of samples.'}));
+
+    PALLET_FILTER_LIST.add([
+        FILTER_MIN_ALT_READS,
+        FILTER_MIN_NUM_SAMPLES,
+        FILTER_MAX_NUM_SAMPLES,
+        FILTER_MIN_AC,
+        FILTER_MAX_AC,
+        FILTER_MIN_PHRED
+    ]);
+
     var metadataRequest = $.ajax({
         url: "/mongo_svr/ve/meta/workspace/" + workspaceKey,
         dataType: "json",
         success: function(json)
         {
-            // clear tables
-            $('#config_columns_table').empty();
-
-            // 1ST 7 VCF columns displayed by default
-            var displayCols = new Array();
-            displayCols.push("CHROM");
-            displayCols.push("POS");
-            displayCols.push("ID");
-            displayCols.push("REF");
-            displayCols.push("ALT");
-            displayCols.push("QUAL");
-            displayCols.push("FILTER");
-            addRowToConfigColumnsTable(true, "CHROM",  "The chromosome.");
-            addRowToConfigColumnsTable(true, "POS",    "The reference position, with the 1st base having position 1.");
-            addRowToConfigColumnsTable(true, "ID",     "Semi-colon separated list of unique identifiers.");
-            addRowToConfigColumnsTable(true, "REF",    "The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).");
-            addRowToConfigColumnsTable(true, "ALT",    "Comma separated list of alternate non-reference alleles called on at least one of the samples.");
-            addRowToConfigColumnsTable(false, "QUAL",   "Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).");
-            addRowToConfigColumnsTable(false, "FILTER", "PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.");
-
-            displayCols.push("#_Samples");
-            displayCols.push("Samples");
-            addRowToConfigColumnsTable(true, "#_Samples", "The number of samples.");
-            addRowToConfigColumnsTable(true, "Samples", "The names of samples.");
-
             var info = json.INFO;
 
             // delete the properties that are actually FORMAT fields, not INFO fields
@@ -1538,7 +1488,15 @@ function setWorkspace(workspaceKey)
                 var infoFieldName = infoFieldNames[i];
                 if (info.hasOwnProperty(infoFieldName))
                 {
-                    displayCols.push(infoFieldName);
+                    var isVisible = false; // TODO: dynamically set visibilty for SNPEFF columns
+                    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn(
+                        {
+                            visible:isVisible,
+                            name:'INFO.'+infoFieldName,
+                            displayName:infoFieldName,
+                            description:info[infoFieldName].Description
+                        }
+                    ));
 
                     var infoFilter = new Filter();
                     infoFilter.set("name", infoFieldName);
@@ -1562,8 +1520,6 @@ function setWorkspace(workspaceKey)
                     infoFilter.set("category", category);
 
                     INFO_FILTER_LIST.add(infoFilter);
-
-                    addRowToConfigColumnsTable(false, infoFieldName, info[infoFieldName].Description);
                 }
             }
 
@@ -1579,22 +1535,12 @@ function setWorkspace(workspaceKey)
             allSamples.sort(SortByName);
 
             // rebuild the DataTables widget since columns have changed
-            initVariantTable(workspaceKey, displayCols);
-
-            // TODO: understand why this can't be in global space
-            PALLET_FILTER_LIST.add([
-                FILTER_MIN_ALT_READS,
-                FILTER_MIN_NUM_SAMPLES,
-                FILTER_MAX_NUM_SAMPLES,
-                FILTER_MIN_AC,
-                FILTER_MAX_AC,
-                FILTER_MIN_PHRED
-            ]);
+            initVariantTable(workspaceKey, VARIANT_TABLE_COLUMN_LIST);
 
             searchedView.setWorkspace(workspaceKey);
-            searchedView.setDisplayCols(displayCols);
+            searchedView.setDisplayCols(VARIANT_TABLE_COLUMN_LIST);
 
-            initBackbone(workspaceKey, displayCols);
+            initBackbone(workspaceKey);
             initGeneTab(workspaceKey);
             initGroupTab(workspaceKey, allSamples);
             initInfoTab(workspaceKey, INFO_FILTER_LIST);
@@ -1788,7 +1734,7 @@ function deleteWorkspace(workspaceKey)
  * Downloads data in TSV format for the given query and selected columns.
  *
  * @param workspaceKey
- * @param displayCols
+ * @param displayCols An array of VariantTableColumn models
  */
 function download(workspaceKey, displayCols)
 {
@@ -1796,7 +1742,15 @@ function download(workspaceKey, displayCols)
     var query = buildQuery(SEARCHED_FILTER_LIST, workspaceKey);
 
     // add attribute returnFields
-    query.returnFields = getVisibleColumns();
+    var returnFields = new Array();
+    _.each(displayCols.models, function(displayCol)
+    {
+        if (displayCol.get("visible"))
+        {
+            returnFields.push(displayCol.get("name"));
+        }
+    });
+    query.returnFields = returnFields;
 
     var jsonStr = JSON.stringify(query)
 
