@@ -57,9 +57,9 @@ var WorkspacesView = function (workspaces) {
 
         initialize: function()
         {
-            this.listenTo(WORKSPACE_LIST, 'add',    this.addOne);
-            this.listenTo(WORKSPACE_LIST, 'remove', this.removeOne);
-            this.listenTo(WORKSPACE_LIST, 'reset',  this.removeAll);
+            this.listenTo(workspaces, 'add',    this.addOne);
+            this.listenTo(workspaces, 'remove', this.removeOne);
+            this.listenTo(workspaces, 'reset',  this.removeAll);
         },
 
         render: function()
