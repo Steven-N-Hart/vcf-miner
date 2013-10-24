@@ -31,6 +31,8 @@ var SearchedView = function (filters) {
             // set id
             $(this.el).attr('id', this.model.get("id"));
 
+            $(this.el).attr('type', 'data_row');
+
             this.$el.html(this.template(this.model.toJSON()));
 
             setRemoveFilterButtonVisibility();
@@ -55,6 +57,7 @@ var SearchedView = function (filters) {
         {
             this.listenTo(filters, 'add',    this.addOne);
             this.listenTo(filters, 'remove', this.removeOne);
+            this.listenTo(filters, 'reset',  this.removeAll);
         },
 
         render: function()
@@ -83,6 +86,14 @@ var SearchedView = function (filters) {
             this.$("#" + filter.get("id")).remove();
 
             setRemoveFilterButtonVisibility();
+        },
+
+        removeAll: function()
+        {
+            // remove all rows except for the add button row
+            this.$("tr[type='data_row']").each(function() {
+                $( this ).remove();
+            });
         }
     });
 

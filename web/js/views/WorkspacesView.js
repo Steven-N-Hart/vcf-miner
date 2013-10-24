@@ -25,6 +25,8 @@ var WorkspacesView = function (workspaces) {
             // set id
             $(this.el).attr('id', this.model.get("id"));
 
+            $(this.el).attr('type', 'data_row');
+
             this.model.set("displayStatus", getDisplayStatus(this.model));
 
             this.$el.html(this.template(this.model.toJSON()));
@@ -57,6 +59,7 @@ var WorkspacesView = function (workspaces) {
         {
             this.listenTo(WORKSPACE_LIST, 'add',    this.addOne);
             this.listenTo(WORKSPACE_LIST, 'remove', this.removeOne);
+            this.listenTo(WORKSPACE_LIST, 'reset',  this.removeAll);
         },
 
         render: function()
@@ -75,6 +78,14 @@ var WorkspacesView = function (workspaces) {
         {
             // remove element with corresponding group ID from DOM
             $("#" + workspace.get("id")).remove();
+        },
+
+        removeAll: function()
+        {
+            // remove all rows except for the add button row
+            this.$("tr[type='data_row']").each(function() {
+                $( this ).remove();
+            });
         }
     });
 

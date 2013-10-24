@@ -23,6 +23,7 @@ var ConfigVariantTableView = function (variantTableCols) {
             // set id of table row <tr>
             $(this.el).attr('id', this.model.get("id"));
 
+            $(this.el).attr('type', 'data_row');
 
             var html = this.template(this.model.toJSON());
 
@@ -55,6 +56,7 @@ var ConfigVariantTableView = function (variantTableCols) {
         {
             this.listenTo(variantTableCols, 'add',    this.addOne);
             this.listenTo(variantTableCols, 'remove', this.removeOne);
+            this.listenTo(variantTableCols, 'reset',  this.removeAll);
         },
 
         render: function()
@@ -72,6 +74,14 @@ var ConfigVariantTableView = function (variantTableCols) {
         {
             // remove TR with corresponding filter ID from DOM
             this.$("#" + filter.get("id")).remove();
+        },
+
+        removeAll: function()
+        {
+            // remove all rows except for the add button row
+            this.$("tr[type='data_row']").each(function() {
+                $( this ).remove();
+            });
         }
     });
 

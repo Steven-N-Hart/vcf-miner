@@ -162,7 +162,7 @@ function initTemplates()
 function getWorkspaces()
 {
     // clear out workspaces
-    removeAll(WORKSPACE_LIST);
+    WORKSPACE_LIST.reset();
 
     // TODO: users hardcoded - need authentication?
     var users = new Array();
@@ -776,13 +776,7 @@ function addFilter()
  */
 function removeFilter(filterID)
 {
-    _.each(SEARCHED_FILTER_LIST.models, function(filter)
-    {
-        if (filter.get("id") == filterID)
-        {
-            SEARCHED_FILTER_LIST.remove(filter);
-        }
-    });
+    SEARCHED_FILTER_LIST.remove(SEARCHED_FILTER_LIST.findWhere({id: filterID}));
 }
 
 function initBackbone(workspaceKey)
@@ -821,7 +815,7 @@ function backboneSampleGroupView(workspaceKey)
         initialize: function() {
             this.listenTo(SAMPLE_GROUP_LIST, 'add',    this.addOne);
             this.listenTo(SAMPLE_GROUP_LIST, 'remove', this.removeOne);
-            SAMPLE_GROUP_LIST.fetch();
+            this.listenTo(SAMPLE_GROUP_LIST, 'reset',  this.removeAll);
         },
 
         render: function() {
@@ -835,6 +829,10 @@ function backboneSampleGroupView(workspaceKey)
         removeOne: function(group) {
             // remove element with corresponding group ID from DOM
             this.$("#" + group.get("id")).remove();
+        },
+
+        removeAll: function() {
+            this.$el.empty();
         }
     });
 
@@ -1337,10 +1335,10 @@ function toggleDisplayColumn(id)
 function setWorkspace(workspaceKey)
 {
     // reset collections
-    removeAll(PALLET_FILTER_LIST);
-    removeAll(INFO_FILTER_LIST);
-    removeAll(SEARCHED_FILTER_LIST);
-    removeAll(VARIANT_TABLE_COLUMN_LIST);
+    PALLET_FILTER_LIST.reset();
+    INFO_FILTER_LIST.reset();
+    SEARCHED_FILTER_LIST.reset();
+    VARIANT_TABLE_COLUMN_LIST.reset();
 
     // update screens
     $("#getting_started").toggle(false);
@@ -1672,8 +1670,6 @@ function download(workspaceKey, displayCols)
     var jsonStr = JSON.stringify(query)
 
     console.debug("Sending download request to server with the following JSON:" + jsonStr);
-
-    // TODO: remove previous form
 
     // dynamically add HTML form that is hidden
     var form = $('<form>').attr(
