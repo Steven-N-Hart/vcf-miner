@@ -41,59 +41,6 @@ var SampleGroupList = Backbone.Collection.extend({
 
 var SAMPLE_GROUP_LIST = new SampleGroupList();
 
-// ENUM
-var FilterCategory =
-{
-    UNKNOWN:    0,
-    SAMPLE:     1,
-    GENE:       2,
-    GROUP:      3,
-    INFO_INT:   4,
-    INFO_FLOAT: 5,
-    INFO_FLAG:  6,
-    INFO_STR:   7
-}
-
-// ENUM
-var FilterOperator =
-{
-    UNKNOWN: 0,
-    EQ:      1,
-    LT:      2,
-    LTEQ:    3,
-    GT:      4,
-    GTEQ:    5,
-    NE:      6
-}
-
-// MODEL
-var Filter = Backbone.Model.extend({
-    defaults: function()
-    {
-        return {
-            name:            "NA",
-            operator:        FilterOperator.UNKNOWN,
-            displayOperator: "NA",
-            value:           "NA",
-            displayValue:    "NA", // may be abbreviated
-            numMatches:      0,
-            category:        FilterCategory.UNKNOWN,
-            id:              guid()
-        };
-    }
-});
-
-// COLLECTION of Filters
-var FilterList = Backbone.Collection.extend({
-    model: Filter,
-    localStorage: new Backbone.LocalStorage("mongo-backbone"),
-    nextOrder: function() {
-        if (!this.length) return 1;
-        return this.last().get('order') + 1;
-    },
-    comparator: 'order'
-});
-
 // specific filters
 var FILTER_NONE            = new Filter();
 var FILTER_MIN_ALT_READS   = new Filter();
@@ -219,14 +166,7 @@ function setFilterDisplay(filter)
     }
     else
     {
-        if (value.length > 5)
-        {
-            displayValue = value.substr(0, 5) + "...";
-        }
-        else
-        {
-            displayValue = value;
-        }
+        displayValue = value;
     }
     filter.set("displayValue", $.trim(displayValue));
 
