@@ -15,52 +15,16 @@ var ERROR_TEMPLATE;
 // GLOBAL CONSTANT
 var MAX_RESULTS = 1000;
 
-// MODEL
-var SampleGroup = Backbone.Model.extend({
-    defaults: function()
-    {
-        return {
-            name:        "NA",
-            description: "NA",
-            sampleNames: [],
-            id: guid()
-        };
-    }
-});
-
-// COLLECTION of SampleGroups
-var SampleGroupList = Backbone.Collection.extend({
-    model: SampleGroup,
-    localStorage: new Backbone.LocalStorage("mongo-backbone"),
-    nextOrder: function() {
-        if (!this.length) return 1;
-        return this.last().get('order') + 1;
-    },
-    comparator: 'order'
-});
-
-var SAMPLE_GROUP_LIST = new SampleGroupList();
-
 // specific filters
-var FILTER_NONE            = new Filter();
-var FILTER_MIN_ALT_READS   = new Filter();
-var FILTER_MIN_NUM_SAMPLES = new Filter();
-var FILTER_MAX_NUM_SAMPLES = new Filter();
-var FILTER_MIN_AC          = new Filter();
-var FILTER_MAX_AC          = new Filter();
-var FILTER_MIN_PHRED       = new Filter();
-var FILTER_GENE            = new Filter();
-var FILTER_GROUP           = new Filter();
-
-FILTER_NONE.set(           {name: 'none',          operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'});
-FILTER_MIN_ALT_READS.set(  {name: 'Min Alt Reads', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
-FILTER_MIN_NUM_SAMPLES.set({name: 'Min # Samples', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
-FILTER_MAX_NUM_SAMPLES.set({name: 'Max # Samples', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
-FILTER_MIN_AC.set(         {name: 'Min AC',        operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
-FILTER_MAX_AC.set(         {name: 'Max AC',        operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
-FILTER_MIN_PHRED.set(      {name: 'Min Phred',     operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
-FILTER_GENE.set(           {name: 'Gene',          operator: FilterOperator.EQ, value: '' , displayValue: '0', category: FilterCategory.GENE});
-FILTER_GROUP.set(          {name: 'Group',         operator: FilterOperator.EQ, value: '' , displayValue: '0', category: FilterCategory.GROUP});
+var FILTER_NONE            = new Filter({name: 'none',          operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'});
+var FILTER_MIN_ALT_READS   = new Filter({name: 'Min Alt Reads', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+var FILTER_MIN_NUM_SAMPLES = new Filter({name: 'Min # Samples', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+var FILTER_MAX_NUM_SAMPLES = new Filter({name: 'Max # Samples', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+var FILTER_MIN_AC          = new Filter({name: 'Min AC',        operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+var FILTER_MAX_AC          = new Filter({name: 'Max AC',        operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+var FILTER_MIN_PHRED       = new Filter({name: 'Min Phred',     operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+var FILTER_GENE            = new Filter({name: 'Gene',          operator: FilterOperator.EQ, value: '' , displayValue: '0', category: FilterCategory.GENE});
+var FILTER_GROUP           = new Filter({name: 'Group',         operator: FilterOperator.EQ, value: '' , displayValue: '0', category: FilterCategory.GROUP});
 
 var SEARCHED_FILTER_LIST = new FilterList;
 var PALLET_FILTER_LIST = new FilterList;
@@ -75,6 +39,9 @@ var variantTableColumnView;
 var WORKSPACE_LIST = new WorkspaceList();
 var workspacesView;
 
+var SAMPLE_GROUP_LIST = new SampleGroupList();
+var sampleGroupListView;
+
 $( document ).ready(function()
 {
     searchedView = new SearchedView(SEARCHED_FILTER_LIST);
@@ -83,6 +50,8 @@ $( document ).ready(function()
     variantTableColumnView = new VariantTableColumnView(VARIANT_TABLE_COLUMN_LIST);
 
     workspacesView = new WorkspacesView(WORKSPACE_LIST);
+
+    sampleGroupListView = new SampleGroupListView(SAMPLE_GROUP_LIST);
 
     initTemplates();
 
@@ -719,66 +688,6 @@ function removeFilter(filterID)
     SEARCHED_FILTER_LIST.remove(SEARCHED_FILTER_LIST.findWhere({id: filterID}));
 }
 
-function initBackbone(workspaceKey)
-{
-    backboneSampleGroupView(workspaceKey);
-}
-
-function backboneSampleGroupView(workspaceKey)
-{
-    var SampleGroupView = Backbone.View.extend({
-
-        tagName: "option",
-
-        initialize: function() {
-            this.listenTo(this.model, 'change', this.render);
-        },
-
-        render: function() {
-            // TODO: tell server that group has changed
-
-            this.$el.text(this.model.get("name"));
-            this.$el.attr( 'id', this.model.get("id"));
-            this.$el.attr( 'value', this.model.get("id"));
-
-            return this;
-        },
-
-        clear: function() {
-            this.model.destroy();
-        }
-    });
-
-    var GroupListView = Backbone.View.extend({
-        el: $("#group_list"),
-
-        initialize: function() {
-            this.listenTo(SAMPLE_GROUP_LIST, 'add',    this.addOne);
-            this.listenTo(SAMPLE_GROUP_LIST, 'remove', this.removeOne);
-            this.listenTo(SAMPLE_GROUP_LIST, 'reset',  this.removeAll);
-        },
-
-        render: function() {
-        },
-
-        addOne: function(group) {
-            var view = new SampleGroupView({model: group});
-            this.$el.append(view.render().el);
-        },
-
-        removeOne: function(group) {
-            // remove element with corresponding group ID from DOM
-            this.$("#" + group.get("id")).remove();
-        },
-
-        removeAll: function() {
-            this.$el.empty();
-        }
-    });
-
-    var groupListView = new GroupListView();
-}
-
 function toSampleGroupPOJO(workspaceKey, groupModel)
 {
     var pojo = new Object();
@@ -1395,7 +1304,6 @@ function setWorkspace(workspaceKey)
             searchedView.setWorkspace(workspaceKey);
             searchedView.setDisplayCols(VARIANT_TABLE_COLUMN_LIST);
 
-            initBackbone(workspaceKey);
             initGeneTab(workspaceKey);
             initGroupTab(workspaceKey, allSamples);
             initInfoTab(workspaceKey, INFO_FILTER_LIST);
