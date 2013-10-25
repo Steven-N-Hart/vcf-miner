@@ -51,6 +51,12 @@
             /* must be half of the width, minus scrollbar on the left (30px) */
             margin-left: -300px;
         }
+
+        /* override jquery layout */
+        .ui-layout-west{
+            z-index: 50 !important;
+            overflow: auto !important;
+        }
     </style>
 
     <!-- underscorejs templates -->
