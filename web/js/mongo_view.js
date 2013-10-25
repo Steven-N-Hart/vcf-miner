@@ -1217,7 +1217,7 @@ function addWorkspace()
     // some browsers put C:\\fakepath\\ on the front
     var name = uploadFile.name.replace("C:\\fakepath\\", "");
     // chomp off trailing .vcf file extension
-    name = name.split(".")[0];
+    name = name.replace(new RegExp('\.vcf'), '');
     console.debug("Adding working with name=" + name);
 
     // progress on transfers from the server to the client (downloads)
