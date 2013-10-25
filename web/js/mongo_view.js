@@ -28,7 +28,9 @@ var FILTER_GROUP           = new Filter({name: 'Group',         operator: Filter
 
 var SEARCHED_FILTER_LIST = new FilterList;
 var PALLET_FILTER_LIST = new FilterList;
+
 var INFO_FILTER_LIST = new FilterList;
+var infoFilterTab;
 
 var searchedView;
 
@@ -52,6 +54,8 @@ $( document ).ready(function()
     workspacesView = new WorkspacesView(WORKSPACE_LIST);
 
     sampleGroupListView = new SampleGroupListView(SAMPLE_GROUP_LIST);
+
+    infoFilterTab = new InfoFilterTab(INFO_FILTER_LIST);
 
     initTemplates();
 
@@ -285,26 +289,6 @@ function initSampleTab(sampleFilters)
     }
 }
 
-function initInfoTab(workspaceKey, infoFilters)
-{
-    var infoFieldList = $('#info_field_list');
-    infoFieldList.empty();
-    for (var i=0; i < infoFilters.models.length; i++)
-    {
-        var filter = infoFilters.models[i];
-
-        infoFieldList.append("<option value='"+filter.get("id")+"'>"+filter.get("name")+"</option>");
-
-        infoFieldList.change(function()
-        {
-            infoFieldChanged(workspaceKey);
-        });
-
-        // simulate user clicking on 1st entry
-        infoFieldChanged(workspaceKey);
-    }
-}
-
 function getGroupPopoverTitle()
 {
     var numSamples = getSelectedGroup().get("sampleNames").length;
@@ -429,6 +413,7 @@ function buildQuery(filterList, workspaceKey)
     query.workspace = workspaceKey;
 
     var sampleGroups      = new Array();
+    var infoFlagFilters = new Array();
     var infoNumberFilters = new Array();
     var infoStringFilters = new Array();
 
@@ -475,8 +460,7 @@ function buildQuery(filterList, workspaceKey)
         switch (filter.get("category"))
         {
             case FilterCategory.INFO_FLAG:
-                // TODO:
-                console.debug("TODO: flag fields not implemented");
+                infoFlagFilters.push(toInfoFlagFilterPojo(filter));
                 break;
             case FilterCategory.INFO_INT:
             case FilterCategory.INFO_FLOAT:
@@ -489,6 +473,7 @@ function buildQuery(filterList, workspaceKey)
     });
 
     query.sampleGroups      = sampleGroups;
+    //query.infoFlagFilters = infoFlagFilters; // TODO: enable this when server-side is there
     query.infoNumberFilters = infoNumberFilters;
     query.infoStringFilters = infoStringFilters;
 
@@ -615,61 +600,8 @@ function addFilter()
             break;
 
         case "tab_content_info":
-            // get selected filter
-            var filterID = $('#info_field_list').val();
-            var filter = INFO_FILTER_LIST.findWhere({id: filterID});
-
-            var valueDiv = $("#info_value_div");
-            switch (filter.get("category"))
-            {
-                case FilterCategory.INFO_FLAG:
-                    // TODO:
-                    break;
-                case FilterCategory.INFO_INT:
-                case FilterCategory.INFO_FLOAT:
-                    filter.set("value", $("#info_value_div input").val());
-                    break;
-                case FilterCategory.INFO_STR:
-                    var filter = INFO_FILTER_LIST.findWhere({id: filterID});
-                    var checkedVals = $("#info_field_dropdown_checkbox").dropdownCheckbox("checked");
-                    var valueStr = "";
-                    var valueArr = new Array();
-                    for (var i=0; i < checkedVals.length; i++)
-                    {
-                        valueArr.push(checkedVals[i].label);
-                    }
-                    filter.set("value", valueArr);
-                    break;
-            };
-
-            // get selected operator
-            var operator = FilterOperator.EQ; // default
-            var selectedOperatorOpt = $('#info_operator_list');
-            if (typeof selectedOperatorOpt !== "undefined")
-            {
-                switch(selectedOperatorOpt.val())
-                {
-                    case 'eq':
-                        operator = FilterOperator.EQ;
-                        break;
-                    case 'gt':
-                        operator = FilterOperator.GT;
-                        break;
-                    case 'gteq':
-                        operator = FilterOperator.GTEQ;
-                        break;
-                    case 'lt':
-                        operator = FilterOperator.LT;
-                        break;
-                    case 'lteq':
-                        operator = FilterOperator.LTEQ;
-                        break;
-                    case 'ne':
-                        operator = FilterOperator.NE;
-                        break;
-                }
-            }
-            filter.set("operator", operator);
+            filter = infoFilterTab.getFilter();
+            window.alert("INFO flag fields are not implemented yet on the server.")
             break;
     }
 
@@ -773,100 +705,6 @@ function loadSampleGroups(workspaceKey)
     });
 }
 
-function infoFieldChanged(workspaceKey)
-{
-    // get selected filter
-    var filterID = $('#info_field_list').val();
-    var filter = INFO_FILTER_LIST.findWhere({id: filterID});
-
-    // constants for operator options
-    var OPTION_EQ   = "<option value='eq'>=</option>";
-    var OPTION_GT   = "<option value='gt'>&gt;</option>";
-    var OPTION_GTEQ = "<option value='gteq'>&#x2265;</option>";
-    var OPTION_LT   = "<option value='lt'>&lt;</option>";
-    var OPTION_LTEQ = "<option value='lteq'>&#x2264;</option>";
-    var OPTION_NE   = "<option value='ne'>&#x2260;</option>";
-
-    // value DIV area
-    var valueDiv = $("#info_value_div");
-    // clear div value area
-    valueDiv.empty();
-
-    // operator list
-    var opList = $("#info_operator_list");
-    // clear operator list
-    opList.empty();
-    switch (filter.get("category"))
-    {
-        case FilterCategory.INFO_FLAG:
-            opList.append(OPTION_EQ);
-            opList.append(OPTION_NE);
-            valueDiv.append("<input type='checkbox'/>");
-            break;
-        case FilterCategory.INFO_INT:
-            opList.append(OPTION_EQ);
-            opList.append(OPTION_GT);
-            opList.append(OPTION_GTEQ);
-            opList.append(OPTION_LT);
-            opList.append(OPTION_LTEQ);
-            opList.append(OPTION_NE);
-            valueDiv.append("<input class='input-mini' type='number' value='0'>");
-            break;
-        case FilterCategory.INFO_FLOAT:
-            opList.append(OPTION_EQ);
-            opList.append(OPTION_GT);
-            opList.append(OPTION_GTEQ);
-            opList.append(OPTION_LT);
-            opList.append(OPTION_LTEQ);
-            opList.append(OPTION_NE);
-            valueDiv.append("<input class='input-mini' type='number' step='any' value='0.0'>");
-            break;
-        case FilterCategory.INFO_STR:
-            opList.append(OPTION_EQ);
-            opList.append(OPTION_NE);
-
-            valueDiv.append("<div class='dropdown' id='info_field_dropdown_checkbox'></div>");
-
-            // dynamically query to populate dropdown
-            var fieldName = filter.get("name");
-            $.ajax({
-                url: "/mongo_svr/ve/typeahead/w/" + workspaceKey + "/f/" + fieldName,
-                dataType: "json",
-                async: false,
-                success: function(json)
-                {
-                    var fieldValues = json[fieldName];
-                    if (typeof fieldValues === "undefined")
-                    {
-                        console.warn("INFO string field " + fieldName + " has no available values.");
-                        fieldValues = new Array();
-                    }
-
-                    // sort values
-                    fieldValues.sort(function(a,b) { return a.localeCompare(b) } );
-
-                    var dropdownData = new Array();
-                    for (var i = 0; i < fieldValues.length; i++)
-                    {
-                        dropdownData.push({id: i, label: fieldValues[i]});
-                    }
-
-                    var dropdownCheckbox = $("#info_field_dropdown_checkbox");
-                    dropdownCheckbox.dropdownCheckbox({
-                        autosearch: true,
-                        hideHeader: false,
-                        data: dropdownData
-                    });
-                },
-                error: function(jqXHR, textStatus)
-                {
-                    $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-                }
-            });
-            break;
-    }
-}
-
 function sampleFieldChanged()
 {
     // get selected filter
@@ -879,70 +717,6 @@ function sampleFieldChanged()
     valueDiv.empty();
 
     valueDiv.append("<input class='input-mini' type='number' value='0'>");
-}
-
-/**
- * Shows a modal dialog for the user to select one or more values for
- * an INFO string field.
- *
- * @param workspaceKey
- * @param fieldName
- * @param filterID
- */
-function showInfoFieldValuesModal(workspaceKey, fieldName, filterID)
-{
-    $.ajax({
-        url: "/mongo_svr/ve/typeahead/w/" + workspaceKey + "/f/" + fieldName,
-        dataType: "json",
-        async: false,
-        success: function(json)
-        {
-            var fieldValues = json[fieldName];
-            if (typeof fieldValues === "undefined")
-            {
-                console.warn("INFO string field " + fieldName + " has no available values.");
-                fieldValues = new Array();
-            }
-
-            // sort values
-            fieldValues.sort(function(a,b) { return a.localeCompare(b) } );
-
-            var dropdownData = new Array();
-            for (var i = 0; i < fieldValues.length; i++)
-            {
-                dropdownData.push({id: i, label: fieldValues[i]});
-            }
-
-            $("#info_field_dropdown_checkbox").dropdownCheckbox("reset", dropdownData);
-
-            // remove any other attached event handlers
-            $('#apply_info_string_values_button').unbind();
-
-            $('#apply_info_string_values_button').click(function (e)
-            {
-                var filter = INFO_FILTER_LIST.findWhere({id: filterID});
-                var checkedVals = $("#info_field_dropdown_checkbox").dropdownCheckbox("checked");
-                var valueStr = "";
-                for (var i=0; i < checkedVals.length; i++)
-                {
-                    valueStr += checkedVals[i].label;
-
-                    if ((i+1) < checkedVals.length)
-                    {
-                        valueStr += ",";
-                    }
-                }
-                $("#" +filterID+ "_value_field").val(valueStr);
-            });
-
-            // show dialog
-            $('#info_field_string_values_modal').modal();
-        },
-        error: function(jqXHR, textStatus)
-        {
-            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-        }
-    });
 }
 
 /**
@@ -1183,6 +957,9 @@ function toggleDisplayColumn(id)
 
 function setWorkspace(workspaceKey)
 {
+    infoFilterTab.setWorkspace(workspaceKey);
+    searchedView.setWorkspace(workspaceKey);
+
     // reset collections
     PALLET_FILTER_LIST.reset();
     INFO_FILTER_LIST.reset();
@@ -1203,7 +980,7 @@ function setWorkspace(workspaceKey)
 
     console.debug("User selected workspace: " + workspaceKey);
 
-    $("#vcf_file").html("Workspace: " + workspace.get("alias"));
+    $("#vcf_file").html("VCF File: " + workspace.get("alias"));
 
     // standard 1st 7 VCF file columns
     VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'CHROM',  displayName:'CHROM',  description:'The chromosome.'}));
@@ -1301,12 +1078,10 @@ function setWorkspace(workspaceKey)
             // rebuild the DataTables widget since columns have changed
             initVariantTable(workspaceKey, VARIANT_TABLE_COLUMN_LIST);
 
-            searchedView.setWorkspace(workspaceKey);
             searchedView.setDisplayCols(VARIANT_TABLE_COLUMN_LIST);
 
             initGeneTab(workspaceKey);
             initGroupTab(workspaceKey, allSamples);
-            initInfoTab(workspaceKey, INFO_FILTER_LIST);
             initSampleTab(PALLET_FILTER_LIST);
 
             // backbone MVC will send query request based on adding this filter
@@ -1317,6 +1092,34 @@ function setWorkspace(workspaceKey)
             $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
         }
     });
+}
+
+/**
+ * Translates the given Filter model into a InfoFlagFilter server-side object.
+ *
+ * @param filter
+ */
+function toInfoFlagFilterPojo(filter)
+{
+    var pojo = new Object();
+
+    pojo.key = "INFO." + filter.get("name");
+
+    pojo.value = filter.get("value");
+
+    var comparator;
+    switch(filter.get("operator"))
+    {
+        case FilterOperator.EQ:
+            comparator='';
+            break;
+        case FilterOperator.NE:
+            comparator = '$ne';
+            break;
+    }
+    pojo.comparator = comparator;
+
+    return pojo;
 }
 
 /**
