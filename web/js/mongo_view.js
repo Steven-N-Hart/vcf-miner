@@ -43,6 +43,7 @@ var workspacesView;
 
 var SAMPLE_GROUP_LIST = new SampleGroupList();
 var sampleGroupListView;
+var groupFilterTab;
 
 $( document ).ready(function()
 {
@@ -53,9 +54,8 @@ $( document ).ready(function()
 
     workspacesView = new WorkspacesView(WORKSPACE_LIST);
 
-    sampleGroupListView = new SampleGroupListView(SAMPLE_GROUP_LIST);
-
     infoFilterTab = new InfoFilterTab(INFO_FILTER_LIST);
+    groupFilterTab = new GroupFilterTab(SAMPLE_GROUP_LIST);
 
     initTemplates();
 
@@ -171,103 +171,6 @@ function setFilterDisplay(filter)
     filter.set("displayOperator", displayOperator);
 }
 
-function initGroupTab(workspaceKey, allSampleNames)
-{
-    $('#remove_group_button').click(function (e)
-    {
-        var group = getSelectedGroup();
-
-        SAMPLE_GROUP_LIST.remove(group);
-
-        // tell server about removed sample group
-        removeSampleGroup(workspaceKey, group);
-
-        updateGroupDetailsPane();
-    });
-
-    var availableSamplesList = $('#available_samples_list');
-    var groupSamplesList = $('#group_samples_list');
-
-    $('#add_sample_to_group_button').click(function (e)
-    {
-        $('#available_samples_list option:selected').each(function()
-        {
-            var sampleName = $(this).val();
-            groupSamplesList.append("<option>" + sampleName + "</option>");
-
-            // remove option from available list
-            $(this).remove();
-        });
-    });
-
-    $('#remove_sample_from_group_button').click(function (e)
-    {
-        $('#group_samples_list option:selected').each(function()
-        {
-            var sampleName = $(this).val();
-            availableSamplesList.append("<option value='"+sampleName+"'>" + sampleName + "</option>");
-
-            // remove option from available list
-            $(this).remove();
-        });
-    });
-
-    $('#new_group_apply').click(function (e)
-    {
-        var group = new SampleGroup();
-        group.set("name", $('#group_name_field').val());
-        group.set("description", '');
-
-        var sampleNames = $.map($('#group_samples_list option'), function(e) { return e.value; });
-        group.set("sampleNames", sampleNames);
-
-        updateGroupDetailsPane(group);
-        SAMPLE_GROUP_LIST.add(group);
-        saveSampleGroup(workspaceKey, group);
-
-        // select last Group
-        //$("#group_list option:last").attr("selected","selected");
-    });
-
-    $('#new_group_button').click(function (e)
-    {
-        // reset widgets
-        $('#group_name_field').val('');
-        availableSamplesList.empty();
-        groupSamplesList.empty();
-
-        for (var i=0; i < allSampleNames.length; i++)
-        {
-            var sampleName = allSampleNames[i];
-            availableSamplesList.append("<option value='"+sampleName+"'>" + sampleName + "</option>");
-        }
-
-        // show dialog
-        $('#create_group_modal').modal();
-    });
-
-    var groupList = $('#group_list');
-
-    // selection in group list selection has changed or clicked on
-    groupList.change(function()
-    {
-        groupList.popover('show');
-        updateGroupDetailsPane(getSelectedGroup());
-    });
-
-    groupList.popover(
-        {
-            animation:  true,
-            html:       true,
-            placement: 'bottom',
-            title:      getGroupPopoverTitle,
-            content:    getGroupPopoverContent
-        }
-    );
-
-    loadSampleGroups(workspaceKey);
-}
-
 function initSampleTab(sampleFilters)
 {
     var sampleFieldList = $('#sample_field_list');
@@ -286,86 +189,6 @@ function initSampleTab(sampleFilters)
 
         // simulate user clicking on 1st entry
         sampleFieldChanged();
-    }
-}
-
-function getGroupPopoverTitle()
-{
-    var numSamples = getSelectedGroup().get("sampleNames").length;
-    var title =  'This group has <b>' + numSamples + '</b>';
-
-    if (numSamples == 1)
-    {
-        title += " sample";
-    } else
-    {
-        title += " samples";
-    }
-
-    return title + "<button type='button' id='close' class='close' onclick=\"$('#group_list').popover('hide');\">&times;</button>";
-}
-
-function getGroupPopoverContent()
-{
-    var group = getSelectedGroup();
-    var html = "";
-
-    html += "<select size='8'>";
-    for (var i=0; i < group.get("sampleNames").length; i++)
-    {
-        html += "<option>" + group.get("sampleNames")[i] + "</option>";
-    }
-    html += "</select>";
-
-    return html;
-}
-
-/**
- * Updates the details pane for the given SampleGroup model.
- * @param group
- */
-function updateGroupDetailsPane(group)
-{
-    var div = $('#group_sample_div');
-    var sampleCountLabel = $('#group_sample_list_count');
-    var sampleList = $('#group_sample_list');
-
-    if (typeof group === "undefined")
-    {
-        div.hide();
-    }
-    else
-    {
-        div.show();
-        sampleCountLabel.text("Samples (" + group.get("sampleNames").length + ")");
-        sampleList.empty();
-        for (var i=0; i < group.get("sampleNames").length; i++)
-        {
-            sampleList.append("<option>" + group.get("sampleNames")[i] + "</option>");
-        }
-    }
-}
-
-/**
- * Gets the currently selected group.
- *
- * @returns selected SampleGroup model
- */
-function getSelectedGroup()
-{
-    // get selected option from select
-    var groupOption = $('#group_list option:selected');
-
-    var id = groupOption.val();
-
-    for (var i = 0; i < SAMPLE_GROUP_LIST.models.length; i++)
-    {
-        var group = SAMPLE_GROUP_LIST.models[i];
-        if (id == group.get("id"))
-        {
-            console.debug("user selected group with id=" + id + " name=" + group.get("name"));
-            return group;
-        }
     }
 }
 
@@ -451,7 +274,7 @@ function buildQuery(filterList, workspaceKey)
                     var group = SAMPLE_GROUP_LIST.models[i];
                     if (group.get("name") === FILTER_GROUP.get("value"))
                     {
-                        sampleGroups.push(toSampleGroupPOJO(workspaceKey, group));
+                        sampleGroups.push(group.toSampleGroupPOJO(workspaceKey));
                     }
                 }
                 break;
@@ -594,7 +417,7 @@ function addFilter()
             break;
 
         case "tab_content_group":
-            var group = getSelectedGroup();
+            var group = groupFilterTab.getSelectedGroup();
             FILTER_GROUP.set("value", group.get("name"));
             filter = FILTER_GROUP;
             break;
@@ -620,65 +443,10 @@ function removeFilter(filterID)
     SEARCHED_FILTER_LIST.remove(SEARCHED_FILTER_LIST.findWhere({id: filterID}));
 }
 
-function toSampleGroupPOJO(workspaceKey, groupModel)
-{
-    var pojo = new Object();
-    pojo.workspace   = workspaceKey;
-    pojo.alias       = groupModel.get("name");
-    pojo.description = groupModel.get("description");
-    pojo.samples     = groupModel.get("sampleNames");
-    pojo.inSample    = true; // TODO: pull this from UI
-    return pojo;
-}
-
-function saveSampleGroup(workspaceKey, group)
-{
-    // translate backbone model to pojo expected by server
-    var pojo = toSampleGroupPOJO(workspaceKey, group);
-
-    console.debug("Saving group: " + JSON.stringify(pojo));
-
-    $.ajax({
-        type: "POST",
-        url: "/mongo_svr/ve/samples/savegroup",
-        contentType: "application/json",
-        data: JSON.stringify(pojo),
-        dataType: "json",
-        success: function(json)
-        {
-            console.debug("saved group: " + pojo.alias);
-        },
-        error: function(jqXHR, textStatus)
-        {
-            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-        }
-    });
-}
-
-function removeSampleGroup(workspaceKey, group)
-{
-    // translate backbone model to pojo expected by server
-    var pojo = toSampleGroupPOJO(workspaceKey, group);
-
-    $.ajax({
-        type: "POST",
-        url: "/mongo_svr/ve/samples/deletegroup",
-        contentType: "application/json",
-        data: JSON.stringify(pojo),
-        dataType: "json",
-        success: function(json)
-        {
-            console.debug("deleted group: " + pojo.alias);
-        },
-        error: function(jqXHR, textStatus)
-        {
-            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-        }
-    });
-}
-
 function loadSampleGroups(workspaceKey)
 {
+    SAMPLE_GROUP_LIST.reset();
+
     $.ajax({
         url: "/mongo_svr/ve/samples/groups/w/" + workspaceKey,
         dataType: "json",
@@ -1003,6 +771,8 @@ function setWorkspace(workspaceKey)
         FILTER_MIN_PHRED
     ]);
 
+    loadSampleGroups(workspaceKey);
+
     var metadataRequest = $.ajax({
         url: "/mongo_svr/ve/meta/workspace/" + workspaceKey,
         dataType: "json",
@@ -1075,13 +845,14 @@ function setWorkspace(workspaceKey)
             // sort alphabetically
             allSamples.sort(SortByName);
 
+            groupFilterTab.initialize(workspaceKey, allSamples);
+
             // rebuild the DataTables widget since columns have changed
             initVariantTable(workspaceKey, VARIANT_TABLE_COLUMN_LIST);
 
             searchedView.setDisplayCols(VARIANT_TABLE_COLUMN_LIST);
 
             initGeneTab(workspaceKey);
-            initGroupTab(workspaceKey, allSamples);
             initSampleTab(PALLET_FILTER_LIST);
 
             // backbone MVC will send query request based on adding this filter
