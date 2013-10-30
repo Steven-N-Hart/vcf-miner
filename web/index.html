@@ -74,7 +74,9 @@
         <td>
             <% if (displayStatus == 'Available') { %>
                 <button id="<%=id%>_load_button" title="Load" type="button" class="btn btn-mini" onclick="setWorkspace('<%=key%>')"><i class="icon-play"></i></button>
-            <button id="<%=id%>_delete_button" title="Delete" type="button" class="btn btn-mini" onclick="deleteWorkspace('<%=key%>')"><i class="icon-remove"></i></button>
+            <% } %>
+            <% if ((displayStatus == 'Available') || (displayStatus == 'Failed')) { %>
+                <button id="<%=id%>_delete_button" title="Delete" type="button" class="btn btn-mini" onclick="deleteWorkspace('<%=key%>')"><i class="icon-remove"></i></button>
             <% } %>
         </td>
     </script>

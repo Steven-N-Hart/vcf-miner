@@ -1,7 +1,8 @@
 // ENUM
 var ReadyStatus =
 {
-    UNKNOWN:   -1,
+    UNKNOWN:    -2,
+    FAILED:     -1,
     NOT_READY:  0,
     READY:      1
 }

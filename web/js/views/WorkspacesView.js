@@ -42,6 +42,8 @@ var WorkspacesView = function (workspaces) {
                 return "Processing";
             case ReadyStatus.READY:
                 return "Available";
+            case ReadyStatus.FAILED:
+                return "Failed";
             default:
                 return "NA";
         }
