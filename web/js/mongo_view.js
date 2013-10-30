@@ -298,10 +298,10 @@ function buildQuery(filterList, workspaceKey)
                     case FILTER_MIN_PHRED.get("name"):
                         query.minPHRED = filter.get("value");
                         break;
-                    case FILTER_GENE.get("name"):
-                        query.genes = filter.get("value");
-                        break;
                 }
+                break;
+            case FilterCategory.GENE:
+                query.genes = filter.get("value");
                 break;
         }
     });
