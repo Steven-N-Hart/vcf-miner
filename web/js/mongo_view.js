@@ -536,7 +536,7 @@ function initVariantTable(workspaceKey, displayCols)
         "aoColumns": aoColumns,
         'aaData':    [],
         "bDestroy":  true,
-        "iDisplayLength": 50,
+        "iDisplayLength": 25,
         "bAutoWidth": true,
         "sScrollX": "100%",
         "bScrollCollapse": true
