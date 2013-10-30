@@ -253,14 +253,14 @@ function buildQuery(filterList, workspaceKey)
         switch (filter.get("category"))
         {
             case FilterCategory.INFO_FLAG:
-                infoFlagFilters.push(toInfoFlagFilterPojo(filter));
+                infoFlagFilters.push(filter.toInfoFlagFilterPojo());
                 break;
             case FilterCategory.INFO_INT:
             case FilterCategory.INFO_FLOAT:
-                infoNumberFilters.push(toInfoNumberFilterPojo(filter));
+                infoNumberFilters.push(filter.toInfoNumberFilterPojo());
                 break;
             case FilterCategory.INFO_STR:
-                infoStringFilters.push(toInfoStringFilterPojo(filter));
+                infoStringFilters.push(filter.toInfoStringFilterPojo());
                 break;
             case FilterCategory.GROUP:
                 // lookup SampleGroup model that corresponds to name
@@ -307,7 +307,7 @@ function buildQuery(filterList, workspaceKey)
     });
 
     query.sampleGroups      = sampleGroups;
-    //query.infoFlagFilters = infoFlagFilters; // TODO: enable this when server-side is there
+    query.infoFlagFilters = infoFlagFilters;
     query.infoNumberFilters = infoNumberFilters;
     query.infoStringFilters = infoStringFilters;
 
@@ -871,114 +871,6 @@ function setWorkspace(workspaceKey)
             $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
         }
     });
-}
-
-/**
- * Translates the given Filter model into a InfoFlagFilter server-side object.
- *
- * @param filter
- */
-function toInfoFlagFilterPojo(filter)
-{
-    var pojo = new Object();
-
-    pojo.key = "INFO." + filter.get("name");
-
-    pojo.value = filter.get("value");
-
-    var comparator;
-    switch(filter.get("operator"))
-    {
-        case FilterOperator.EQ:
-            comparator='';
-            break;
-        case FilterOperator.NE:
-            comparator = '$ne';
-            break;
-    }
-    pojo.comparator = comparator;
-
-    return pojo;
-}
-
-/**
- * Translates the given Filter model into a InfoNumberFilter server-side object.
- *
- * @param filter
- */
-function toInfoNumberFilterPojo(filter)
-{
-    var pojo = new Object();
-
-    pojo.key = "INFO." + filter.get("name");
-
-    pojo.value = filter.get("value");
-
-    var comparator;
-    switch(filter.get("operator"))
-    {
-        case FilterOperator.EQ:
-            comparator='';
-            break;
-        case FilterOperator.GT:
-            comparator='$gt';
-            break;
-        case FilterOperator.GTEQ:
-            comparator='$gte';
-            break;
-        case FilterOperator.LT:
-            comparator='$lt';
-            break;
-        case FilterOperator.LTEQ:
-            comparator = '$lte';
-            break;
-        case FilterOperator.NE:
-            comparator = '$ne';
-            break;
-    }
-    pojo.comparator = comparator;
-
-    return pojo;
-}
-
-/**
- * Translates the given Filter model into a InfoStringFilter server-side object.
- *
- * @param filter
- */
-function toInfoStringFilterPojo(filter)
-{
-    var pojo = new Object();
-
-    pojo.key = "INFO." + filter.get("name");
-
-    var value = filter.get("value");
-    var displayValue = '';
-
-    if (value instanceof Array)
-    {
-        pojo.values = value;
-    }
-    else
-    {
-        var values = new Array();
-        values.push(filter.get("value"));
-        pojo.values = values;
-    }
-
-    var comparator;
-    switch(filter.get("operator"))
-    {
-        case FilterOperator.EQ:
-            comparator='$in';
-            break;
-        case FilterOperator.NE:
-            comparator = '$ne';
-            break;
-    }
-    pojo.comparator = comparator;
-
-    return pojo;
 }
 
 /**

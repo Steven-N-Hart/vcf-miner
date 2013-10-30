@@ -81,7 +81,7 @@ var InfoFilterTab = function (filters) {
         {
             case FilterCategory.INFO_FLAG:
                 opList.append(OPTION_EQ);
-                opList.append(OPTION_NE);
+                //opList.append(OPTION_NE); // not supported by server-side
                 valueDiv.append(
                     "<div id='info_flag_radio_group' class='form-inline'>" +
                         "<label class='radio inline' style='margin-right:20px;'><input type='radio' name='flag_group' id='true' checked='true'> True</label>" +

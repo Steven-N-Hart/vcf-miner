@@ -27,6 +27,108 @@ var FilterOperator =
 
 // MODEL
 var Filter = Backbone.Model.extend({
+    /**
+     * Translates this model into a InfoFlagFilter server-side object.
+     */
+    toInfoFlagFilterPojo: function()
+    {
+        var pojo = new Object();
+
+        pojo.key = "INFO." + this.get("name");
+
+        pojo.value = this.get("value");
+
+//        var comparator;
+//        switch(this.get("operator"))
+//        {
+//            case FilterOperator.EQ:
+//                comparator='';
+//                break;
+//            case FilterOperator.NE:
+//                comparator = '$ne';
+//                break;
+//        }
+//        pojo.comparator = comparator;
+
+        return pojo;
+    },
+
+    /**
+     * Translates this model into a InfoNumberFilter server-side object.
+     */
+    toInfoNumberFilterPojo: function()
+    {
+        var pojo = new Object();
+
+        pojo.key = "INFO." + this.get("name");
+
+        pojo.value = this.get("value");
+
+        var comparator;
+        switch(this.get("operator"))
+        {
+            case FilterOperator.EQ:
+                comparator='';
+                break;
+            case FilterOperator.GT:
+                comparator='$gt';
+                break;
+            case FilterOperator.GTEQ:
+                comparator='$gte';
+                break;
+            case FilterOperator.LT:
+                comparator='$lt';
+                break;
+            case FilterOperator.LTEQ:
+                comparator = '$lte';
+                break;
+            case FilterOperator.NE:
+                comparator = '$ne';
+                break;
+        }
+        pojo.comparator = comparator;
+
+        return pojo;
+    },
+
+    /**
+     * Translates the given Filter model into a InfoStringFilter server-side object.
+     */
+    toInfoStringFilterPojo: function()
+    {
+        var pojo = new Object();
+
+        pojo.key = "INFO." + this.get("name");
+
+        var value = this.get("value");
+        var displayValue = '';
+
+        if (value instanceof Array)
+        {
+            pojo.values = value;
+        }
+        else
+        {
+            var values = new Array();
+            values.push(this.get("value"));
+            pojo.values = values;
+        }
+
+        var comparator;
+        switch(this.get("operator"))
+        {
+            case FilterOperator.EQ:
+                comparator='$in';
+                break;
+            case FilterOperator.NE:
+                comparator = '$ne';
+                break;
+        }
+        pojo.comparator = comparator;
+
+        return pojo;
+    },
+
     defaults: function()
     {
         return {
