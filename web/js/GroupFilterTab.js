@@ -160,7 +160,35 @@ var GroupFilterTab = function (sampleGroups) {
          *
          * @returns selected SampleGroup model
          */
-        getSelectedGroup: getSelectedGroup
+        getSelectedGroup: getSelectedGroup,
+
+        /**
+         * Gets the selected filter.
+         *
+         * @return Filter model
+         */
+        getFilter: function()
+        {
+            var group = groupFilterTab.getSelectedGroup();
+
+            var filter = new Filter();
+            filter.set("category", FilterCategory.GROUP);
+            filter.set("name", "Variant Samples");
+            filter.set("value", group.get("name"));
+
+            var foo = $('#group_operator_list').val();
+            switch($('#group_operator_list').val())
+            {
+                case 'IN':
+                    filter.set("operator", FilterOperator.IN);
+                    break;
+                case 'NOT_IN':
+                    filter.set("operator", FilterOperator.NOT_IN);
+                    break;
+            }
+
+            return filter;
+        }
 
     };
 

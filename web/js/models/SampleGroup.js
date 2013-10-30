@@ -1,13 +1,13 @@
 var SampleGroup = Backbone.Model.extend({
 
-    toSampleGroupPOJO: function(workspaceKey)
+    toSampleGroupPOJO: function(workspaceKey, inSample)
     {
         var pojo = {};
         pojo.workspace   = workspaceKey;
         pojo.alias       = this.get("name");
         pojo.description = this.get("description");
         pojo.samples     = this.get("sampleNames");
-        pojo.inSample    = true; // TODO: pull this from UI
+        pojo.inSample    = inSample;
         return pojo;
     },
 

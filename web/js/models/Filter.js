@@ -20,7 +20,9 @@ var FilterOperator =
     LTEQ:    3,
     GT:      4,
     GTEQ:    5,
-    NE:      6
+    NE:      6,
+    IN:      7,
+    NOT_IN:  8
 }
 
 // MODEL

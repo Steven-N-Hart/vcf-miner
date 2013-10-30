@@ -167,6 +167,12 @@ function setFilterDisplay(filter)
         case FilterOperator.NE:
             displayOperator = '&#x2260;';
             break;
+        case FilterOperator.IN:
+            displayOperator = 'IN';
+            break;
+        case FilterOperator.NOT_IN:
+            displayOperator = 'NOT_IN';
+            break;
     }
     filter.set("displayOperator", displayOperator);
 }
@@ -244,42 +250,6 @@ function buildQuery(filterList, workspaceKey)
     _.each(filterList.models, function(filter)
     {
         // assign filter value to correct query object attribute
-        switch (filter.get("name"))
-        {
-            case FILTER_MIN_ALT_READS.get("name"):
-                query.minAltReads = filter.get("value");
-                break;
-            case FILTER_MIN_NUM_SAMPLES.get("name"):
-                query.minNumSample = filter.get("value");
-                break;
-            case FILTER_MAX_NUM_SAMPLES.get("name"):
-                query.maxNumSample = filter.get("value");
-                break;
-            case FILTER_MIN_AC.get("name"):
-                query.minAC = filter.get("value");
-                break;
-            case FILTER_MAX_AC.get("name"):
-                query.maxAC = filter.get("value");
-                break;
-            case FILTER_MIN_PHRED.get("name"):
-                query.minPHRED = filter.get("value");
-                break;
-            case FILTER_GENE.get("name"):
-                query.genes = filter.get("value");
-                break;
-            case FILTER_GROUP.get("name"):
-                // lookup SampleGroup model that corresponds to name
-                for (var i=0; i < SAMPLE_GROUP_LIST.models.length; i++)
-                {
-                    var group = SAMPLE_GROUP_LIST.models[i];
-                    if (group.get("name") === FILTER_GROUP.get("value"))
-                    {
-                        sampleGroups.push(group.toSampleGroupPOJO(workspaceKey));
-                    }
-                }
-                break;
-        }
-
         switch (filter.get("category"))
         {
             case FilterCategory.INFO_FLAG:
@@ -291,6 +261,47 @@ function buildQuery(filterList, workspaceKey)
                 break;
             case FilterCategory.INFO_STR:
                 infoStringFilters.push(toInfoStringFilterPojo(filter));
+                break;
+            case FilterCategory.GROUP:
+                // lookup SampleGroup model that corresponds to name
+                var group = SAMPLE_GROUP_LIST.findWhere({name: filter.get("value")});
+                var inSample;
+                switch(filter.get("operator"))
+                {
+                    case FilterOperator.IN:
+                        inSample = true;
+                        break;
+                    case FilterOperator.NOT_IN:
+                        inSample = false;
+                        break;
+                }
+                sampleGroups.push(group.toSampleGroupPOJO(workspaceKey, inSample));
+                break;
+            case FilterCategory.SAMPLE:
+                switch (filter.get("name"))
+                {
+                    case FILTER_MIN_ALT_READS.get("name"):
+                        query.minAltReads = filter.get("value");
+                        break;
+                    case FILTER_MIN_NUM_SAMPLES.get("name"):
+                        query.minNumSample = filter.get("value");
+                        break;
+                    case FILTER_MAX_NUM_SAMPLES.get("name"):
+                        query.maxNumSample = filter.get("value");
+                        break;
+                    case FILTER_MIN_AC.get("name"):
+                        query.minAC = filter.get("value");
+                        break;
+                    case FILTER_MAX_AC.get("name"):
+                        query.maxAC = filter.get("value");
+                        break;
+                    case FILTER_MIN_PHRED.get("name"):
+                        query.minPHRED = filter.get("value");
+                        break;
+                    case FILTER_GENE.get("name"):
+                        query.genes = filter.get("value");
+                        break;
+                }
                 break;
         }
     });
@@ -417,14 +428,11 @@ function addFilter()
             break;
 
         case "tab_content_group":
-            var group = groupFilterTab.getSelectedGroup();
-            FILTER_GROUP.set("value", group.get("name"));
-            filter = FILTER_GROUP;
+            filter = groupFilterTab.getFilter();
             break;
 
         case "tab_content_info":
             filter = infoFilterTab.getFilter();
-            window.alert("INFO flag fields are not implemented yet on the server.")
             break;
     }
 
