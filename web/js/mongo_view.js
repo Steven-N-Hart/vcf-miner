@@ -23,14 +23,11 @@ var FILTER_MAX_NUM_SAMPLES = new Filter({name: 'Max # Samples', operator: Filter
 var FILTER_MIN_AC          = new Filter({name: 'Min AC',        operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
 var FILTER_MAX_AC          = new Filter({name: 'Max AC',        operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
 var FILTER_MIN_PHRED       = new Filter({name: 'Min Phred',     operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
-var FILTER_GENE            = new Filter({name: 'Gene',          operator: FilterOperator.EQ, value: '' , displayValue: '0', category: FilterCategory.GENE});
-var FILTER_GROUP           = new Filter({name: 'Group',         operator: FilterOperator.EQ, value: '' , displayValue: '0', category: FilterCategory.GROUP});
 
 var SEARCHED_FILTER_LIST = new FilterList;
 var PALLET_FILTER_LIST = new FilterList;
 
 var INFO_FILTER_LIST = new FilterList;
-var infoFilterTab;
 
 var searchedView;
 
@@ -42,8 +39,8 @@ var WORKSPACE_LIST = new WorkspaceList();
 var workspacesView;
 
 var SAMPLE_GROUP_LIST = new SampleGroupList();
-var sampleGroupListView;
-var groupFilterTab;
+
+var addFilterDialog;
 
 $( document ).ready(function()
 {
@@ -54,12 +51,15 @@ $( document ).ready(function()
 
     workspacesView = new WorkspacesView(WORKSPACE_LIST);
 
-    infoFilterTab = new InfoFilterTab(INFO_FILTER_LIST);
-    groupFilterTab = new GroupFilterTab(SAMPLE_GROUP_LIST);
+    addFilterDialog = new AddFilterDialog(INFO_FILTER_LIST, SEARCHED_FILTER_LIST, SAMPLE_GROUP_LIST, PALLET_FILTER_LIST);
+    $('#show_add_filter_dialog_button').click(function (e)
+    {
+        addFilterDialog.show();
+    });
 
     initTemplates();
 
-    getWorkspaces();
+    loadWorkspaces(WORKSPACE_LIST);
 
     // initialize the file input field
     $(":file").filestyle({buttonText: ''});
@@ -78,11 +78,13 @@ function initTemplates()
 
 /**
  * Queries the server for available workspaces
+ *
+ * @param workspaces
  */
-function getWorkspaces()
+function loadWorkspaces(workspaces)
 {
     // clear out workspaces
-    WORKSPACE_LIST.reset();
+    workspaces.reset();
 
     // TODO: users hardcoded - need authentication?
     var users = new Array();
@@ -107,7 +109,7 @@ function getWorkspaces()
                         ws.set("alias", json[attr].alias);
                         ws.set("user",  user);
                         ws.set("status", json[attr].ready);
-                        WORKSPACE_LIST.add(ws);
+                        workspaces.add(ws);
                     }
                 }
             },
@@ -120,104 +122,33 @@ function getWorkspaces()
 }
 
 /**
- * Looks at the filter's current values and tries to be smart about
- * how display value should look.
+ * Loads Sample Groups for the specified workspace.
  *
- * @param filter
+ * @param workspaceKey
+ * @param sampleGroups
  */
-function setFilterDisplay(filter)
+function loadSampleGroups(workspaceKey, sampleGroups)
 {
-    var value = filter.get("value");
-    var displayValue = '';
-
-    if (value instanceof Array)
-    {
-        for (var i = 0; i < value.length; i++)
-        {
-            displayValue += value[i] + ' ';
-        }
-    }
-    else
-    {
-        displayValue = value;
-    }
-    filter.set("displayValue", $.trim(displayValue));
-
-    var displayOperator;
-    switch(filter.get("operator"))
-    {
-        case FilterOperator.UNKNOWN:
-            displayOperator='';
-            break;
-        case FilterOperator.EQ:
-            displayOperator='=';
-            break;
-        case FilterOperator.GT:
-            displayOperator='&gt;';
-            break;
-        case FilterOperator.GTEQ:
-            displayOperator='&#x2265;';
-            break;
-        case FilterOperator.LT:
-            displayOperator='&lt;';
-            break;
-        case FilterOperator.LTEQ:
-            displayOperator = '&#x2264;';
-            break;
-        case FilterOperator.NE:
-            displayOperator = '&#x2260;';
-            break;
-        case FilterOperator.IN:
-            displayOperator = 'IN';
-            break;
-        case FilterOperator.NOT_IN:
-            displayOperator = 'NOT_IN';
-            break;
-    }
-    filter.set("displayOperator", displayOperator);
-}
-
-function initSampleTab(sampleFilters)
-{
-    var sampleFieldList = $('#sample_field_list');
-    sampleFieldList.empty();
-
-    for (var i=0; i < sampleFilters.models.length; i++)
-    {
-        var filter = sampleFilters.models[i];
-
-        sampleFieldList.append("<option value='"+filter.get("id")+"'>"+filter.get("name")+"</option>");
-
-        sampleFieldList.change(function()
-        {
-            sampleFieldChanged();
-        });
-
-        // simulate user clicking on 1st entry
-        sampleFieldChanged();
-    }
-}
-
-function initGeneTab(workspaceKey)
-{
-    $('#reset_gene_list').click(function (e)
-    {
-        $('#gene_list').empty();
-    });
+    sampleGroups.reset();
 
     $.ajax({
-        type: "GET",
-        url: "/mongo_svr/ve/gene/getGenes/w/" + workspaceKey,
+        url: "/mongo_svr/ve/samples/groups/w/" + workspaceKey,
         dataType: "json",
         success: function(json)
         {
-            $('#gene_typeahead').typeahead({
-                source: json,
-                updater: function (selection)
-                {
-                    $('#gene_list').append("<option value='"+selection+"'>"+selection+"</option>");
-                }
-            });
+            var groupArray = json.sampleGroups;
+            console.debug(json);
+            console.debug("Number of groups: " + groupArray.length);
+            for (var i = 0; i < groupArray.length; i++)
+            {
+                // translate to SampleGroup model
+                var group = new SampleGroup();
+                group.set("name",        groupArray[i].alias);
+                group.set("description", groupArray[i].description);
+                group.set("sampleNames", groupArray[i].samples);
+
+                sampleGroups.add(group);
+            }
         },
         error: function(jqXHR, textStatus)
         {
@@ -378,70 +309,6 @@ function sendQuery(query, displayCols)
 }
 
 /**
- * Displays dialog box so that user can add a new filter.
- */
-function showAddNewFilter()
-{
-    var addFilterDiv = $('#add_filter_modal');
-
-    //var table = document.getElementById('add_filter_table');
-
-    $('#add_filter_tabs a').click(function (e)
-    {
-        e.preventDefault();
-        $(this).tab('show');
-    })
-    // display
-    addFilterDiv.modal();
-}
-
-/**
- * Adds a filter to the collection of filters that are searched
- */
-function addFilter()
-{
-    // determine ID of currently selected tab
-    var tabId = $("ul#add_filter_tabs li.active > a").attr("href").split("#")[1];
-
-    // construct filter object
-    var filter;
-    switch(tabId)
-    {
-        case "tab_content_sample":
-            // get selected filter
-            var filterID = $('#sample_field_list').val();
-            filter = PALLET_FILTER_LIST.findWhere({id: filterID});
-            // update filter's value based on textfield value
-            filter.set("value", $("#sample_value_div input").val());
-            break;
-
-        case "tab_content_gene":
-            var geneArray = new Array();
-            $("#gene_list option").each(function()
-            {
-                var gene = $(this).val();
-                geneArray.push(gene);
-            });
-
-            FILTER_GENE.set("value", geneArray);
-            filter = FILTER_GENE;
-            break;
-
-        case "tab_content_group":
-            filter = groupFilterTab.getFilter();
-            break;
-
-        case "tab_content_info":
-            filter = infoFilterTab.getFilter();
-            break;
-    }
-
-    setFilterDisplay(filter);
-    SEARCHED_FILTER_LIST.add(filter);
-    $("#add_filter_close").click();
-}
-
-/**
  * Removes filter from the collection of filters that are searched
  *
  * @param filterID
@@ -449,50 +316,6 @@ function addFilter()
 function removeFilter(filterID)
 {
     SEARCHED_FILTER_LIST.remove(SEARCHED_FILTER_LIST.findWhere({id: filterID}));
-}
-
-function loadSampleGroups(workspaceKey)
-{
-    SAMPLE_GROUP_LIST.reset();
-
-    $.ajax({
-        url: "/mongo_svr/ve/samples/groups/w/" + workspaceKey,
-        dataType: "json",
-        success: function(json)
-        {
-            var groupArray = json.sampleGroups;
-            console.debug(json);
-            console.debug("Number of groups: " + groupArray.length);
-            for (var i = 0; i < groupArray.length; i++)
-            {
-                // translate to SampleGroup model
-                var group = new SampleGroup();
-                group.set("name",        groupArray[i].alias);
-                group.set("description", groupArray[i].description);
-                group.set("sampleNames", groupArray[i].samples);
-
-                SAMPLE_GROUP_LIST.add(group);
-            }
-        },
-        error: function(jqXHR, textStatus)
-        {
-            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-        }
-    });
-}
-
-function sampleFieldChanged()
-{
-    // get selected filter
-    var filterID = $('#sample_field_list').val();
-    var filter = PALLET_FILTER_LIST.findWhere({id: filterID});
-
-    // value DIV area
-    var valueDiv = $("#sample_value_div");
-    // clear div value area
-    valueDiv.empty();
-
-    valueDiv.append("<input class='input-mini' type='number' value='0'>");
 }
 
 /**
@@ -733,7 +556,6 @@ function toggleDisplayColumn(id)
 
 function setWorkspace(workspaceKey)
 {
-    infoFilterTab.setWorkspace(workspaceKey);
     searchedView.setWorkspace(workspaceKey);
 
     // reset collections
@@ -779,7 +601,7 @@ function setWorkspace(workspaceKey)
         FILTER_MIN_PHRED
     ]);
 
-    loadSampleGroups(workspaceKey);
+    loadSampleGroups(workspaceKey, SAMPLE_GROUP_LIST);
 
     var metadataRequest = $.ajax({
         url: "/mongo_svr/ve/meta/workspace/" + workspaceKey,
@@ -853,15 +675,12 @@ function setWorkspace(workspaceKey)
             // sort alphabetically
             allSamples.sort(SortByName);
 
-            groupFilterTab.initialize(workspaceKey, allSamples);
-
             // rebuild the DataTables widget since columns have changed
             initVariantTable(workspaceKey, VARIANT_TABLE_COLUMN_LIST);
 
             searchedView.setDisplayCols(VARIANT_TABLE_COLUMN_LIST);
 
-            initGeneTab(workspaceKey);
-            initSampleTab(PALLET_FILTER_LIST);
+            addFilterDialog.initialize(workspaceKey, allSamples);
 
             // backbone MVC will send query request based on adding this filter
             SEARCHED_FILTER_LIST.add(FILTER_NONE);
@@ -928,7 +747,7 @@ function addWorkspace()
             $("#progress").css('width','100%');
 
             // refresh workspaces
-            getWorkspaces();
+            loadWorkspaces(WORKSPACE_LIST);
         } else
         {
             console.log("Error " + xhr.status + " occurred uploading your file.<br \/>");

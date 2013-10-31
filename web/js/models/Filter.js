@@ -28,6 +28,64 @@ var FilterOperator =
 // MODEL
 var Filter = Backbone.Model.extend({
     /**
+     * Looks at the filter's current values and tries to be smart about
+     * how display value should look.
+     *
+     * @param filter
+     */
+    setFilterDisplay: function()
+    {
+        var value = this.get("value");
+        var displayValue = '';
+
+        if (value instanceof Array)
+        {
+            for (var i = 0; i < value.length; i++)
+            {
+                displayValue += value[i] + ' ';
+            }
+        }
+        else
+        {
+            displayValue = value;
+        }
+        this.set("displayValue", $.trim(displayValue));
+
+        var displayOperator;
+        switch(this.get("operator"))
+        {
+            case FilterOperator.UNKNOWN:
+                displayOperator='';
+                break;
+            case FilterOperator.EQ:
+                displayOperator='=';
+                break;
+            case FilterOperator.GT:
+                displayOperator='&gt;';
+                break;
+            case FilterOperator.GTEQ:
+                displayOperator='&#x2265;';
+                break;
+            case FilterOperator.LT:
+                displayOperator='&lt;';
+                break;
+            case FilterOperator.LTEQ:
+                displayOperator = '&#x2264;';
+                break;
+            case FilterOperator.NE:
+                displayOperator = '&#x2260;';
+                break;
+            case FilterOperator.IN:
+                displayOperator = 'IN';
+                break;
+            case FilterOperator.NOT_IN:
+                displayOperator = 'NOT_IN';
+                break;
+        }
+        this.set("displayOperator", displayOperator);
+    },
+
+    /**
      * Translates this model into a InfoFlagFilter server-side object.
      */
     toInfoFlagFilterPojo: function()

@@ -156,20 +156,13 @@ var GroupFilterTab = function (sampleGroups) {
         },
 
         /**
-         * Gets the currently selected group.
-         *
-         * @returns selected SampleGroup model
-         */
-        getSelectedGroup: getSelectedGroup,
-
-        /**
          * Gets the selected filter.
          *
          * @return Filter model
          */
         getFilter: function()
         {
-            var group = groupFilterTab.getSelectedGroup();
+            var group = getSelectedGroup();
 
             var filter = new Filter();
             filter.set("category", FilterCategory.GROUP);
