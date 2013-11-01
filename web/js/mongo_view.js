@@ -31,23 +31,18 @@ var INFO_FILTER_LIST = new FilterList;
 
 var searchedView;
 
-var VARIANT_TABLE_COLUMN_LIST = new VariantTableColumnList();
-var configVariantTableView;
-var variantTableColumnView;
-
 var WORKSPACE_LIST = new WorkspaceList();
 var workspacesView;
 
 var SAMPLE_GROUP_LIST = new SampleGroupList();
 
 var addFilterDialog;
+var variantTable;
+var columnsDialog;
 
 $( document ).ready(function()
 {
     searchedView = new SearchedView(SEARCHED_FILTER_LIST);
-
-    configVariantTableView = new ConfigVariantTableView(VARIANT_TABLE_COLUMN_LIST);
-    variantTableColumnView = new VariantTableColumnView(VARIANT_TABLE_COLUMN_LIST);
 
     workspacesView = new WorkspacesView(WORKSPACE_LIST);
 
@@ -57,12 +52,18 @@ $( document ).ready(function()
         addFilterDialog.show();
     });
 
+    variantTable = new VariantTable(SEARCHED_FILTER_LIST);
+
+    columnsDialog = new ColumnsDialog(variantTable);
+    // delegated event listener since the toolbar is added dynamically to a DataTable
+    $(document).on('click', '#columns_button', function()
+    {
+        columnsDialog.show();
+    });
+
     initTemplates();
 
     loadWorkspaces(WORKSPACE_LIST);
-
-    // initialize the file input field
-    $(":file").filestyle({buttonText: ''});
 });
 
 /**
@@ -272,7 +273,7 @@ function sendQuery(query, displayCols)
             }
 
             // populate the variant table
-            addRowsToVariantTable(json.results, displayCols);
+            variantTable.addRows(json.results, displayCols);
 
             // update count on Filter
             // loop through filter collection
@@ -318,242 +319,6 @@ function removeFilter(filterID)
     SEARCHED_FILTER_LIST.remove(SEARCHED_FILTER_LIST.findWhere({id: filterID}));
 }
 
-/**
- * Initializes the DataTable widget for variants.
- *
- * @param workspaceKey
- * @param displayCols An array of VariantTableColumn models.
- */
-function initVariantTable(workspaceKey, displayCols)
-{
-    var table = $('<table>').attr(
-        {
-            id:      'variant_table',
-            class:   'table table-striped table-bordered',
-            border:   '0',
-            cellpadding: '0',
-            cellspacing: '0'
-        });
-
-    // remove previous table if present
-    $('#variant_table_div').empty();
-
-    $('#variant_table_div').append(table);
-
-
-    var aoColumns = new Array();
-    // loop through collection
-    _.each(displayCols.models, function(displayCol)
-    {
-        aoColumns.push({ "sTitle":   displayCol.get("displayName") });
-    });
-
-    var sDom =
-        "<'row'<'pull-right'<'toolbar'>>>" +
-        "<'row'<'pull-left'l><'pull-right'i>>" +
-        "<'row't>" +
-        "<'row'<'pull-left'p>>";
-
-    $('#variant_table').dataTable( {
-        "sDom": sDom,
-        "aoColumns": aoColumns,
-        'aaData':    [],
-        "bDestroy":  true,
-        "iDisplayLength": 25,
-        "bAutoWidth": true,
-        "sScrollX": "100%",
-        "bScrollCollapse": true
-    });
-
-
-    var toolbar = $("#table_toolbar").clone();
-    $("div .toolbar").append(toolbar);
-
-    // init export button
-    $('#export_button', toolbar).click(function (e)
-    {
-        download(workspaceKey, displayCols);
-    });
-
-    // set visibility
-    var colIdx = 0;
-    _.each(displayCols.models, function(displayCol)
-    {
-        var isVisible = displayCol.get("visible");
-        $('#variant_table').dataTable().fnSetColumnVis(colIdx++, isVisible);
-    });
-}
-
-/**
- * Marks up obj with HTML to get a nice looking display value for a single DataTables cell.
- *
- * @param obj
- */
-function getDataTablesDisplayValue(value)
-{
-    var id = guid();
-
-    if (typeof value === "undefined")
-    {
-        return '';
-    }
-
-    var displayValue = '';
-
-    if (value instanceof Array)
-    {
-        if (value.length > 0)
-        {
-            displayValue = value[0];
-        }
-        if (value.length > 1)
-        {
-            var left = value.length - 1;
-            var expandAnchor = '<a id="' + id + '_expand" title="Show remaining '+ left +'">...</a>';
-            var collapseAnchor = '<a id="' + id + '_collapse">collapse</a>';
-
-            displayValue += expandAnchor;
-
-            // expansion has each array item separated by whitespace
-            var moreText = ''
-            for (var i = 1; i < value.length; i++)
-            {
-                moreText += value[i] + ' ';
-            }
-
-            $('body').on('click', '#' + id + '_expand',
-                function()
-                {
-                    $(this).replaceWith(' <div>' + moreText + ' ' + collapseAnchor + '</div>');
-
-                    $('body').on('click', '#' + id + '_collapse',
-                        function()
-                        {
-                            // replace div with original expand anchor
-                            $(this).parent().replaceWith(expandAnchor);
-                        }
-                    );
-
-                }
-            );
-        }
-    }
-    else
-    {
-        var MAX_LENGTH = 15;
-        if (value.length > MAX_LENGTH)
-        {
-            var expandAnchor = '<a id="' + id + '_expand" title="Show remaining characters">...</a>';
-            var collapseAnchor = '<a id="' + id + '_collapse">'+value+'</a>';
-
-            displayValue = '<div>' + value.substr(0, MAX_LENGTH) + expandAnchor + "</div>";
-
-            var remainingText = value.substr(MAX_LENGTH);
-
-            $('body').on('click', '#' + id + '_expand',
-                function()
-                {
-                    $(this).parent().replaceWith('<div>' + collapseAnchor + '</div>');
-
-                    $('body').on('click', '#' + id + '_collapse',
-                        function()
-                        {
-                            // replace div with original expand anchor
-                            $(this).parent().replaceWith(displayValue);
-                        }
-                    );
-                }
-            );
-        }
-        else
-        {
-            displayValue = value;
-        }
-    }
-
-    return displayValue;
-}
-
-/**
- * Adds 0 or more rows to the Variant Table.
- *
- * @param variants An array of variant objects.  Each is rendered as a single DataTable row.
- * @param displayCols An array of VariantTableColumn models.
- */
-function addRowsToVariantTable(variants, displayCols)
-{
-    var aaData = new Array();
-
-    for (var i = 0; i < variants.length; i++)
-    {
-        var variant = variants[i];
-
-        var aaDataRow = new Array();
-
-        // loop through collection
-        _.each(displayCols.models, function(displayCol)
-        {
-            var name = displayCol.get("name");
-
-            if (name.substring(0, 4) === 'INFO')
-            {
-                // INFO column
-                var infoFieldName = displayCol.get("displayName");
-                var variantInfo = variant['INFO'];
-                if(variantInfo[infoFieldName] !== undefined)
-                {
-                    aaDataRow.push(getDataTablesDisplayValue(variantInfo[infoFieldName]));
-                }
-                else
-                {
-                    aaDataRow.push("");
-                }
-            }
-            else
-            {
-                aaDataRow.push(getDataTablesDisplayValue(variant[name]));
-            }
-
-        });
-
-        aaData.push(aaDataRow);
-    }
-
-    var table = $('#variant_table').dataTable();
-
-    // update DataTable
-    table.fnClearTable();
-    table.fnAddData(aaData);
-}
-
-/**
- * Shows or hides Variant Table column.
- *
- * @param id The id of the VariantTableColumn model
- */
-function toggleDisplayColumn(id)
-{
-    var col = VARIANT_TABLE_COLUMN_LIST.findWhere({id: id});
-
-    var table = $('#variant_table').dataTable();
-    var aoColumns = table.fnSettings().aoColumns;
-
-    // translate column name to DataTables column
-    for (i=0; i < aoColumns.length; i++)
-    {
-        if (aoColumns[i].sTitle == col.get("displayName"))
-        {
-            var isVisible = aoColumns[i].bVisible;
-
-            // flip visibility
-            isVisible = !isVisible;
-
-            col.set("visible", isVisible);
-            return;
-        }
-    }
-}
-
 function setWorkspace(workspaceKey)
 {
     searchedView.setWorkspace(workspaceKey);
@@ -562,7 +327,6 @@ function setWorkspace(workspaceKey)
     PALLET_FILTER_LIST.reset();
     INFO_FILTER_LIST.reset();
     SEARCHED_FILTER_LIST.reset();
-    VARIANT_TABLE_COLUMN_LIST.reset();
 
     // update screens
     $("#getting_started").toggle(false);
@@ -579,18 +343,6 @@ function setWorkspace(workspaceKey)
     console.debug("User selected workspace: " + workspaceKey);
 
     $("#vcf_file").html("VCF File: " + workspace.get("alias"));
-
-    // standard 1st 7 VCF file columns
-    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'CHROM',  displayName:'CHROM',  description:'The chromosome.'}));
-    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'POS',    displayName:'POS',    description:'The reference position, with the 1st base having position 1.'}));
-    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'ID',     displayName:'ID',     description:'Semi-colon separated list of unique identifiers.'}));
-    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'REF',    displayName:'REF',    description:'The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).'}));
-    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'ALT',    displayName:'ALT',    description:'Comma separated list of alternate non-reference alleles called on at least one of the samples.'}));
-    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:false, name:'QUAL',   displayName:'QUAL',   description:'Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).'}));
-    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:false, name:'FILTER', displayName:'FILTER', description:'PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
-
-    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'GenotypePostitiveCount', displayName:'#_Samples', description:'The number of samples.'}));
-    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn({visible:true,  name:'GenotypePositiveList',  displayName:'Samples',   description:'The names of samples.'}));
 
     PALLET_FILTER_LIST.add([
         FILTER_MIN_ALT_READS,
@@ -625,19 +377,25 @@ function setWorkspace(workspaceKey)
             // get the INFO field names sorted alphabetically
             var infoFieldNames = getSortedAttrNames(info);
 
+            var columns = new VariantTableColumnList();
+            // standard 1st 7 VCF file columns
+            columns.add(new VariantTableColumn({visible:true,  name:'CHROM',  displayName:'CHROM',  description:'The chromosome.'}));
+            columns.add(new VariantTableColumn({visible:true,  name:'POS',    displayName:'POS',    description:'The reference position, with the 1st base having position 1.'}));
+            columns.add(new VariantTableColumn({visible:true,  name:'ID',     displayName:'ID',     description:'Semi-colon separated list of unique identifiers.'}));
+            columns.add(new VariantTableColumn({visible:true,  name:'REF',    displayName:'REF',    description:'The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).'}));
+            columns.add(new VariantTableColumn({visible:true,  name:'ALT',    displayName:'ALT',    description:'Comma separated list of alternate non-reference alleles called on at least one of the samples.'}));
+            columns.add(new VariantTableColumn({visible:false, name:'QUAL',   displayName:'QUAL',   description:'Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).'}));
+            columns.add(new VariantTableColumn({visible:false, name:'FILTER', displayName:'FILTER', description:'PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
+
+            columns.add(new VariantTableColumn({visible:true,  name:'GenotypePostitiveCount', displayName:'#_Samples', description:'The number of samples.'}));
+            columns.add(new VariantTableColumn({visible:true,  name:'GenotypePositiveList',  displayName:'Samples',   description:'The names of samples.'}));
+
+
             for (var i = 0; i < infoFieldNames.length; i++) {
                 var infoFieldName = infoFieldNames[i];
                 if (info.hasOwnProperty(infoFieldName))
                 {
-                    var isVisible = false; // TODO: dynamically set visibilty for SNPEFF columns
-                    VARIANT_TABLE_COLUMN_LIST.add(new VariantTableColumn(
-                        {
-                            visible:isVisible,
-                            name:'INFO.'+infoFieldName,
-                            displayName:infoFieldName,
-                            description:info[infoFieldName].Description
-                        }
-                    ));
+                    columns.add(new VariantTableColumn({visible:false,  name:'INFO.'+infoFieldName,  displayName:infoFieldName,   description:info[infoFieldName].Description}));
 
                     var infoFilter = new Filter();
                     infoFilter.set("name", infoFieldName);
@@ -664,6 +422,9 @@ function setWorkspace(workspaceKey)
                 }
             }
 
+            // rebuild the DataTables widget since columns have changed
+            variantTable.initialize(workspaceKey, columns);
+
             var allSamples = new Array();
             for (var key in json.SAMPLES)
             {
@@ -675,10 +436,7 @@ function setWorkspace(workspaceKey)
             // sort alphabetically
             allSamples.sort(SortByName);
 
-            // rebuild the DataTables widget since columns have changed
-            initVariantTable(workspaceKey, VARIANT_TABLE_COLUMN_LIST);
-
-            searchedView.setDisplayCols(VARIANT_TABLE_COLUMN_LIST);
+            searchedView.setDisplayCols(variantTable.getVisibleColumns());
 
             addFilterDialog.initialize(workspaceKey, allSamples);
 
@@ -784,54 +542,4 @@ function deleteWorkspace(workspaceKey)
             $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
         }
     });
-}
-
-/**
- * Downloads data in TSV format for the given query and selected columns.
- *
- * @param workspaceKey
- * @param displayCols An array of VariantTableColumn models
- */
-function download(workspaceKey, displayCols)
-{
-    // send query request to server
-    var query = buildQuery(SEARCHED_FILTER_LIST, workspaceKey);
-
-    // add attribute returnFields
-    var returnFields = new Array();
-    _.each(displayCols.models, function(displayCol)
-    {
-        if (displayCol.get("visible"))
-        {
-            returnFields.push(displayCol.get("name"));
-        }
-    });
-    query.returnFields = returnFields;
-
-    var jsonStr = JSON.stringify(query)
-
-    console.debug("Sending download request to server with the following JSON:" + jsonStr);
-
-    // dynamically add HTML form that is hidden
-    var form = $('<form>').attr(
-        {
-            id:      'export_form',
-            method:  'POST',
-            action:  '/mongo_svr/download',
-            enctype: 'application/x-www-form-urlencoded'
-        });
-    var input = $('<input>').attr(
-        {
-            type: 'hidden',
-            name: 'json',
-            value: jsonStr
-        });
-    form.append(input);
-    $("body").append(form);
-
-    // programmatically submit form to perform download
-    $('#export_form').submit();
-
-    // remove form
-    $('#export_form').remove();
 }

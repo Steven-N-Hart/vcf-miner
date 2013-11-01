@@ -12,6 +12,9 @@ var InfoFilterTab = function (filters) {
     var OPTION_LTEQ = "<option value='lteq'>&#x2264;</option>";
     var OPTION_NE   = "<option value='ne'>&#x2260;</option>";
 
+    // initialize the file input field
+    $(":file").filestyle({buttonText: ''});
+
     var ListView = Backbone.View.extend({
 
         initialize: function()
