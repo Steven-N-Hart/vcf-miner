@@ -152,7 +152,6 @@ var VariantTable = function (searchFilters) {
 
         $('#variant_table_div').append(table);
 
-
         var aoColumns = new Array();
         // loop through collection
         _.each(tableColumns.models, function(displayCol)
@@ -166,7 +165,7 @@ var VariantTable = function (searchFilters) {
                 "<'row't>" +
                 "<'row'<'pull-left'p>>";
 
-        $('#variant_table').dataTable( {
+        var dataTable = $('#variant_table').dataTable( {
             "sDom": sDom,
             "aoColumns": aoColumns,
             'aaData':    [],
@@ -174,9 +173,19 @@ var VariantTable = function (searchFilters) {
             "iDisplayLength": 25,
             "bAutoWidth": true,
             "sScrollX": "100%",
-            "bScrollCollapse": true
-        });
+            "bScrollCollapse": true,
+            "fnHeaderCallback": function( nHead, aData, iStart, iEnd, aiDisplay )
+            {
+                // set tooltip 'title' attribute for all TH elements that correspond to visible columns
+                var colIdx = 0;
+                _.each(getVisibleColumns().models, function(column)
+                {
+                    $('th:eq('+ colIdx +')', nHead).attr('title', column.get("description"));
+                    colIdx++;
+                });
 
+            }
+        });
 
         var toolbar = $("#table_toolbar").clone();
         $("div .toolbar").append(toolbar);
