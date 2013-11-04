@@ -31,20 +31,16 @@ var INFO_FILTER_LIST = new FilterList;
 
 var searchedView;
 
-var WORKSPACE_LIST = new WorkspaceList();
-var workspacesView;
-
 var SAMPLE_GROUP_LIST = new SampleGroupList();
 
 var addFilterDialog;
 var variantTable;
 var columnsDialog;
+var WorkspaceController;
 
 $( document ).ready(function()
 {
     searchedView = new SearchedView(SEARCHED_FILTER_LIST);
-
-    workspacesView = new WorkspacesView(WORKSPACE_LIST);
 
     addFilterDialog = new AddFilterDialog(INFO_FILTER_LIST, SEARCHED_FILTER_LIST, SAMPLE_GROUP_LIST, PALLET_FILTER_LIST);
     $('#show_add_filter_dialog_button').click(function (e)
@@ -63,7 +59,8 @@ $( document ).ready(function()
 
     initTemplates();
 
-    loadWorkspaces(WORKSPACE_LIST);
+    workspaceController = new WorkspaceController(setWorkspace);
+    workspaceController.refreshWorkspaces();
 });
 
 /**
@@ -75,51 +72,6 @@ function initTemplates()
     WARNING_TEMPLATE         = $("#warning-message-template").html();
     WARNING_POPOVER_TEMPLATE = $("#warning-popover-template").html();
     ERROR_TEMPLATE           = $("#error-message-template").html();
-}
-
-/**
- * Queries the server for available workspaces
- *
- * @param workspaces
- */
-function loadWorkspaces(workspaces)
-{
-    // clear out workspaces
-    workspaces.reset();
-
-    // TODO: users hardcoded - need authentication?
-    var users = new Array();
-    users.push('steve');
-    users.push('dan');
-
-    // perform REST call per-user
-    for (var i = 0; i < users.length; i++)
-    {
-        var user = users[i];
-        // get workspace information from server
-        var workspaceRequest = $.ajax({
-            url: "/mongo_svr/ve/q/owner/list_workspaces/" + user,
-            dataType: "json",
-            success: function(json)
-            {
-                // each workspace object has an increment num as the attr name
-                for (var attr in json) {
-                    if (json.hasOwnProperty(attr)) {
-                        var ws = new Workspace();
-                        ws.set("key",   json[attr].key);
-                        ws.set("alias", json[attr].alias);
-                        ws.set("user",  user);
-                        ws.set("status", json[attr].ready);
-                        workspaces.add(ws);
-                    }
-                }
-            },
-            error: function(jqXHR, textStatus)
-            {
-                $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-            }
-        });
-    }
 }
 
 /**
@@ -319,8 +271,16 @@ function removeFilter(filterID)
     SEARCHED_FILTER_LIST.remove(SEARCHED_FILTER_LIST.findWhere({id: filterID}));
 }
 
-function setWorkspace(workspaceKey)
+/**
+ * Callback
+ *
+ * @param workspace
+ */
+function setWorkspace(workspace)
 {
+    var workspaceKey = workspace.get("key");
+    console.debug("User selected workspace: " + workspaceKey);
+
     searchedView.setWorkspace(workspaceKey);
 
     // reset collections
@@ -332,15 +292,6 @@ function setWorkspace(workspaceKey)
     $("#getting_started").toggle(false);
     $("#jquery-ui-container").toggle(true);
     initWorkspaceScreen();
-
-    // move workspaces pane from getting_started screen to workspace screen
-    var workspacesPane = $("#workspaces_pane").detach();
-    var placeholder = $("#workspaces_placeholder");
-    placeholder.append(workspacesPane);
-
-    var workspace = WORKSPACE_LIST.findWhere({key: workspaceKey});
-
-    console.debug("User selected workspace: " + workspaceKey);
 
     $("#vcf_file").html("VCF File: " + workspace.get("alias"));
 
@@ -442,100 +393,6 @@ function setWorkspace(workspaceKey)
 
             // backbone MVC will send query request based on adding this filter
             SEARCHED_FILTER_LIST.add(FILTER_NONE);
-        },
-        error: function(jqXHR, textStatus)
-        {
-            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-        }
-    });
-}
-
-/**
- * Uploads a VCF to the server to create a new workspace.
- */
-function addWorkspace()
-{
-    $("#progress").css('width','0%');
-
-    // TODO: hardcoded user
-    var user = 'steve';
-
-    var uploadFile = $( '#vcf_file_upload' )[0].files[0]
-
-    // some browsers put C:\\fakepath\\ on the front
-    var name = uploadFile.name.replace("C:\\fakepath\\", "");
-    // chomp off trailing .vcf file extension
-    name = name.replace(new RegExp('\.vcf'), '');
-    console.debug("Adding working with name=" + name);
-
-    // progress on transfers from the server to the client (downloads)
-    function updateProgress (oEvent)
-    {
-        if (oEvent.lengthComputable)
-        {
-            var percentComplete = (oEvent.loaded / oEvent.total) * 100;
-            $("#progress").css('width',percentComplete + '%');
-        }
-    }
-
-//    function transferComplete(evt)
-//    {
-//        alert("The transfer is complete.");
-//    }
-
-//    function transferFailed(evt)
-//    {
-//        alert("An error occurred while transferring the file.");
-//    }
-
-    var xhr = new XMLHttpRequest();
-//
-    xhr.upload.addEventListener("progress", updateProgress, false);
-    //xhr.addEventListener("load", transferComplete, false);
-    //xhr.addEventListener("error", transferFailed, false);
-
-    xhr.open('POST', "/mongo_svr/uploadvcf/user/" + user + "/alias/" + name, true);
-
-    xhr.onload = function(oEvent)
-    {
-        if (xhr.status == 200)
-        {
-            console.log("Uploaded!");
-
-            $("#progress").css('width','100%');
-
-            // refresh workspaces
-            loadWorkspaces(WORKSPACE_LIST);
-        } else
-        {
-            console.log("Error " + xhr.status + " occurred uploading your file.<br \/>");
-        }
-        $('#upload_vcf_progress_modal').modal('hide');
-    };
-
-    var formData = new FormData;
-    formData.append('file', uploadFile);
-    xhr.send(formData);
-
-    // hide
-    $('#add_workspace_modal').modal('hide');
-
-     // display
-    $('#upload_vcf_progress_modal').modal();
-}
-
-function deleteWorkspace(workspaceKey)
-{
-    var workspace = WORKSPACE_LIST.findWhere({key: workspaceKey});
-
-    console.debug("Deleting working with name=" + workspace.get("alias") + " and key=" + workspaceKey);
-
-    $.ajax({
-        type: "DELETE",
-        url: "/mongo_svr/ve/delete_workspace/" + workspaceKey,
-        success: function(json)
-        {
-            WORKSPACE_LIST.remove(workspace);
         },
         error: function(jqXHR, textStatus)
         {

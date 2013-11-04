@@ -73,10 +73,10 @@
         <span class="label"><td><%=displayStatus%></td></span>
         <td>
             <% if (displayStatus == 'Available') { %>
-                <button id="<%=id%>_load_button" title="Load" type="button" class="btn btn-mini" onclick="setWorkspace('<%=key%>')"><i class="icon-play"></i></button>
+                <button id="<%=id%>_load_button" title="Load" type="button" class="btn btn-mini"><i class="icon-play"></i></button>
             <% } %>
             <% if ((displayStatus == 'Available') || (displayStatus == 'Failed')) { %>
-                <button id="<%=id%>_delete_button" title="Delete" type="button" class="btn btn-mini" onclick="deleteWorkspace('<%=key%>')"><i class="icon-remove"></i></button>
+                <button id="<%=id%>_delete_button" title="Delete" type="button" class="btn btn-mini"><i class="icon-remove"></i></button>
             <% } %>
         </td>
     </script>
@@ -133,7 +133,7 @@
 
     <script src="js/models/Workspace.js" type="text/javascript"></script>
     <script src="js/collections/WorkspaceList.js" type="text/javascript"></script>
-    <script src="js/views/WorkspacesView.js" type="text/javascript"></script>
+    <script src="js/WorkspaceController.js" type="text/javascript"></script>
 
     <script src="js/models/Filter.js" type="text/javascript"></script>
     <script src="js/collections/FilterList.js" type="text/javascript"></script>
@@ -205,7 +205,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-primary" aria-hidden="true" onclick="addWorkspace()">Import</button>
+        <button class="btn btn-primary" aria-hidden="true" id="import_workspace_button">Import</button>
         <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
     </div>
 </div>
