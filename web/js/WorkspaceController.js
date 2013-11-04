@@ -1,3 +1,12 @@
+/**
+ *
+ * @param fnSetWorkspaceCallback
+ *      Function callback that takes a Workspace as a parameter.  This function is called
+ *      when the user changes the workspace.
+ *
+ * @returns {{refreshWorkspaces: Function, getWorkspace: Function}}
+ * @constructor
+ */
 var WorkspaceController = function (fnSetWorkspaceCallback) {
 
     // private vars
@@ -12,6 +21,11 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
     {
         addWorkspace();
     });
+
+    // array of workspace keys that should be updated automatically
+    var notReadyKeys = new Array();
+    var TIMER_INTERVAL = 10000; // 10 seconds
+    setInterval(updateNotReadyWorkspaces, TIMER_INTERVAL);
 
     /**
      * Single row in table.
@@ -69,18 +83,17 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
             $("#add_workspace_row").before(view.render().el);
 
             // register event listeners
-            $('#' + workspace.get("id") + '_load_button').click(function (e)
+            $(document).on('click', '#' + workspace.get("id") + '_load_button', function()
             {
                 // move the workspaces pane
                 movePane();
 
                 fnSetWorkspaceCallback(workspace);
             });
-            $('#' + workspace.get("id") + '_delete_button').click(function (e)
+            $(document).on('click', '#' + workspace.get("id") + '_delete_button', function()
             {
                 deleteWorkspace(workspace);
             });
-
         },
 
         removeOne: function(workspace)
@@ -131,11 +144,65 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
         placeholder.append(workspacesPane);
     }
 
+    function updateNotReadyWorkspaces()
+    {
+        if (notReadyKeys.length == 0)
+        {
+            return;
+        }
+
+        // perform REST call per-user
+        for (var i = 0; i < users.length; i++)
+        {
+            var user = users[i];
+            // get workspace information from server
+            var workspaceRequest = $.ajax({
+                url: "/mongo_svr/ve/q/owner/list_workspaces/" + user,
+                dataType: "json",
+                success: function(json)
+                {
+
+                    // each workspace object has an increment num as the attr name
+                    for (var attr in json) {
+                        if (json.hasOwnProperty(attr)) {
+                            var key = json[attr].key;
+                            var ws = workspaces.findWhere({key: key});
+
+                            if($.inArray(key, notReadyKeys) != -1)
+                            {
+                                console.log("updating status for key " + key);
+                                ws.set("status", json[attr].ready);
+
+                                if ((ws.get("status") == ReadyStatus.READY) ||
+                                    (ws.get("status") == ReadyStatus.FAILED))
+                                {
+                                    // delete key
+                                    var index = notReadyKeys.indexOf(key);
+                                    if (index > -1) {
+                                        notReadyKeys.splice(index, 1);
+                                    }
+                                    console.log("Removing auto-updates for key "  + key);
+                                }
+                            }
+
+                        }
+                    }
+                },
+                error: function(jqXHR, textStatus)
+                {
+                    $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+                }
+            });
+        }
+    }
+
     /**
      * Refreshes the Backbone collection of workspaces by querying the server.
      */
-    function refreshWorkspaces()
+    function refreshAllWorkspaces()
     {
+        console.log("refreshing all workspaces");
+
         // clear out workspaces
         workspaces.reset();
 
@@ -149,6 +216,7 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
                 dataType: "json",
                 success: function(json)
                 {
+
                     // each workspace object has an increment num as the attr name
                     for (var attr in json) {
                         if (json.hasOwnProperty(attr)) {
@@ -158,6 +226,12 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
                             ws.set("user",  user);
                             ws.set("status", json[attr].ready);
                             workspaces.add(ws);
+
+                            if ((ws.get("status") == ReadyStatus.NOT_READY) && ($.inArray(ws.get("key"), notReadyKeys) == -1))
+                            {
+                                console.log("Adding auto-updates for key "  + ws.get("key"));
+                                notReadyKeys.push(ws.get("key"));
+                            }
                         }
                     }
                 },
@@ -223,8 +297,7 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
 
                 $("#progress").css('width','100%');
 
-                // refresh workspaces
-                refreshWorkspaces(workspaces);
+                refreshAllWorkspaces();
             } else
             {
                 console.log("Error " + xhr.status + " occurred uploading your file.<br \/>");
@@ -274,7 +347,7 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
         /**
          * Refresh all workspaces from server.
          */
-        refreshWorkspaces: refreshWorkspaces,
+        refreshWorkspaces: refreshAllWorkspaces,
 
         /**
          * Gets a Workspace model for the corresponding key.
