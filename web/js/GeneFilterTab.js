@@ -3,6 +3,16 @@ var GeneFilterTab = function () {
     // private variables
     var workspaceKey;
 
+    // initialize typeahead widget
+    var geneTypeahead = $('#gene_typeahead').typeahead({
+        source: new Array(),
+        updater: function (selection)
+        {
+            $('#gene_list').append("<option value='"+selection+"'>"+selection+"</option>");
+        }
+    });
+
+
     $('#reset_gene_list').click(function (e)
     {
         $('#gene_list').empty();
@@ -18,13 +28,7 @@ var GeneFilterTab = function () {
             dataType: "json",
             success: function(json)
             {
-                $('#gene_typeahead').typeahead({
-                    source: json,
-                    updater: function (selection)
-                    {
-                        $('#gene_list').append("<option value='"+selection+"'>"+selection+"</option>");
-                    }
-                });
+                geneTypeahead.data('typeahead').source = json;
             },
             error: function(jqXHR, textStatus)
             {
