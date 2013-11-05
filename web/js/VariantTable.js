@@ -140,11 +140,11 @@ var VariantTable = function (searchFilters) {
 
         var table = $('<table>').attr(
             {
-                id:      'variant_table',
-                class:   'table table-striped table-bordered',
-                border:   '0',
-                cellpadding: '0',
-                cellspacing: '0'
+                "id":           'variant_table',
+                "class":        'table table-striped table-bordered',
+                "border":       '0',
+                "cellpadding":  '0',
+                "cellspacing":  '0'
             });
 
         // remove previous table if present
