@@ -40,6 +40,21 @@ var WorkspaceController;
 
 $( document ).ready(function()
 {
+    //test for MSIE x.x;
+    if (/MSIE (\d+\.\d+);/.test(navigator.userAgent))
+    {
+        $('#getting_started_content').append($('#browser_not_supported_pane'));
+        $('#browser_not_supported_pane').toggle();
+
+        // end execution here
+        return;
+    }
+    else
+    {
+        $('#getting_started_content').append($('#welcome_pane'));
+        $('#welcome_pane').toggle();
+    }
+
     searchedView = new SearchedView(SEARCHED_FILTER_LIST);
 
     addFilterDialog = new AddFilterDialog(INFO_FILTER_LIST, SEARCHED_FILTER_LIST, SAMPLE_GROUP_LIST, PALLET_FILTER_LIST);
