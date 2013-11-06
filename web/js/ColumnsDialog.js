@@ -48,7 +48,7 @@ var ColumnsDialog = function (variantTable) {
         removeOne: function(variantTableCol)
         {
             // remove TR with corresponding filter ID from DOM
-            this.$("#" + filter.get("id")).remove();
+            this.$("#" + filter.get("id")+"_col_row").remove();
         },
 
         removeAll: function()
