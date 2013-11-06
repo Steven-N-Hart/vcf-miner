@@ -1,6 +1,22 @@
-var SampleFilterTab = function (sampleFilters) {
+var SampleFilterTab = function () {
 
     // private variables
+    var FILTER_MIN_ALT_READS   = new Filter({name: 'Min Alt Reads', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+    var FILTER_MIN_NUM_SAMPLES = new Filter({name: 'Min # Samples', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+    var FILTER_MAX_NUM_SAMPLES = new Filter({name: 'Max # Samples', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+    var FILTER_MIN_AC          = new Filter({name: 'Min AC',        operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+    var FILTER_MAX_AC          = new Filter({name: 'Max AC',        operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+    var FILTER_MIN_PHRED       = new Filter({name: 'Min Phred',     operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
+
+    var sampleFilters = new FilterList();
+    sampleFilters.add([
+        FILTER_MIN_ALT_READS,
+        FILTER_MIN_NUM_SAMPLES,
+        FILTER_MAX_NUM_SAMPLES,
+        FILTER_MIN_AC,
+        FILTER_MAX_AC,
+        FILTER_MIN_PHRED
+    ]);
 
     function reset()
     {
@@ -28,7 +44,7 @@ var SampleFilterTab = function (sampleFilters) {
     {
         // get selected filter
         var filterID = $('#sample_field_list').val();
-        var filter = PALLET_FILTER_LIST.findWhere({id: filterID});
+        var filter = sampleFilters.findWhere({id: filterID});
 
         // value DIV area
         var valueDiv = $("#sample_value_div");

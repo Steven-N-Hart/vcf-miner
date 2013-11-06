@@ -12,20 +12,12 @@ var WARNING_TEMPLATE;
 var WARNING_POPOVER_TEMPLATE;
 var ERROR_TEMPLATE;
 
+var FILTER_NONE            = new Filter({name: 'none',          operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'});
+
 // GLOBAL CONSTANT
 var MAX_RESULTS = 1000;
 
-// specific filters
-var FILTER_NONE            = new Filter({name: 'none',          operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'});
-var FILTER_MIN_ALT_READS   = new Filter({name: 'Min Alt Reads', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
-var FILTER_MIN_NUM_SAMPLES = new Filter({name: 'Min # Samples', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
-var FILTER_MAX_NUM_SAMPLES = new Filter({name: 'Max # Samples', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
-var FILTER_MIN_AC          = new Filter({name: 'Min AC',        operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
-var FILTER_MAX_AC          = new Filter({name: 'Max AC',        operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
-var FILTER_MIN_PHRED       = new Filter({name: 'Min Phred',     operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE});
-
 var SEARCHED_FILTER_LIST = new FilterList;
-var PALLET_FILTER_LIST = new FilterList;
 
 var INFO_FILTER_LIST = new FilterList;
 
@@ -57,7 +49,7 @@ $( document ).ready(function()
 
     searchedView = new SearchedView(SEARCHED_FILTER_LIST);
 
-    addFilterDialog = new AddFilterDialog(INFO_FILTER_LIST, SEARCHED_FILTER_LIST, SAMPLE_GROUP_LIST, PALLET_FILTER_LIST);
+    addFilterDialog = new AddFilterDialog(INFO_FILTER_LIST, SEARCHED_FILTER_LIST, SAMPLE_GROUP_LIST);
     $('#show_add_filter_dialog_button').click(function (e)
     {
         addFilterDialog.show();
@@ -140,10 +132,11 @@ function buildQuery(filterList, workspaceKey)
 
     query.workspace = workspaceKey;
 
-    var sampleGroups      = new Array();
-    var infoFlagFilters = new Array();
-    var infoNumberFilters = new Array();
-    var infoStringFilters = new Array();
+    var genes               = new Array();
+    var sampleGroups        = new Array();
+    var infoFlagFilters     = new Array();
+    var infoNumberFilters   = new Array();
+    var infoStringFilters   = new Array();
 
     // loop through filter collection
     _.each(filterList.models, function(filter)
@@ -176,37 +169,33 @@ function buildQuery(filterList, workspaceKey)
                 }
                 sampleGroups.push(group.toSampleGroupPOJO(workspaceKey, inSample));
                 break;
-            case FilterCategory.SAMPLE:
-                switch (filter.get("name"))
-                {
-                    case FILTER_MIN_ALT_READS.get("name"):
-                        query.minAltReads = filter.get("value");
-                        break;
-                    case FILTER_MIN_NUM_SAMPLES.get("name"):
-                        query.minNumSample = filter.get("value");
-                        break;
-                    case FILTER_MAX_NUM_SAMPLES.get("name"):
-                        query.maxNumSample = filter.get("value");
-                        break;
-                    case FILTER_MIN_AC.get("name"):
-                        query.minAC = filter.get("value");
-                        break;
-                    case FILTER_MAX_AC.get("name"):
-                        query.maxAC = filter.get("value");
-                        break;
-                    case FILTER_MIN_PHRED.get("name"):
-                        query.minPHRED = filter.get("value");
-                        break;
-                }
+            case FilterCategory.SAMPLE_MIN_ALT_READS:
+                query.minAltReads = filter.get("value");
+                break;
+            case FilterCategory.SAMPLE_MIN_NUM_SAMPLES:
+                query.minNumSample = filter.get("value");
+                break;
+            case FilterCategory.SAMPLE_MAX_NUM_SAMPLES:
+                query.maxNumSample = filter.get("value");
+                break;
+            case FilterCategory.SAMPLE_MIN_AC:
+                query.minAC = filter.get("value");
+                break;
+            case FilterCategory.SAMPLE_MAX_AC:
+                query.maxAC = filter.get("value");
+                break;
+            case FilterCategory.SAMPLE_MIN_PHRED:
+                query.minPHRED = filter.get("value");
                 break;
             case FilterCategory.GENE:
-                query.genes = filter.get("value");
+                genes = genes.concat(filter.get("value"));
                 break;
         }
     });
 
+    query.genes             = genes;
     query.sampleGroups      = sampleGroups;
-    query.infoFlagFilters = infoFlagFilters;
+    query.infoFlagFilters   = infoFlagFilters;
     query.infoNumberFilters = infoNumberFilters;
     query.infoStringFilters = infoStringFilters;
 
@@ -299,7 +288,6 @@ function setWorkspace(workspace)
     searchedView.setWorkspace(workspaceKey);
 
     // reset collections
-    PALLET_FILTER_LIST.reset();
     INFO_FILTER_LIST.reset();
     SEARCHED_FILTER_LIST.reset();
 
@@ -309,15 +297,6 @@ function setWorkspace(workspace)
     initWorkspaceScreen();
 
     $("#vcf_file").html("VCF File: " + workspace.get("alias"));
-
-    PALLET_FILTER_LIST.add([
-        FILTER_MIN_ALT_READS,
-        FILTER_MIN_NUM_SAMPLES,
-        FILTER_MAX_NUM_SAMPLES,
-        FILTER_MIN_AC,
-        FILTER_MAX_AC,
-        FILTER_MIN_PHRED
-    ]);
 
     loadSampleGroups(workspaceKey, SAMPLE_GROUP_LIST);
 

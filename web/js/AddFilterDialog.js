@@ -1,8 +1,8 @@
-var AddFilterDialog = function (infoFilters, searchedFilters, sampleGroups, sampleFilters) {
+var AddFilterDialog = function (infoFilters, searchedFilters, sampleGroups) {
 
     // private variables
     var workspaceKey;
-    var sampleFilterTab = new SampleFilterTab(sampleFilters);
+    var sampleFilterTab = new SampleFilterTab();
     var geneFilterTab   = new GeneFilterTab();
     var groupFilterTab  = new GroupFilterTab(sampleGroups);
     var infoFilterTab   = new InfoFilterTab(infoFilters);

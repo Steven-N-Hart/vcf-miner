@@ -1,14 +1,19 @@
 // ENUM
 var FilterCategory =
 {
-    UNKNOWN:    0,
-    SAMPLE:     1,
-    GENE:       2,
-    GROUP:      3,
-    INFO_INT:   4,
-    INFO_FLOAT: 5,
-    INFO_FLAG:  6,
-    INFO_STR:   7
+    UNKNOWN:                0,
+    SAMPLE_MIN_ALT_READS:   1,
+    SAMPLE_MIN_NUM_SAMPLES: 2,
+    SAMPLE_MAX_NUM_SAMPLES: 3,
+    SAMPLE_MIN_AC:          4,
+    SAMPLE_MAX_AC:          5,
+    SAMPLE_MIN_PHRED:       6,
+    GENE:                   7,
+    GROUP:                  8,
+    INFO_INT:               9,
+    INFO_FLOAT:             10,
+    INFO_FLAG:              11,
+    INFO_STR:               12
 }
 
 // ENUM
