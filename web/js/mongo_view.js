@@ -21,12 +21,15 @@ var SEARCHED_FILTER_LIST = new FilterList;
 
 var INFO_FILTER_LIST = new FilterList;
 
+var VARIANT_TABLE_COLUMNS   = new VariantTableColumnList();
+var VARIANT_TABLE_ROWS      = new VariantTableRowList();
+
 var searchedView;
 
 var SAMPLE_GROUP_LIST = new SampleGroupList();
 
 var addFilterDialog;
-var variantTable;
+var variantTableView;
 var columnsDialog;
 var WorkspaceController;
 
@@ -55,14 +58,24 @@ $( document ).ready(function()
         addFilterDialog.show();
     });
 
-    variantTable = new VariantTable(SEARCHED_FILTER_LIST);
+    new VariantTableColumnView({"model": VARIANT_TABLE_COLUMNS});
 
-    columnsDialog = new ColumnsDialog(variantTable);
-    // delegated event listener since the toolbar is added dynamically to a DataTable
-    $(document).on('click', '#columns_button', function()
-    {
-        columnsDialog.show();
-    });
+    variantTableView = new VariantTableDataView(
+        {
+            "el": $('#variant_table_div'),
+            "model": VARIANT_TABLE_ROWS,
+            "columns": VARIANT_TABLE_COLUMNS
+        }
+    );
+//    variantTableView.render();
+
+    // TODO: fixme
+//    columnsDialog = new ColumnsDialog(variantTable);
+//    // delegated event listener since the toolbar is added dynamically to a DataTable
+//    $(document).on('click', '#columns_button', function()
+//    {
+//        columnsDialog.show();
+//    });
 
     initTemplates();
 
@@ -228,8 +241,46 @@ function sendQuery(query, displayCols)
                 console.debug("Mongo Query: " + json.mongoQuery);
             }
 
+            // TODO:
             // populate the variant table
-            variantTable.addRows(json.results, displayCols);
+//            variantTable.addRows(json.results, displayCols);
+            VARIANT_TABLE_ROWS.reset();
+
+            var variants = json.results;
+            for (var i = 0; i < variants.length; i++)
+            {
+                var variant = variants[i];
+
+                // extract row values
+                var rowValues = new Array();
+
+                // loop through collection
+                _.each(VARIANT_TABLE_COLUMNS.models, function(col)
+                {
+                    var name = col.get("name");
+
+                    if (name.substring(0, 4) === 'INFO')
+                    {
+                        // INFO column
+                        var infoFieldName = col.get("displayName");
+                        var variantInfo = variant['INFO'];
+                        if(variantInfo[infoFieldName] !== undefined)
+                        {
+                            rowValues.push(variantInfo[infoFieldName]);
+                        }
+                        else
+                        {
+                            rowValues.push("");
+                        }
+                    }
+                    else
+                    {
+                        rowValues.push(variant[name]);
+                    }
+                });
+                VARIANT_TABLE_ROWS.add(new VariantTableRow({"values": rowValues}));
+            }
+            VARIANT_TABLE_ROWS.trigger("finalize");
 
             // update count on Filter
             // loop through filter collection
@@ -290,6 +341,7 @@ function setWorkspace(workspace)
     // reset collections
     INFO_FILTER_LIST.reset();
     SEARCHED_FILTER_LIST.reset();
+    VARIANT_TABLE_COLUMNS.reset();
 
     // update screens
     $("#getting_started").toggle(false);
@@ -322,25 +374,24 @@ function setWorkspace(workspace)
             // get the INFO field names sorted alphabetically
             var infoFieldNames = getSortedAttrNames(info);
 
-            var columns = new VariantTableColumnList();
             // standard 1st 7 VCF file columns
-            columns.add(new VariantTableColumn({visible:true,  name:'CHROM',  displayName:'CHROM',  description:'The chromosome.'}));
-            columns.add(new VariantTableColumn({visible:true,  name:'POS',    displayName:'POS',    description:'The reference position, with the 1st base having position 1.'}));
-            columns.add(new VariantTableColumn({visible:true,  name:'ID',     displayName:'ID',     description:'Semi-colon separated list of unique identifiers.'}));
-            columns.add(new VariantTableColumn({visible:true,  name:'REF',    displayName:'REF',    description:'The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).'}));
-            columns.add(new VariantTableColumn({visible:true,  name:'ALT',    displayName:'ALT',    description:'Comma separated list of alternate non-reference alleles called on at least one of the samples.'}));
-            columns.add(new VariantTableColumn({visible:false, name:'QUAL',   displayName:'QUAL',   description:'Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).'}));
-            columns.add(new VariantTableColumn({visible:false, name:'FILTER', displayName:'FILTER', description:'PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
+            VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'CHROM',  displayName:'CHROM',  description:'The chromosome.'}));
+            VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'POS',    displayName:'POS',    description:'The reference position, with the 1st base having position 1.'}));
+            VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'ID',     displayName:'ID',     description:'Semi-colon separated list of unique identifiers.'}));
+            VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'REF',    displayName:'REF',    description:'The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).'}));
+            VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'ALT',    displayName:'ALT',    description:'Comma separated list of alternate non-reference alleles called on at least one of the samples.'}));
+            VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:false, name:'QUAL',   displayName:'QUAL',   description:'Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).'}));
+            VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:false, name:'FILTER', displayName:'FILTER', description:'PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
 
-            columns.add(new VariantTableColumn({visible:true,  name:'GenotypePostitiveCount', displayName:'#_Samples', description:'The number of samples.'}));
-            columns.add(new VariantTableColumn({visible:true,  name:'GenotypePositiveList',  displayName:'Samples',   description:'The names of samples.'}));
+            VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'GenotypePostitiveCount', displayName:'#_Samples', description:'The number of samples.'}));
+            VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'GenotypePositiveList',  displayName:'Samples',   description:'The names of samples.'}));
 
 
             for (var i = 0; i < infoFieldNames.length; i++) {
                 var infoFieldName = infoFieldNames[i];
                 if (info.hasOwnProperty(infoFieldName))
                 {
-                    columns.add(new VariantTableColumn({visible:false,  name:'INFO.'+infoFieldName,  displayName:infoFieldName,   description:info[infoFieldName].Description}));
+                    VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:false,  name:'INFO.'+infoFieldName,  displayName:infoFieldName,   description:info[infoFieldName].Description}));
 
                     var infoFilter = new Filter();
                     infoFilter.set("name", infoFieldName);
@@ -367,8 +418,11 @@ function setWorkspace(workspace)
                 }
             }
 
+            // TODO:
+            variantTableView.render();
+//            initVariantTable();
             // rebuild the DataTables widget since columns have changed
-            variantTable.initialize(workspaceKey, columns);
+//            variantTable.initialize(workspaceKey, columns);
 
             var allSamples = new Array();
             for (var key in json.SAMPLES)
@@ -381,7 +435,8 @@ function setWorkspace(workspace)
             // sort alphabetically
             allSamples.sort(SortByName);
 
-            searchedView.setDisplayCols(variantTable.getVisibleColumns());
+            // TODO:
+//            searchedView.setDisplayCols(variantTable.getVisibleColumns());
 
             addFilterDialog.initialize(workspaceKey, allSamples);
 
@@ -393,4 +448,69 @@ function setWorkspace(workspace)
             $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
         }
     });
+
+    function initVariantTable()
+    {
+//        var table = $('<table>').attr(
+//            {
+//                "id":           'variant_table',
+//                "class":        'table table-striped table-bordered',
+//                "border":       '0',
+//                "cellpadding":  '0',
+//                "cellspacing":  '0'
+//            });
+
+        // remove previous table if present
+        $('#variant_table_div').empty();
+
+//        $('#variant_table_div').append(table);
+        $('#variant_table_div').append(variantTableView.el);
+
+        var aoColumns = new Array();
+        // loop through collection
+        _.each(VARIANT_TABLE_COLUMNS.models, function(displayCol)
+        {
+            aoColumns.push({ "sTitle":   displayCol.get("displayName") });
+        });
+
+        var sDom =
+            "<'row'<'pull-right'<'toolbar'>>>" +
+                "<'row'<'pull-left'l><'pull-right'i>>" +
+                "<'row't>" +
+                "<'row'<'pull-left'p>>";
+
+        var dataTable = $('#variant_table').dataTable( {
+            "sDom": sDom,
+            "aoColumns": aoColumns,
+            'aaData':    [],
+            "bDestroy":  true,
+            "iDisplayLength": 25,
+            "bAutoWidth": true,
+            "sScrollX": "100%",
+            "bScrollCollapse": true
+// TODO:
+//            "fnHeaderCallback": function( nHead, aData, iStart, iEnd, aiDisplay )
+//            {
+//                // set tooltip 'title' attribute for all TH elements that correspond to visible columns
+//                var colIdx = 0;
+//                _.each(getVisibleColumns().models, function(column)
+//                {
+//                    $('th:eq('+ colIdx +')', nHead).attr('title', column.get("description"));
+//                    colIdx++;
+//                });
+//
+//            }
+        });
+
+        var toolbar = $("#table_toolbar").clone();
+        $("div .toolbar").append(toolbar);
+
+        // set visibility
+        var colIdx = 0;
+        _.each(VARIANT_TABLE_COLUMNS.models, function(col)
+        {
+            var isVisible = col.get("visible");
+            $('#variant_table').dataTable().fnSetColumnVis(colIdx++, isVisible);
+        });
+    }
 }
