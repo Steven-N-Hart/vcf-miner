@@ -30,7 +30,6 @@ var SAMPLE_GROUP_LIST = new SampleGroupList();
 
 var addFilterDialog;
 var variantTableView;
-var columnsDialog;
 var WorkspaceController;
 
 $( document ).ready(function()
@@ -67,15 +66,6 @@ $( document ).ready(function()
             "columns": VARIANT_TABLE_COLUMNS
         }
     );
-//    variantTableView.render();
-
-    // TODO: fixme
-//    columnsDialog = new ColumnsDialog(variantTable);
-//    // delegated event listener since the toolbar is added dynamically to a DataTable
-//    $(document).on('click', '#columns_button', function()
-//    {
-//        columnsDialog.show();
-//    });
 
     initTemplates();
 
@@ -418,11 +408,7 @@ function setWorkspace(workspace)
                 }
             }
 
-            // TODO:
             variantTableView.render();
-//            initVariantTable();
-            // rebuild the DataTables widget since columns have changed
-//            variantTable.initialize(workspaceKey, columns);
 
             var allSamples = new Array();
             for (var key in json.SAMPLES)
@@ -448,69 +434,4 @@ function setWorkspace(workspace)
             $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
         }
     });
-
-    function initVariantTable()
-    {
-//        var table = $('<table>').attr(
-//            {
-//                "id":           'variant_table',
-//                "class":        'table table-striped table-bordered',
-//                "border":       '0',
-//                "cellpadding":  '0',
-//                "cellspacing":  '0'
-//            });
-
-        // remove previous table if present
-        $('#variant_table_div').empty();
-
-//        $('#variant_table_div').append(table);
-        $('#variant_table_div').append(variantTableView.el);
-
-        var aoColumns = new Array();
-        // loop through collection
-        _.each(VARIANT_TABLE_COLUMNS.models, function(displayCol)
-        {
-            aoColumns.push({ "sTitle":   displayCol.get("displayName") });
-        });
-
-        var sDom =
-            "<'row'<'pull-right'<'toolbar'>>>" +
-                "<'row'<'pull-left'l><'pull-right'i>>" +
-                "<'row't>" +
-                "<'row'<'pull-left'p>>";
-
-        var dataTable = $('#variant_table').dataTable( {
-            "sDom": sDom,
-            "aoColumns": aoColumns,
-            'aaData':    [],
-            "bDestroy":  true,
-            "iDisplayLength": 25,
-            "bAutoWidth": true,
-            "sScrollX": "100%",
-            "bScrollCollapse": true
-// TODO:
-//            "fnHeaderCallback": function( nHead, aData, iStart, iEnd, aiDisplay )
-//            {
-//                // set tooltip 'title' attribute for all TH elements that correspond to visible columns
-//                var colIdx = 0;
-//                _.each(getVisibleColumns().models, function(column)
-//                {
-//                    $('th:eq('+ colIdx +')', nHead).attr('title', column.get("description"));
-//                    colIdx++;
-//                });
-//
-//            }
-        });
-
-        var toolbar = $("#table_toolbar").clone();
-        $("div .toolbar").append(toolbar);
-
-        // set visibility
-        var colIdx = 0;
-        _.each(VARIANT_TABLE_COLUMNS.models, function(col)
-        {
-            var isVisible = col.get("visible");
-            $('#variant_table').dataTable().fnSetColumnVis(colIdx++, isVisible);
-        });
-    }
 }

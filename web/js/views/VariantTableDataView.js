@@ -4,19 +4,6 @@
  */
 var VariantTableDataView = Backbone.View.extend({
 
-//    tagName:    "table",
-//
-//    id:         "variant_table",
-//
-//    className:  "table table-striped table-bordered",
-//
-//    attributes:
-//    {
-//        "border"        : "0",
-//        "cellpadding"   : "0",
-//        "cellspacing"   : "0"
-//    },
-
     /**
      * Called when the view is first created
      *
@@ -70,46 +57,27 @@ var VariantTableDataView = Backbone.View.extend({
             "bAutoWidth": true,
             "sScrollX": "100%",
             "bScrollCollapse": true,
-            "fnInitComplete": function(oSettings, json)
-            {
-                console.log("fnInitComplete() called");
-            },
             "fnHeaderCallback": function( nHead, aData, iStart, iEnd, aiDisplay )
             {
                 // set tooltip 'title' attribute for all TH elements that correspond to visible columns
                 var colIdx = 0;
-                _.each(that.options.columns.models, function(col)
+                _.each(that.getVisibleColumns().models, function(col)
                 {
-                    if (col.get("visible"))
-                    {
-                        $('th:eq('+ colIdx +')', nHead).attr('title', col.get("description"));
-                        colIdx++;
-                    }
+                    $('th:eq('+ colIdx +')', nHead).attr('title', col.get("description"));
+                    colIdx++;
                 });
 
             }
         });
 
-        // TODO:
-        console.log("setting up toolbar");
-
         var toolbar = $("#table_toolbar").clone();
         this.$('.toolbar').append(toolbar);
-//        $("div .toolbar").append(toolbar);
-//        this.$el.append(toolbar);
 
-//        var test1 = $('div .toolbar');
-//        var test2 = $('.toolbar');
-//
-//        var test4 = $('.toolbar', this.$el);
-
-        // set visibility
-        var colIdx = 0;
-        _.each(this.options.columns.models, function(col)
+        // make all columns invisible by default
+        for (var colIdx in this.options.columns.models)
         {
-            var isVisible = col.get("visible");
-            $('#variant_table').dataTable().fnSetColumnVis(colIdx++, isVisible);
-        });
+            this.$('#variant_table').dataTable().fnSetColumnVis(colIdx++, false);
+        }
     },
 
     /**
@@ -118,6 +86,14 @@ var VariantTableDataView = Backbone.View.extend({
     drawTable: function()
     {
         this.$('#variant_table').dataTable().fnDraw();
+
+        // set visibility
+        var colIdx = 0;
+        _.each(this.options.columns.models, function(col)
+        {
+            var isVisible = col.get("visible");
+            this.$('#variant_table').dataTable().fnSetColumnVis(colIdx++, isVisible);
+        });
     },
 
     /**
@@ -170,13 +146,17 @@ var VariantTableDataView = Backbone.View.extend({
         var moreText = ''
         for (var i = 0; i < value.length; i++)
         {
-            moreText += value[i] + ' ';
+            moreText += value[i] + '<br>';
         }
 
         var collapseAnchorHTML = '<a class="collapse" data-row-id="' + rowID + '" data-col-id="' + colID + '">collapse</a>';
 
-        // update HTML content of the <TD> tag
-        anchor.parent().html(' <div>' + moreText + ' ' + collapseAnchorHTML + '</div>');
+        var display = ' <div>' + moreText + ' ' + collapseAnchorHTML + '</div>';
+
+        // update cell
+        var trElement = anchor.parents('tr')[0]; // find ancestor <TR> element that contains the anchor
+        this.$('#variant_table').dataTable().fnUpdate(display, trElement, colID, false);
+        this.$('#variant_table').dataTable().fnStandingRedraw()
     },
 
     /**
@@ -197,7 +177,10 @@ var VariantTableDataView = Backbone.View.extend({
 
         var collapseAnchorHTML = '<a class="collapse" data-row-id="' + rowID + '" data-col-id="' + colID + '">'+value+'</a>';
 
-        anchor.parent().html('<div>' + collapseAnchorHTML + '</div>');
+        // update cell
+        var trElement = anchor.parents('tr')[0]; // find ancestor <TR> element that contains the anchor
+        this.$('#variant_table').dataTable().fnUpdate(collapseAnchorHTML, trElement, colID, false);
+        this.$('#variant_table').dataTable().fnStandingRedraw()
     },
 
     /**
@@ -218,8 +201,10 @@ var VariantTableDataView = Backbone.View.extend({
         var p = anchor.parent();
         var display = this.getDisplayValue(variantTableRow, colID);
 
-        // replace div with original expand anchor
-        anchor.parent().replaceWith(this.getDisplayValue(variantTableRow, colID));
+        // update cell
+        var trElement = anchor.parents('tr')[0]; // find ancestor <TR> element that contains the anchor
+        this.$('#variant_table').dataTable().fnUpdate(display, trElement, colID, false);
+        this.$('#variant_table').dataTable().fnStandingRedraw()
     },
 
     /**
