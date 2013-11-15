@@ -32,8 +32,27 @@ var VariantTableDataView = Backbone.View.extend({
         "click #columns_button":  "configColumns"
     },
 
+    prepForDelete: function()
+    {
+        this.$('#variant_table').dataTable().fnDestroy();
+    },
+
     render: function()
     {
+        // remove previous table if present
+        this.$el.empty();
+
+        // construct a new HTML table and add to DOM
+        var table = $('<table>').attr(
+            {
+                "id":           'variant_table',
+                "class":        'table table-striped table-bordered',
+                "border":       '0',
+                "cellpadding":  '0',
+                "cellspacing":  '0'
+            });
+        this.$el.append(table);
+
         var aoColumns = new Array();
         // loop through collection
         _.each(this.options.columns.models, function(displayCol)

@@ -29,8 +29,8 @@ var searchedView;
 var SAMPLE_GROUP_LIST = new SampleGroupList();
 
 var addFilterDialog;
-var variantTableView;
 var WorkspaceController;
+var variantTableView;
 
 $( document ).ready(function()
 {
@@ -58,14 +58,6 @@ $( document ).ready(function()
     });
 
     new VariantTableColumnView({"model": VARIANT_TABLE_COLUMNS});
-
-    variantTableView = new VariantTableDataView(
-        {
-            "el": $('#variant_table_div'),
-            "model": VARIANT_TABLE_ROWS,
-            "columns": VARIANT_TABLE_COLUMNS
-        }
-    );
 
     initTemplates();
 
@@ -332,6 +324,22 @@ function setWorkspace(workspace)
     INFO_FILTER_LIST.reset();
     SEARCHED_FILTER_LIST.reset();
     VARIANT_TABLE_COLUMNS.reset();
+
+    // destroy old view
+    if (typeof variantTableView !== "undefined")
+    {
+        variantTableView.prepForDelete();
+        variantTableView.remove();
+    }
+
+    // create a new view for variant table
+    variantTableView = new VariantTableDataView(
+        {
+            "model": VARIANT_TABLE_ROWS,
+            "columns": VARIANT_TABLE_COLUMNS
+        }
+    );
+    $('#variant_table_div').append(variantTableView.el);
 
     // update screens
     $("#getting_started").toggle(false);
