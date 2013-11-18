@@ -29,6 +29,18 @@ var CreateGroupDialog = function (sampleGroups) {
         });
     });
 
+    $('#remove_sample_from_group_button').click(function (e)
+    {
+        $('#group_samples_list option:selected').each(function()
+        {
+            var sampleName = $(this).val();
+            availableSamplesList.append("<option value='"+sampleName+"'>" + sampleName + "</option>");
+
+            // remove option from available list
+            $(this).remove();
+        });
+    });
+
     /**
      * Create a new group
      */
