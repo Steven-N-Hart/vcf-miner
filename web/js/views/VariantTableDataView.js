@@ -338,29 +338,5 @@ var VariantTableDataView = Backbone.View.extend({
         );
 
         dialog.render();
-    },
-
-    /**
-     * Callback triggered by the DataTables widget when the header is being drawn.
-     *
-     * @param nHead
-     * @param aData
-     * @param iStart
-     * @param iEnd
-     * @param aiDisplay
-     */
-    headerCallback: function( nHead, aData, iStart, iEnd, aiDisplay )
-    {
-        // set tooltip 'title' attribute for all TH elements that correspond to visible columns
-        var colIdx = 0;
-        _.each(this.options.columns.models, function(column)
-        {
-            if (col.get("visible"))
-            {
-                $('th:eq('+ colIdx +')', nHead).attr('title', column.get("description"));
-                colIdx++;
-            }
-        });
-
     }
 });
