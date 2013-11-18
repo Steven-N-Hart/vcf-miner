@@ -32,11 +32,6 @@ var VariantTableDataView = Backbone.View.extend({
         "click #columns_button":  "configColumns"
     },
 
-    prepForDelete: function()
-    {
-        this.$('#variant_table').dataTable().fnDestroy();
-    },
-
     render: function()
     {
         // remove previous table if present
@@ -57,7 +52,12 @@ var VariantTableDataView = Backbone.View.extend({
         // loop through collection
         _.each(this.options.columns.models, function(displayCol)
         {
-            aoColumns.push({ "sTitle":   displayCol.get("displayName") });
+            aoColumns.push(
+                {
+                    "sTitle":   displayCol.get("displayName"),
+                    "bVisible": displayCol.get("visible")
+                }
+            );
         });
 
         var sDom =
@@ -91,12 +91,6 @@ var VariantTableDataView = Backbone.View.extend({
 
         var toolbar = $("#table_toolbar").clone();
         this.$('.toolbar').append(toolbar);
-
-        // make all columns invisible by default
-        for (var colIdx in this.options.columns.models)
-        {
-            this.$('#variant_table').dataTable().fnSetColumnVis(colIdx++, false);
-        }
     },
 
     /**
@@ -105,14 +99,6 @@ var VariantTableDataView = Backbone.View.extend({
     drawTable: function()
     {
         this.$('#variant_table').dataTable().fnDraw();
-
-        // set visibility
-        var colIdx = 0;
-        _.each(this.options.columns.models, function(col)
-        {
-            var isVisible = col.get("visible");
-            this.$('#variant_table').dataTable().fnSetColumnVis(colIdx++, isVisible);
-        });
     },
 
     /**

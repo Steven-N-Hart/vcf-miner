@@ -328,7 +328,6 @@ function setWorkspace(workspace)
     // destroy old view
     if (typeof variantTableView !== "undefined")
     {
-        variantTableView.prepForDelete();
         variantTableView.remove();
     }
 
