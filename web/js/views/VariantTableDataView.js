@@ -291,11 +291,14 @@ var VariantTableDataView = Backbone.View.extend({
 
         // add attribute returnFields
         var returnFields = new Array();
+        var displayFields = new Array();
         _.each(this.getVisibleColumns().models, function(visibleCol)
         {
             returnFields.push(visibleCol.get("name"));
+            displayFields.push(visibleCol.get("displayName"));
         });
         query.returnFields = returnFields;
+        query.displayFields = displayFields;
 
         var jsonStr = JSON.stringify(query)
 
