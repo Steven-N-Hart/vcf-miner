@@ -335,7 +335,9 @@ function setWorkspace(workspace)
     variantTableView = new VariantTableDataView(
         {
             "model": VARIANT_TABLE_ROWS,
-            "columns": VARIANT_TABLE_COLUMNS
+            "columns": VARIANT_TABLE_COLUMNS,
+            "filters": SEARCHED_FILTER_LIST,
+            "workspaceKey": workspaceKey
         }
     );
     $('#variant_table_div').append(variantTableView.el);
