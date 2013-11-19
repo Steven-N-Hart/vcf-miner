@@ -80,6 +80,11 @@ var InfoFilterTab = function (filters) {
         var opList = $("#info_operator_list");
         // clear operator list
         opList.empty();
+
+        var includeNullsHTML =
+            "<div class='row-fluid'><h4>OR</h4></div>"+
+            "<div class='row-fluid checkbox'><label><input type='checkbox' id='include_nulls'> Variant does not have this INFO field.</label></div>";
+
         switch (filter.get("category"))
         {
             case FilterCategory.INFO_FLAG:
@@ -99,7 +104,8 @@ var InfoFilterTab = function (filters) {
                 opList.append(OPTION_LT);
                 opList.append(OPTION_LTEQ);
                 opList.append(OPTION_NE);
-                valueDiv.append("<input class='input-mini' type='number' value='0'>");
+                valueDiv.append("<div class='row-fluid'><input class='input-mini' type='number' value='0'></div>");
+                valueDiv.append(includeNullsHTML);
                 break;
             case FilterCategory.INFO_FLOAT:
                 opList.append(OPTION_EQ);
@@ -108,13 +114,15 @@ var InfoFilterTab = function (filters) {
                 opList.append(OPTION_LT);
                 opList.append(OPTION_LTEQ);
                 opList.append(OPTION_NE);
-                valueDiv.append("<input class='input-mini' type='number' step='any' value='0.0'>");
+                valueDiv.append("<div class='row-fluid'><input class='input-mini' type='number' step='any' value='0.0'></div>");
+                valueDiv.append(includeNullsHTML);
                 break;
             case FilterCategory.INFO_STR:
                 opList.append(OPTION_EQ);
                 opList.append(OPTION_NE);
 
-                valueDiv.append("<div class='dropdown' id='info_field_dropdown_checkbox'></div>");
+                valueDiv.append("<div class='row-fluid'><div class='dropdown' id='info_field_dropdown_checkbox'></div></div>");
+                valueDiv.append(includeNullsHTML);
 
                 // dynamically query to populate dropdown
                 var fieldName = filter.get("name");
@@ -154,6 +162,7 @@ var InfoFilterTab = function (filters) {
                 });
                 break;
         }
+
     }
 
     // public API
@@ -195,6 +204,7 @@ var InfoFilterTab = function (filters) {
                 case FilterCategory.INFO_INT:
                 case FilterCategory.INFO_FLOAT:
                     filter.set("value", $("#info_value_div input").val());
+                    filter.set("includeNulls", $("#include_nulls").is(':checked'));
                     break;
                 case FilterCategory.INFO_STR:
                     var filter = filters.findWhere({id: filterID});
@@ -206,6 +216,7 @@ var InfoFilterTab = function (filters) {
                         valueArr.push(checkedVals[i].label);
                     }
                     filter.set("value", valueArr);
+                    filter.set("includeNulls", $("#include_nulls").is(':checked'));
                     break;
             };
 

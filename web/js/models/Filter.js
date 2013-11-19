@@ -47,13 +47,29 @@ var Filter = Backbone.Model.extend({
         {
             for (var i = 0; i < value.length; i++)
             {
-                displayValue += value[i] + ' ';
+                if (i > 0)
+                    displayValue += '<h5 class="text-center">OR</h5>';
+                displayValue += '<div class="text-center">' + value[i] + '</div>';
             }
         }
         else
         {
             displayValue = value;
         }
+
+        // check if we need to display whether nulls will be included
+        switch(this.get("category"))
+        {
+            case FilterCategory.INFO_FLOAT:
+            case FilterCategory.INFO_INT:
+            case FilterCategory.INFO_STR:
+                if (this.get("includeNulls"))
+                {
+                    displayValue += ' <h5 class="text-center">OR</h5><div class="text-center"><i>NOT PRESENT</i></div>';
+                }
+                break;
+        }
+
         this.set("displayValue", $.trim(displayValue));
 
         var displayOperator;
@@ -150,6 +166,7 @@ var Filter = Backbone.Model.extend({
                 break;
         }
         pojo.comparator = comparator;
+        pojo.includeNulls = this.get("includeNulls");
 
         return pojo;
     },
@@ -188,6 +205,7 @@ var Filter = Backbone.Model.extend({
                 break;
         }
         pojo.comparator = comparator;
+        pojo.includeNulls = this.get("includeNulls");
 
         return pojo;
     },
@@ -202,7 +220,8 @@ var Filter = Backbone.Model.extend({
             displayValue:    "NA", // may be abbreviated
             numMatches:      0,
             category:        FilterCategory.UNKNOWN,
-            id:              guid()
+            id:              guid(),
+            includeNulls:    false
         };
     }
 });
