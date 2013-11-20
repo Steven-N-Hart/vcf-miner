@@ -47,14 +47,12 @@ var Filter = Backbone.Model.extend({
         {
             for (var i = 0; i < value.length; i++)
             {
-                if (i > 0)
-                    displayValue += '<h5 class="text-center">OR</h5>';
-                displayValue += '<div class="text-center">' + value[i] + '</div>';
+                displayValue += '<div class="text-left">' + value[i] + '</div>';
             }
         }
         else
         {
-            displayValue = value;
+            displayValue = '<div class="text-left">' + value + '</div>';
         }
 
         // check if we need to display whether nulls will be included
@@ -65,7 +63,7 @@ var Filter = Backbone.Model.extend({
             case FilterCategory.INFO_STR:
                 if (this.get("includeNulls"))
                 {
-                    displayValue += ' <h5 class="text-center">OR</h5><div class="text-center"><i>NOT PRESENT</i></div>';
+                    displayValue += '<div class="text-left">+null</div>';
                 }
                 break;
         }

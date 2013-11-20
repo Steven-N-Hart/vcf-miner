@@ -82,8 +82,7 @@ var InfoFilterTab = function (filters) {
         opList.empty();
 
         var includeNullsHTML =
-            "<div class='row-fluid'><h4>OR</h4></div>"+
-            "<div class='row-fluid checkbox'><label><input type='checkbox' id='include_nulls'> Variant does not have this INFO field.</label></div>";
+            "<div class='row-fluid checkbox'><label><input type='checkbox' id='include_nulls'> Keep variants with missing annotation (+null)</label></div>";
 
         switch (filter.get("category"))
         {
