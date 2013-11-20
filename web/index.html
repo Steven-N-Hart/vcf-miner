@@ -72,12 +72,13 @@
     <script id="workspaces-template" type="text/template">
         <span class="label"><td><%=alias%></td></span>
         <span class="label"><td><%=displayStatus%></td></span>
-        <td>
+        <span class="label"><td style="white-space:nowrap;"><%=date%></td></span>
+        <td style="white-space:nowrap;">
             <% if (displayStatus == 'Available') { %>
-                <button id="<%=id%>_load_button" title="Load" type="button" class="btn btn-mini"><i class="icon-play"></i></button>
+            <button id="<%=id%>_load_button" title="Load" type="button" class="btn btn-mini"><i class="icon-play"></i></button>
             <% } %>
             <% if ((displayStatus == 'Available') || (displayStatus == 'Failed')) { %>
-                <button id="<%=id%>_delete_button" title="Delete" type="button" class="btn btn-mini"><i class="icon-remove"></i></button>
+            <button id="<%=id%>_delete_button" title="Delete" type="button" class="btn btn-mini"><i class="icon-remove"></i></button>
             <% } %>
         </td>
     </script>
@@ -445,28 +446,30 @@
 <!-- GETTING STARTED -->
 <div id="welcome_pane" class="hide">
     <div class="row-fluid">
-        <div class="span3"></div>
-        <div class="span6 text-center">
-            <h1>Welcome!</h1>
-            <h3>Get started by loading a VCF File with the <button type="button" class="btn btn-mini"><i class="icon-play"></i></button>  button.</h3>
+        <div class="span12">
+            <div class="text-center">
+                <h1>Welcome!</h1>
+                <h3>Get started by loading a VCF File with the <button type="button" class="btn btn-mini"><i class="icon-play"></i></button>  button.</h3>
+            </div>
         </div>
-        <div class="span3"></div>
     </div>
     <div class="row-fluid">
-        <div class="span3"></div>
-        <div class="span6">
-            <div class="well">
+        <div class="span2"></div>
+        <div class="span8">
+            <div class="well text-center">
                 <ul id="workspaces_pane" class="nav nav-list">
-                    <div class="nav-header"><h4>VCF Files</h4></div>
+                    <div class="nav-header text-left"><h4>VCF Files</h4></div>
                     <div id="workspaces_view">
                         <table class="table" id="workspaces_table">
                             <tr>
                                 <th>Name</th>
                                 <th>Status</th>
+                                <th>Date</th>
                                 <th></th>
                             </tr>
                             <tr id="add_workspace_row">
                                 <td><button title="Import a new VCF File into the system" class="btn btn-primary" onclick="$('#add_workspace_modal').modal();">Import VCF File</button></td>
+                                <td></td>
                                 <td></td>
                                 <td></td>
                             </tr>
@@ -475,7 +478,7 @@
                 </ul>
             </div>
         </div>
-        <div class="span3"></div>
+        <div class="span2"></div>
     </div>
 </div>
 

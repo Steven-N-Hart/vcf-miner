@@ -172,6 +172,7 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
                             {
                                 console.log("updating status for key " + key);
                                 ws.set("status", json[attr].ready);
+                                ws.set("date", getDateString(json[attr].timestamp));
 
                                 if ((ws.get("status") == ReadyStatus.READY) ||
                                     (ws.get("status") == ReadyStatus.FAILED))
@@ -225,6 +226,8 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
                             ws.set("alias", json[attr].alias);
                             ws.set("user",  user);
                             ws.set("status", json[attr].ready);
+                            ws.set("date", getDateString(json[attr].timestamp));
+
                             workspaces.add(ws);
 
                             if ((ws.get("status") == ReadyStatus.NOT_READY) && ($.inArray(ws.get("key"), notReadyKeys) == -1))
@@ -241,6 +244,17 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
                 }
             });
         }
+    }
+
+    function getDateString(timestamp)
+    {
+        var dateStr = '';
+        if (typeof timestamp !== "undefined")
+        {
+            var date = new Date(timestamp);
+            dateStr = date.toLocaleString();
+        }
+        return dateStr;
     }
 
     /**

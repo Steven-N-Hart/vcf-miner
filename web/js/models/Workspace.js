@@ -11,11 +11,12 @@ var Workspace = Backbone.Model.extend({
     defaults: function()
     {
         return {
+            date:   null,
             key:    "NA",
             alias:  "NA",
             user:   "NA",
             status: ReadyStatus.UNKNOWN,
-            id:      guid()
+            id:     guid()
         };
     }
 });
