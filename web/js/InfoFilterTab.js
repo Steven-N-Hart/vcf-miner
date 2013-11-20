@@ -184,7 +184,12 @@ var InfoFilterTab = function (filters) {
         {
             // get selected filter
             var filterID = $('#info_field_list').val();
-            var filter = filters.findWhere({id: filterID});
+
+            // make a new identical copy of the model (because the same model can be added multiple times).
+            var filter = filters.findWhere({id: filterID}).clone();
+
+            // assign new uid
+            filter.set("id", guid());
 
             var valueDiv = $("#info_value_div");
             switch (filter.get("category"))
