@@ -12,10 +12,29 @@ var CreateGroupDialog = function (sampleGroups) {
     var availableSamplesList = $('#available_samples_list');
     var groupSamplesList = $('#group_samples_list');
 
-    $('#new_group_apply').click(function()
-    {
-        create();
-    });
+    // jQuery validate plugin config
+    $('#create_group_form').validate(
+        {
+            rules:
+            {
+                group_name_field:
+                {
+                    required: true,
+                    minlength: 1
+                }
+            },
+            submitHandler: function(form) {
+                create();
+                $('#create_group_modal').modal('hide')
+            },
+            highlight: function(element) {
+                $(element).closest('.control-group').removeClass('success').addClass('error');
+            },
+            success: function(element) {
+                element.closest('.control-group').removeClass('error').addClass('success');
+            }
+        }
+    );
 
     $('#add_sample_to_group_button').click(function (e)
     {

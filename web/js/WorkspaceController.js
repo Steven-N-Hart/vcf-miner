@@ -249,11 +249,11 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
     function getDateString(timestamp)
     {
         var dateStr = '';
-        if (typeof timestamp !== "undefined")
-        {
-            var date = new Date(timestamp);
-            dateStr = date.toLocaleString();
-        }
+//        if (typeof timestamp !== "undefined")
+//        {
+//            var date = new Date(timestamp);
+//            dateStr = date.toLocaleString();
+//        }
         return dateStr;
     }
 

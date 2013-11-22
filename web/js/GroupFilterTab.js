@@ -2,6 +2,9 @@ var GroupFilterTab = function (sampleGroups) {
 
     // private variables
     var groupList = $('#group_list');
+    var count = $('#group_sample_count');
+    var list = $('#group_sample_names_list');
+
     var view;
     var createGroupDialog = new CreateGroupDialog(sampleGroups);
 
@@ -15,47 +18,27 @@ var GroupFilterTab = function (sampleGroups) {
     {
         var group = getSelectedGroup();
 
-        groupList.popover(
-            {
-                animation:  true,
-                html:       true,
-                placement: 'bottom',
-                title:      getGroupPopoverTitle(group),
-                content:    getGroupPopoverContent(group)
-            }
-        );
-
-        groupList.popover('show');
+        updateGroupInfo(group);
     });
 
-    function getGroupPopoverTitle(group)
+    function updateGroupInfo(group)
     {
-        var numSamples = group.get("sampleNames").length;
-        var title =  'This group has <b>' + numSamples + '</b>';
+        count.empty();
+        list.empty();
 
-        if (numSamples == 1)
+        if (typeof group !== 'undefined')
         {
-            title += " sample";
-        } else
-        {
-            title += " samples";
+            count.append('Number of samples: <b>' + group.get("sampleNames").length) + '</b>';
+
+
+            var listHTML = '<select size="8">';
+            for (var i=0; i < group.get("sampleNames").length; i++)
+            {
+                listHTML += "<option>" + group.get("sampleNames")[i] + "</option>";
+            }
+            listHTML += '</select>';
+            list.append(listHTML);
         }
-
-        return title + "<button type='button' id='close' class='close' onclick=\"$('#group_list').popover('destroy');\">&times;</button>";
-    }
-
-    function getGroupPopoverContent(group)
-    {
-        var html = "";
-
-        html += "<select size='8'>";
-        for (var i=0; i < group.get("sampleNames").length; i++)
-        {
-            html += "<option>" + group.get("sampleNames")[i] + "</option>";
-        }
-        html += "</select>";
-
-        return html;
     }
 
     function getSelectedGroup()
@@ -65,15 +48,11 @@ var GroupFilterTab = function (sampleGroups) {
 
         var id = groupOption.val();
 
-        for (var i = 0; i < sampleGroups.models.length; i++)
-        {
-            var group = sampleGroups.models[i];
-            if (id == group.get("id"))
-            {
-                console.debug("user selected group with id=" + id + " name=" + group.get("name"));
-                return group;
-            }
-        }
+        var group = sampleGroups.findWhere({id: id})
+
+        console.debug("user selected group with id=" + id + " name=" + group.get("name"));
+
+        return group;
     }
 
     /**
@@ -124,6 +103,7 @@ var GroupFilterTab = function (sampleGroups) {
 
             // auto-select the added one
             $("#group_list option[value='"+ group.get("id") +"']").prop('selected',true);
+            updateGroupInfo(group);
         },
 
         removeOne: function(group)
@@ -135,6 +115,8 @@ var GroupFilterTab = function (sampleGroups) {
         removeAll: function()
         {
             this.$el.empty();
+            count.empty();
+            list.empty();
         }
     });
 
