@@ -13,6 +13,34 @@ var GroupFilterTab = function (sampleGroups) {
         createGroupDialog.show();
     });
 
+    // add custom validation method for the group drowdown to make sure a group
+    // is selected
+    jQuery.validator.addMethod("checkGroup", function(value, element) {
+        if (typeof getSelectedGroup() === 'undefined')
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }, "");
+
+    // jQuery validate plugin config
+    $('#group_tab_form').validate(
+        {
+            rules:
+            {
+                group_list: {
+                    checkGroup: true
+                }
+            },
+
+            // disable default error placement
+            errorPlacement: function(error, element) {}
+        }
+    );
+
     // selection in group list selection has changed or clicked on
     groupList.change(function()
     {
@@ -48,9 +76,10 @@ var GroupFilterTab = function (sampleGroups) {
 
         var id = groupOption.val();
 
-        var group = sampleGroups.findWhere({id: id})
+        var group = sampleGroups.findWhere({id: id});
 
-        console.debug("user selected group with id=" + id + " name=" + group.get("name"));
+        if (typeof group !== 'undefined')
+            console.debug("user selected group with id=" + id + " name=" + group.get("name"));
 
         return group;
     }
@@ -135,6 +164,16 @@ var GroupFilterTab = function (sampleGroups) {
         initialize: function(ws, allSampleNames)
         {
             createGroupDialog.initialize(ws, allSampleNames);
+
+            this.validate();
+        },
+
+        /**
+         * Performs validation on the user's current selections/entries.
+         */
+        validate: function()
+        {
+            return groupList.valid();
         },
 
         /**

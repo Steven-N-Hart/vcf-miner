@@ -33,7 +33,8 @@ var AddFilterDialog = function (infoFilters, searchedFilters, sampleGroups) {
                 break;
 
             case "tab_content_group":
-                filter = groupFilterTab.getFilter();
+                if (groupFilterTab.validate())
+                    filter = groupFilterTab.getFilter();
                 break;
 
             case "tab_content_info":
@@ -41,9 +42,13 @@ var AddFilterDialog = function (infoFilters, searchedFilters, sampleGroups) {
                 break;
         }
 
-        filter.setFilterDisplay();
-        searchedFilters.add(filter);
-        $("#add_filter_close").click();
+        if (typeof filter !== 'undefined')
+        {
+            filter.setFilterDisplay();
+            searchedFilters.add(filter);
+            $("#add_filter_close").click();
+            $('#add_filter_modal').modal('hide')
+        }
     }
 
     function reset()
