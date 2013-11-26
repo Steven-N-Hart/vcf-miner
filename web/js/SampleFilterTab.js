@@ -27,10 +27,10 @@ var SampleFilterTab = function () {
                 }
             },
             highlight: function(element) {
-                $(element).closest('.control-group').removeClass('success').addClass('error');
+                $(element).closest('.control-group').addClass('error');
             },
             success: function(element) {
-                element.closest('.control-group').removeClass('error').addClass('success');
+                element.closest('.control-group').removeClass('error');
             }
         }
     );
