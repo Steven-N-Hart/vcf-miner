@@ -274,35 +274,37 @@
                             </form>
                         </div>
                         <div class="tab-pane" id="tab_content_gene"> <!-- GENE tab -->
-                            <div class="container-fluid">
-                                <div class="row-fluid"> <!-- header row -->
-                                    <div class="span2"><h4>Filter</h4></div>
-                                    <div class="span10"><h4>Value</h4></div>
-                                </div>
-                                <div class="row-fluid"> <!-- divider -->
-                                    <div class="span12"><hr></div>
-                                </div>
-                                <div class="row-fluid">
-                                    <div class="span2">Gene</div>
-                                    <div class="span10">
-                                        <div class="row-fluid">
-                                            <div class="span12">
-                                                <input id="gene_typeahead" type="text" data-provide="typeahead" autocomplete="off" placeholder="<Enter Gene Name>">
+                            <form id="gene_tab_form" action="">
+                                <div class="container-fluid">
+                                    <div class="row-fluid"> <!-- header row -->
+                                        <div class="span2"><h4>Filter</h4></div>
+                                        <div class="span10"><h4>Value</h4></div>
+                                    </div>
+                                    <div class="row-fluid"> <!-- divider -->
+                                        <div class="span12"><hr></div>
+                                    </div>
+                                    <div class="row-fluid">
+                                        <div class="span2">Gene</div>
+                                        <div class="span10">
+                                            <div class="row-fluid">
+                                                <div class="span12">
+                                                    <input id="gene_typeahead" type="text" data-provide="typeahead" autocomplete="off" placeholder="<Enter Gene Name>">
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="row-fluid">
-                                            <div class="span12">
-                                                <select id="gene_list" size="10" multiple="multiple"></select>
+                                            <div class="row-fluid">
+                                                <div class="span12 control-group">
+                                                    <select id="gene_list" name="gene_list" size="10" multiple="multiple"></select>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="row-fluid">
-                                            <div class="span12">
-                                                <button id="reset_gene_list" title="Remove all rows">Reset</button>
+                                            <div class="row-fluid">
+                                                <div class="span12">
+                                                    <button id="reset_gene_list" title="Remove all rows">Reset</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                         <div class="tab-pane" id="tab_content_group"> <!-- GROUP tab -->
                             <form id="group_tab_form" action="">

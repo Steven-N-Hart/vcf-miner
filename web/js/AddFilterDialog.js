@@ -30,7 +30,8 @@ var AddFilterDialog = function (infoFilters, searchedFilters, sampleGroups) {
                 break;
 
             case "tab_content_gene":
-                filter = geneFilterTab.getFilter();
+                if (geneFilterTab.validate())
+                    filter = geneFilterTab.getFilter();
                 break;
 
             case "tab_content_group":

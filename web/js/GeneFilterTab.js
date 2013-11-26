@@ -18,6 +18,38 @@ var GeneFilterTab = function () {
         $('#gene_list').empty();
     });
 
+    // add custom validation method for the gene list to make sure at least 1 is there
+    jQuery.validator.addMethod("checkGenes", function(value, element) {
+        if ($('#gene_list option').length > 0)
+        {
+            return true;
+        }
+        else
+        {
+            console.log("not valid");
+            return false;
+        }
+    }, "At least 1 Gene must be added");
+
+    // jQuery validate plugin config
+    $('#gene_tab_form').validate(
+        {
+            rules:
+            {
+                gene_list: {
+                    checkGenes: true
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.control-group').addClass('error');
+            },
+            success: function(element) {
+                element.closest('.control-group').removeClass('error');
+            }
+        }
+    );
+
+
     function reset()
     {
         $('#gene_list').empty();
@@ -49,6 +81,14 @@ var GeneFilterTab = function () {
         {
             workspaceKey = ws;
             reset();
+        },
+
+        /**
+         * Performs validation on the user's current selections/entries.
+         */
+        validate: function()
+        {
+            return $('#gene_tab_form').valid();
         },
 
         /**
