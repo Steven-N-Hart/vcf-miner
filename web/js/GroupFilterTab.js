@@ -164,8 +164,6 @@ var GroupFilterTab = function (sampleGroups) {
         initialize: function(ws, allSampleNames)
         {
             createGroupDialog.initialize(ws, allSampleNames);
-
-            this.validate();
         },
 
         /**

@@ -18,6 +18,23 @@ var SampleFilterTab = function () {
         FILTER_MIN_PHRED
     ]);
 
+    // jQuery validate plugin config
+    $('#sample_tab_form').validate({
+            rules: {
+                sample_filter_value: {
+                    required: true,
+                    number:true
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.control-group').removeClass('success').addClass('error');
+            },
+            success: function(element) {
+                element.closest('.control-group').removeClass('error').addClass('success');
+            }
+        }
+    );
+
     function reset()
     {
         var sampleFieldList = $('#sample_field_list');
@@ -51,7 +68,7 @@ var SampleFilterTab = function () {
         // clear div value area
         valueDiv.empty();
 
-        valueDiv.append("<input class='input-mini' type='number' value='0'>");
+        valueDiv.append("<input name='sample_filter_value' class='input-mini' value='0'>");
     }
 
     // public API
@@ -62,6 +79,14 @@ var SampleFilterTab = function () {
         initialize: function()
         {
             reset();
+        },
+
+        /**
+         * Performs validation on the user's current selections/entries.
+         */
+        validate: function()
+        {
+            return $('#sample_tab_form').valid();
         },
 
         /**

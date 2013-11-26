@@ -25,7 +25,8 @@ var AddFilterDialog = function (infoFilters, searchedFilters, sampleGroups) {
         switch(tabId)
         {
             case "tab_content_sample":
-                filter = sampleFilterTab.getFilter();
+                if (sampleFilterTab.validate())
+                    filter = sampleFilterTab.getFilter();
                 break;
 
             case "tab_content_gene":
