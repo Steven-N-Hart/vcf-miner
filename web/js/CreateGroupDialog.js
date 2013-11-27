@@ -28,10 +28,10 @@ var CreateGroupDialog = function (sampleGroups) {
                 $('#create_group_modal').modal('hide')
             },
             highlight: function(element) {
-                $(element).closest('.control-group').removeClass('success').addClass('error');
+                $(element).parent().addClass('control-group error');
             },
             success: function(element) {
-                element.closest('.control-group').removeClass('error').addClass('success');
+                $(element).parent().removeClass('control-group error');
             }
         }
     );

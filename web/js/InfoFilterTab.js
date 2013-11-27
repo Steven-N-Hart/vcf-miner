@@ -15,6 +15,29 @@ var InfoFilterTab = function (filters) {
     // initialize the file input field
     $(":file").filestyle({buttonText: ''});
 
+    // jQuery validate plugin config
+    $('#info_tab_form').validate(
+        {
+            rules:
+            {
+                int_field_value: {
+                    required: true,
+                    integer: true
+                },
+                float_field_value: {
+                    required: true,
+                    number: true
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('control-group error');
+            },
+            success: function(element) {
+                $(element).parent().removeClass('control-group error');
+            }
+        }
+    );
+
     var ListView = Backbone.View.extend({
 
         initialize: function()
@@ -60,6 +83,17 @@ var InfoFilterTab = function (filters) {
     });
 
     /**
+     * Gets the currently selected Filter model.
+     *
+     * @returns {*}
+     */
+    function getSelectedFilter()
+    {
+        var filterID = $('#info_field_list').val();
+        return INFO_FILTER_LIST.findWhere({id: filterID});
+    }
+
+    /**
      * Dynamically alters the tab's "operator" and "value" areas based on
      * the selected INFO field.
      *
@@ -68,8 +102,7 @@ var InfoFilterTab = function (filters) {
     function infoFieldChanged(workspaceKey)
     {
         // get selected filter
-        var filterID = $('#info_field_list').val();
-        var filter = INFO_FILTER_LIST.findWhere({id: filterID});
+        var filter = getSelectedFilter();
 
         // value DIV area
         var valueDiv = $("#info_value_div");
@@ -103,7 +136,8 @@ var InfoFilterTab = function (filters) {
                 opList.append(OPTION_LT);
                 opList.append(OPTION_LTEQ);
                 opList.append(OPTION_NE);
-                valueDiv.append("<div class='row-fluid'><input class='input-mini' type='number' value='0'></div>");
+                valueDiv.append("<div class='row-fluid' id='value_div'><input name='int_field_value' class='input-mini' value='0'></div>");
+                valueDiv.append("<div class='row-fluid'><div class='span12'><hr></div></div>");
                 valueDiv.append(includeNullsHTML);
                 break;
             case FilterCategory.INFO_FLOAT:
@@ -113,14 +147,16 @@ var InfoFilterTab = function (filters) {
                 opList.append(OPTION_LT);
                 opList.append(OPTION_LTEQ);
                 opList.append(OPTION_NE);
-                valueDiv.append("<div class='row-fluid'><input class='input-mini' type='number' step='any' value='0.0'></div>");
+                valueDiv.append("<div class='row-fluid' id='value_div'><input name='float_field_value' class='input-mini' step='any' value='0.0'></div>");
+                valueDiv.append("<div class='row-fluid'><div class='span12'><hr></div></div>");
                 valueDiv.append(includeNullsHTML);
                 break;
             case FilterCategory.INFO_STR:
                 opList.append(OPTION_EQ);
                 opList.append(OPTION_NE);
 
-                valueDiv.append("<div class='row-fluid'><div class='dropdown' id='info_field_dropdown_checkbox'></div></div>");
+                valueDiv.append("<div class='row-fluid'><div class='dropdown' id='info_field_dropdown_checkbox' name='str_field_value'></div></div>");
+                valueDiv.append("<div class='row-fluid'><div class='span12'><hr></div></div>");
                 valueDiv.append(includeNullsHTML);
 
                 // dynamically query to populate dropdown
@@ -162,6 +198,8 @@ var InfoFilterTab = function (filters) {
                 break;
         }
 
+        // re-validate since form has changed
+        $('#info_tab_form').valid();
     }
 
     // public API
@@ -173,6 +211,35 @@ var InfoFilterTab = function (filters) {
         setWorkspace: function(ws)
         {
             workspaceKey = ws;
+        },
+
+        /**
+         * Performs validation on the user's current selections/entries.
+         */
+        validate: function()
+        {
+            var filter = getSelectedFilter();
+
+            switch (filter.get("category"))
+            {
+                case FilterCategory.INFO_STR:
+                    var numChecked = $("#info_field_dropdown_checkbox").dropdownCheckbox("checked").length;
+                    if(numChecked > 0)
+                    {
+                        $("#info_field_value_validation_warning").remove();
+                        return true;
+                    }
+                    else
+                    {
+                        if ($("#info_field_value_validation_warning").length == 0)
+                            $("#info_value_div").append('<div class="row-fluid" id="info_field_value_validation_warning"><div class="alert alert-error">At least 1 string should be checked.</div></div>');
+
+                        return false;
+                    }
+                    break
+                default:
+                    return $('#info_tab_form').valid();
+            }
         },
 
         /**

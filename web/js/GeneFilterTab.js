@@ -26,7 +26,6 @@ var GeneFilterTab = function () {
         }
         else
         {
-            console.log("not valid");
             return false;
         }
     }, "At least 1 Gene must be added");
@@ -41,11 +40,11 @@ var GeneFilterTab = function () {
                 }
             },
             highlight: function(element) {
-                $(element).closest('.control-group').addClass('error');
+                $(element).parent().addClass('control-group error');
             },
             success: function(element) {
-                element.closest('.control-group').removeClass('error');
-            }
+                $(element).parent().removeClass('control-group error');
+            },
         }
     );
 

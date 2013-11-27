@@ -16,15 +16,19 @@ var GroupFilterTab = function (sampleGroups) {
     // add custom validation method for the group drowdown to make sure a group
     // is selected
     jQuery.validator.addMethod("checkGroup", function(value, element) {
+
         if (typeof getSelectedGroup() === 'undefined')
         {
+//            if ($("#group_field_value_validation_warning").length == 0)
+//                $("#group_value_div").append('<div class="row-fluid" id="group_field_value_validation_warning"><label>A group must be selected.</label></div>');
             return false;
         }
         else
         {
+//            $("#group_field_value_validation_warning").remove();
             return true;
         }
-    }, "");
+    }, "A group must be selected.");
 
     // jQuery validate plugin config
     $('#group_tab_form').validate(
@@ -34,10 +38,7 @@ var GroupFilterTab = function (sampleGroups) {
                 group_list: {
                     checkGroup: true
                 }
-            },
-
-            // disable default error placement
-            errorPlacement: function(error, element) {}
+            }
         }
     );
 
@@ -133,12 +134,14 @@ var GroupFilterTab = function (sampleGroups) {
             // auto-select the added one
             $("#group_list option[value='"+ group.get("id") +"']").prop('selected',true);
             updateGroupInfo(group);
+            validate();
         },
 
         removeOne: function(group)
         {
             // remove element with corresponding group ID from DOM
             this.$("#" + group.get("id")).remove();
+            validate();
         },
 
         removeAll: function()
@@ -146,10 +149,16 @@ var GroupFilterTab = function (sampleGroups) {
             this.$el.empty();
             count.empty();
             list.empty();
+            validate();
         }
     });
 
     view = new ListView();
+
+    function validate()
+    {
+        return groupList.valid();
+    }
 
     // public API
     return {
@@ -169,10 +178,7 @@ var GroupFilterTab = function (sampleGroups) {
         /**
          * Performs validation on the user's current selections/entries.
          */
-        validate: function()
-        {
-            return groupList.valid();
-        },
+        validate: validate,
 
         /**
          * Gets the selected filter.

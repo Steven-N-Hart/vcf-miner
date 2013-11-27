@@ -40,7 +40,8 @@ var AddFilterDialog = function (infoFilters, searchedFilters, sampleGroups) {
                 break;
 
             case "tab_content_info":
-                filter = infoFilterTab.getFilter();
+                if (infoFilterTab.validate())
+                    filter = infoFilterTab.getFilter();
                 break;
         }
 
