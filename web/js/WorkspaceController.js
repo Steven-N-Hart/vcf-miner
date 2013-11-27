@@ -251,8 +251,7 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
         var dateStr = '';
         if (typeof timestamp !== "undefined")
         {
-            var date = new Date(timestamp);
-            dateStr = date.toLocaleString();
+            dateStr = moment(timestamp).format('MM/DD/YYYY h:mm A'); ;
         }
         return dateStr;
     }
