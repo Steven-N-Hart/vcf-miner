@@ -2,7 +2,7 @@
 <html lang="us">
 <head>
 	<meta charset="utf-8">
-	<title>Mongo View</title>
+	<title>VCF-Miner</title>
 
     <link rel="stylesheet" type="text/css" href="jquery.layout-1.3.0/css/layout-default-latest.css">
     <link rel="stylesheet" type="text/css" href="jquery.layout-1.3.0/css/complex.css">
@@ -61,6 +61,13 @@
         .selectwidth100Percent
         {
             width:100% !important;
+        }
+
+        #watermark{
+            background-image: url(img/vcf-miner.png);
+            background-repeat:no-repeat;
+            width: 535px;
+            height: 600px;
         }
     </style>
 
@@ -466,40 +473,52 @@
 
 <!-- GETTING STARTED -->
 <div id="welcome_pane" class="hide">
-    <div class="row-fluid">
+    <div class="row">
         <div class="span12">
-            <div class="text-center">
-                <h1>Welcome!</h1>
-                <h3>Get started by loading a VCF File with the <button type="button" class="btn btn-mini"><i class="icon-play"></i></button>  button.</h3>
+            <div class="row-fluid">
+                <div class="span12">
+                    <table>
+                        <tr>
+                            <td>
+                                <div class="text-center">
+                                    <h1>Welcome!</h1>
+                                    <h3>Get started by loading a VCF File with the <button type="button" class="btn btn-mini"><i class="icon-play"></i></button>  button.</h3>
+                                </div>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="text-center">
+                                    <ul id="workspaces_pane" class="nav nav-list">
+                                        <div class="nav-header text-left"><h4>VCF Files</h4></div>
+                                        <div id="workspaces_view">
+                                            <table class="table" id="workspaces_table">
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Status</th>
+                                                    <th>Date</th>
+                                                    <th></th>
+                                                </tr>
+                                                <tr id="add_workspace_row">
+                                                    <td><button title="Import a new VCF File into the system" class="btn btn-primary" onclick="$('#add_workspace_modal').modal();">Import VCF File</button></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div id=watermark></div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="row-fluid">
-        <div class="span2"></div>
-        <div class="span8">
-            <div class="well text-center">
-                <ul id="workspaces_pane" class="nav nav-list">
-                    <div class="nav-header text-left"><h4>VCF Files</h4></div>
-                    <div id="workspaces_view">
-                        <table class="table" id="workspaces_table">
-                            <tr>
-                                <th>Name</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th></th>
-                            </tr>
-                            <tr id="add_workspace_row">
-                                <td><button title="Import a new VCF File into the system" class="btn btn-primary" onclick="$('#add_workspace_modal').modal();">Import VCF File</button></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </table>
-                    </div>
-                </ul>
-            </div>
-        </div>
-        <div class="span2"></div>
     </div>
 </div>
 
@@ -531,15 +550,8 @@
 <div id="getting_started">
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
-            <div class="container-fluid">
-                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="brand" href="#">Mongo View</a>
-                <img src="img/bull-graphic.png" style="height: 40px; width: 60px;">
-            </div>
+            <img class="pull-left" src="img/miner_only.png" style="height: 60px; width: 75px;">
+            <a class="brand" href="#">VCF-Miner</a>
         </div>
     </div>
 
@@ -555,13 +567,8 @@
         <div class="navbar navbar-inverse navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container-fluid">
-                    <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="brand" href="#">Mongo View</a>
-                    <img src="img/bull-graphic.png" width="60" height="50">
+                    <img class="pull-left" src="img/miner_only.png" style="height: 60px; width: 75px;">
+                    <a class="brand" href="#">VCF-Miner</a>
                     <ul class="nav pull-right">
                         <li id="vcf_file" class="navbar-text"></li>
                     </ul>
