@@ -25,9 +25,6 @@ var VariantTableDataView = Backbone.View.extend({
      */
     events:
     {
-        "click .expand-array"  :  "expandArray",
-        "click .expand-string" :  "expandString",
-        "click .collapse"      :  "collapse",
         "click #export_button" :  "download",
         "click #columns_button":  "configColumns"
     },
@@ -62,7 +59,7 @@ var VariantTableDataView = Backbone.View.extend({
 
         var sDom =
             "<'row'<'pull-right'<'toolbar'>>>" +
-                "<'row'<'pull-left'l><'pull-right'i>>" +
+                "R<'row'<'pull-left'l><'pull-right'i>>" +
                 "<'row't>" +
                 "<'row'<'pull-left'p>>";
 
@@ -73,8 +70,7 @@ var VariantTableDataView = Backbone.View.extend({
             'aaData':    [],
             "bDestroy":  true,
             "iDisplayLength": 25,
-            "bAutoWidth": true,
-            "sScrollX": "100%",
+            "bAutoWidth": false,
             "bScrollCollapse": true,
             "fnHeaderCallback": function( nHead, aData, iStart, iEnd, aiDisplay )
             {
@@ -130,89 +126,6 @@ var VariantTableDataView = Backbone.View.extend({
     },
 
     /**
-     * Expands the cell from showing only the 1ST array entry to showing
-     * each array item on a separate line.
-     *
-     * @param e
-     *      jQuery event
-     */
-    expandArray: function(e)
-    {
-        var anchor = $(e.currentTarget);
-        var rowID = anchor.attr('data-row-id');
-        var colID = anchor.attr('data-col-id');
-
-        var variantTableRow = this.model.findWhere({id: rowID});
-        var value = variantTableRow.get("values")[colID];
-
-        var displayValue = '';
-
-        // expansion has each array item separated by whitespace
-        var moreText = ''
-        for (var i = 0; i < value.length; i++)
-        {
-            moreText += value[i] + '<br>';
-        }
-
-        var collapseAnchorHTML = '<a class="collapse" data-row-id="' + rowID + '" data-col-id="' + colID + '">collapse</a>';
-
-        var display = ' <div>' + moreText + ' ' + collapseAnchorHTML + '</div>';
-
-        // update cell
-        var trElement = anchor.parents('tr')[0]; // find ancestor <TR> element that contains the anchor
-        this.$('#variant_table').dataTable().fnUpdate(display, trElement, colID, false);
-        this.$('#variant_table').dataTable().fnStandingRedraw()
-    },
-
-    /**
-     * Expands the cell from showing only the 1ST X chacaters to showing all the
-     * characters as a collapsing link.
-     *
-     * @param e
-     *      jQuery event
-     */
-    expandString: function(e)
-    {
-        var anchor = $(e.currentTarget);
-        var rowID = anchor.attr('data-row-id');
-        var colID = anchor.attr('data-col-id');
-
-        var variantTableRow = this.model.findWhere({id: rowID});
-        var value = variantTableRow.get("values")[colID];
-
-        var collapseAnchorHTML = '<a class="collapse" data-row-id="' + rowID + '" data-col-id="' + colID + '">'+value+'</a>';
-
-        // update cell
-        var trElement = anchor.parents('tr')[0]; // find ancestor <TR> element that contains the anchor
-        this.$('#variant_table').dataTable().fnUpdate(collapseAnchorHTML, trElement, colID, false);
-        this.$('#variant_table').dataTable().fnStandingRedraw()
-    },
-
-    /**
-     * Collapses the expanded cell.
-     *
-     * @param e
-     *      The jQuery event
-     */
-    collapse: function(e)
-    {
-        var anchor = $(e.currentTarget);
-        var rowID = anchor.attr('data-row-id');
-        var colID = anchor.attr('data-col-id');
-
-        var variantTableRow = this.model.findWhere({id: rowID});
-        var value = variantTableRow.get("values")[colID];
-
-        var p = anchor.parent();
-        var display = this.getDisplayValue(variantTableRow, colID);
-
-        // update cell
-        var trElement = anchor.parents('tr')[0]; // find ancestor <TR> element that contains the anchor
-        this.$('#variant_table').dataTable().fnUpdate(display, trElement, colID, false);
-        this.$('#variant_table').dataTable().fnStandingRedraw()
-    },
-
-    /**
      * Marks up obj with HTML to get a nice looking display value for a single DataTables cell.
      *
      * @param variantTableRow
@@ -234,29 +147,14 @@ var VariantTableDataView = Backbone.View.extend({
 
         if (value instanceof Array)
         {
-            if (value.length > 0)
+            for (var i = 0; i < value.length; i++)
             {
-                displayValue = value[0];
-            }
-            if (value.length > 1)
-            {
-                var left = value.length - 1;
-                var expandAnchor = '<a class="expand-array" data-row-id="' + rowID + '" data-col-id="' + colID + '" title="Show remaining '+ left +'">...</a>';
-                displayValue += expandAnchor;
+                displayValue += value[i] + ' ';
             }
         }
         else
         {
-            var MAX_LENGTH = 15;
-            if (value.length > MAX_LENGTH)
-            {
-                var expandAnchor = '<a class="expand-string" data-row-id="' + rowID + '" data-col-id="' + colID + '" title="Show remaining characters">...</a>';
-                displayValue = '<div>' + value.substr(0, MAX_LENGTH) + expandAnchor + "</div>";
-            }
-            else
-            {
-                displayValue = value;
-            }
+            displayValue = value;
         }
 
         return displayValue;
