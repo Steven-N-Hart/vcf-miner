@@ -16,123 +16,24 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
     users.push('steve');
     users.push('dan');
 
-    // listen for import workspace button presses
-    $('#import_workspace_button').click(function (e)
-    {
-        addWorkspace();
-    });
-
     // array of workspace keys that should be updated automatically
     var notReadyKeys = new Array();
     var TIMER_INTERVAL = 10000; // 10 seconds
     setInterval(updateNotReadyWorkspaces, TIMER_INTERVAL);
 
-    /**
-     * Single row in table.
-     * @type {*}
-     */
-    var RowView = Backbone.View.extend({
-
-        tagName: "tr",
-
-        template: _.template($('#workspaces-template').html()),
-
-        initialize: function()
-        {
-            this.listenTo(this.model, 'change', this.render);
-        },
-
-        render: function()
-        {
-            // set id
-            $(this.el).attr('id', this.model.get("id"));
-
-            $(this.el).attr('type', 'data_row');
-
-            this.model.set("displayStatus", getDisplayStatus(this.model));
-
-            this.$el.html(this.template(this.model.toJSON()));
-            return this;
-        }
-    });
-
-    /**
-     * Overall view for entire table.  Contains a nested view per row.
-     * @type {*}
-     */
-    var TableView = Backbone.View.extend({
-
-        el: $("#workspaces_view"),
-
-        initialize: function()
-        {
-            this.listenTo(workspaces, 'add',    this.addOne);
-            this.listenTo(workspaces, 'remove', this.removeOne);
-            this.listenTo(workspaces, 'reset',  this.removeAll);
-        },
-
-        render: function()
-        {
-        },
-
-        addOne: function(workspace)
-        {
-            var view = new RowView({model: workspace});
-
-            // add right before the Add Filter button row
-            $("#add_workspace_row").before(view.render().el);
-
-            // register event listeners
-            $(document).on('click', '#' + workspace.get("id") + '_load_button', function()
-            {
-                // move the workspaces pane
-                movePane();
-
-                fnSetWorkspaceCallback(workspace);
-            });
-            $(document).on('click', '#' + workspace.get("id") + '_delete_button', function()
-            {
-                deleteWorkspace(workspace);
-            });
-        },
-
-        removeOne: function(workspace)
-        {
-            // remove element with corresponding group ID from DOM
-            $("#" + workspace.get("id")).remove();
-        },
-
-        removeAll: function()
-        {
-            // remove all rows except for the add button row
-            this.$("tr[type='data_row']").each(function() {
-                $( this ).remove();
-            });
-        }
-    });
-
-    view = new TableView();
-
-    /**
-     * Gets human readable display status for the given workspace.
-     *
-     * @param workspace
-     * @returns {string}
-     */
-    function getDisplayStatus(workspace)
+    $('#import_workspace_button').click(function()
     {
-        switch(workspace.get("status"))
+        addWorkspace();
+    });
+
+    new WorkspaceTableView(
         {
-            case ReadyStatus.NOT_READY:
-                return "Processing";
-            case ReadyStatus.READY:
-                return "Available";
-            case ReadyStatus.FAILED:
-                return "Failed";
-            default:
-                return "NA";
+            "el": $('#workspaces_table_div'),
+            "model": workspaces,
+            "fnSetWorkspaceCallback": fnSetWorkspaceCallback,
+            "fnDeleteWorkspaceCallback": deleteWorkspace
         }
-    }
+    );
 
     /**
      * Move workspaces pane from getting_started screen to workspace screen
@@ -246,16 +147,6 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
         }
     }
 
-    function getDateString(timestamp)
-    {
-        var dateStr = '';
-        if (typeof timestamp !== "undefined")
-        {
-            dateStr = moment(timestamp).format('MM/DD/YYYY h:mm A'); ;
-        }
-        return dateStr;
-    }
-
     /**
      * Uploads a VCF to the server to create a new workspace.
      */
@@ -340,12 +231,13 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
 
         console.debug("Deleting working with name=" + workspace.get("alias") + " and key=" + workspaceKey);
 
+        var that = this;
         $.ajax({
             type: "DELETE",
             url: "/mongo_svr/ve/delete_workspace/" + workspaceKey,
             success: function(json)
             {
-                workspaces.remove(workspace);
+                that.model.remove(workspace);
             },
             error: function(jqXHR, textStatus)
             {
@@ -353,6 +245,17 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
             }
         });
     }
+
+    function getDateString(timestamp)
+    {
+        var dateStr = '';
+        if (typeof timestamp !== "undefined")
+        {
+            dateStr = moment(timestamp).format('MM/DD/YYYY h:mm A'); ;
+        }
+        return dateStr;
+    }
+
 
     // public API
     return {

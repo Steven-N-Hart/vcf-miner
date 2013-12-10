@@ -81,20 +81,6 @@
         <td><span class="badge badge-info" id="<%=id%>_num_matches_label"><%=numMatches%></span></td>
         <td><button id="<%=id%>_remove_button" title="Remove filter from your search" type="button" class="btn btn-mini" onclick="removeFilter('<%=id%>')"><i class="icon-remove"></i></button></td>
     </script>
-
-    <script id="workspaces-template" type="text/template">
-        <span class="label"><td><%=alias%></td></span>
-        <span class="label"><td><%=displayStatus%></td></span>
-        <span class="label"><td style="white-space:nowrap;"><%=date%></td></span>
-        <td style="white-space:nowrap;">
-            <% if (displayStatus == 'Available') { %>
-            <button id="<%=id%>_load_button" title="Load" type="button" class="btn btn-mini"><i class="icon-play"></i></button>
-            <% } %>
-            <% if ((displayStatus == 'Available') || (displayStatus == 'Failed')) { %>
-            <button id="<%=id%>_delete_button" title="Delete" type="button" class="btn btn-mini"><i class="icon-remove"></i></button>
-            <% } %>
-        </td>
-    </script>
     <script id="config-variant-table-col-template" type="text/template">
         <tr id='<%=id%>_col_row' type='data_row'>
             <td><input data-col-id='<%=id%>' class="input-mini toggle-visibility" type="checkbox" checked="true"/></td>
@@ -153,6 +139,8 @@
     <script src="js/models/Workspace.js" type="text/javascript"></script>
     <script src="js/collections/WorkspaceList.js" type="text/javascript"></script>
     <script src="js/WorkspaceController.js" type="text/javascript"></script>
+    <script src="js/views/WorkspaceTableView.js" type="text/javascript"></script>
+    <script src="js/views/WorkspaceTableRowView.js" type="text/javascript"></script>
 
     <script src="js/models/Filter.js" type="text/javascript"></script>
     <script src="js/collections/FilterList.js" type="text/javascript"></script>
@@ -483,41 +471,37 @@
                     <table>
                         <tr>
                             <td>
-                                <div class="text-center">
-                                    <h1>Welcome!</h1>
-                                    <h3>Get started by loading a VCF File with the <button type="button" class="btn btn-mini"><i class="icon-play"></i></button>  button.</h3>
+                                <div class="well">
+                                    <h3>Getting started:</h3>
+                                    <table>
+                                        <tr>
+                                            <td>1.</td>
+                                            <td><button title="Import a new VCF File into the system" class="btn btn-primary" onclick="$('#add_workspace_modal').modal();">Import</button> a new VCF File</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2.</td>
+                                            <td>Load an existing VCF File in the list below</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td><h3></h3></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td><div class="pull-right" id="workspaces_table_div"></div></td>
+                                        </tr>
+                                    </table>
                                 </div>
                             </td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="text-center">
-                                    <ul id="workspaces_pane" class="nav nav-list">
-                                        <div class="nav-header text-left"><h4>VCF Files</h4></div>
-                                        <div id="workspaces_view">
-                                            <table class="table" id="workspaces_table">
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <th>Status</th>
-                                                    <th>Date</th>
-                                                    <th></th>
-                                                </tr>
-                                                <tr id="add_workspace_row">
-                                                    <td><button title="Import a new VCF File into the system" class="btn btn-primary" onclick="$('#add_workspace_modal').modal();">Import VCF File</button></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </ul>
-                                </div>
-                            </td>
-                            <td>
+                            <td class="pull-right">
                                 <div id=watermark></div>
                             </td>
                         </tr>
+                        <!--<tr>-->
+                            <!--<td>-->
+                                <!--<div id="workspaces_table_div"></div>-->
+                            <!--</td>-->
+                        <!--</tr>-->
                     </table>
                 </div>
             </div>
@@ -605,8 +589,6 @@
                 </div>
             </ul>
         </div>
-
-        <div id="workspaces_placeholder" class="well sidebar-nav"></div>
     </div>
 
     <!-- CENTER -->

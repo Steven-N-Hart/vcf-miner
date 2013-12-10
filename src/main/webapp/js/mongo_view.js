@@ -24,6 +24,8 @@ var INFO_FILTER_LIST = new FilterList;
 var VARIANT_TABLE_COLUMNS   = new VariantTableColumnList();
 var VARIANT_TABLE_ROWS      = new VariantTableRowList();
 
+var WORKSPACES = new WorkspaceList();
+
 var searchedView;
 
 var SAMPLE_GROUP_LIST = new SampleGroupList();
@@ -60,6 +62,8 @@ $( document ).ready(function()
     new VariantTableColumnView({"model": VARIANT_TABLE_COLUMNS});
 
     initTemplates();
+
+    new VariantTableColumnView({"model": VARIANT_TABLE_COLUMNS});
 
     workspaceController = new WorkspaceController(setWorkspace);
     workspaceController.refreshWorkspaces();
