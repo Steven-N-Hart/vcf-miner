@@ -43,27 +43,27 @@ var WorkspaceTableRowView = Backbone.View.extend({
     {
         var id = workspace.get("id");
         var actionHtml;
+        var loadButtonHtml = '<button id="'+id+'_load_button" class="btn" aria-hidden="true">Load</button>';
+        var deleteButtonHtml = '<button id="'+id+'_delete_button" class="btn" aria-hidden="true">Delete</button>';
         switch(workspace.get("status"))
         {
             case ReadyStatus.READY:
-                actionHtml = '<div style="white-space:nowrap;">' +
-                    '<button id="'+id+'_load_button" title="Load" type="button" class="btn btn-mini"><i class="icon-play"></i></button>' +
-                    '<button id="'+id+'_delete_button" title="Delete" type="button" class="btn btn-mini"><i class="icon-remove"></i></button>' +
-                    '</div>';
-
+                actionHtml = '<div style="white-space:nowrap;">' + loadButtonHtml + deleteButtonHtml + '</div>';
                 break;
             case ReadyStatus.FAILED:
-                actionHtml =
-                    '<button id="'+id+'_delete_button" title="Delete" type="button" class="btn btn-mini"><i class="icon-remove"></i></button>';
+                actionHtml = deleteButtonHtml;
                 break;
             default:
                 actionHtml = '';
         }
 
+        var alias = workspace.get("alias");
+        var aliasHtml = "<div class='ellipsis' title='"+alias+"'>"+alias+"</div>";
+
         var aaDataRow =
         {
             "DT_RowId": workspace.get("id"),
-            "0": workspace.get("alias"),
+            "0": aliasHtml,
             "1": this.getDisplayStatus(workspace),
             "2": workspace.get("date"),
             "3": actionHtml
