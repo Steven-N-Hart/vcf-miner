@@ -6,6 +6,12 @@
  * To change this template use File | Settings | File Templates.
  */
 
+var SETTINGS =
+{
+    maxFilteredVariants: 1000,
+    popupDuration: 3 // seconds
+};
+
 // GLOBAL: templates for showing messages to user in designated message area
 var INFO_TEMPLATE;
 var WARNING_TEMPLATE;
@@ -13,9 +19,6 @@ var WARNING_POPOVER_TEMPLATE;
 var ERROR_TEMPLATE;
 
 var FILTER_NONE            = new Filter({name: 'none',          operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'});
-
-// GLOBAL CONSTANT
-var MAX_RESULTS = 1000;
 
 var SEARCHED_FILTER_LIST = new FilterList;
 
@@ -98,6 +101,8 @@ $( document ).ready(function()
         $(this).tab('show');
     })
 
+    var settingsTab = new SettingsTab(SETTINGS);
+
 });
 
 /**
@@ -158,7 +163,7 @@ function buildQuery(filterList, workspaceKey)
 {
     // build query from FILTER model
     var query = new Object();
-    query.numberResults = MAX_RESULTS;
+    query.numberResults = SETTINGS.maxFilteredVariants;
 
     query.workspace = workspaceKey;
 
@@ -304,10 +309,11 @@ function sendQuery(query, displayCols)
             var lastFilter = _.last(SEARCHED_FILTER_LIST.models);
             lastFilter.set("numMatches", json.totalResults);
 
-            if (json.totalResults > MAX_RESULTS)
+            if (json.totalResults > SETTINGS.maxFilteredVariants)
             {
-                var m = 'Loaded only ' + MAX_RESULTS;
+                var m = 'Loaded only ' + SETTINGS.maxFilteredVariants;
                 numMatchesLabel = $('#' + lastFilter.get("id") + "_num_matches_label");
+                numMatchesLabel.popover('destroy');
                 numMatchesLabel.popover(
                     {
                         html: true,
@@ -315,10 +321,9 @@ function sendQuery(query, displayCols)
                     }
                 );
                 numMatchesLabel.popover('show');
-                // hide popover after 2 seconds
                 setTimeout(
                     function(){numMatchesLabel.popover('hide');},
-                    2000
+                    SETTINGS.popupDuration * 1000
                 );
             }
         },
