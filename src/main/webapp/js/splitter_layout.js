@@ -34,13 +34,13 @@ function toggleStateManagement ( skipAlert, mode ) {
 // set EVERY 'state' here so will undo ALL layout changes
 // used by the 'Reset State' button: myLayout.loadState( stateResetSettings )
 var stateResetSettings = {
-        north__size:		"auto"
-    ,	north__initClosed:	false
-    ,	north__initHidden:	false
+//        north__size:		"auto"
+//    ,	north__initClosed:	false
+//    ,	north__initHidden:	false
 //    ,	south__size:		"auto"
 //    ,	south__initClosed:	false
 //    ,	south__initHidden:	false
-    ,	west__size:			300
+    	west__size:			300
     ,	west__initClosed:	false
     ,	west__initHidden:	false
 //    ,	east__size:			300
@@ -64,11 +64,11 @@ function initWorkspaceScreen()
         ,	togglerLength_closed:	35			// "100%" OR -1 = full height
 
         //	some resizing/toggling settings
-        ,	north__size:			    50	    // OVERRIDE size of header height
-        ,	north__resizable:			false	    // OVERRIDE
-        ,	north__closable:			false	    // OVERRIDE
-        ,	north__slidable:			false	// OVERRIDE the pane-default of 'slidable=true'
-        ,	north__togglerLength_closed: '100%'	// toggle-button is full-width of resizer-bar
+//        ,	north__size:			    50	    // OVERRIDE size of header height
+//        ,	north__resizable:			false	    // OVERRIDE
+//        ,	north__closable:			false	    // OVERRIDE
+//        ,	north__slidable:			false	// OVERRIDE the pane-default of 'slidable=true'
+//        ,	north__togglerLength_closed: '100%'	// toggle-button is full-width of resizer-bar
 //        ,	south__resizable:			false	// OVERRIDE the pane-default of 'resizable=true'
 //        ,	south__spacing_open:		0		// no resizer-bar when open (zero height)
 //        ,	south__spacing_closed:		20		// big resizer-bar when open (zero height)

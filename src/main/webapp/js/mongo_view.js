@@ -67,6 +67,37 @@ $( document ).ready(function()
 
     workspaceController = new WorkspaceController(setWorkspace);
     workspaceController.refreshWorkspaces();
+
+    // clicking on brand is redirected to a click on home tab
+    $('.navbar .brand').click(function(e)
+        {
+            $('#home_tab').click();
+        }
+    );
+
+    // handle click event on navbar tabs
+    $('#navbar_tabs a').click(function (e)
+    {
+        switch(e.target.id)
+        {
+            case 'home_tab':
+                showHomeScreen();
+                break;
+            case 'settings_tab':
+                showSettingsScreen();
+                break;
+            case 'table_tab':
+                showTableScreen();
+                break;
+        }
+        // switch active tab
+        var parent = $(this).parent();
+        $(this).parent().siblings('li').removeClass('active');
+        $(this).parent().addClass('active');
+
+        $(this).tab('show');
+    })
+
 });
 
 /**
@@ -312,6 +343,27 @@ function removeFilter(filterID)
     SEARCHED_FILTER_LIST.remove(SEARCHED_FILTER_LIST.findWhere({id: filterID}));
 }
 
+function showHomeScreen()
+{
+    $("#getting_started").toggle(true);
+    $("#jquery-ui-container").toggle(false);
+    $("#settings").toggle(false);
+}
+
+function showTableScreen()
+{
+    $("#getting_started").toggle(false);
+    $("#jquery-ui-container").toggle(true);
+    $("#settings").toggle(false);
+}
+
+function showSettingsScreen()
+{
+    $("#getting_started").toggle(false);
+    $("#jquery-ui-container").toggle(false);
+    $("#settings").toggle(true);
+}
+
 /**
  * Callback
  *
@@ -347,8 +399,10 @@ function setWorkspace(workspace)
     $('#variant_table_div').append(variantTableView.el);
 
     // update screens
-    $("#getting_started").toggle(false);
-    $("#jquery-ui-container").toggle(true);
+    $('#navbar_tab_table a').text(workspace.get("alias"));
+    $('#navbar_tab_table').toggle(true); // set visible if not already
+    $('#table_tab').click(); // register click event to switch to that tab
+
     initWorkspaceScreen();
 
     $("#vcf_file").html("VCF File: " + workspace.get("alias"));

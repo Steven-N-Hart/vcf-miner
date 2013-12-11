@@ -15,9 +15,9 @@
     <link rel="stylesheet" type="text/css" href="bootstrap-modal-2.1/css/bootstrap-modal.css">
     <link rel="stylesheet" type="text/css" href="Acquisio-bootstrap-dropdown-checkbox-5f2ad8d/css/bootstrap-dropdown-checkbox.css">
 
-    <!-- workaround for navbar overlapping site by 40 pixels -->
     <style>
-        body { padding-top: 40px; }
+        /*workaround for navbar overlapping site by 40 pixels */
+        /*body { padding-top: 40px; }*/
 
         body .wide-modal {
             /* new custom width */
@@ -541,43 +541,45 @@
     </div>
 </div>
 
-<div id="getting_started">
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="navbar-inner">
-            <img class="pull-left" src="img/miner_only.png" style="height: 60px; width: 75px;">
-            <a class="brand" href="#">VCF-Miner</a>
+<!-- Navigation bar -->
+<div class="navbar navbar-inverse navbar-static-top">
+    <div class="navbar-inner">
+        <div class="nav-collapse collapse">
+            <div class="pull-left"><a class="brand">VCF-Miner</a></div>
+            <ul id="navbar_tabs" class="nav">
+                <li class="active"><a id="home_tab">Home</a></li>
+                <li><a id="settings_tab">Settings</a></li>
+
+                <!-- hidden at the start because no VCF has been loaded yet -->
+                <li id="navbar_tab_table" class="hide"><a id="table_tab">SET_BY_JAVASCRIPT</a></li>
+            </ul>
         </div>
     </div>
+</div>
 
+<div id="getting_started">
     <!-- placeholder-->
     <div id="getting_started_content" class="hero-unit"></div>
 </div>
 
-<!-- JQUERY-UI Layout -->
-<div id="jquery-ui-container" style="zoom: 1; overflow: hidden; width: auto; height: auto; margin: 0px; position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; cursor: auto; " class="ui-layout-container hide">
-    <!-- NORTH -->
-    <div class="ui-layout-north ui-layout-pane ui-layout-pane-north" onmouseover="myLayout.allowOverflow('north')" onmouseout="myLayout.resetOverflow(this)" style="position: absolute; margin: 0px; top: 0px; bottom: auto; left: 0px; right: 0px; width: auto; z-index: 0; height: 66px; display: block; visibility: visible; overflow: auto; ">
-
-        <div class="navbar navbar-inverse navbar-fixed-top">
-            <div class="navbar-inner">
-                <div class="container-fluid">
-                    <img class="pull-left" src="img/miner_only.png" style="height: 60px; width: 75px;">
-                    <a class="brand" href="#">VCF-Miner</a>
-                    <ul class="nav pull-right">
-                        <li id="vcf_file" class="navbar-text"></li>
-                    </ul>
-                </div>
-            </div>
+<div id="settings" class="hide">
+    <!-- placeholder-->
+    <div id="todo" class="hero-unit">
+        <div class="well">
+            <h2>TODO</h2>
         </div>
-
     </div>
+</div>
+
+<!-- JQUERY-UI Layout -->
+<div id="jquery-ui-container" style="zoom: 1; overflow: hidden; width: auto; height: auto; margin: 0px; position: absolute; top: 40px; bottom: 0px; left: 0px; right: 0px; cursor: auto; " class="ui-layout-container hide">
 
     <!-- WEST -->
     <div class="ui-layout-west pane pane-west" style="position: absolute; margin: 0px; left: 0px; right: auto; top: 95px; bottom: 0px; height: 458px; z-index: 0; width: 346px; display: block; visibility: visible; ">
 
         <span id="west-closer" class="button-close button-close-west" title="Close West Pane"></span>
 
-        <div class="well sidebar-nav">
+        <div class="sidebar-nav">
             <ul class="nav nav-list">
                 <div class="nav-header"><h4>You Searched For</h4></div>
                 <div id="searched_view">
@@ -605,6 +607,7 @@
 
     </div>
 </div>
+
 
 </body>
 </html>
