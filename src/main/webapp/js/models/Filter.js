@@ -9,11 +9,12 @@ var FilterCategory =
     SAMPLE_MAX_AC:          5,
     SAMPLE_MIN_PHRED:       6,
     GENE:                   7,
-    GROUP:                  8,
-    INFO_INT:               9,
-    INFO_FLOAT:             10,
-    INFO_FLAG:              11,
-    INFO_STR:               12
+    IN_GROUP:               8,
+    NOT_IN_GROUP:           9,
+    INFO_INT:               10,
+    INFO_FLOAT:             11,
+    INFO_FLAG:              12,
+    INFO_STR:               13
 }
 
 // ENUM
@@ -25,9 +26,7 @@ var FilterOperator =
     LTEQ:    3,
     GT:      4,
     GTEQ:    5,
-    NE:      6,
-    IN:      7,
-    NOT_IN:  8
+    NE:      6
 }
 
 // MODEL

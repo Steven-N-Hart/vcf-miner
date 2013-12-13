@@ -2,9 +2,7 @@ var AddFilterDialog = function (infoFilters, searchedFilters, sampleGroups) {
 
     // private variables
     var workspaceKey;
-    var sampleFilterTab = new SampleFilterTab();
-    var geneFilterTab   = new GeneFilterTab();
-    var groupFilterTab  = new GroupFilterTab(sampleGroups);
+    var sampleFilterTab = new SampleFilterTab(sampleGroups);
     var infoFilterTab   = new InfoFilterTab(infoFilters);
 
     $('#add_filter').click(function()
@@ -27,16 +25,6 @@ var AddFilterDialog = function (infoFilters, searchedFilters, sampleGroups) {
             case "tab_content_sample":
                 if (sampleFilterTab.validate())
                     filter = sampleFilterTab.getFilter();
-                break;
-
-            case "tab_content_gene":
-                if (geneFilterTab.validate())
-                    filter = geneFilterTab.getFilter();
-                break;
-
-            case "tab_content_group":
-                if (groupFilterTab.validate())
-                    filter = groupFilterTab.getFilter();
                 break;
 
             case "tab_content_info":
@@ -72,9 +60,7 @@ var AddFilterDialog = function (infoFilters, searchedFilters, sampleGroups) {
         {
             workspaceKey = ws;
 
-            sampleFilterTab.initialize();
-            geneFilterTab.initialize(workspaceKey);
-            groupFilterTab.initialize(workspaceKey, sampleNames);
+            sampleFilterTab.initialize(workspaceKey, sampleNames);
             infoFilterTab.setWorkspace(workspaceKey);
         },
 

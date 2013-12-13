@@ -189,19 +189,15 @@ function buildQuery(filterList, workspaceKey)
             case FilterCategory.INFO_STR:
                 infoStringFilters.push(filter.toInfoStringFilterPojo());
                 break;
-            case FilterCategory.GROUP:
+            case FilterCategory.IN_GROUP:
+            case FilterCategory.NOT_IN_GROUP:
                 // lookup SampleGroup model that corresponds to name
                 var group = SAMPLE_GROUP_LIST.findWhere({name: filter.get("value")});
                 var inSample;
-                switch(filter.get("operator"))
-                {
-                    case FilterOperator.IN:
-                        inSample = true;
-                        break;
-                    case FilterOperator.NOT_IN:
-                        inSample = false;
-                        break;
-                }
+                if (filter.get("category") == FilterCategory.IN_GROUP)
+                    inSample = true;
+                if (filter.get("category") == FilterCategory.NOT_IN_GROUP)
+                    inSample = false;
                 sampleGroups.push(group.toSampleGroupPOJO(workspaceKey, inSample));
                 break;
             case FilterCategory.SAMPLE_MIN_ALT_READS:
