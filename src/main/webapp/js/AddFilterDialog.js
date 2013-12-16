@@ -61,7 +61,7 @@ var AddFilterDialog = function (infoFilters, searchedFilters, sampleGroups) {
             workspaceKey = ws;
 
             sampleFilterTab.initialize(workspaceKey, sampleNames);
-            infoFilterTab.setWorkspace(workspaceKey);
+            infoFilterTab.initialize(workspaceKey);
         },
 
         /**

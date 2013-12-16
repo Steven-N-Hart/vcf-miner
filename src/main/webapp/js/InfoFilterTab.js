@@ -208,9 +208,15 @@ var InfoFilterTab = function (filters) {
          *
          * @param workspaceKey
          */
-        setWorkspace: function(ws)
+        initialize: function(ws)
         {
             workspaceKey = ws;
+
+            // check to see whether we have any INFO annotation
+            if (filters.length > 0)
+                $('#no_info_annotation_warning').toggle(false);
+            else
+                $('#no_info_annotation_warning').toggle(true);
         },
 
         /**

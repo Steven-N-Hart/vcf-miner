@@ -261,51 +261,49 @@
                         <div class="tab-pane active" id="tab_content_sample"> <!-- SAMPLE tab -->
                             <form id="sample_tab_form" action="">
                                 <div class="container-fluid" id="pallet_view">
-                                    <div class="row-fluid">
-                                        <div class="span12 alert alert-info">
-                                            <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                            <table>
-                                                <tr>
-                                                    <td><i class="fa fa-info-circle fa-2x"></i></td>
-                                                    <td><strong>Getting started with Sample Filters</strong></td>
-                                                </tr>
-                                                <tr>
-                                                    <td></td>
-                                                    <td>
-                                                        <p>Filters in this tab are derived from the SAMPLE columns of VCF files.
-                                                            The FORMAT column is used to define the information contained within each subsequent genotype column, which consists of a colon separated list of fields.
-                                                            </p>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><i class="fa fa-book fa-2x"></i></td>
-                                                    <td>
-                                                        <strong>Example</strong>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td></td>
-                                                    <td>
-                                                        <p>The FORMAT field GT:GQ:DP indicates that the samples contain information regarding the genotype, genotype quality and read depth for each sample.
-                                                            Let's say each sample has an entry for depth of coverage and there are 3 samples in your VCF.
-                                                            SampleA DP=20, SampleB DP=25, and SampleC DP=10. VCF-miner is capable of querying numeric values such as these.
-                                                            If you filter that the DP should be >=20, the row</p>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><i class="fa fa-wrench fa-2x"></i></td>
-                                                    <td>
-                                                        <strong>Technical Point</strong>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td></td>
-                                                    <td>
-                                                        <p>For VCF-Miner to recognize arbitrary key:value pairs, there must be properly formatted both in this field and in the Meta-information lines.</p>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
+                                    <div class="span12 alert alert-info">
+                                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                        <table>
+                                            <tr>
+                                                <td><i class="fa fa-info-circle fa-2x"></i></td>
+                                                <td><strong>Getting started with Sample Filters</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <p>Filters in this tab are derived from the SAMPLE columns of VCF files.
+                                                        The FORMAT column is used to define the information contained within each subsequent genotype column, which consists of a colon separated list of fields.
+                                                        </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><i class="fa fa-book fa-2x"></i></td>
+                                                <td>
+                                                    <strong>Example</strong>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <p>The FORMAT field GT:GQ:DP indicates that the samples contain information regarding the genotype, genotype quality and read depth for each sample.
+                                                        Let's say each sample has an entry for depth of coverage and there are 3 samples in your VCF.
+                                                        SampleA DP=20, SampleB DP=25, and SampleC DP=10. VCF-miner is capable of querying numeric values such as these.
+                                                        If you filter that the DP should be >=20, the row</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><i class="fa fa-wrench fa-2x"></i></td>
+                                                <td>
+                                                    <strong>Technical Point</strong>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <p>For VCF-Miner to recognize arbitrary key:value pairs, there must be properly formatted both in this field and in the Meta-information lines.</p>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </div>
                                     <div class="row-fluid"> <!-- header row -->
                                         <div class="span4"><h4>Filter</h4></div>
@@ -343,32 +341,56 @@
                         <div class="tab-pane" id="tab_content_info"> <!-- info tab -->
                             <form id="info_tab_form" action="">
                                 <div class="container-fluid" id="info_filter_table">
-                                    <div class="span12 alert alert-info">
-                                        <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                        <table>
-                                            <tr>
-                                                <td><i class="fa fa-info-circle fa-2x"></i></td>
-                                                <td><strong>Getting started with INFO Filters</strong></td>
-                                            </tr>
-                                            <tr>
-                                                <td></td>
-                                                <td>
-                                                    <p>Filters in this tab are derived from the INFO column of VCF files.  Annotations found in this column are variant specific, not sample specific.  For example, the gene name in the info field may be GENE=TP53. No matter what sample has the variant - they would all refer to TP53.</p>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td><i class="fa fa-wrench fa-2x"></i></td>
-                                                <td>
-                                                    <strong>Technical Point</strong>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td></td>
-                                                <td>
-                                                    <p>For VCF-Miner to recognize arbitrary key:value pairs, there must be properly formatted both in this field and in the Meta-information lines.</p>
-                                                </td>
-                                            </tr>
-                                        </table>
+                                    <!-- This warning is hidden by default.  javascript will enable if warranted -->
+                                    <div class="row-fluid hide" id="no_info_annotation_warning">
+                                        <div class="span12 alert">
+                                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                            <table>
+                                                <tr>
+                                                    <td><i class="fa fa-warning fa-2x"></i></td>
+                                                    <td><strong>Missing INFO Annotation</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td>
+                                                        <p>No INFO fields were detected.  Double check your original VCF file for the following:</p>
+                                                        <ul>
+                                                            <li>One or more lines in the VCF file header that are prefixed with ##INFO, 1 per INFO annotation type</li>
+                                                            <li>8th column titled INFO containing the INFO annotation data</li>
+                                                        </ul>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="row-fluid">
+                                        <div class="span12 alert alert-info">
+                                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                            <table>
+                                                <tr>
+                                                    <td><i class="fa fa-info-circle fa-2x"></i></td>
+                                                    <td><strong>Getting started with INFO Filters</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td>
+                                                        <p>Filters in this tab are derived from the INFO column of VCF files.  Annotations found in this column are variant specific, not sample specific.  For example, the gene name in the info field may be GENE=TP53. No matter what sample has the variant - they would all refer to TP53.</p>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><i class="fa fa-wrench fa-2x"></i></td>
+                                                    <td>
+                                                        <strong>Technical Point</strong>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td>
+                                                        <p>For VCF-Miner to recognize arbitrary key:value pairs, there must be properly formatted both in this field and in the Meta-information lines.</p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
                                     </div>
                                     <div class="row-fluid"> <!-- header row -->
                                         <div class="span4"><h4>Filter</h4></div>
