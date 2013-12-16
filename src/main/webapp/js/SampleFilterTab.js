@@ -46,13 +46,35 @@ var SampleFilterTab = function (groups) {
         }
     );
 
+    // add custom validation method for the group drowdown to make sure a group
+    // is selected
+    jQuery.validator.addMethod("checkGroup", function(value, element) {
+
+        if (typeof groupListView.getSelectedGroup() === 'undefined')
+        {
+//            if ($("#group_field_value_validation_warning").length == 0)
+//                $("#group_value_div").append('<div class="row-fluid" id="group_field_value_validation_warning"><label>A group must be selected.</label></div>');
+            return false;
+        }
+        else
+        {
+//            $("#group_field_value_validation_warning").remove();
+            return true;
+        }
+    }, "A group must be selected.");
+
     // jQuery validate plugin config
     $('#sample_tab_form').validate({
             rules: {
                 sample_filter_value: {
                     required: true,
                     number:true
+                },
+
+                group_list: {
+                    checkGroup: true
                 }
+
             },
             highlight: function(element) {
                 $(element).parent().addClass('control-group error');
@@ -82,7 +104,6 @@ var SampleFilterTab = function (groups) {
             // simulate user clicking on 1st entry
             sampleFieldChanged();
         }
-
     }
 
     function sampleFieldChanged()
@@ -95,6 +116,18 @@ var SampleFilterTab = function (groups) {
         {
             case FilterCategory.IN_GROUP:
             case FilterCategory.NOT_IN_GROUP:
+                // always make sure count and sample list
+                // are cleared if no group is selected
+                if (typeof groupListView.getSelectedGroup() == 'undefined')
+                {
+                    count.empty();
+                    list.empty();
+                }
+
+                // make sure a group is selected, otherwise it should show a
+                // validation warning to user
+                validate();
+
                 $('#group_value_div').toggle(true);
                 $('#sample_value_div').toggle(false);
             break;
@@ -125,6 +158,13 @@ var SampleFilterTab = function (groups) {
         }
         listHTML += '</select>';
         list.append(listHTML);
+
+        validate();
+    }
+
+    function validate()
+    {
+        return $('#sample_tab_form').valid();
     }
 
     // public API
@@ -146,10 +186,7 @@ var SampleFilterTab = function (groups) {
         /**
          * Performs validation on the user's current selections/entries.
          */
-        validate: function()
-        {
-            return $('#sample_tab_form').valid();
-        },
+        validate: validate,
 
         /**
          * Gets the selected filter.
