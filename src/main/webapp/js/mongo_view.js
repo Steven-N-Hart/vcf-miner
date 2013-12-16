@@ -241,7 +241,7 @@ function buildQuery(filterList, workspaceKey)
  */
 function sendQuery(query, displayCols)
 {
-    var pleaseWaitDiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h3>Running Query.  Please wait...</h3></div><div class="modal-body"></div></div>');
+    var pleaseWaitDiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h3>Running Filters.  Please wait...</h3></div><div class="modal-body"></div></div>');
     pleaseWaitDiv.modal();
 
     console.debug("Sending query to server:" + JSON.stringify(query));
