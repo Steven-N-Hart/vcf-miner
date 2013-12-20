@@ -161,9 +161,7 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
 
         // some browsers put C:\\fakepath\\ on the front
         var name = uploadFile.name.replace("C:\\fakepath\\", "");
-        // chomp off trailing .vcf file extension
-        name = name.replace(new RegExp('\.vcf'), '');
-        console.debug("Adding working with name=" + name);
+        console.debug("Adding workspace with name=" + name);
 
         // progress on transfers from the server to the client (downloads)
         function updateProgress (oEvent)
@@ -192,6 +190,9 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
         //xhr.addEventListener("error", transferFailed, false);
 
         xhr.open('POST', "/mongo_svr/uploadvcf/user/" + user + "/alias/" + name, true);
+
+        // setup HTTP request header key/value pairs
+        xhr.setRequestHeader('file-compression', uploadFile.name);
 
         xhr.onload = function(oEvent)
         {
