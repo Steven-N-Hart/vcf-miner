@@ -70,6 +70,7 @@ var VariantTableDataView = Backbone.View.extend({
             'aaData':    [],
             "bDestroy":  true,
             "iDisplayLength": 25,
+            "aLengthMenu": [[10, 25, 50, 100, 500, 1000, -1],[10, 25, 50, 100, 500, 1000, 'All']],
             "bAutoWidth": false,
             "bScrollCollapse": true,
             "fnHeaderCallback": function( nHead, aData, iStart, iEnd, aiDisplay )
