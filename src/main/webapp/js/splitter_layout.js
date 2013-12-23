@@ -76,17 +76,26 @@ function initWorkspaceScreen()
         //	some pane-size settings
         ,	west__minSize:				200
         ,	west__size: 				400
-        ,	west__spacing_closed:		21			// wider space when closed
-        ,	west__togglerLength_closed:	21			// make toggler 'square' - 21x21
+        ,	west__spacing_closed:		5			// wider space when closed
+        ,	west__togglerLength_closed:	-1			// -1 = full height
         ,	west__togglerAlign_closed:	"top"		// align to top of resizer
         ,	west__togglerLength_open:	0			// NONE - using custom togglers INSIDE west-pane
-        ,	west__togglerTip_open:		"Close West Pane"
-        ,	west__togglerTip_closed:	"Open West Pane"
-        ,	west__resizerTip_open:		"Resize West Pane"
+        ,	west__togglerTip_open:		"Hide Filters"
+        ,	west__togglerTip_closed:	"Show Filters"
+        ,	west__resizerTip_open:		"Resize Filter Pane"
+        ,   west__togglerContent_closed: '<i class="fa fa-arrow-right"></i>'
         ,	west__slideTrigger_open:	"click" 	// default
         ,	west__slideTrigger_close:	"click" 	// default
         ,	west__initClosed:			false
 //        ,	west__fxSettings_open:		{ easing: "easeOutBounce" } //	add 'bounce' option to default 'slide' effect
+        ,   west__onopen_end:           function() // hide show button
+                                        {
+                                            $("#west-opener").toggle(false);
+                                        }
+        ,   west__onclose_end:          function() // make show button visible
+                                        {
+                                            $("#west-opener").toggle(true);
+                                        }
 
 //        ,	east__size:					300
 //        ,	east__minSize:				200
@@ -128,10 +137,12 @@ function initWorkspaceScreen()
      *
      * CSS will size and position the spans, as well as set the background-images
      */
-    var westSelector = "body > .ui-layout-west"; // outer-west pane
+//    var westSelector = "body > .ui-layout-west"; // outer-west pane
     // CREATE SPANs for close-buttons - using unique IDs as identifiers
-    $("<span></span>").attr("id", "west-closer" ).prependTo( westSelector );
+//    $("<span></span>").attr("id", "west-closer" ).prependTo( westSelector );
     // BIND layout events to close-buttons to make them functional
     myLayout.addCloseBtn("#west-closer", "west");
+    myLayout.addOpenBtn("#west-opener", "west");
+
 }
 //});

@@ -58,7 +58,7 @@ var VariantTableDataView = Backbone.View.extend({
         });
 
         var sDom =
-            "<'row'<'pull-right'<'toolbar'>>>" +
+            "<'row'<'pull-left'<'show'>><'pull-right'<'toolbar'>>>" +
                 "R<'row'<'pull-left'l><'pull-right'i>>" +
                 "<'row't>" +
                 "<'row'<'pull-left'p>>";
@@ -85,6 +85,8 @@ var VariantTableDataView = Backbone.View.extend({
 
             }
         });
+
+        this.$('.show').append($("#west-opener"));
 
         var toolbar = $("#table_toolbar").clone();
         this.$('.toolbar').append(toolbar);

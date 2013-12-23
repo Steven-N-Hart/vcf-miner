@@ -182,6 +182,9 @@
 
 <body>
 
+<!-- show button -->
+<button id="west-opener" title="Show Filters" type="button" class="hide btn btn-mini"><i class="fa fa-arrow-right"></i> Show</button>
+
 <!-- Table Toolbar -->
 <div id="table_toolbar" class="btn-group hide">
     <button class="btn" title="Show/Hide Table Columns" id="columns_button"><i class="icon-list-alt"></i> Columns</button>
@@ -636,11 +639,14 @@
     <!-- WEST -->
     <div class="ui-layout-west pane pane-west" style="position: absolute; margin: 0px; left: 0px; right: auto; top: 95px; bottom: 0px; height: 458px; z-index: 0; width: 346px; display: block; visibility: visible; ">
 
-        <span id="west-closer" class="button-close button-close-west" title="Close West Pane"></span>
-
         <div class="sidebar-nav">
             <ul class="nav nav-list">
-                <div class="nav-header"><h4>You Searched For</h4></div>
+                <div class="nav-header">
+                    <div class="row-fluid">
+                        <div class="span10"><h4>You Searched For</h4></div>
+                        <div class="span2 pull-right"><button id="west-closer" title="Hide Filters" type="button" class="btn btn-mini"><i class="fa fa-arrow-left"></i> Hide</button></div>
+                    </div>
+                </div>
                 <div id="searched_view">
                     <table class="table" id="searched_table">
                         <tr>
