@@ -90,8 +90,7 @@ var WorkspaceTableView = Backbone.View.extend({
     {
         var view = new WorkspaceTableRowView(
             {
-                model: workspace,
-                "fnDeleteWorkspaceCallback": this.options.fnDeleteWorkspaceCallback
+                model: workspace
             }
         );
         var aaDataRow = view.toAaDataRow(workspace);
@@ -107,7 +106,16 @@ var WorkspaceTableView = Backbone.View.extend({
         });
         $(document).on('click', '#' + workspace.get("id") + '_delete_button', function()
         {
-            that.options.fnDeleteWorkspaceCallback(workspace);
+            var confirmDialog = new ConfirmDialog(
+                "Delete VCF File",
+                "Delete " + workspace.get('alias') + " loaded " + workspace.get('date') + "?",
+                "Delete",
+                function()
+                {
+                    that.options.fnDeleteWorkspaceCallback(workspace);
+                }
+            );
+            confirmDialog.show();
         });
 
         var dataTable = this.$('#workspace_table').dataTable();

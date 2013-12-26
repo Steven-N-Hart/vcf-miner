@@ -162,6 +162,7 @@
     <script src="js/InfoFilterTab.js" type="text/javascript"></script>
 
     <script src="js/AddFilterDialog.js" type="text/javascript"></script>
+    <script src="js/ConfirmDialog.js" type="text/javascript"></script>
 
     <script src="js/models/VariantTableColumn.js" type="text/javascript"></script>
     <script src="js/models/VariantTableRow.js" type="text/javascript"></script>
@@ -189,6 +190,20 @@
 <div id="table_toolbar" class="btn-group hide">
     <button class="btn" title="Show/Hide Table Columns" id="columns_button"><i class="icon-list-alt"></i> Columns</button>
     <button class="btn" title="Export Table as Tab-Delimited file" id="export_button"><i class="icon-download"></i> Export</button>
+</div>
+
+<!-- Modal -->
+<div id="confirm_modal" data-backdrop="static" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="confirm_label" aria-hidden="true">
+    <div class="modal-header">
+        <h3 id="confirm_label"><!-- added by javascript --></h3>
+    </div>
+    <div class="modal-body">
+        <!-- added by javascript -->
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" aria-hidden="true" id="confirm_modal_ok">Ok</button>
+        <button class="btn" id="confirm_modal_cancel">Cancel</button>
+    </div>
 </div>
 
 <!-- Modal -->
