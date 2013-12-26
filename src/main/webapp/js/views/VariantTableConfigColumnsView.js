@@ -24,7 +24,8 @@ var VariantTableConfigColumnsView = Backbone.View.extend({
      */
     events:
     {
-        "click .toggle-visibility" : "toggleVisibility"
+        "click .toggle-visibility" : "toggleVisibility",
+        "click .toggle-all-visibility" : "toggleAllVisibility"
     },
 
     render: function()
@@ -87,6 +88,27 @@ var VariantTableConfigColumnsView = Backbone.View.extend({
 
         var isVisible = checkbox.is(':checked');
         variantTableCol.set("visible", isVisible);
+    },
+
+    /**
+     * Handles a "ALL" checkbox events
+     *
+     * @param e
+     *      The jQuery event.
+     */
+    toggleAllVisibility: function(e)
+    {
+        var isVisible = $(e.currentTarget).is(':checked');
+
+        // loop through all checkboxes
+        this.$(".toggle-visibility").each(function() {
+            var infoFieldCheckbox = $(this);
+
+            if (infoFieldCheckbox.is(':checked') !== isVisible)
+            {
+                infoFieldCheckbox.click();
+            }
+        });
     }
 
 });

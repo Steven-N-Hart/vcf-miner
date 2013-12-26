@@ -62,8 +62,6 @@ $( document ).ready(function()
         addFilterDialog.show();
     });
 
-    new VariantTableColumnView({"model": VARIANT_TABLE_COLUMNS});
-
     initTemplates();
 
     new VariantTableColumnView({"model": VARIANT_TABLE_COLUMNS});
