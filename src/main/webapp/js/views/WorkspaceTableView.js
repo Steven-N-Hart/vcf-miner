@@ -108,7 +108,7 @@ var WorkspaceTableView = Backbone.View.extend({
         {
             var confirmDialog = new ConfirmDialog(
                 "Delete VCF File",
-                "Delete " + workspace.get('alias') + " loaded " + workspace.get('date') + "?",
+                "Delete " + workspace.get('alias') + "?",
                 "Delete",
                 function()
                 {
