@@ -190,7 +190,6 @@ var VariantTableDataView = Backbone.View.extend({
         // send query request to server
         var query = buildQuery(this.options.filters, this.options.workspaceKey);
 
-        // add attribute returnFields
         var returnFields = new Array();
         var displayFields = new Array();
         _.each(this.getVisibleColumns().models, function(visibleCol)
@@ -200,6 +199,18 @@ var VariantTableDataView = Backbone.View.extend({
         });
         query.returnFields = returnFields;
         query.displayFields = displayFields;
+
+        var displayFiltersApplied = new Array();
+        _.each(this.options.filters.models, function(filter)
+        {
+            displayFiltersApplied.push(
+                {
+                    filterText: filter.get("name") + " " + filter.getOperatorAsASCII() + " " + filter.getValueAsASCII(),
+                    numberVariantsRemaining: filter.get("numMatches")
+                }
+            );
+        });
+        query.displayFiltersApplied = displayFiltersApplied;
 
         var jsonStr = JSON.stringify(query)
 

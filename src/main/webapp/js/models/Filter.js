@@ -39,68 +39,8 @@ var Filter = Backbone.Model.extend({
      */
     setFilterDisplay: function()
     {
-        var value = this.get("value");
-        var displayValue = '';
-
-        if (value instanceof Array)
-        {
-            for (var i = 0; i < value.length; i++)
-            {
-                displayValue += '<div class="text-left">' + value[i] + '</div>';
-            }
-        }
-        else
-        {
-            displayValue = '<div class="text-left">' + value + '</div>';
-        }
-
-        // check if we need to display whether nulls will be included
-        switch(this.get("category"))
-        {
-            case FilterCategory.INFO_FLOAT:
-            case FilterCategory.INFO_INT:
-            case FilterCategory.INFO_STR:
-                if (this.get("includeNulls"))
-                {
-                    displayValue += '<div class="text-left">+null</div>';
-                }
-                break;
-        }
-
-        this.set("displayValue", $.trim(displayValue));
-
-        var displayOperator;
-        switch(this.get("operator"))
-        {
-            case FilterOperator.UNKNOWN:
-                displayOperator='';
-                break;
-            case FilterOperator.EQ:
-                displayOperator='=';
-                break;
-            case FilterOperator.GT:
-                displayOperator='&gt;';
-                break;
-            case FilterOperator.GTEQ:
-                displayOperator='&#x2265;';
-                break;
-            case FilterOperator.LT:
-                displayOperator='&lt;';
-                break;
-            case FilterOperator.LTEQ:
-                displayOperator = '&#x2264;';
-                break;
-            case FilterOperator.NE:
-                displayOperator = '&#x2260;';
-                break;
-            case FilterOperator.IN:
-                displayOperator = 'IN';
-                break;
-            case FilterOperator.NOT_IN:
-                displayOperator = 'NOT_IN';
-                break;
-        }
-        this.set("displayOperator", displayOperator);
+        this.set("displayValue", $.trim(this.getValueAsHTML()));
+        this.set("displayOperator", this.getOperatorAsHTML());
     },
 
     /**
@@ -205,6 +145,126 @@ var Filter = Backbone.Model.extend({
         pojo.includeNulls = this.get("includeNulls");
 
         return pojo;
+    },
+
+    getValueAsHTML: function()
+    {
+        var value = this.get("value");
+        var html = '';
+
+        if (value instanceof Array)
+        {
+            for (var i = 0; i < value.length; i++)
+            {
+                html += '<div class="text-left">' + value[i] + '</div>';
+            }
+        }
+        else
+        {
+            html = '<div class="text-left">' + value + '</div>';
+        }
+
+        // check if we need to display whether nulls will be included
+        if((this.get("category") == FilterCategory.INFO_STR) && this.get("includeNulls"))
+        {
+            html += '<div class="text-left">+null</div>';
+        }
+
+        return html;
+    },
+
+    getValueAsASCII: function()
+    {
+        var value = this.get("value");
+        var asciiStr = '';
+
+        if (value instanceof Array)
+        {
+            for (var i = 0; i < value.length; i++)
+            {
+                asciiStr += value[i];
+
+                if ((i+1) < value.length)
+                {
+                    asciiStr += ', ';
+                }
+            }
+        }
+        else
+        {
+            asciiStr = value;
+        }
+
+        // check if we need to display whether nulls will be included
+        if((this.get("category") == FilterCategory.INFO_STR) && this.get("includeNulls"))
+        {
+            asciiStr += ' +null';
+        }
+
+        return asciiStr;
+    },
+
+    getOperatorAsHTML: function()
+    {
+        var html;
+        switch(this.get("operator"))
+        {
+            case FilterOperator.UNKNOWN:
+                html='';
+                break;
+            case FilterOperator.EQ:
+                html='=';
+                break;
+            case FilterOperator.GT:
+                html='&gt;';
+                break;
+            case FilterOperator.GTEQ:
+                html='&#x2265;';
+                break;
+            case FilterOperator.LT:
+                html='&lt;';
+                break;
+            case FilterOperator.LTEQ:
+                html = '&#x2264;';
+                break;
+            case FilterOperator.NE:
+                html = '&#x2260;';
+                break;
+        }
+        return html;
+    },
+
+    /**
+     * Translates operator to ASCII friendly characters (e.g. less than or equals would be <=)
+     */
+    getOperatorAsASCII: function()
+    {
+        var asciiStr;
+        switch(this.get("operator"))
+        {
+            case FilterOperator.EQ:
+                asciiStr='=';
+                break;
+            case FilterOperator.GT:
+                asciiStr='>';
+                break;
+            case FilterOperator.GTEQ:
+                asciiStr='>=';
+                break;
+            case FilterOperator.LT:
+                asciiStr='<';
+                break;
+            case FilterOperator.LTEQ:
+                asciiStr='<=';
+                break;
+            case FilterOperator.NE:
+                asciiStr='!=';
+                break;
+            default:
+                asciiStr='';
+        }
+
+        return asciiStr;
     },
 
     defaults: function()
