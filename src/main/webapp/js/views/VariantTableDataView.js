@@ -86,7 +86,9 @@ var VariantTableDataView = Backbone.View.extend({
             }
         });
 
-        this.$('.show').append($("#west-opener"));
+        var showButton = $('<button id="west-opener" title="Show Filters" type="button" class="showButton hide btn btn-mini"><i class="fa fa-arrow-right"></i> Show</button>');
+        this.$('.show').append(showButton);
+        $('#jquery-ui-container').layout().addOpenBtn("#west-opener", "west");
 
         var toolbar = $("#table_toolbar").clone();
         this.$('.toolbar').append(toolbar);

@@ -118,6 +118,9 @@ function initWorkspaceScreen()
         ,	showDebugMessages:			true // log and/or display messages from debugging & testing code
     });
 
+    // always make sure west pane is open
+    myLayout.open("west");
+
     // if there is no state-cookie, then DISABLE state management initially
     var cookieExists = !$.isEmptyObject( myLayout.readCookie() );
     if (!cookieExists) toggleStateManagement( true, false );
@@ -137,12 +140,7 @@ function initWorkspaceScreen()
      *
      * CSS will size and position the spans, as well as set the background-images
      */
-//    var westSelector = "body > .ui-layout-west"; // outer-west pane
-    // CREATE SPANs for close-buttons - using unique IDs as identifiers
-//    $("<span></span>").attr("id", "west-closer" ).prependTo( westSelector );
-    // BIND layout events to close-buttons to make them functional
     myLayout.addCloseBtn("#west-closer", "west");
-    myLayout.addOpenBtn("#west-opener", "west");
 
 }
 //});
