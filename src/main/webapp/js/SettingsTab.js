@@ -10,7 +10,7 @@ var SettingsTab = function (settings) {
     // private variables
 
     // jQuery validate plugin config
-    $('#settings_form').validate(
+    $('#settings_general_form').validate(
         {
             rules:
             {
@@ -26,10 +26,6 @@ var SettingsTab = function (settings) {
                     max:10
                 }
             },
-            submitHandler: function(form) {
-                settings.maxFilteredVariants = $('#max_filtered_variants_field').val();
-                settings.popupDuration = $('#popover_time_field').val();
-            },
             highlight: function(element) {
                 $(element).parent().addClass('control-group error');
             },
@@ -40,6 +36,23 @@ var SettingsTab = function (settings) {
     );
 
 
+    var fieldMaxFilteredVariants = $('#max_filtered_variants_field');
+    fieldMaxFilteredVariants.change(function(event) {
+
+        if (fieldMaxFilteredVariants.valid() == true){
+            settings.maxFilteredVariants = fieldMaxFilteredVariants.val();
+        }
+
+    });
+
+    var fieldPopoverTime = $('#popover_time_field');
+    fieldPopoverTime.change(function(event) {
+
+        if (fieldPopoverTime.valid() == true){
+            settings.popupDuration = fieldPopoverTime.val();
+        }
+
+    });
 
     // public API
     return {
