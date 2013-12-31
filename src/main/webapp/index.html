@@ -282,19 +282,23 @@
                         <div class="tab-pane active" id="tab_content_sample"> <!-- SAMPLE tab -->
                             <form id="sample_tab_form" action="">
                                 <div class="container-fluid" id="pallet_view">
-                                    <div class="span12 alert alert-info">
-                                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    <div class="row-fluid"> <!-- help row -->
+                                        <a class="accordion-toggle pull-right" data-toggle="collapse" data-parent="#accordion2" href="#sample_filter_help">
+                                            <i class="fa fa-question-circle"></i> Help
+                                        </a>
+                                    </div>
+                                    <div id="sample_filter_help" class="collapse alert-info">
                                         <table>
                                             <tr>
                                                 <td><i class="fa fa-info-circle fa-2x"></i></td>
-                                                <td><strong>Getting started with Sample Filters</strong></td>
+                                                <td><strong>Overview</strong></td>
                                             </tr>
                                             <tr>
                                                 <td></td>
                                                 <td>
                                                     <p>Filters in this tab are derived from the SAMPLE columns of VCF files.
                                                         The FORMAT column is used to define the information contained within each subsequent genotype column, which consists of a colon separated list of fields.
-                                                        </p>
+                                                    </p>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -384,34 +388,36 @@
                                             </table>
                                         </div>
                                     </div>
-                                    <div class="row-fluid">
-                                        <div class="span12 alert alert-info">
-                                            <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                            <table>
-                                                <tr>
-                                                    <td><i class="fa fa-info-circle fa-2x"></i></td>
-                                                    <td><strong>Getting started with INFO Filters</strong></td>
-                                                </tr>
-                                                <tr>
-                                                    <td></td>
-                                                    <td>
-                                                        <p>Filters in this tab are derived from the INFO column of VCF files.  Annotations found in this column are variant specific, not sample specific.  For example, the gene name in the info field may be GENE=TP53. No matter what sample has the variant - they would all refer to TP53.</p>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><i class="fa fa-wrench fa-2x"></i></td>
-                                                    <td>
-                                                        <strong>Technical Point</strong>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td></td>
-                                                    <td>
-                                                        <p>For VCF-Miner to recognize arbitrary key:value pairs, there must be properly formatted both in this field and in the Meta-information lines.</p>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
+                                    <div class="row-fluid"> <!-- help row -->
+                                        <a class="accordion-toggle pull-right" data-toggle="collapse" data-parent="#accordion2" href="#info_filter_help">
+                                            <i class="fa fa-question-circle"></i> Help
+                                        </a>
+                                    </div>
+                                    <div id="info_filter_help" class="collapse alert-info">
+                                        <table>
+                                            <tr>
+                                                <td><i class="fa fa-info-circle fa-2x"></i></td>
+                                                <td><strong>Overview</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <p>Filters in this tab are derived from the INFO column of VCF files.  Annotations found in this column are variant specific, not sample specific.  For example, the gene name in the info field may be GENE=TP53. No matter what sample has the variant - they would all refer to TP53.</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><i class="fa fa-wrench fa-2x"></i></td>
+                                                <td>
+                                                    <strong>Technical Point</strong>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <p>For VCF-Miner to recognize arbitrary key:value pairs, there must be properly formatted both in this field and in the Meta-information lines.</p>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </div>
                                     <div class="row-fluid"> <!-- header row -->
                                         <div class="span4"><h4>Filter</h4></div>
