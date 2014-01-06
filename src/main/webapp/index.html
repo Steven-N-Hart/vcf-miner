@@ -78,6 +78,8 @@
             white-space: nowrap;
             overflow: hidden;
         }
+
+        .vertical-spacer {  margin-top: 40px; }
     </style>
 
     <!-- underscorejs templates -->
@@ -143,11 +145,21 @@
 
     <script src="js/views/SearchedView.js" type="text/javascript"></script>
 
+    <script src="js/models/VCFDataField.js" type="text/javascript"></script>
+    <script src="js/models/DatabaseIndex.js" type="text/javascript"></script>
+    <script src="js/collections/DatabaseIndexList.js" type="text/javascript"></script>
+    <script src="js/DatabaseIndexController.js" type="text/javascript"></script>
+    <script src="js/views/IndexTableView.js" type="text/javascript"></script>
+    <script src="js/views/IndexTableRowView.js" type="text/javascript"></script>
+
     <script src="js/models/Workspace.js" type="text/javascript"></script>
     <script src="js/collections/WorkspaceList.js" type="text/javascript"></script>
     <script src="js/WorkspaceController.js" type="text/javascript"></script>
     <script src="js/views/WorkspaceTableView.js" type="text/javascript"></script>
     <script src="js/views/WorkspaceTableRowView.js" type="text/javascript"></script>
+
+    <script src="js/views/IndexTableView.js" type="text/javascript"></script>
+    <script src="js/views/IndexTableRowView.js" type="text/javascript"></script>
 
     <script src="js/models/Filter.js" type="text/javascript"></script>
     <script src="js/collections/FilterList.js" type="text/javascript"></script>
@@ -650,6 +662,16 @@
         </div>
         <div class="well">
             <h3>Indexes</h3>
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div id="indexes_table_div"></div>
+                </div>
+                <div class="row-fluid vertical-spacer">
+                </div>
+                <div class="row-fluid">
+                    <div class='row-fluid checkbox'><label><input type='checkbox' id='include_nulls'> Show warnings when adding a Filter on an non-indexed column</label></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

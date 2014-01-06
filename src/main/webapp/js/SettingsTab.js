@@ -8,6 +8,8 @@
 var SettingsTab = function (settings) {
 
     // private variables
+    var indexController = new DatabaseIndexController();
+    indexController.refreshIndexes();
 
     // jQuery validate plugin config
     $('#settings_general_form').validate(
@@ -56,6 +58,10 @@ var SettingsTab = function (settings) {
 
     // public API
     return {
+
+        initialize: function()
+        {
+        }
 
     };
 
