@@ -44,7 +44,7 @@ var GeneFilterTab = function () {
             },
             success: function(element) {
                 $(element).parent().removeClass('control-group error');
-            },
+            }
         }
     );
 

@@ -115,7 +115,8 @@ var InfoFilterTab = function (filters) {
         opList.empty();
 
         var includeNullsHTML =
-            "<div class='row-fluid checkbox'><label><input type='checkbox' id='include_nulls'> Keep variants with missing annotation (+null)</label></div>";
+            //"<div class='row-fluid checkbox'><label><input type='checkbox' id='include_nulls'> Keep variants with missing annotation (+null)</label></div>";
+        "<div class='row-fluid'><input type='checkbox' id='include_nulls'/> Keep variants with missing annotation (+null)</div>";
 
         switch (filter.get("category"))
         {
@@ -155,51 +156,173 @@ var InfoFilterTab = function (filters) {
                 opList.append(OPTION_EQ);
                 opList.append(OPTION_NE);
 
-                valueDiv.append("<div class='row-fluid'><div class='dropdown' id='info_field_dropdown_checkbox' name='str_field_value'></div></div>");
+                if (useTypeAheadWidget(filter.get("name")))
+                {
+                    valueDiv.append('<input id="info_str_typeahead" type="text" placeholder="enter value here" autocomplete="off" spellcheck="false"/>');
+                    valueDiv.append('<textarea id="info_str_value_area" rows="7" wrap="off" placeholder="" autocomplete="off" spellcheck="false"/>');
+                    $('#info_str_typeahead').typeahead({
+                        remote:
+                        {
+                            url: '/mongo_svr/ve/typeahead/w/'+workspaceKey+'/f/'+filter.get("name")+'/p/%QUERY/x/100',
+                            filter: function(parsedResponse) {
+                                var dataset = new Array();
+                                var values = parsedResponse[filter.get("name")];
+                                for (var i = 0; i < values.length; i++) {
+                                    var datum = {
+                                        value: values[i]
+                                    };
+                                    dataset.push(datum);
+                                }
+                                return dataset;
+                            }
+                        },
+                        limit: 10
+                    });
+
+                    // append typeahead value to the textarea
+                    $('#info_str_typeahead').on('typeahead:selected', function (object, datum) {
+                        var area = $('#info_str_value_area');
+                        area.val(area.val() + datum.value + '\n');
+
+                        // clear out value
+                        $('#info_str_typeahead').val('');
+
+                        // validate once user adds value
+                        validate();
+                    });
+
+                    // validate after user changes textarea manually
+                    $('#info_str_value_area').change(function(event) {
+                        validate();
+                    });
+                }
+                else
+                {
+                    // dropdown checkbox widget
+                    valueDiv.append("<div class='row-fluid'><div class='dropdown' id='info_field_dropdown_checkbox' name='str_field_value'></div></div>");
+
+                    // dynamically query to populate dropdown
+                    var fieldName = filter.get("name");
+                    $.ajax({
+                        url: "/mongo_svr/ve/typeahead/w/" + workspaceKey + "/f/" + fieldName,
+                        dataType: "json",
+                        async: false,
+                        success: function(json)
+                        {
+                            var fieldValues = json[fieldName];
+                            if (typeof fieldValues === "undefined")
+                            {
+                                console.warn("INFO string field " + fieldName + " has no available values.");
+                                fieldValues = new Array();
+                            }
+
+                            // sort values
+                            fieldValues.sort(function(a,b) { return a.localeCompare(b) } );
+
+                            var dropdownData = new Array();
+                            for (var i = 0; i < fieldValues.length; i++)
+                            {
+                                dropdownData.push({id: i, label: fieldValues[i]});
+                            }
+
+                            var dropdownCheckbox = $("#info_field_dropdown_checkbox");
+                            dropdownCheckbox.dropdownCheckbox({
+                                autosearch: true,
+                                hideHeader: false,
+                                data: dropdownData
+                            });
+                        },
+                        error: function(jqXHR, textStatus)
+                        {
+                            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+                        }
+                    });
+                }
+
                 valueDiv.append("<div class='row-fluid'><div class='span12'><hr></div></div>");
                 valueDiv.append(includeNullsHTML);
-
-                // dynamically query to populate dropdown
-                var fieldName = filter.get("name");
-                $.ajax({
-                    url: "/mongo_svr/ve/typeahead/w/" + workspaceKey + "/f/" + fieldName,
-                    dataType: "json",
-                    async: false,
-                    success: function(json)
-                    {
-                        var fieldValues = json[fieldName];
-                        if (typeof fieldValues === "undefined")
-                        {
-                            console.warn("INFO string field " + fieldName + " has no available values.");
-                            fieldValues = new Array();
-                        }
-
-                        // sort values
-                        fieldValues.sort(function(a,b) { return a.localeCompare(b) } );
-
-                        var dropdownData = new Array();
-                        for (var i = 0; i < fieldValues.length; i++)
-                        {
-                            dropdownData.push({id: i, label: fieldValues[i]});
-                        }
-
-                        var dropdownCheckbox = $("#info_field_dropdown_checkbox");
-                        dropdownCheckbox.dropdownCheckbox({
-                            autosearch: true,
-                            hideHeader: false,
-                            data: dropdownData
-                        });
-                    },
-                    error: function(jqXHR, textStatus)
-                    {
-                        $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-                    }
-                });
                 break;
         }
 
         // re-validate since form has changed
         $('#info_tab_form').valid();
+    }
+
+    function validate()
+    {
+        var filter = getSelectedFilter();
+
+        switch (filter.get("category"))
+        {
+            case FilterCategory.INFO_STR:
+
+                if ($('#info_str_value_area').length > 0)
+                {
+                    if ($('#info_str_value_area').val().trim().length > 0)
+                    {
+                        $("#info_field_value_validation_warning").remove();
+                        return true;
+                    }
+                    else
+                    {
+                        if ($("#info_field_value_validation_warning").length == 0)
+                            $("#info_value_div").append('<div class="row-fluid" id="info_field_value_validation_warning"><div class="alert alert-error">At least 1 value should be entered.</div></div>');
+                    }
+                }
+                else
+                {
+                    var numChecked = $("#info_field_dropdown_checkbox").dropdownCheckbox("checked").length;
+                    if(numChecked > 0)
+                    {
+                        $("#info_field_value_validation_warning").remove();
+                        return true;
+                    }
+                    else
+                    {
+                        if ($("#info_field_value_validation_warning").length == 0)
+                            $("#info_value_div").append('<div class="row-fluid" id="info_field_value_validation_warning"><div class="alert alert-error">At least 1 string should be checked.</div></div>');
+
+                        return false;
+                    }
+                }
+                break
+            default:
+                return $('#info_tab_form').valid();
+        }
+    }
+
+    /**
+     * Determines whether the given field should use the typeahead widget (e.g. lots of values)
+     *
+     * @param field
+     * @returns {boolean}
+     */
+    function useTypeAheadWidget(field)
+    {
+        // TODO
+        var maxValues = SETTINGS.maxFilterValues;
+
+        var useTypeAhead = false;
+        // perform synchronous AJAX call
+        $.ajax({
+            async: false,
+            url: "/mongo_svr/ve/typeahead/w/"+workspaceKey+"/f/"+field,
+            dataType: "json",
+            success: function(json)
+            {
+                var valueArray = json[field];
+                if ((valueArray == undefined) || (valueArray.length > maxValues))
+                {
+                    useTypeAhead = true;
+                }
+            },
+            error: function(jqXHR, textStatus)
+            {
+                $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+            }
+        });
+
+        return useTypeAhead;
     }
 
     // public API
@@ -222,31 +345,7 @@ var InfoFilterTab = function (filters) {
         /**
          * Performs validation on the user's current selections/entries.
          */
-        validate: function()
-        {
-            var filter = getSelectedFilter();
-
-            switch (filter.get("category"))
-            {
-                case FilterCategory.INFO_STR:
-                    var numChecked = $("#info_field_dropdown_checkbox").dropdownCheckbox("checked").length;
-                    if(numChecked > 0)
-                    {
-                        $("#info_field_value_validation_warning").remove();
-                        return true;
-                    }
-                    else
-                    {
-                        if ($("#info_field_value_validation_warning").length == 0)
-                            $("#info_value_div").append('<div class="row-fluid" id="info_field_value_validation_warning"><div class="alert alert-error">At least 1 string should be checked.</div></div>');
-
-                        return false;
-                    }
-                    break
-                default:
-                    return $('#info_tab_form').valid();
-            }
-        },
+        validate: validate,
 
         /**
          * Gets the selected filter.
@@ -281,19 +380,31 @@ var InfoFilterTab = function (filters) {
                 case FilterCategory.INFO_INT:
                 case FilterCategory.INFO_FLOAT:
                     filter.set("value", $("#info_value_div input").val());
-                    filter.set("includeNulls", $("#include_nulls").is(':checked'));
+                    filter.set("includeNulls", ($("#include_nulls:checked").length > 0) ? true:false);
                     break;
                 case FilterCategory.INFO_STR:
                     var filter = filters.findWhere({id: filterID});
-                    var checkedVals = $("#info_field_dropdown_checkbox").dropdownCheckbox("checked");
-                    var valueStr = "";
-                    var valueArr = new Array();
-                    for (var i=0; i < checkedVals.length; i++)
+
+                    var valueArr;
+
+                    if ($('#info_str_value_area').length > 0)
                     {
-                        valueArr.push(checkedVals[i].label);
+                        // grab values from text area
+                        valueArr = $('#info_str_value_area').val().split("\n");
                     }
+                    else
+                    {
+                        // grab values from dropdown checkbox widget
+                        valueArr = new Array();
+                        var checkedVals = $("#info_field_dropdown_checkbox").dropdownCheckbox("checked");
+                        for (var i=0; i < checkedVals.length; i++)
+                        {
+                            valueArr.push(checkedVals[i].label);
+                        }
+                    }
+
                     filter.set("value", valueArr);
-                    filter.set("includeNulls", $("#include_nulls").is(':checked'));
+                    filter.set("includeNulls", ($("#include_nulls:checked").length > 0) ? true:false);
                     break;
             };
 

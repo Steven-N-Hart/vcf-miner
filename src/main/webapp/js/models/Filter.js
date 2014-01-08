@@ -165,7 +165,7 @@ var Filter = Backbone.Model.extend({
         }
 
         // check if we need to display whether nulls will be included
-        if((this.get("category") == FilterCategory.INFO_STR) && this.get("includeNulls"))
+        if((this.get("includeNulls") != undefined) && this.get("includeNulls"))
         {
             html += '<div class="text-left">+null</div>';
         }
@@ -196,7 +196,7 @@ var Filter = Backbone.Model.extend({
         }
 
         // check if we need to display whether nulls will be included
-        if((this.get("category") == FilterCategory.INFO_STR) && this.get("includeNulls"))
+        if((this.get("includeNulls") != undefined) && this.get("includeNulls"))
         {
             asciiStr += ' +null';
         }

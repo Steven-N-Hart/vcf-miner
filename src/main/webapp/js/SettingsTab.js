@@ -26,6 +26,11 @@ var SettingsTab = function (settings) {
                     integer: true,
                     min:0,
                     max:10
+                },
+                max_filter_values_field: {
+                    required: true,
+                    integer: true,
+                    min:1
                 }
             },
             highlight: function(element) {
@@ -52,6 +57,15 @@ var SettingsTab = function (settings) {
 
         if (fieldPopoverTime.valid() == true){
             settings.popupDuration = fieldPopoverTime.val();
+        }
+
+    });
+
+    var fieldMaxFilterValues = $('#max_filter_values_field');
+    fieldMaxFilterValues.change(function(event) {
+
+        if (fieldMaxFilterValues.valid() == true){
+            settings.maxFilterValues = fieldMaxFilterValues.val();
         }
 
     });

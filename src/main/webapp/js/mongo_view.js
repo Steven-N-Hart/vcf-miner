@@ -6,10 +6,12 @@
  * To change this template use File | Settings | File Templates.
  */
 
+// GLOBAL settings for entire system
 var SETTINGS =
 {
     maxFilteredVariants: 1000,
-    popupDuration: 3 // seconds
+    popupDuration: 3, // seconds
+    maxFilterValues: 10
 };
 
 // GLOBAL: templates for showing messages to user in designated message area

@@ -14,6 +14,8 @@
     <link rel="stylesheet" type="text/css" href="bootstrap-modal-2.1/css/bootstrap-modal.css">
     <link rel="stylesheet" type="text/css" href="Acquisio-bootstrap-dropdown-checkbox-5f2ad8d/css/bootstrap-dropdown-checkbox.css">
     <link rel="stylesheet" type="text/css" href="font-awesome-4.0.3/css/font-awesome.css">
+    <!--<link rel="stylesheet" type="text/css" href="typeahead-0.9.3/typeahead.css">-->
+    <link rel="stylesheet" type="text/css" href="typeahead-0.9.3/typeahead.js-bootstrap.css">
 
     <style>
         /*workaround for navbar overlapping site by 40 pixels */
@@ -131,6 +133,7 @@
     <script src="jquery-validation-1.11.1/jquery.validate.js"></script>
     <script src="jquery-validation-1.11.1/additional-methods.js"></script>
     <script src="bootstrap-2.3.2/js/bootstrap.js"></script>
+    <script src="typeahead-0.9.3/typeahead.js"></script>
     <script src="DataTables-1.9.4/media/js/jquery.dataTables.js"></script>
     <script src="DataTables-1.9.4/media/js/DT_bootstrap.js"></script>
     <script src="DataTables-ColReorderWithResize-1.0.7/ColReorderWithResize.js"></script>
@@ -656,6 +659,12 @@
                     <label class="control-label" for="popover_time_field">Popup Display Time (Seconds)</label>
                     <div class="controls">
                         <input name="popover_time_field" id="popover_time_field" value="3">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="max_filter_values_field">MAX Loaded Values</label>
+                    <div class="controls">
+                        <input name="max_filter_values_field" id="max_filter_values_field" value="10">
                     </div>
                 </div>
             </form>
