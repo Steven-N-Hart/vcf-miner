@@ -13,6 +13,7 @@ var SETTINGS =
     popupDuration: 3, // seconds
     maxFilterValues: 10
 };
+var SETTINGS_TAB;
 
 // GLOBAL: templates for showing messages to user in designated message area
 var INFO_TEMPLATE;
@@ -101,8 +102,7 @@ $( document ).ready(function()
         $(this).tab('show');
     })
 
-    var settingsTab = new SettingsTab(SETTINGS);
-
+    SETTINGS_TAB = new SettingsTab(SETTINGS);
 });
 
 /**
@@ -445,6 +445,16 @@ function setWorkspace(workspace)
             VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'GenotypePositiveList',  displayName:'Samples',   description:'The names of samples.'}));
 
 
+            // TODO: switch VariantTableColumn to use these VCFDataField models
+            var dataFields = new VCFDataFieldList();
+            dataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, id:'CHROM',  description:'The chromosome.'}));
+            dataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, id:'POS',    description:'The reference position, with the 1st base having position 1.'}));
+            dataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, id:'ID',     description:'Semi-colon separated list of unique identifiers.'}));
+            dataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, id:'REF',    description:'The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).'}));
+            dataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, id:'ALT',    description:'Comma separated list of alternate non-reference alleles called on at least one of the samples.'}));
+            dataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, id:'QUAL',   description:'Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).'}));
+            dataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, id:'FILTER', description:'PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
+
             for (var i = 0; i < infoFieldNames.length; i++) {
                 var infoFieldName = infoFieldNames[i];
                 if (info.hasOwnProperty(infoFieldName))
@@ -455,24 +465,30 @@ function setWorkspace(workspace)
                     infoFilter.set("name", infoFieldName);
 
                     var category;
+                    var dataType;
                     switch(info[infoFieldName].type)
                     {
                         case 'Flag':
                             category = FilterCategory.INFO_FLAG;
+                            dataType = VCFDataType.FLAG;
                             break;
                         case 'Integer':
                             category = FilterCategory.INFO_INT;
+                            dataType = VCFDataType.INTEGER;
                             break;
                         case 'Float':
                             category = FilterCategory.INFO_FLOAT;
+                            dataType = VCFDataType.FLOAT;
                             break;
                         default:
                             category = FilterCategory.INFO_STR;
+                            dataType = VCFDataType.STRING;
                             break;
                     }
                     infoFilter.set("category", category);
 
                     INFO_FILTER_LIST.add(infoFilter);
+                    dataFields.add(new VCFDataField({category:VCFDataCategory.INFO, type:dataType, id:'INFO.'+infoFieldName, description:info[infoFieldName].Description}));
                 }
             }
 
@@ -493,6 +509,7 @@ function setWorkspace(workspace)
 //            searchedView.setDisplayCols(variantTable.getVisibleColumns());
 
             addFilterDialog.initialize(workspaceKey, allSamples);
+            SETTINGS_TAB.initialize(workspaceKey, dataFields);
 
             // backbone MVC will send query request based on adding this filter
             SEARCHED_FILTER_LIST.add(FILTER_NONE);

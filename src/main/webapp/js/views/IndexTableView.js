@@ -17,7 +17,6 @@ var IndexTableView = Backbone.View.extend({
     {
         // rebind so that options can be access in other functions
         this.options = options;
-
         this.listenTo(this.model, "add",        this.addRow);
         this.listenTo(this.model, "reset",      this.clearRows);
 
@@ -56,13 +55,11 @@ var IndexTableView = Backbone.View.extend({
 
         var sDom = "<'row't>";
 
-        var that = this;
         var dataTable = this.$('#index_table').dataTable( {
             "sDom": sDom,
             "aoColumns": aoColumns,
             'aaData':    [],
-            "bDestroy":  true,
-            "iDisplayLength": 25,
+            "iDisplayLength": -1,
             "bAutoWidth": false,
             "bScrollCollapse": true
         });
@@ -129,10 +126,8 @@ var IndexTableView = Backbone.View.extend({
     {
         var button = $(e.currentTarget);
         var fieldId = button.attr('data-field-id');
-        var index = this.findIndex(fieldId);
-
-        // TODO:
-        console.log("create index TODO " + fieldId);
+        var index = this.findIndexModel(fieldId);
+        this.options.createIndexCallback(index.get("dataField"));
     },
 
     deleteIndex: function(e)
@@ -141,14 +136,14 @@ var IndexTableView = Backbone.View.extend({
         var fieldId = button.attr('data-field-id');
         var index = this.findIndexModel(fieldId);
 
+        var dropIndexCallback =  this.options.dropIndexCallback;
         var confirmDialog = new ConfirmDialog(
             "Delete Index",
             "Delete index for column " + fieldId + "?",
             "Delete",
             function()
             {
-                // TODO:
-                console.log("delete index TODO");
+                dropIndexCallback(index.get("dataField"));
             }
         );
         confirmDialog.show();

@@ -8,8 +8,9 @@
 var SettingsTab = function (settings) {
 
     // private variables
+    var workspaceKey;
+    var dataFields;
     var indexController = new DatabaseIndexController();
-    indexController.refreshIndexes();
 
     // jQuery validate plugin config
     $('#settings_general_form').validate(
@@ -73,8 +74,14 @@ var SettingsTab = function (settings) {
     // public API
     return {
 
-        initialize: function()
+        initialize: function(wsKey, vcfDataFields)
         {
+            workspaceKey = wsKey;
+            dataFields = vcfDataFields;
+
+            indexController.initialize(workspaceKey, dataFields);
+
+            indexController.refreshIndexes();
         }
 
     };
