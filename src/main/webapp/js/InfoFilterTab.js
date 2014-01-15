@@ -186,7 +186,10 @@ var InfoFilterTab = function (indexController) {
                 opList.append(OPTION_EQ);
                 opList.append(OPTION_NE);
 
-                if (useTypeAheadWidget(fieldID))
+                var values = getFieldValues(fieldID, SETTINGS.maxFilterValues + 1);
+
+                // use typahead if we have MORE values than specified as the max
+                if (values.length > SETTINGS.maxFilterValues)
                 {
                     valueDiv.append('<input id="info_str_typeahead" type="text" placeholder="enter value here" autocomplete="off" spellcheck="false"/>');
                     valueDiv.append('<textarea id="info_str_value_area" rows="7" wrap="off" placeholder="" autocomplete="off" spellcheck="false"/>');
@@ -206,7 +209,7 @@ var InfoFilterTab = function (indexController) {
                                 return dataset;
                             }
                         },
-                        limit: 10
+                        limit: 10 // TODO: have this max configurable?
                     });
 
                     // append typeahead value to the textarea
@@ -231,41 +234,58 @@ var InfoFilterTab = function (indexController) {
                     // dropdown checkbox widget
                     valueDiv.append("<div class='row-fluid'><div class='dropdown' id='info_field_dropdown_checkbox' name='str_field_value'></div></div>");
 
-                    // dynamically query to populate dropdown
-                    $.ajax({
-                        url: "/mongo_svr/ve/typeahead/w/" + workspaceKey + "/f/INFO." + fieldID,
-                        dataType: "json",
-                        async: false,
-                        success: function(json)
-                        {
-                            var fieldValues = json[fieldID];
-                            if (typeof fieldValues === "undefined")
-                            {
-                                console.warn("INFO string field " + fieldName + " has no available values.");
-                                fieldValues = new Array();
-                            }
+                    // sort values
+                    values.sort(function(a,b) { return a.localeCompare(b) } );
 
-                            // sort values
-                            fieldValues.sort(function(a,b) { return a.localeCompare(b) } );
+                    var dropdownData = new Array();
+                    for (var i = 0; i < values.length; i++)
+                    {
+                        dropdownData.push({id: i, label: values[i]});
+                    }
 
-                            var dropdownData = new Array();
-                            for (var i = 0; i < fieldValues.length; i++)
-                            {
-                                dropdownData.push({id: i, label: fieldValues[i]});
-                            }
-
-                            var dropdownCheckbox = $("#info_field_dropdown_checkbox");
-                            dropdownCheckbox.dropdownCheckbox({
-                                autosearch: true,
-                                hideHeader: false,
-                                data: dropdownData
-                            });
-                        },
-                        error: function(jqXHR, textStatus)
-                        {
-                            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-                        }
+                    var dropdownCheckbox = $("#info_field_dropdown_checkbox");
+                    dropdownCheckbox.dropdownCheckbox({
+                        autosearch: true,
+                        hideHeader: false,
+                        data: dropdownData
                     });
+
+
+//                    // dynamically query to populate dropdown
+//                    $.ajax({
+//                        url: "/mongo_svr/ve/typeahead/w/" + workspaceKey + "/f/INFO." + fieldID,
+//                        dataType: "json",
+//                        async: false,
+//                        success: function(json)
+//                        {
+//                            var fieldValues = json[fieldID];
+//                            if (typeof fieldValues === "undefined")
+//                            {
+//                                console.warn("INFO string field " + fieldName + " has no available values.");
+//                                fieldValues = new Array();
+//                            }
+//
+//                            // sort values
+//                            fieldValues.sort(function(a,b) { return a.localeCompare(b) } );
+//
+//                            var dropdownData = new Array();
+//                            for (var i = 0; i < fieldValues.length; i++)
+//                            {
+//                                dropdownData.push({id: i, label: fieldValues[i]});
+//                            }
+//
+//                            var dropdownCheckbox = $("#info_field_dropdown_checkbox");
+//                            dropdownCheckbox.dropdownCheckbox({
+//                                autosearch: true,
+//                                hideHeader: false,
+//                                data: dropdownData
+//                            });
+//                        },
+//                        error: function(jqXHR, textStatus)
+//                        {
+//                            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+//                        }
+//                    });
                 }
 
                 valueDiv.append("<div class='row-fluid'><div class='span12'><hr></div></div>");
@@ -319,6 +339,32 @@ var InfoFilterTab = function (indexController) {
             default:
                 return $('#info_tab_form').valid();
         }
+    }
+
+    /**
+     * Fetches values for the given field, up to the specified max cutoff.
+     * @param fieldID
+     * @param max
+     * @returns {Array}
+     */
+    function getFieldValues(fieldID, maxCutoff)
+    {
+        var values = new Array();
+        // perform synchronous AJAX call
+        $.ajax({
+            async: false,
+            url: "/mongo_svr/ve/typeahead/w/"+workspaceKey+"/f/INFO."+fieldID+"/x/"+maxCutoff,
+            dataType: "json",
+            success: function(json)
+            {
+                values = json["INFO."+fieldID];
+            },
+            error: function(jqXHR, textStatus)
+            {
+                $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+            }
+        });
+        return values;
     }
 
     /**
