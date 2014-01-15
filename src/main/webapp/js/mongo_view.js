@@ -11,7 +11,7 @@ var SETTINGS =
 {
     maxFilteredVariants: 1000,
     popupDuration: 3, // seconds
-    maxFilterValues: 10
+    maxFilterValues: 100
 };
 var SETTINGS_TAB;
 
@@ -488,8 +488,16 @@ function setWorkspace(workspace)
                     infoFilter.set("category", category);
 
                     INFO_FILTER_LIST.add(infoFilter);
-                    dataFields.add(new VCFDataField({category:VCFDataCategory.INFO, type:dataType, id:'INFO.'+infoFieldName, description:info[infoFieldName].Description}));
+                    dataFields.add(new VCFDataField({category:VCFDataCategory.INFO, type:dataType, id:infoFieldName, description:info[infoFieldName].Description}));
                 }
+            }
+
+            // process FORMAT column information
+            var format = json.FORMAT;
+            // get the INFO field names sorted alphabetically
+            var formatFieldNames = getSortedAttrNames(format);
+            for (var i = 0; i < formatFieldNames.length; i++) {
+                dataFields.add(new VCFDataField({category:VCFDataCategory.FORMAT, id:'FORMAT.'+formatFieldNames[i]}));
             }
 
             variantTableView.render();

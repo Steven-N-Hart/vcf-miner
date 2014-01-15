@@ -7,7 +7,7 @@
  * @returns {{show: Function}}
  * @constructor
  */
-var ConfirmDialog = function (title, message, confirmButtonText, confirmCallback) {
+var ConfirmDialog = function (title, message, confirmButtonText, confirmCallback, cancelCallback) {
 
     // private variables
 
@@ -20,6 +20,10 @@ var ConfirmDialog = function (title, message, confirmButtonText, confirmCallback
 
     $('#confirm_modal_cancel').click(function()
     {
+        if (cancelCallback !== undefined) {
+            cancelCallback();
+        }
+
         close();
     });
 

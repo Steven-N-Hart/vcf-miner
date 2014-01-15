@@ -4,6 +4,9 @@
  */
 var IndexTableView = Backbone.View.extend({
 
+    // unique ID
+    table_uid: "",
+
     /**
      * Called when the view is first created
      *
@@ -15,6 +18,8 @@ var IndexTableView = Backbone.View.extend({
      *      when the user changes the workspace.     */
     initialize: function(options)
     {
+        this.table_uid = "index_table_" + guid();
+
         // rebind so that options can be access in other functions
         this.options = options;
         this.listenTo(this.model, "add",        this.addRow);
@@ -28,8 +33,8 @@ var IndexTableView = Backbone.View.extend({
      */
     events:
     {
-        "click .evt_create_idx" : "createIndex",
-        "click .evt_delete_idx" : "deleteIndex"
+        "change .evt_create_idx" : "createIndex",
+        "change .evt_delete_idx" : "deleteIndex"
     },
 
     render: function()
@@ -40,7 +45,7 @@ var IndexTableView = Backbone.View.extend({
         // construct a new HTML table and add to DOM
         var table = $('<table>').attr(
             {
-                "id":           'index_table',
+                "id":           this.table_uid,
                 "class":        'table table-striped table-bordered',
                 "border":       '0',
                 "cellpadding":  '0',
@@ -49,19 +54,20 @@ var IndexTableView = Backbone.View.extend({
         this.$el.append(table);
 
         var aoColumns = new Array();
-        aoColumns.push({"sTitle" : "Column"});
+        aoColumns.push({"sTitle" : "Name"});
         aoColumns.push({"sTitle" : "Status"});
         aoColumns.push({"sTitle" : ""});
 
         var sDom = "<'row't>";
 
-        var dataTable = this.$('#index_table').dataTable( {
+        var dataTable = this.$('#'+this.table_uid).dataTable( {
             "sDom": sDom,
             "aoColumns": aoColumns,
             'aaData':    [],
             "iDisplayLength": -1,
             "bAutoWidth": false,
-            "bScrollCollapse": true
+            "bScrollCollapse": true,
+            "bSort": this.options.sortable
         });
     },
 
@@ -74,7 +80,8 @@ var IndexTableView = Backbone.View.extend({
     {
         var view = new IndexTableRowView(
             {
-                model: index
+                model: index,
+                tableId: this.table_uid
             }
         );
         var aaDataRow = view.toAaDataRow(index);
@@ -82,7 +89,7 @@ var IndexTableView = Backbone.View.extend({
         var aaData = new Array();
         aaData.push(aaDataRow);
 
-        var dataTable = this.$('#index_table').dataTable();
+        var dataTable = this.$('#'+this.table_uid).dataTable();
 
         dataTable.fnAddData(aaData, false);
 
@@ -97,7 +104,7 @@ var IndexTableView = Backbone.View.extend({
      */
     clearRows: function()
     {
-        this.$('#index_table').dataTable().fnClearTable();
+        this.$('#'+this.table_uid).dataTable().fnClearTable();
     },
 
     /**
@@ -125,25 +132,59 @@ var IndexTableView = Backbone.View.extend({
     createIndex: function(e)
     {
         var button = $(e.currentTarget);
+
         var fieldId = button.attr('data-field-id');
+
         var index = this.findIndexModel(fieldId);
+
+        // check for no-change
+        if (index.get("status") == IndexStatus.READY)
+        {
+            return;
+        }
+
+        // disable radio buttons for the row
+        $('#'+this.table_uid+' tbody tr[id='+fieldId+'] input[type=radio]').attr("disabled", "disabled");
+
         this.options.createIndexCallback(index.get("dataField"));
     },
 
     deleteIndex: function(e)
     {
-        var button = $(e.currentTarget);
-        var fieldId = button.attr('data-field-id');
+        var offButton = $(e.currentTarget);
+        var fieldId = offButton.attr('data-field-id');
+
         var index = this.findIndexModel(fieldId);
 
+        // check for no-change
+        if (index.get("status") == IndexStatus.NONE)
+        {
+            return;
+        }
+
+        // disable radio buttons for the row
+        $('#'+this.table_uid+' tbody tr[id='+fieldId+'] input[type=radio]').attr("disabled", "disabled");
+
         var dropIndexCallback =  this.options.dropIndexCallback;
+        var that = this;
         var confirmDialog = new ConfirmDialog(
             "Delete Index",
             "Delete index for column " + fieldId + "?",
             "Delete",
             function()
             {
+                // confirm
                 dropIndexCallback(index.get("dataField"));
+            },
+            function()
+            {
+                // cancel, need to toggle the radio button back to ON
+                var onButton = $('input[type="radio"][data-field-id="'+fieldId+'"][value="on"]');
+
+                // re-enable the radio buttons
+                $('#'+that.table_uid+' tbody tr[id='+fieldId+'] input[type=radio]').removeAttr("disabled", "disabled");
+
+                onButton.click();
             }
         );
         confirmDialog.show();

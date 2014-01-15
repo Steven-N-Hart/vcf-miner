@@ -156,6 +156,8 @@
     <script src="js/DatabaseIndexController.js" type="text/javascript"></script>
     <script src="js/views/IndexTableView.js" type="text/javascript"></script>
     <script src="js/views/IndexTableRowView.js" type="text/javascript"></script>
+    <script src="js/models/IndexesStatus.js" type="text/javascript"></script>
+    <script src="js/views/IndexesStatusView.js" type="text/javascript"></script>
 
     <script src="js/models/Workspace.js" type="text/javascript"></script>
     <script src="js/collections/WorkspaceList.js" type="text/javascript"></script>
@@ -649,7 +651,7 @@
     <!-- placeholder-->
     <div class="hero-unit">
         <div class="well">
-            <h3>General</h3>
+            <h2>General</h2>
             <form id="settings_general_form" class="form-horizontal">
                 <div class="control-group">
                     <label class="control-label" for="max_filtered_variants_field">MAX Filtered Variants</label>
@@ -666,21 +668,39 @@
                 <div class="control-group">
                     <label class="control-label" for="max_filter_values_field">MAX Loaded Values</label>
                     <div class="controls">
-                        <input name="max_filter_values_field" id="max_filter_values_field" value="10">
+                        <input name="max_filter_values_field" id="max_filter_values_field" value="100">
                     </div>
                 </div>
             </form>
         </div>
         <div class="well">
-            <h3>Indexes</h3>
-            <div class="container-fluid">
-                <div class="row-fluid">
-                    <div id="indexes_table_div"></div>
+            <h2>Indexes</h2>
+            <div class='row-fluid checkbox'><label><input type='checkbox' id='include_nulls'> Show warnings when adding a Filter on an non-indexed column</label></div>
+            <div class="row-fluid">
+                <div class="span6" id="indexes_status_div"></div>
+            </div>
+            <div class="well">
+                <h3>General</h3>
+                <div class="container-fluid">
+                    <div class="row-fluid">
+                        <div class="pull-left" id="general_indexes_table_div"></div>
+                    </div>
                 </div>
-                <div class="row-fluid vertical-spacer">
+            </div>
+            <div class="well">
+                <h3>INFO</h3>
+                <div class="container-fluid">
+                    <div class="row-fluid">
+                        <div class="pull-left" id="info_indexes_table_div"></div>
+                    </div>
                 </div>
-                <div class="row-fluid">
-                    <div class='row-fluid checkbox'><label><input type='checkbox' id='include_nulls'> Show warnings when adding a Filter on an non-indexed column</label></div>
+            </div>
+            <div class="well">
+                <h3>FORMAT</h3>
+                <div class="container-fluid">
+                    <div class="row-fluid">
+                        <div class="pull-left" id="format_indexes_table_div"></div>
+                    </div>
                 </div>
             </div>
         </div>
