@@ -5,12 +5,10 @@
  * @returns {{initialize: Function, show: Function}}
  * @constructor
  */
-var SettingsTab = function (settings) {
+var SettingsTab = function (settings, indexController) {
 
     // private variables
     var workspaceKey;
-    var dataFields;
-    var indexController = new DatabaseIndexController();
 
     // jQuery validate plugin config
     $('#settings_general_form').validate(
@@ -43,6 +41,39 @@ var SettingsTab = function (settings) {
         }
     );
 
+    new IndexesStatusView(
+        {
+            "el": $('#indexes_status_div'),
+            "model": indexController.getOverallIndexStatus()
+        }
+    );
+
+    new IndexTableView(
+        {
+            "el": $('#general_indexes_table_div'),
+            "model": indexController.getGeneralIndexes(),
+            "sortable":false,
+            "createIndexCallback": indexController.createIndex,
+            "dropIndexCallback": indexController.deleteIndex
+        }
+    );
+    new IndexTableView(
+        {
+            "el": $('#info_indexes_table_div'),
+            "model": indexController.getInfoIndexes(),
+            "sortable":true,
+            "createIndexCallback": indexController.createIndex,
+            "dropIndexCallback": indexController.deleteIndex
+        }
+    );
+    new IndexTableView(
+        {
+            "el": $('#format_indexes_table_div'),
+            "model": indexController.getFormatIndexes(),
+            "createIndexCallback": indexController.createIndex,
+            "dropIndexCallback": indexController.deleteIndex
+        }
+    );
 
     var fieldMaxFilteredVariants = $('#max_filtered_variants_field');
     fieldMaxFilteredVariants.change(function(event) {
@@ -71,17 +102,25 @@ var SettingsTab = function (settings) {
 
     });
 
+    var fieldShowMissingIdxWarnings = $('#show_missing_index_warnings');
+    fieldShowMissingIdxWarnings.change(function(event) {
+
+        var checkbox = event.currentTarget;
+        if (checkbox.checked) {
+            settings.showMissingIndexWarning = true;
+        } else
+        {
+            settings.showMissingIndexWarning = false;
+        }
+    });
+
+
     // public API
     return {
 
-        initialize: function(wsKey, vcfDataFields)
+        initialize: function(wsKey)
         {
             workspaceKey = wsKey;
-            dataFields = vcfDataFields;
-
-            indexController.initialize(workspaceKey, dataFields);
-
-            indexController.refreshIndexes();
         }
 
     };

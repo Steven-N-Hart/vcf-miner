@@ -12,50 +12,15 @@ var DatabaseIndexController = function () {
     var generalIndexes = new DatabaseIndexList();
     var infoIndexes = new DatabaseIndexList();
     var formatIndexes = new DatabaseIndexList();
+    var indexedFieldNames;
 
     // array of dataFields that should be updated automatically
     var notReadyDataFields = new Array();
     var TIMER_INTERVAL = 5000; // 5 seconds
     setInterval(updateNotReadyIndexes, TIMER_INTERVAL);
 
-    new IndexesStatusView(
-        {
-            "el": $('#indexes_status_div'),
-            "model": overallStatus
-        }
-    );
-
-    new IndexTableView(
-        {
-            "el": $('#general_indexes_table_div'),
-            "model": generalIndexes,
-            "sortable":false,
-            "createIndexCallback": createIndex,
-            "dropIndexCallback": deleteIndex
-        }
-    );
-    new IndexTableView(
-        {
-            "el": $('#info_indexes_table_div'),
-            "model": infoIndexes,
-            "sortable":true,
-            "createIndexCallback": createIndex,
-            "dropIndexCallback": deleteIndex
-        }
-    );
-    new IndexTableView(
-        {
-            "el": $('#format_indexes_table_div'),
-            "model": formatIndexes,
-            "createIndexCallback": createIndex,
-            "dropIndexCallback": deleteIndex
-        }
-    );
-
-    function getIndexedFieldNames()
+    function loadIndexedFieldNames()
     {
-        var indexedFieldNames = new Array();
-
         // synchronous AJAX call to server for index information
         $.ajax({
             async: false,
@@ -63,6 +28,7 @@ var DatabaseIndexController = function () {
             dataType: "json",
             success: function(json) {
 
+                indexedFieldNames = new Array();
                 var fields = json.fields;
                 for (var i = 0; i < fields.length; i++) {
                     var fieldName = getSortedAttrNames(fields[i].key)[0];
@@ -74,29 +40,6 @@ var DatabaseIndexController = function () {
                 $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
             }
         });
-
-        return indexedFieldNames;
-    }
-
-    function getOperations()
-    {
-        var indexedFieldNames = new Array();
-
-        // synchronous AJAX call to server for index information
-        $.ajax({
-            async: false,
-            url: "/mongo_svr/ve/index/getOperations/" + workspaceKey,
-            dataType: "json",
-            success: function(json) {
-
-            },
-            error: function(jqXHR, textStatus) {
-
-                $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-            }
-        });
-
-        return indexedFieldNames;
     }
 
     function createIndex(vcfDataField)
@@ -152,14 +95,12 @@ var DatabaseIndexController = function () {
         formatIndexes.reset();
         overallStatus.set("numReady", 0);
 
-        var indexedFieldNames = getIndexedFieldNames();
-
         // create Index models
         _.each(dataFields.models, function(vcfDataField) {
 
             var status;
             var progress = 0; // TODO
-            if (isDataFieldIndexed(vcfDataField, indexedFieldNames)) {
+            if (isDataFieldIndexed(vcfDataField)) {
 
                 // TODO: check for building indexes for auto-updates
 
@@ -201,7 +142,7 @@ var DatabaseIndexController = function () {
         };
     }
 
-    function isDataFieldIndexed(vcfDataField, indexedFieldNames)
+    function isDataFieldIndexed(vcfDataField)
     {
         if (jQuery.inArray( getIndexName(vcfDataField), indexedFieldNames ) > -1) {
             return true;
@@ -220,14 +161,15 @@ var DatabaseIndexController = function () {
             return;
         }
 
-        var indexedFieldNames = getIndexedFieldNames();
+        // freshly load the indexed field names
+        loadIndexedFieldNames();
 
         for (var i = 0; i < notReadyDataFields.length; i++) {
 
             var vcfDataField = notReadyDataFields[i];
             var index = getIndexByDataField(vcfDataField);
             var status = index.get("status");
-            var isIndexed = isDataFieldIndexed(vcfDataField, indexedFieldNames);
+            var isIndexed = isDataFieldIndexed(vcfDataField);
 
             if ((status !== IndexStatus.READY) && isIndexed) {
                 // data field was not indexed, but server is now indicating that it is
@@ -293,12 +235,40 @@ var DatabaseIndexController = function () {
         {
             workspaceKey = wsKey;
             dataFields = vcfDataFields;
+
+            loadIndexedFieldNames();
         },
 
         /**
          * Refresh all workspaces from server.
          */
-        refreshIndexes: refreshAllIndexes
+        refreshIndexes: refreshAllIndexes,
+
+        isDataFieldIndexed: isDataFieldIndexed,
+
+        getGeneralIndexes: function()
+        {
+            return generalIndexes;
+        },
+
+        getInfoIndexes: function()
+        {
+            return infoIndexes;
+        },
+
+        getFormatIndexes: function()
+        {
+            return formatIndexes;
+        },
+
+        getOverallIndexStatus: function()
+        {
+            return overallStatus;
+        },
+
+        createIndex: createIndex,
+
+        deleteIndex: deleteIndex
     };
 
 };

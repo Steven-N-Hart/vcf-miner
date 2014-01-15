@@ -11,7 +11,8 @@ var SETTINGS =
 {
     maxFilteredVariants: 1000,
     popupDuration: 3, // seconds
-    maxFilterValues: 100
+    maxFilterValues: 100,
+    showMissingIndexWarning: false
 };
 var SETTINGS_TAB;
 
@@ -25,8 +26,6 @@ var FILTER_NONE            = new Filter({name: 'none',          operator: Filter
 
 var SEARCHED_FILTER_LIST = new FilterList;
 
-var INFO_FILTER_LIST = new FilterList;
-
 var VARIANT_TABLE_COLUMNS   = new VariantTableColumnList();
 var VARIANT_TABLE_ROWS      = new VariantTableRowList();
 
@@ -39,6 +38,7 @@ var SAMPLE_GROUP_LIST = new SampleGroupList();
 var addFilterDialog;
 var WorkspaceController;
 var variantTableView;
+var indexController;
 
 $( document ).ready(function()
 {
@@ -57,9 +57,10 @@ $( document ).ready(function()
         $('#welcome_pane').toggle();
     }
 
+    indexController = new DatabaseIndexController();
     searchedView = new SearchedView(SEARCHED_FILTER_LIST);
 
-    addFilterDialog = new AddFilterDialog(INFO_FILTER_LIST, SEARCHED_FILTER_LIST, SAMPLE_GROUP_LIST);
+    addFilterDialog = new AddFilterDialog(SEARCHED_FILTER_LIST, SAMPLE_GROUP_LIST, indexController);
     $('#show_add_filter_dialog_button').click(function (e)
     {
         addFilterDialog.show();
@@ -102,7 +103,7 @@ $( document ).ready(function()
         $(this).tab('show');
     })
 
-    SETTINGS_TAB = new SettingsTab(SETTINGS);
+    SETTINGS_TAB = new SettingsTab(SETTINGS, indexController);
 });
 
 /**
@@ -378,7 +379,6 @@ function setWorkspace(workspace)
     searchedView.setWorkspace(workspaceKey);
 
     // reset collections
-    INFO_FILTER_LIST.reset();
     SEARCHED_FILTER_LIST.reset();
     VARIANT_TABLE_COLUMNS.reset();
 
@@ -461,33 +461,23 @@ function setWorkspace(workspace)
                 {
                     VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:false,  name:'INFO.'+infoFieldName,  displayName:infoFieldName,   description:info[infoFieldName].Description}));
 
-                    var infoFilter = new Filter();
-                    infoFilter.set("name", infoFieldName);
-
-                    var category;
                     var dataType;
                     switch(info[infoFieldName].type)
                     {
                         case 'Flag':
-                            category = FilterCategory.INFO_FLAG;
                             dataType = VCFDataType.FLAG;
                             break;
                         case 'Integer':
-                            category = FilterCategory.INFO_INT;
                             dataType = VCFDataType.INTEGER;
                             break;
                         case 'Float':
-                            category = FilterCategory.INFO_FLOAT;
                             dataType = VCFDataType.FLOAT;
                             break;
                         default:
-                            category = FilterCategory.INFO_STR;
                             dataType = VCFDataType.STRING;
                             break;
                     }
-                    infoFilter.set("category", category);
 
-                    INFO_FILTER_LIST.add(infoFilter);
                     dataFields.add(new VCFDataField({category:VCFDataCategory.INFO, type:dataType, id:infoFieldName, description:info[infoFieldName].Description}));
                 }
             }
@@ -516,8 +506,10 @@ function setWorkspace(workspace)
             // TODO:
 //            searchedView.setDisplayCols(variantTable.getVisibleColumns());
 
-            addFilterDialog.initialize(workspaceKey, allSamples);
-            SETTINGS_TAB.initialize(workspaceKey, dataFields);
+            addFilterDialog.initialize(workspaceKey, allSamples, dataFields);
+            SETTINGS_TAB.initialize(workspaceKey);
+            indexController.initialize(workspaceKey, dataFields);
+            indexController.refreshIndexes();
 
             // backbone MVC will send query request based on adding this filter
             SEARCHED_FILTER_LIST.add(FILTER_NONE);

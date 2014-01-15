@@ -31,6 +31,7 @@ var ConfirmDialog = function (title, message, confirmButtonText, confirmCallback
     {
         // unregister event handlers
         $('#confirm_modal_ok').unbind();
+        $('#confirm_modal_cancel').unbind();
 
         $('#confirm_modal').modal('hide');
     }

@@ -1,8 +1,9 @@
-var InfoFilterTab = function (filters) {
+var InfoFilterTab = function (indexController) {
 
     // private variables
     var workspaceKey;
     var view;
+    var infoFields = new VCFDataFieldList();
 
     // constants for operator options
     var OPTION_EQ   = "<option value='eq'>=</option>";
@@ -12,6 +13,7 @@ var InfoFilterTab = function (filters) {
     var OPTION_LTEQ = "<option value='lteq'>&#x2264;</option>";
     var OPTION_NE   = "<option value='ne'>&#x2260;</option>";
 
+    // TODO: this supposed to be here?
     // initialize the file input field
     $(":file").filestyle({buttonText: ''});
 
@@ -42,67 +44,95 @@ var InfoFilterTab = function (filters) {
 
         initialize: function()
         {
-            this.listenTo(filters, 'add',    this.addOne);
-            this.listenTo(filters, 'remove', this.removeOne);
-            this.listenTo(filters, 'reset',  this.removeAll);
+            this.listenTo(this.model, 'add',    this.addOne);
+            this.listenTo(this.model, 'remove', this.removeOne);
+            this.listenTo(this.model, 'reset',  this.removeAll);
+        },
+
+        /**
+         * Delegated events
+         */
+        events:
+        {
+            "change" : "selectionChanged"
         },
 
         render: function()
         {
         },
 
-        addOne: function(filter)
+        addOne: function(infoDataField)
         {
-            $('#info_field_list').append("<option value='"+filter.get("id")+"'>"+filter.get("name")+"</option>");
+            var fieldID = infoDataField.get("id");
+            this.$el.append("<option value='"+fieldID+"'>"+fieldID+"</option>");
 
             // check if this is the 1ST added
-            if (filters.models.length == 1)
+            if (this.model.models.length == 1)
             {
                 // simulate user choosing the 1st INFO field
-                infoFieldChanged(workspaceKey);
+                infoFieldChanged();
             }
         },
 
-        removeOne: function(filter)
+        selectionChanged: function(e)
         {
-            $("#info_field_list option[value='"+filter.get("id")+"']").remove();
+            infoFieldChanged();
+        },
+
+        removeOne: function(infoDataField)
+        {
+            var fieldID = infoDataField.get("id");
+            $("#info_field_list option[value='"+fieldID+"']").remove();
         },
 
         removeAll: function()
         {
-            $('#info_field_list').empty();
+            this.$el.empty();
         }
     });
 
-    view = new ListView();
-
-    // listen for selection changes to list
-    $('#info_field_list').change(function()
-    {
-        infoFieldChanged(workspaceKey);
-    });
+    view = new ListView(
+        {
+            "el": $('#info_field_list'),
+            "model": infoFields
+        }
+    );
 
     /**
-     * Gets the currently selected Filter model.
+     * Gets the currently selected VCFDataField model.
      *
      * @returns {*}
      */
-    function getSelectedFilter()
+    function getSelectedInfoField()
     {
-        var filterID = $('#info_field_list').val();
-        return INFO_FILTER_LIST.findWhere({id: filterID});
+        var fieldID = $('#info_field_list').val();
+        return infoFields.findWhere({id: fieldID});
     }
 
     /**
      * Dynamically alters the tab's "operator" and "value" areas based on
      * the selected INFO field.
-     *
-     * @param workspaceKey
      */
-    function infoFieldChanged(workspaceKey)
+    function infoFieldChanged()
     {
-        // get selected filter
-        var filter = getSelectedFilter();
+        // get selected VCFDataField model
+        var infoField = getSelectedInfoField();
+        var fieldID = infoField.get("id");
+
+        if (SETTINGS.showMissingIndexWarning && !indexController.isDataFieldIndexed(infoField))
+        {
+            var confirmDialog = new ConfirmDialog(
+                "",
+                fieldID + " does not have an index.  Would you like to create a new index to boost filtering performance?",
+                "Create Index",
+                function()
+                {
+                    // confirm
+                    indexController.createIndex(infoField);
+                }
+            );
+            confirmDialog.show();
+        }
 
         // value DIV area
         var valueDiv = $("#info_value_div");
@@ -118,9 +148,9 @@ var InfoFilterTab = function (filters) {
             //"<div class='row-fluid checkbox'><label><input type='checkbox' id='include_nulls'> Keep variants with missing annotation (+null)</label></div>";
         "<div class='row-fluid'><input type='checkbox' id='include_nulls'/> Keep variants with missing annotation (+null)</div>";
 
-        switch (filter.get("category"))
+        switch (infoField.get("type"))
         {
-            case FilterCategory.INFO_FLAG:
+            case VCFDataType.FLAG:
                 opList.append(OPTION_EQ);
                 //opList.append(OPTION_NE); // not supported by server-side
                 valueDiv.append(
@@ -130,7 +160,7 @@ var InfoFilterTab = function (filters) {
                     "</div>"
                 );
                 break;
-            case FilterCategory.INFO_INT:
+            case VCFDataType.INTEGER:
                 opList.append(OPTION_EQ);
                 opList.append(OPTION_GT);
                 opList.append(OPTION_GTEQ);
@@ -141,7 +171,7 @@ var InfoFilterTab = function (filters) {
                 valueDiv.append("<div class='row-fluid'><div class='span12'><hr></div></div>");
                 valueDiv.append(includeNullsHTML);
                 break;
-            case FilterCategory.INFO_FLOAT:
+            case VCFDataType.FLOAT:
                 opList.append(OPTION_EQ);
                 opList.append(OPTION_GT);
                 opList.append(OPTION_GTEQ);
@@ -152,21 +182,21 @@ var InfoFilterTab = function (filters) {
                 valueDiv.append("<div class='row-fluid'><div class='span12'><hr></div></div>");
                 valueDiv.append(includeNullsHTML);
                 break;
-            case FilterCategory.INFO_STR:
+            case VCFDataType.STRING:
                 opList.append(OPTION_EQ);
                 opList.append(OPTION_NE);
 
-                if (useTypeAheadWidget(filter.get("name")))
+                if (useTypeAheadWidget(fieldID))
                 {
                     valueDiv.append('<input id="info_str_typeahead" type="text" placeholder="enter value here" autocomplete="off" spellcheck="false"/>');
                     valueDiv.append('<textarea id="info_str_value_area" rows="7" wrap="off" placeholder="" autocomplete="off" spellcheck="false"/>');
                     $('#info_str_typeahead').typeahead({
                         remote:
                         {
-                            url: '/mongo_svr/ve/typeahead/w/'+workspaceKey+'/f/'+filter.get("name")+'/p/%QUERY/x/100',
+                            url: '/mongo_svr/ve/typeahead/w/'+workspaceKey+'/f/'+fieldID+'/p/%QUERY/x/100', //TODO: 100 max?
                             filter: function(parsedResponse) {
                                 var dataset = new Array();
-                                var values = parsedResponse[filter.get("name")];
+                                var values = parsedResponse[fieldID];
                                 for (var i = 0; i < values.length; i++) {
                                     var datum = {
                                         value: values[i]
@@ -202,14 +232,13 @@ var InfoFilterTab = function (filters) {
                     valueDiv.append("<div class='row-fluid'><div class='dropdown' id='info_field_dropdown_checkbox' name='str_field_value'></div></div>");
 
                     // dynamically query to populate dropdown
-                    var fieldName = filter.get("name");
                     $.ajax({
-                        url: "/mongo_svr/ve/typeahead/w/" + workspaceKey + "/f/" + fieldName,
+                        url: "/mongo_svr/ve/typeahead/w/" + workspaceKey + "/f/INFO." + fieldID,
                         dataType: "json",
                         async: false,
                         success: function(json)
                         {
-                            var fieldValues = json[fieldName];
+                            var fieldValues = json[fieldID];
                             if (typeof fieldValues === "undefined")
                             {
                                 console.warn("INFO string field " + fieldName + " has no available values.");
@@ -250,11 +279,12 @@ var InfoFilterTab = function (filters) {
 
     function validate()
     {
-        var filter = getSelectedFilter();
+        var infoField = getSelectedInfoField();
+        var fieldID = infoField.get("id");
 
-        switch (filter.get("category"))
+        switch (infoField.get("type"))
         {
-            case FilterCategory.INFO_STR:
+            case VCFDataType.STRING:
 
                 if ($('#info_str_value_area').length > 0)
                 {
@@ -297,20 +327,19 @@ var InfoFilterTab = function (filters) {
      * @param field
      * @returns {boolean}
      */
-    function useTypeAheadWidget(field)
+    function useTypeAheadWidget(fieldID)
     {
-        // TODO
         var maxValues = SETTINGS.maxFilterValues;
 
         var useTypeAhead = false;
         // perform synchronous AJAX call
         $.ajax({
             async: false,
-            url: "/mongo_svr/ve/typeahead/w/"+workspaceKey+"/f/"+field,
+            url: "/mongo_svr/ve/typeahead/w/"+workspaceKey+"/f/INFO."+fieldID,
             dataType: "json",
             success: function(json)
             {
-                var valueArray = json[field];
+                var valueArray = json[fieldID];
                 if ((valueArray == undefined) || (valueArray.length > maxValues))
                 {
                     useTypeAhead = true;
@@ -331,12 +360,21 @@ var InfoFilterTab = function (filters) {
          *
          * @param workspaceKey
          */
-        initialize: function(ws)
+        initialize: function(ws, vcfDataFields)
         {
             workspaceKey = ws;
 
+            // pick out the INFO data fields
+            infoFields.reset();
+            _.each(vcfDataFields.models, function(vcfDataField) {
+                if (vcfDataField.get("category") == VCFDataCategory.INFO)
+                {
+                    infoFields.add(vcfDataField);
+                }
+            });
+
             // check to see whether we have any INFO annotation
-            if (filters.length > 0)
+            if (infoFields.length > 0)
                 $('#no_info_annotation_warning').toggle(false);
             else
                 $('#no_info_annotation_warning').toggle(true);
@@ -348,25 +386,24 @@ var InfoFilterTab = function (filters) {
         validate: validate,
 
         /**
-         * Gets the selected filter.
+         * Gets a new Filter model built from the user's customizations.
          *
          * @return Filter model
          */
         getFilter: function()
         {
-            // get selected filter
-            var filterID = $('#info_field_list').val();
+            // get selected VCFDataField
+            var infoField = getSelectedInfoField();
+            var fieldID = infoField.get("id");
 
-            // make a new identical copy of the model (because the same model can be added multiple times).
-            var filter = filters.findWhere({id: filterID}).clone();
-
-            // assign new uid
-            filter.set("id", guid());
+            var filter = new Filter();
+            filter.set("name", fieldID);
 
             var valueDiv = $("#info_value_div");
-            switch (filter.get("category"))
+            switch (infoField.get("type"))
             {
-                case FilterCategory.INFO_FLAG:
+                case VCFDataType.FLAG:
+                    filter.set("category", FilterCategory.INFO_FLAG);
                     var radioId =  $('#info_flag_radio_group input[type=radio]:checked').attr('id');
                     if (radioId == 'true')
                     {
@@ -377,13 +414,15 @@ var InfoFilterTab = function (filters) {
                         filter.set("value", false);
                     }
                     break;
-                case FilterCategory.INFO_INT:
-                case FilterCategory.INFO_FLOAT:
+                case VCFDataType.INTEGER:
+                    filter.set("category", FilterCategory.INFO_INT);
+                case VCFDataType.FLOAT:
+                    filter.set("category", FilterCategory.INFO_FLOAT);
                     filter.set("value", $("#info_value_div input").val());
                     filter.set("includeNulls", ($("#include_nulls:checked").length > 0) ? true:false);
                     break;
-                case FilterCategory.INFO_STR:
-                    var filter = filters.findWhere({id: filterID});
+                case VCFDataType.STRING:
+                    filter.set("category", FilterCategory.INFO_STR);
 
                     var valueArr;
 

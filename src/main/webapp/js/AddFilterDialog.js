@@ -1,9 +1,9 @@
-var AddFilterDialog = function (infoFilters, searchedFilters, sampleGroups) {
+var AddFilterDialog = function (searchedFilters, sampleGroups, indexController) {
 
     // private variables
     var workspaceKey;
     var sampleFilterTab = new SampleFilterTab(sampleGroups);
-    var infoFilterTab   = new InfoFilterTab(infoFilters);
+    var infoFilterTab   = new InfoFilterTab(indexController);
 
     $('#add_filter').click(function()
     {
@@ -56,12 +56,12 @@ var AddFilterDialog = function (infoFilters, searchedFilters, sampleGroups) {
          * @param sampleNames
          *      An array of strings, each string representing a sample name.
          */
-        initialize: function(ws, sampleNames)
+        initialize: function(ws, sampleNames, vcfDataFields)
         {
             workspaceKey = ws;
 
             sampleFilterTab.initialize(workspaceKey, sampleNames);
-            infoFilterTab.initialize(workspaceKey);
+            infoFilterTab.initialize(workspaceKey, vcfDataFields);
         },
 
         /**
