@@ -76,6 +76,7 @@ var SettingsTab = function (settings, indexController) {
     );
 
     var fieldMaxFilteredVariants = $('#max_filtered_variants_field');
+    settings.maxFilteredVariants = fieldMaxFilteredVariants.val();
     fieldMaxFilteredVariants.change(function(event) {
 
         if (fieldMaxFilteredVariants.valid() == true){
@@ -85,6 +86,7 @@ var SettingsTab = function (settings, indexController) {
     });
 
     var fieldPopoverTime = $('#popover_time_field');
+    settings.popupDuration = fieldPopoverTime.val();
     fieldPopoverTime.change(function(event) {
 
         if (fieldPopoverTime.valid() == true){
@@ -94,6 +96,7 @@ var SettingsTab = function (settings, indexController) {
     });
 
     var fieldMaxFilterValues = $('#max_filter_values_field');
+    settings.maxFilterValues = fieldMaxFilterValues.val();
     fieldMaxFilterValues.change(function(event) {
 
         if (fieldMaxFilterValues.valid() == true){

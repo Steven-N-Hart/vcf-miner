@@ -9,9 +9,9 @@
 // GLOBAL settings for entire system
 var SETTINGS =
 {
-    maxFilteredVariants: 1000,
-    popupDuration: 3, // seconds
-    maxFilterValues: 100,
+    maxFilteredVariants: 0,
+    popupDuration: 0, // seconds
+    maxFilterValues: 0,
     showMissingIndexWarning: false
 };
 var SETTINGS_TAB;
