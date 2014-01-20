@@ -29,8 +29,8 @@ var IndexTableRowView = Backbone.View.extend({
         var index = this.model;
 
         // remove element with corresponding ID from DOM
-        var id = index.get("dataField").get("id");
-        var nRow =  $('#'+this.options.tableId+' tbody tr[id='+id+']')[0];
+        var name = index.get("name");
+        var nRow =  $('#'+this.options.tableId+' tbody tr[id="'+name+'"]')[0];
 
         var dataTable = $('#'+this.options.tableId).dataTable();
         dataTable.fnUpdate( this.toAaDataRow(index), nRow );
@@ -44,14 +44,13 @@ var IndexTableRowView = Backbone.View.extend({
      */
     toAaDataRow: function(index)
     {
-        var id = index.get("dataField").get("id");
-        var name = index.get("dataField").get("id");
+        var name = index.get("name");
 
         var nameHtml = "<div class='ellipsis' title='"+name+"'>"+name+"</div>";
         var statusLabel = $("<label>"+this.getDisplayStatus(index)+"</label>");
 
-        var onRadioButton  = $('<input data-field-id="'+id+'" type="radio" class="evt_create_idx" name="index_group_'+id+'" value="on">');
-        var offRadioButton = $('<input data-field-id="'+id+'" type="radio" class="evt_delete_idx" name="index_group_'+id+'" value="off">');
+        var onRadioButton  = $('<input data-field-id="'+name+'" type="radio" class="evt_create_idx" name="index_group_'+name+'" value="on">');
+        var offRadioButton = $('<input data-field-id="'+name+'" type="radio" class="evt_delete_idx" name="index_group_'+name+'" value="off">');
 
         var onLabel = $("<label class='radio inline' style='margin-right:20px;'></label>");
         var offLabel = $("<label class='radio inline' style='margin-right:20px;'></label>");
@@ -87,7 +86,7 @@ var IndexTableRowView = Backbone.View.extend({
 
         var aaDataRow =
         {
-            "DT_RowId": id,
+            "DT_RowId": name,
             "0": nameHtml,
             "1": statusHtml,
             "2": actionHtml

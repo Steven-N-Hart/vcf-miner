@@ -11,6 +11,8 @@ var DatabaseIndex = Backbone.Model.extend({
     defaults: function()
     {
         return {
+            name: "unknown",
+
             /**
              * Corresponding data field the index is built for.
              */

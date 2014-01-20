@@ -2,19 +2,13 @@
 var FilterCategory =
 {
     UNKNOWN:                0,
-    SAMPLE_MIN_ALT_READS:   1,
-    SAMPLE_MIN_NUM_SAMPLES: 2,
-    SAMPLE_MAX_NUM_SAMPLES: 3,
-    SAMPLE_MIN_AC:          4,
-    SAMPLE_MAX_AC:          5,
-    SAMPLE_MIN_PHRED:       6,
-    GENE:                   7,
-    IN_GROUP:               8,
-    NOT_IN_GROUP:           9,
-    INFO_INT:               10,
-    INFO_FLOAT:             11,
-    INFO_FLAG:              12,
-    INFO_STR:               13
+    FORMAT:                 1,
+    IN_GROUP:               2,
+    NOT_IN_GROUP:           3,
+    INFO_INT:               4,
+    INFO_FLOAT:             5,
+    INFO_FLAG:              6,
+    INFO_STR:               7
 }
 
 // ENUM
@@ -29,6 +23,14 @@ var FilterOperator =
     NE:      6
 }
 
+// ENUM
+var FilterValueFunction =
+{
+    NONE:   0,
+    MIN:    1,
+    MAX:    2
+}
+
 // MODEL
 var Filter = Backbone.Model.extend({
     /**
@@ -41,6 +43,37 @@ var Filter = Backbone.Model.extend({
     {
         this.set("displayValue", $.trim(this.getValueAsHTML()));
         this.set("displayOperator", this.getOperatorAsHTML());
+    },
+
+    /**
+     * Translates this model into a SampleNumberFilter server-side object.
+     * @returns {Object}
+     */
+    toSampleNumberFilterPojo: function()
+    {
+        var pojo = new Object();
+
+        pojo.key = this.get("name");
+
+        pojo.value = this.get("value");
+
+        pojo.comparator = this.toMongoNumberComparator(this.get("operator"));
+
+        switch(this.get("valueFunction"))
+        {
+            case FilterValueFunction.MIN:
+                pojo.minORmax='min';
+                break;
+            case FilterValueFunction.MAX:
+                pojo.minORmax='max';
+                break;
+        }
+
+        //TODO:
+//        pojo.includeNulls = this.get("includeNulls");
+        pojo.includeNulls = false;
+
+        return pojo;
     },
 
     /**
@@ -80,29 +113,7 @@ var Filter = Backbone.Model.extend({
 
         pojo.value = this.get("value");
 
-        var comparator;
-        switch(this.get("operator"))
-        {
-            case FilterOperator.EQ:
-                comparator='';
-                break;
-            case FilterOperator.GT:
-                comparator='$gt';
-                break;
-            case FilterOperator.GTEQ:
-                comparator='$gte';
-                break;
-            case FilterOperator.LT:
-                comparator='$lt';
-                break;
-            case FilterOperator.LTEQ:
-                comparator = '$lte';
-                break;
-            case FilterOperator.NE:
-                comparator = '$ne';
-                break;
-        }
-        pojo.comparator = comparator;
+        pojo.comparator = this.toMongoNumberComparator(this.get("operator"));
         pojo.includeNulls = this.get("includeNulls");
 
         return pojo;
@@ -145,6 +156,36 @@ var Filter = Backbone.Model.extend({
         pojo.includeNulls = this.get("includeNulls");
 
         return pojo;
+    },
+
+    /**
+     * Translates FilterOperator into a MONGO equivalent comparator.
+     */
+    toMongoNumberComparator: function(filterOperator)
+    {
+        var comparator;
+        switch(this.get("operator"))
+        {
+            case FilterOperator.EQ:
+                comparator='';
+                break;
+            case FilterOperator.GT:
+                comparator='$gt';
+                break;
+            case FilterOperator.GTEQ:
+                comparator='$gte';
+                break;
+            case FilterOperator.LT:
+                comparator='$lt';
+                break;
+            case FilterOperator.LTEQ:
+                comparator = '$lte';
+                break;
+            case FilterOperator.NE:
+                comparator = '$ne';
+                break;
+        }
+        return comparator;
     },
 
     getValueAsHTML: function()
@@ -202,6 +243,24 @@ var Filter = Backbone.Model.extend({
         }
 
         return asciiStr;
+    },
+
+    getValueFunctionAsHTML: function()
+    {
+        var html;
+        switch(this.get("valueFunction"))
+        {
+            case FilterValueFunction.NONE:
+                html='';
+                break;
+            case FilterValueFunction.MIN:
+                html='MIN';
+                break;
+            case FilterValueFunction.MAX:
+                html='MAX';
+                break;
+        }
+        return html;
     },
 
     getOperatorAsHTML: function()
@@ -272,6 +331,7 @@ var Filter = Backbone.Model.extend({
         return {
             name:            "NA",
             operator:        FilterOperator.UNKNOWN,
+            valueFunction:   FilterValueFunction.NONE,
             displayOperator: "NA",
             value:           "NA",
             displayValue:    "NA", // may be abbreviated

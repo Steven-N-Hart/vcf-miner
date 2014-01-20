@@ -110,13 +110,13 @@ var IndexTableView = Backbone.View.extend({
     /**
      * Searches through all models.
      *
-     * @param fieldId
+     * @param indexName
      * @returns {*}
      */
-    findIndexModel: function(fieldId)
+    findIndexModel: function(indexName)
     {
         return _.find(this.model.models, function(index){
-                if (index.get("dataField").get("id") == fieldId)
+                if (index.get("name") == indexName)
                     return index;
             }
         );
@@ -133,9 +133,9 @@ var IndexTableView = Backbone.View.extend({
     {
         var button = $(e.currentTarget);
 
-        var fieldId = button.attr('data-field-id');
+        var indexName = button.attr('data-field-id');
 
-        var index = this.findIndexModel(fieldId);
+        var index = this.findIndexModel(indexName);
 
         // check for no-change
         if (index.get("status") == IndexStatus.READY)
@@ -144,17 +144,18 @@ var IndexTableView = Backbone.View.extend({
         }
 
         // disable radio buttons for the row
-        $('#'+this.table_uid+' tbody tr[id='+fieldId+'] input[type=radio]').attr("disabled", "disabled");
+        $('#'+this.table_uid+' tbody tr[id="'+indexName+'"] input[type=radio]').attr("disabled", "disabled");
 
-        this.options.createIndexCallback(index.get("dataField"));
+        this.options.createIndexCallback(index);
     },
 
     deleteIndex: function(e)
     {
-        var offButton = $(e.currentTarget);
-        var fieldId = offButton.attr('data-field-id');
+        var button = $(e.currentTarget);
 
-        var index = this.findIndexModel(fieldId);
+        var indexName = button.attr('data-field-id');
+
+        var index = this.findIndexModel(indexName);
 
         // check for no-change
         if (index.get("status") == IndexStatus.NONE)
@@ -163,26 +164,26 @@ var IndexTableView = Backbone.View.extend({
         }
 
         // disable radio buttons for the row
-        $('#'+this.table_uid+' tbody tr[id='+fieldId+'] input[type=radio]').attr("disabled", "disabled");
+        $('#'+this.table_uid+' tbody tr[id="'+indexName+'"] input[type=radio]').attr("disabled", "disabled");
 
         var dropIndexCallback =  this.options.dropIndexCallback;
         var that = this;
         var confirmDialog = new ConfirmDialog(
             "Delete Index",
-            "Delete index for column " + fieldId + "?",
+            "Delete index " + indexName + "?",
             "Delete",
             function()
             {
                 // confirm
-                dropIndexCallback(index.get("dataField"));
+                dropIndexCallback(index);
             },
             function()
             {
                 // cancel, need to toggle the radio button back to ON
-                var onButton = $('input[type="radio"][data-field-id="'+fieldId+'"][value="on"]');
+                var onButton = $('input[type="radio"][data-field-id="'+indexName+'"][value="on"]');
 
                 // re-enable the radio buttons
-                $('#'+that.table_uid+' tbody tr[id='+fieldId+'] input[type=radio]').removeAttr("disabled", "disabled");
+                $('#'+that.table_uid+' tbody tr[id="'+indexName+'"] input[type=radio]').removeAttr("disabled", "disabled");
 
                 onButton.click();
             }

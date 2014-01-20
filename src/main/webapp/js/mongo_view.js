@@ -168,11 +168,11 @@ function buildQuery(filterList, workspaceKey)
 
     query.workspace = workspaceKey;
 
-    var genes               = new Array();
     var sampleGroups        = new Array();
     var infoFlagFilters     = new Array();
     var infoNumberFilters   = new Array();
     var infoStringFilters   = new Array();
+    var sampleNumberFilters = new Array();
 
     // loop through filter collection
     _.each(filterList.models, function(filter)
@@ -201,35 +201,17 @@ function buildQuery(filterList, workspaceKey)
                     inSample = false;
                 sampleGroups.push(group.toSampleGroupPOJO(workspaceKey, inSample));
                 break;
-            case FilterCategory.SAMPLE_MIN_ALT_READS:
-                query.minAltReads = filter.get("value");
-                break;
-            case FilterCategory.SAMPLE_MIN_NUM_SAMPLES:
-                query.minNumSample = filter.get("value");
-                break;
-            case FilterCategory.SAMPLE_MAX_NUM_SAMPLES:
-                query.maxNumSample = filter.get("value");
-                break;
-            case FilterCategory.SAMPLE_MIN_AC:
-                query.minAC = filter.get("value");
-                break;
-            case FilterCategory.SAMPLE_MAX_AC:
-                query.maxAC = filter.get("value");
-                break;
-            case FilterCategory.SAMPLE_MIN_PHRED:
-                query.minPHRED = filter.get("value");
-                break;
-            case FilterCategory.GENE:
-                genes = genes.concat(filter.get("value"));
+            case FilterCategory.FORMAT:
+                sampleNumberFilters.push(filter.toSampleNumberFilterPojo());
                 break;
         }
     });
 
-    query.genes             = genes;
-    query.sampleGroups      = sampleGroups;
-    query.infoFlagFilters   = infoFlagFilters;
-    query.infoNumberFilters = infoNumberFilters;
-    query.infoStringFilters = infoStringFilters;
+    query.sampleGroups        = sampleGroups;
+    query.infoFlagFilters     = infoFlagFilters;
+    query.infoNumberFilters   = infoNumberFilters;
+    query.infoStringFilters   = infoStringFilters;
+    query.sampleNumberFilters = sampleNumberFilters;
 
     return query;
 }
@@ -417,18 +399,6 @@ function setWorkspace(workspace)
         {
             var info = json.INFO;
 
-            // delete the properties that are actually FORMAT fields, not INFO fields
-            var shouldDelete = function(obj, propName)
-            {
-                var isFormatField = (obj[propName].EntryType == "FORMAT");
-                if (isFormatField)
-                {
-                    console.debug("Ignoring field " + propName + " because it is of type FORMAT");
-                }
-                return isFormatField;
-            }
-            deleteObjectProperties(info, shouldDelete);
-
             // get the INFO field names sorted alphabetically
             var infoFieldNames = getSortedAttrNames(info);
 
@@ -478,16 +448,18 @@ function setWorkspace(workspace)
                             break;
                     }
 
-                    dataFields.add(new VCFDataField({category:VCFDataCategory.INFO, type:dataType, id:infoFieldName, description:info[infoFieldName].Description}));
+                    var category;
+                    switch(info[infoFieldName].EntryType)
+                    {
+                        case 'FORMAT':
+                            category = VCFDataCategory.FORMAT;
+                            break;
+                        case 'INFO':
+                            category = VCFDataCategory.INFO;
+                            break;
+                    }
+                    dataFields.add(new VCFDataField({category:category, type:dataType, id:infoFieldName, description:info[infoFieldName].Description}));
                 }
-            }
-
-            // process FORMAT column information
-            var format = json.FORMAT;
-            // get the INFO field names sorted alphabetically
-            var formatFieldNames = getSortedAttrNames(format);
-            for (var i = 0; i < formatFieldNames.length; i++) {
-                dataFields.add(new VCFDataField({category:VCFDataCategory.FORMAT, id:'FORMAT.'+formatFieldNames[i]}));
             }
 
             variantTableView.render();

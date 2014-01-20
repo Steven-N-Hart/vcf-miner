@@ -7,27 +7,10 @@
 var SampleFilterTab = function (groups) {
 
     // private variables
-    var FILTER_MIN_ALT_READS   = new Filter({name: 'Min Alt Reads', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE_MIN_ALT_READS});
-    var FILTER_MIN_NUM_SAMPLES = new Filter({name: 'Min # Samples', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE_MIN_NUM_SAMPLES});
-    var FILTER_MAX_NUM_SAMPLES = new Filter({name: 'Max # Samples', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE_MAX_NUM_SAMPLES});
-    var FILTER_MIN_AC          = new Filter({name: 'Min AC',        operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE_MIN_AC});
-    var FILTER_MAX_AC          = new Filter({name: 'Max AC',        operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE_MAX_AC});
-    var FILTER_MIN_PHRED       = new Filter({name: 'Min Phred',     operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.SAMPLE_MIN_PHRED});
+    var formatFields = new VCFDataFieldList();
 
     var FILTER_IN_GROUP        = new Filter({name: 'Samples in Group',     operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.IN_GROUP});
     var FILTER_NOT_IN_GROUP    = new Filter({name: 'Samples not in Group', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.NOT_IN_GROUP});
-
-    var sampleFilters = new FilterList();
-    sampleFilters.add([
-        FILTER_MIN_ALT_READS,
-        FILTER_MIN_NUM_SAMPLES,
-        FILTER_MAX_NUM_SAMPLES,
-        FILTER_MIN_AC,
-        FILTER_MAX_AC,
-        FILTER_MIN_PHRED,
-        FILTER_IN_GROUP,
-        FILTER_NOT_IN_GROUP
-    ]);
 
     var count = $('#group_sample_count');
     var list = $('#group_sample_names_list');
@@ -85,58 +68,112 @@ var SampleFilterTab = function (groups) {
         }
     );
 
-    function reset()
-    {
-        var sampleFieldList = $('#sample_field_list');
-        sampleFieldList.empty();
+    var ListView = Backbone.View.extend({
 
-        for (var i=0; i < sampleFilters.models.length; i++)
+        initialize: function()
         {
-            var filter = sampleFilters.models[i];
+            this.listenTo(this.model, 'add',    this.addOne);
+            this.listenTo(this.model, 'reset',  this.removeAll);
+        },
 
-            sampleFieldList.append("<option value='"+filter.get("id")+"'>"+filter.get("name")+"</option>");
+        /**
+         * Delegated events
+         */
+        events:
+        {
+            "change" : "selectionChanged"
+        },
 
-            sampleFieldList.change(function()
+        render: function()
+        {
+        },
+
+        addOne: function(formatDataField)
+        {
+            var fieldID = formatDataField.get("id");
+            this.$el.append("<option value='"+fieldID+"'>"+fieldID+"</option>");
+
+            // check if this is the 1ST added
+            if (this.model.models.length == 1)
             {
+                // simulate user choosing the 1st field
                 sampleFieldChanged();
-            });
+            }
+        },
 
-            // simulate user clicking on 1st entry
+        selectionChanged: function(e)
+        {
             sampleFieldChanged();
+        },
+
+        removeAll: function()
+        {
+            this.$el.empty();
         }
-    }
+    });
+
+    view = new ListView(
+        {
+            "el": $('#sample_field_list'),
+            "model": formatFields
+        }
+    );
+
+
+//    function reset()
+//    {
+//        var sampleFieldList = $('#sample_field_list');
+//        sampleFieldList.empty();
+//
+//        for (var i=0; i < sampleFilters.models.length; i++)
+//        {
+//            var filter = sampleFilters.models[i];
+//
+//            sampleFieldList.append("<option value='"+filter.get("id")+"'>"+filter.get("name")+"</option>");
+//
+//            sampleFieldList.change(function()
+//            {
+//                sampleFieldChanged();
+//            });
+//
+//            // simulate user clicking on 1st entry
+//            sampleFieldChanged();
+//        }
+//    }
 
     function sampleFieldChanged()
     {
-        // get selected filter
-        var filterID = $('#sample_field_list').val();
-        var filter = sampleFilters.findWhere({id: filterID});
+        // get selected field
+        var fieldID = $('#sample_field_list').val();
+        var formatField = formatFields.findWhere({id: fieldID});
 
-        switch(filter.get("category"))
-        {
-            case FilterCategory.IN_GROUP:
-            case FilterCategory.NOT_IN_GROUP:
-                // always make sure count and sample list
-                // are cleared if no group is selected
-                if (typeof groupListView.getSelectedGroup() == 'undefined')
-                {
-                    count.empty();
-                    list.empty();
-                }
-
-                // make sure a group is selected, otherwise it should show a
-                // validation warning to user
-                validate();
-
-                $('#group_value_div').toggle(true);
-                $('#sample_value_div').toggle(false);
-            break;
-
-            default:
-                // all other cases
-                $('#group_value_div').toggle(false);
-                $('#sample_value_div').toggle(true);
-        }
+        // TODO:
+        $('#sample_value_div').toggle(true);
+//        switch(filter.get("category"))
+//        {
+//            case FilterCategory.IN_GROUP:
+//            case FilterCategory.NOT_IN_GROUP:
+//                // always make sure count and sample list
+//                // are cleared if no group is selected
+//                if (typeof groupListView.getSelectedGroup() == 'undefined')
+//                {
+//                    count.empty();
+//                    list.empty();
+//                }
+//
+//                // make sure a group is selected, otherwise it should show a
+//                // validation warning to user
+//                validate();
+//
+//                $('#group_value_div').toggle(true);
+//                $('#sample_value_div').toggle(false);
+//            break;
+//
+//            default:
+//                // all other cases
+//                $('#group_value_div').toggle(false);
+//                $('#sample_value_div').toggle(true);
+//        }
     }
 
     /**
@@ -177,10 +214,20 @@ var SampleFilterTab = function (groups) {
          * @param allSampleNames
          *      An array of strings, each string representing a sample name.
          */
-        initialize: function(ws, allSampleNames)
+        initialize: function(ws, allSampleNames, vcfDataFields)
         {
             createGroupDialog.initialize(ws, allSampleNames);
-            reset();
+
+            // pick out the INFO data fields
+            formatFields.reset();
+            _.each(vcfDataFields.models, function(vcfDataField) {
+                if (vcfDataField.get("category") == VCFDataCategory.FORMAT)
+                {
+                    formatFields.add(vcfDataField);
+                }
+            });
+
+            // TODO: add groups?
         },
 
         /**
@@ -195,22 +242,76 @@ var SampleFilterTab = function (groups) {
          */
         getFilter: function()
         {
-            // get selected filter
-            var filterID = $('#sample_field_list').val();
-            filter = sampleFilters.findWhere({id: filterID});
+            // get selected field
+            var fieldID = $('#sample_field_list').val();
+            var formatField = formatFields.findWhere({id: fieldID});
 
-            switch(filter.get("category"))
+            var filter = new Filter();
+            filter.set("name", fieldID);
+            filter.set("category", FilterCategory.FORMAT);
+            filter.set("value", $("#sample_value_div input").val());
+
+            // get selected operator
+            var operator = FilterOperator.EQ; // default
+            var selectedOperatorOpt = $('#sample_field_op_list');
+            if (typeof selectedOperatorOpt !== "undefined")
             {
-                case FilterCategory.IN_GROUP:
-                case FilterCategory.NOT_IN_GROUP:
-                    filter.set("value", groupListView.getSelectedGroup().get("name"));
-                    break;
-
-                default:
-                    // all other cases
-                    // update filter's value based on textfield value
-                    filter.set("value", $("#sample_value_div input").val());
+                switch(selectedOperatorOpt.val())
+                {
+                    case 'eq':
+                        operator = FilterOperator.EQ;
+                        break;
+                    case 'gt':
+                        operator = FilterOperator.GT;
+                        break;
+                    case 'gteq':
+                        operator = FilterOperator.GTEQ;
+                        break;
+                    case 'lt':
+                        operator = FilterOperator.LT;
+                        break;
+                    case 'lteq':
+                        operator = FilterOperator.LTEQ;
+                        break;
+                    case 'ne':
+                        operator = FilterOperator.NE;
+                        break;
+                }
             }
+            filter.set("operator", operator);
+
+            // get value function
+            var valueFunc;
+            var selectedFuncList = $('#sample_field_min_max_list');
+            if (typeof selectedFuncList !== "undefined")
+            {
+                switch(selectedFuncList.val())
+                {
+                    case 'min':
+                        valueFunc = FilterValueFunction.MIN;
+                        break;
+                    case 'max':
+                        valueFunc = FilterValueFunction.MAX;
+                        break;
+                    default:
+                        valueFunc = FilterValueFunction.NONE;
+                }
+            }
+            filter.set("valueFunction", valueFunc);
+
+            // TODO: hook up group stuff
+//            switch(filter.get("category"))
+//            {
+//                case FilterCategory.IN_GROUP:
+//                case FilterCategory.NOT_IN_GROUP:
+//                    filter.set("value", groupListView.getSelectedGroup().get("name"));
+//                    break;
+//
+//                default:
+//                    // all other cases
+//                    // update filter's value based on textfield value
+//                    filter.set("value", $("#sample_value_div input").val());
+//            }
 
             return filter;
         }

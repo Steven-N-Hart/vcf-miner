@@ -60,7 +60,7 @@ var AddFilterDialog = function (searchedFilters, sampleGroups, indexController) 
         {
             workspaceKey = ws;
 
-            sampleFilterTab.initialize(workspaceKey, sampleNames);
+            sampleFilterTab.initialize(workspaceKey, sampleNames, vcfDataFields);
             infoFilterTab.initialize(workspaceKey, vcfDataFields);
         },
 

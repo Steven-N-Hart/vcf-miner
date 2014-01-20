@@ -12,14 +12,14 @@ var DatabaseIndexController = function () {
     var generalIndexes = new DatabaseIndexList();
     var infoIndexes = new DatabaseIndexList();
     var formatIndexes = new DatabaseIndexList();
-    var indexedFieldNames;
+    var indexNames;
 
-    // array of dataFields that should be updated automatically
-    var notReadyDataFields = new Array();
+    // array of indexes that should be updated automatically
+    var notReadyIndexes = new Array();
     var TIMER_INTERVAL = 5000; // 5 seconds
     setInterval(updateNotReadyIndexes, TIMER_INTERVAL);
 
-    function loadIndexedFieldNames()
+    function loadIndexNames()
     {
         // synchronous AJAX call to server for index information
         $.ajax({
@@ -28,11 +28,11 @@ var DatabaseIndexController = function () {
             dataType: "json",
             success: function(json) {
 
-                indexedFieldNames = new Array();
+                indexNames = new Array();
                 var fields = json.fields;
                 for (var i = 0; i < fields.length; i++) {
                     var fieldName = getSortedAttrNames(fields[i].key)[0];
-                    indexedFieldNames.push(fieldName);
+                    indexNames.push(fieldName);
                 }
             },
             error: function(jqXHR, textStatus) {
@@ -42,18 +42,17 @@ var DatabaseIndexController = function () {
         });
     }
 
-    function createIndex(vcfDataField)
+    function createIndex(index)
     {
-        var fieldId = vcfDataField.get("id");
-        var indexName = getIndexName(vcfDataField);
-        console.log("Adding auto-updates for VCF field "  + fieldId);
-        notReadyDataFields.push(vcfDataField);
+        var indexName = getServerSideIndexName(index);
+        console.log("Adding auto-updates for index "  + indexName);
+        notReadyIndexes.push(index);
 
         $.ajax({
             url: "/mongo_svr/ve/index/createFieldIndex/" + workspaceKey+"/f/" + indexName,
             dataType: "json",
             success: function(json) {
-                console.log("created index for " + fieldId + " with return status: " + json.status);
+                console.log("created index " + indexName + " with return status: " + json.status);
             },
             error: function(jqXHR, textStatus) {
 
@@ -62,18 +61,17 @@ var DatabaseIndexController = function () {
         });
     }
 
-    function deleteIndex(vcfDataField)
+    function deleteIndex(index)
     {
-        var fieldId = vcfDataField.get("id");
-        var indexName = getIndexName(vcfDataField);
-        console.log("Adding auto-updates for VCF field "  + fieldId);
-        notReadyDataFields.push(vcfDataField);
+        var indexName = getServerSideIndexName(index);
+        console.log("Adding auto-updates for index "  + indexName);
+        notReadyIndexes.push(index);
 
         $.ajax({
             url: "/mongo_svr/ve/index/dropFieldIndex/" + workspaceKey+"/f/" + indexName + "_1",
             dataType: "json",
             success: function(json) {
-                console.log("dropped index for " + fieldId + " with return status: " + json.status);
+                console.log("dropped index " + indexName + " with return status: " + json.status);
             },
             error: function(jqXHR, textStatus) {
 
@@ -98,57 +96,82 @@ var DatabaseIndexController = function () {
         // create Index models
         _.each(dataFields.models, function(vcfDataField) {
 
-            var status;
-            var progress = 0; // TODO
-            if (isDataFieldIndexed(vcfDataField)) {
-
-                // TODO: check for building indexes for auto-updates
-
-
-                status = IndexStatus.READY;
-                overallStatus.set("numReady", overallStatus.get("numReady") + 1);
-            } else {
-                status = IndexStatus.NONE;
-            }
-
-            var index = new DatabaseIndex({dataField: vcfDataField, status: status, progress:progress});
+            var indexNames = new Array(); // a single data field may have 0 or more indexes
+            var indexList;
             switch (vcfDataField.get("category"))
             {
                 case VCFDataCategory.GENERAL:
-                    generalIndexes.add(index);
+                    indexNames.push(vcfDataField.get("id"));
+                    indexList = generalIndexes;
                     break;
                 case VCFDataCategory.INFO:
-                    infoIndexes.add(index);
+                    indexNames.push(vcfDataField.get("id"));
+                    indexList = infoIndexes;
                     break;
                 case VCFDataCategory.FORMAT:
-                    formatIndexes.add(index);
+                    // 2 indexes per FORMAT field (min,max)
+                    indexNames.push("min."+vcfDataField.get("id"));
+                    indexNames.push("max."+vcfDataField.get("id"));
+                    indexList = formatIndexes;
                     break;
             };
+
+            var status;
+            var progress = 0; // TODO
+            for (var i=0; i < indexNames.length; i++ )
+            {
+                var name = indexNames[i];
+                var index = new DatabaseIndex({name: name, dataField: vcfDataField, status: status, progress:progress});
+                if (isIndexed(index)) {
+
+                    // TODO: check for building indexes for auto-updates
+
+                    index.set("status", IndexStatus.READY);
+                    overallStatus.set("numReady", overallStatus.get("numReady") + 1);
+                } else {
+                    index.set("status", IndexStatus.NONE);
+                }
+                indexList.add(index);
+            }
         });
     }
 
-    function getIndexName(vcfDataField)
+    function getServerSideIndexName(index)
     {
-        var fieldId = vcfDataField.get("id");
+        var indexNameBase = index.get("name");
+        var vcfDataField = index.get("dataField");
 
         switch (vcfDataField.get("category"))
         {
             case VCFDataCategory.GENERAL:
-                return fieldId;
+                return indexNameBase;
             case VCFDataCategory.INFO:
-                return "INFO." + fieldId;
+                return "INFO." + indexNameBase;
             case VCFDataCategory.FORMAT:
-                return "FORMAT." + fieldId;
+                return "FORMAT." + indexNameBase;
         };
     }
 
-    function isDataFieldIndexed(vcfDataField)
+    /**
+     * Checks the given DatabaseIndex model against the server information about what
+     * is indexed.
+     *
+     * @param index
+     * @returns {boolean}
+     */
+    function isIndexed(index)
     {
-        if (jQuery.inArray( getIndexName(vcfDataField), indexedFieldNames ) > -1) {
+        if (jQuery.inArray( getServerSideIndexName(index), indexNames ) > -1) {
             return true;
         } else {
             return false;
         }
+    }
+
+    function isDataFieldIndexed(vcfDataField)
+    {
+        var index = getIndexByDataField(vcfDataField);
+        return isIndexed(index);
     }
 
     /**
@@ -156,45 +179,44 @@ var DatabaseIndexController = function () {
      */
     function updateNotReadyIndexes()
     {
-        if (notReadyDataFields.length == 0)
+        if (notReadyIndexes.length == 0)
         {
             return;
         }
 
         // freshly load the indexed field names
-        loadIndexedFieldNames();
+        loadIndexNames();
 
-        for (var i = 0; i < notReadyDataFields.length; i++) {
+        for (var i = 0; i < notReadyIndexes.length; i++) {
 
-            var vcfDataField = notReadyDataFields[i];
-            var index = getIndexByDataField(vcfDataField);
+            var index = notReadyIndexes[i];
+            var indexName = index.get("name");
             var status = index.get("status");
-            var isIndexed = isDataFieldIndexed(vcfDataField);
+            var indexed = isIndexed(index);
 
-            if ((status !== IndexStatus.READY) && isIndexed) {
+            if ((status !== IndexStatus.READY) && indexed) {
                 // data field was not indexed, but server is now indicating that it is
                 index.set("status", IndexStatus.READY);
                 overallStatus.set("numReady", overallStatus.get("numReady") + 1);
 
                 // delete key
-                var keyIdx = notReadyDataFields.indexOf(vcfDataField);
+                var keyIdx = notReadyIndexes.indexOf(indexName);
                 if (keyIdx > -1) {
-                    notReadyDataFields.splice(keyIdx, 1);
+                    notReadyIndexes.splice(keyIdx, 1);
                 }
-                console.log("Removing auto-updates for data field "  + vcfDataField.get("id") );
+                console.log("Removing auto-updates for index "  + indexName );
 
-            } else if ((status !== IndexStatus.NONE) && !isIndexed) {
+            } else if ((status !== IndexStatus.NONE) && !indexed) {
                 // update Index model
-                var index = getIndexByDataField(vcfDataField);
                 index.set("status", IndexStatus.NONE);
                 overallStatus.set("numReady", overallStatus.get("numReady") - 1);
 
                 // delete key
-                var keyIdx = notReadyDataFields.indexOf(vcfDataField);
+                var keyIdx = notReadyIndexes.indexOf(indexName);
                 if (keyIdx > -1) {
-                    notReadyDataFields.splice(keyIdx, 1);
+                    notReadyIndexes.splice(keyIdx, 1);
                 }
-                console.log("Removing auto-updates for data field "  + vcfDataField.get("id") );
+                console.log("Removing auto-updates for index "  + indexName );
             }
         }
     }
@@ -236,7 +258,7 @@ var DatabaseIndexController = function () {
             workspaceKey = wsKey;
             dataFields = vcfDataFields;
 
-            loadIndexedFieldNames();
+            loadIndexNames();
         },
 
         /**

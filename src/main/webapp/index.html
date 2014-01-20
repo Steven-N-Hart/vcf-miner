@@ -350,19 +350,33 @@
                                         </table>
                                     </div>
                                     <div class="row-fluid"> <!-- header row -->
-                                        <div class="span4"><h4>Filter</h4></div>
-                                        <div class="span8"><h4>Value</h4></div>
+                                        <div class="span6"><h4>Filter</h4></div>
+                                        <div class="span6"><h4>Value</h4></div>
                                     </div>
                                     <div class="row-fluid"> <!-- divider -->
                                         <div class="span12"><hr></div>
                                     </div>
                                     <div class="row-fluid">
-                                        <div class="span4">
-                                            <select class="span12" id="sample_field_list">
+                                        <div class="span6">
+                                            <!-- this dropdown's visibility depends upon the selected sample field -->
+                                            <select class="span3" id="sample_field_min_max_list">
+                                                <option value='max'>MAX</option>
+                                                <option value='min'>MIN</option>
+                                            </select>
+                                            <select class="span6" id="sample_field_list">
                                                 <!-- Dynamically added by javascript -->
                                             </select>
+                                            <!-- this dropdown's visibility depends upon the selected sample field -->
+                                            <select class="span3" id="sample_field_op_list">
+                                                <option value='eq'>=</option>
+                                                <option value='gt'>&gt;</option>
+                                                <option value='gteq'>&#x2265;</option>
+                                                <option value='lt'>&lt;</option>
+                                                <option value='lteq'>&#x2264;</option>
+                                                <option value='ne'>&#x2260;</option>
+                                            </select>
                                         </div>
-                                        <div class="span8">
+                                        <div class="span6">
                                             <!-- these are toggled on/off based on the sample_field_list choosen -->
                                             <div class="row-fluid hide" id="sample_value_div">
                                                 <input name='sample_filter_value' class='input-mini' value='0'>
