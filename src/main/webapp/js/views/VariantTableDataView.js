@@ -207,7 +207,7 @@ var VariantTableDataView = Backbone.View.extend({
         {
             displayFiltersApplied.push(
                 {
-                    filterText: filter.get("name") + " " + filter.getOperatorAsASCII() + " " + filter.getValueAsASCII(),
+                    filterText: filter.getNameAsASCII() + " " + filter.getOperatorAsASCII() + " " + filter.getValueAsASCII(),
                     numberVariantsRemaining: filter.get("numMatches")
                 }
             );

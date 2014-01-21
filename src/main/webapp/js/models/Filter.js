@@ -41,6 +41,7 @@ var Filter = Backbone.Model.extend({
      */
     setFilterDisplay: function()
     {
+        this.set("displayName", $.trim(this.getNameAsHTML()));
         this.set("displayValue", $.trim(this.getValueAsHTML()));
         this.set("displayOperator", this.getOperatorAsHTML());
     },
@@ -188,6 +189,48 @@ var Filter = Backbone.Model.extend({
         return comparator;
     },
 
+    getNameAsHTML: function()
+    {
+        var name = this.get("name");
+        var html = '';
+
+        switch(this.get("valueFunction"))
+        {
+            case FilterValueFunction.NONE:
+                html=name;
+                break;
+            case FilterValueFunction.MIN:
+                html='<strong>MIN(</strong> ' + name + ' <strong>)</strong>';
+                break;
+            case FilterValueFunction.MAX:
+                html='<strong>MAX(</strong> ' + name + ' <strong>)</strong>'
+                break;
+        }
+
+        return html;
+    },
+
+    getNameAsASCII: function()
+    {
+        var name = this.get("name");
+        var asciiStr = '';
+
+        switch(this.get("valueFunction"))
+        {
+            case FilterValueFunction.NONE:
+                asciiStr=name;
+                break;
+            case FilterValueFunction.MIN:
+                asciiStr='MIN( ' + name + ' )';
+                break;
+            case FilterValueFunction.MAX:
+                asciiStr='MAX( ' + name + ' )'
+                break;
+        }
+
+        return asciiStr;
+    },
+
     getValueAsHTML: function()
     {
         var value = this.get("value");
@@ -243,24 +286,6 @@ var Filter = Backbone.Model.extend({
         }
 
         return asciiStr;
-    },
-
-    getValueFunctionAsHTML: function()
-    {
-        var html;
-        switch(this.get("valueFunction"))
-        {
-            case FilterValueFunction.NONE:
-                html='';
-                break;
-            case FilterValueFunction.MIN:
-                html='MIN';
-                break;
-            case FilterValueFunction.MAX:
-                html='MAX';
-                break;
-        }
-        return html;
     },
 
     getOperatorAsHTML: function()
@@ -330,9 +355,10 @@ var Filter = Backbone.Model.extend({
     {
         return {
             name:            "NA",
+            displayName:     "NA",
             operator:        FilterOperator.UNKNOWN,
-            valueFunction:   FilterValueFunction.NONE,
             displayOperator: "NA",
+            valueFunction:   FilterValueFunction.NONE,
             value:           "NA",
             displayValue:    "NA", // may be abbreviated
             numMatches:      0,

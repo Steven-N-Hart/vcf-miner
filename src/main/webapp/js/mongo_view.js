@@ -22,7 +22,7 @@ var WARNING_TEMPLATE;
 var WARNING_POPOVER_TEMPLATE;
 var ERROR_TEMPLATE;
 
-var FILTER_NONE            = new Filter({name: 'none',          operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'});
+var FILTER_NONE            = new Filter({name: 'none', displayName: 'none', operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'});
 
 var SEARCHED_FILTER_LIST = new FilterList;
 
