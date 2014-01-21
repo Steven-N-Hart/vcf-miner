@@ -249,43 +249,6 @@ var InfoFilterTab = function (indexController) {
                         hideHeader: false,
                         data: dropdownData
                     });
-
-
-//                    // dynamically query to populate dropdown
-//                    $.ajax({
-//                        url: "/mongo_svr/ve/typeahead/w/" + workspaceKey + "/f/INFO." + fieldID,
-//                        dataType: "json",
-//                        async: false,
-//                        success: function(json)
-//                        {
-//                            var fieldValues = json[fieldID];
-//                            if (typeof fieldValues === "undefined")
-//                            {
-//                                console.warn("INFO string field " + fieldName + " has no available values.");
-//                                fieldValues = new Array();
-//                            }
-//
-//                            // sort values
-//                            fieldValues.sort(function(a,b) { return a.localeCompare(b) } );
-//
-//                            var dropdownData = new Array();
-//                            for (var i = 0; i < fieldValues.length; i++)
-//                            {
-//                                dropdownData.push({id: i, label: fieldValues[i]});
-//                            }
-//
-//                            var dropdownCheckbox = $("#info_field_dropdown_checkbox");
-//                            dropdownCheckbox.dropdownCheckbox({
-//                                autosearch: true,
-//                                hideHeader: false,
-//                                data: dropdownData
-//                            });
-//                        },
-//                        error: function(jqXHR, textStatus)
-//                        {
-//                            $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-//                        }
-//                    });
                 }
 
                 valueDiv.append("<div class='row-fluid'><div class='span12'><hr></div></div>");
