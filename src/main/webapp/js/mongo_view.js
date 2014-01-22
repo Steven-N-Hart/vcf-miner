@@ -274,6 +274,14 @@ function sendQuery(query, displayCols)
                             rowValues.push("");
                         }
                     }
+                    else if (name === 'GenotypePostitiveCount')
+                    {
+                        rowValues.push(variant['FORMAT'].GenotypePostitiveCount);
+                    }
+                    else if (name === 'GenotypePositiveList')
+                    {
+                        rowValues.push(variant['FORMAT'].GenotypePositiveList);
+                    }
                     else
                     {
                         rowValues.push(variant[name]);
