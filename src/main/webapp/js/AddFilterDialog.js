@@ -10,6 +10,16 @@ var AddFilterDialog = function (searchedFilters, sampleGroups, indexController) 
         addFilter();
     });
 
+    // ENTER key press causes "Add" button click
+    $('#add_filter_modal form').keypress(function (e) {
+        var charCode = e.charCode || e.keyCode || e.which;
+        if (charCode  == 13) {
+            addFilter();
+
+            return false;
+        }
+    });
+
     /**
      * Adds a filter to the collection of filters that are searched
      */
