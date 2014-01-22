@@ -10,8 +10,8 @@ var SampleFilterTab = function (groups) {
     var filters = new FilterList();
 
     // constants
-    var FILTER_IN_GROUP        = new Filter({name: 'Samples in Group',     operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.IN_GROUP});
-    var FILTER_NOT_IN_GROUP    = new Filter({name: 'Samples not in Group', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.NOT_IN_GROUP});
+    var FILTER_IN_GROUP        = new Filter({name: 'Samples in Group',     operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.IN_GROUP, description:'Filters variants based on matching samples'});
+    var FILTER_NOT_IN_GROUP    = new Filter({name: 'Samples not in Group', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.NOT_IN_GROUP, description:'Filters variants based on non-matching samples'});
 
     var count = $('#group_sample_count');
     var list = $('#group_sample_names_list');
@@ -21,6 +21,19 @@ var SampleFilterTab = function (groups) {
     {
         createGroupDialog.show();
     });
+
+    // popover for the dropdown
+    $('#sample_field_list').popover(
+        {
+            placement: 'bottom',
+            trigger: 'hover',
+            html: true,
+            content: function() {
+                return getSelectedFilter().get("description");
+            },
+            delay: {show: 1000}
+        }
+    );
 
     var groupListView = new GroupListView(
         {
@@ -91,13 +104,6 @@ var SampleFilterTab = function (groups) {
             var filterID = filter.get("id");
             var filterName = filter.get("name")
             this.$el.append("<option value='"+filterID+"'>"+filterName+"</option>");
-
-            // check if this is the 1ST added
-            if (this.model.models.length == 1)
-            {
-                // simulate user choosing the 1st field
-                sampleFieldChanged();
-            }
         },
 
         selectionChanged: function(e)
@@ -120,9 +126,11 @@ var SampleFilterTab = function (groups) {
 
     function sampleFieldChanged()
     {
+        // get rid of popover if it's currently shown
+        $('#sample_field_list').popover('hide');
+
         // get selected filter
-        var filterID = $('#sample_field_list').val();
-        var filter = filters.findWhere({id: filterID});
+        var filter = getSelectedFilter();
 
         switch(filter.get("category"))
         {
@@ -184,6 +192,17 @@ var SampleFilterTab = function (groups) {
         return $('#sample_tab_form').valid();
     }
 
+    /**
+     * Gets the currently selected VCFDataField model.
+     *
+     * @returns {*}
+     */
+    function getSelectedFilter()
+    {
+        var filterID = $('#sample_field_list').val();
+        return filters.findWhere({id: filterID});
+    }
+
     // public API
     return {
         /**
@@ -207,6 +226,7 @@ var SampleFilterTab = function (groups) {
                     filters.add(new Filter(
                         {
                             name: vcfDataField.get("id"),
+                            description: vcfDataField.get("description"),
                             operator: FilterOperator.EQ,
                             value: '0',
                             displayValue: '0',
@@ -220,6 +240,9 @@ var SampleFilterTab = function (groups) {
             // standard group filters added last
             filters.add(FILTER_IN_GROUP);
             filters.add(FILTER_NOT_IN_GROUP);
+
+            // simulate user choosing the 1st field
+            sampleFieldChanged();
         },
 
         /**
@@ -234,10 +257,8 @@ var SampleFilterTab = function (groups) {
          */
         getFilter: function()
         {
-            var filterID = $('#sample_field_list').val();
-
             // get a cloned instance of the filter and assign new ID
-            var filter = filters.findWhere({id: filterID}).clone();
+            var filter = getSelectedFilter().clone();
             filter.set("id", guid());             // assign new uid
 
             switch(filter.get("category"))

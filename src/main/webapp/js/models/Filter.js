@@ -192,18 +192,19 @@ var Filter = Backbone.Model.extend({
     getNameAsHTML: function()
     {
         var name = this.get("name");
-        var html = '';
+        var nameLabel = '<label title="'+this.get("description")+'">' + name + "</label>";
+        var html;
 
         switch(this.get("valueFunction"))
         {
             case FilterValueFunction.NONE:
-                html=name;
+                html = nameLabel;
                 break;
             case FilterValueFunction.MIN:
-                html='<strong>MIN(</strong> ' + name + ' <strong>)</strong>';
+                html='<div class="form-inline"><strong>MIN(</strong> ' + nameLabel + ' <strong>)</strong></div>';
                 break;
             case FilterValueFunction.MAX:
-                html='<strong>MAX(</strong> ' + name + ' <strong>)</strong>'
+                html='<div class="form-inline"><strong>MAX(</strong> ' + nameLabel + ' <strong>)</strong></div>'
                 break;
         }
 
@@ -356,6 +357,7 @@ var Filter = Backbone.Model.extend({
         return {
             name:            "NA",
             displayName:     "NA",
+            description:     "NA",
             operator:        FilterOperator.UNKNOWN,
             displayOperator: "NA",
             valueFunction:   FilterValueFunction.NONE,
