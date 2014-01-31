@@ -225,7 +225,7 @@ var SampleFilterTab = function (groups) {
                 {
                     filters.add(new Filter(
                         {
-                            name: vcfDataField.get("id"),
+                            name: vcfDataField.get("name"),
                             description: vcfDataField.get("description"),
                             operator: FilterOperator.EQ,
                             value: '0',

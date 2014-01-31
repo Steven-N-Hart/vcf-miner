@@ -405,11 +405,25 @@ function setWorkspace(workspace)
         dataType: "json",
         success: function(json)
         {
-            var info = json.INFO;
+            var generalDataFields = new VCFDataFieldList();
+            generalDataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, name:'CHROM',  description:'The chromosome.'}));
+            generalDataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, name:'POS',    description:'The reference position, with the 1st base having position 1.'}));
+            generalDataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, name:'ID',     description:'Semi-colon separated list of unique identifiers.'}));
+            generalDataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, name:'REF',    description:'The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).'}));
+            generalDataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, name:'ALT',    description:'Comma separated list of alternate non-reference alleles called on at least one of the samples.'}));
+            generalDataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, name:'QUAL',   description:'Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).'}));
+            generalDataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, name:'FILTER', description:'PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
 
-            // get the INFO field names sorted alphabetically
-            var infoFieldNames = getSortedAttrNames(info);
+            var infoDataFields = toDataFields(json.HEADER.INFO, VCFDataCategory.INFO);
+            var formatDataFields = toDataFields(json.HEADER.FORMAT, VCFDataCategory.FORMAT, dataFields);
 
+            // merge all data fields together into 1 collection
+            var dataFields = new VCFDataFieldList();
+            dataFields.add(generalDataFields.models);
+            dataFields.add(infoDataFields.models);
+            dataFields.add(formatDataFields.models);
+
+            // TODO: switch VariantTableColumn to use these VCFDataField models
             // standard 1st 7 VCF file columns
             VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'CHROM',  displayName:'CHROM',  description:'The chromosome.'}));
             VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'POS',    displayName:'POS',    description:'The reference position, with the 1st base having position 1.'}));
@@ -418,58 +432,14 @@ function setWorkspace(workspace)
             VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'ALT',    displayName:'ALT',    description:'Comma separated list of alternate non-reference alleles called on at least one of the samples.'}));
             VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:false, name:'QUAL',   displayName:'QUAL',   description:'Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).'}));
             VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:false, name:'FILTER', displayName:'FILTER', description:'PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
-
             VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'GenotypePostitiveCount', displayName:'#_Samples', description:'The number of samples.'}));
             VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'GenotypePositiveList',  displayName:'Samples',   description:'The names of samples.'}));
-
-
-            // TODO: switch VariantTableColumn to use these VCFDataField models
-            var dataFields = new VCFDataFieldList();
-            dataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, id:'CHROM',  description:'The chromosome.'}));
-            dataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, id:'POS',    description:'The reference position, with the 1st base having position 1.'}));
-            dataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, id:'ID',     description:'Semi-colon separated list of unique identifiers.'}));
-            dataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, id:'REF',    description:'The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).'}));
-            dataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, id:'ALT',    description:'Comma separated list of alternate non-reference alleles called on at least one of the samples.'}));
-            dataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, id:'QUAL',   description:'Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).'}));
-            dataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, id:'FILTER', description:'PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
-
-            for (var i = 0; i < infoFieldNames.length; i++) {
-                var infoFieldName = infoFieldNames[i];
-                if (info.hasOwnProperty(infoFieldName))
-                {
-                    VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:false,  name:'INFO.'+infoFieldName,  displayName:infoFieldName,   description:info[infoFieldName].Description}));
-
-                    var dataType;
-                    switch(info[infoFieldName].type)
-                    {
-                        case 'Flag':
-                            dataType = VCFDataType.FLAG;
-                            break;
-                        case 'Integer':
-                            dataType = VCFDataType.INTEGER;
-                            break;
-                        case 'Float':
-                            dataType = VCFDataType.FLOAT;
-                            break;
-                        default:
-                            dataType = VCFDataType.STRING;
-                            break;
-                    }
-
-                    var category;
-                    switch(info[infoFieldName].EntryType)
-                    {
-                        case 'FORMAT':
-                            category = VCFDataCategory.FORMAT;
-                            break;
-                        case 'INFO':
-                            category = VCFDataCategory.INFO;
-                            break;
-                    }
-                    dataFields.add(new VCFDataField({category:category, type:dataType, id:infoFieldName, description:info[infoFieldName].Description}));
-                }
-            }
-
+            // update VariantTableColumn models to include info fields
+            _.each(infoDataFields.models, function(infoDataField) {
+                var infoFieldName = infoDataField.get("name");
+                var infoFieldDescription = infoDataField.get("description");
+                VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:false,  name:'INFO.'+infoFieldName,  displayName:infoFieldName,   description:infoFieldDescription}));
+            });
             variantTableView.render();
 
             var allSamples = new Array();
@@ -499,4 +469,38 @@ function setWorkspace(workspace)
             $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
         }
     });
+}
+
+function toDataFields(infoOrFormat, category)
+{
+    var dataFields = new VCFDataFieldList();
+
+    var fieldNames = getSortedAttrNames(infoOrFormat);
+    for (var i = 0; i < fieldNames.length; i++) {
+        var fieldName = fieldNames[i];
+        if (infoOrFormat.hasOwnProperty(fieldName))
+        {
+            var type;
+            switch(infoOrFormat[fieldName].type)
+            {
+                case 'Flag':
+                    type = VCFDataType.FLAG;
+                    break;
+                case 'Integer':
+                    type = VCFDataType.INTEGER;
+                    break;
+                case 'Float':
+                    type = VCFDataType.FLOAT;
+                    break;
+                default:
+                    type = VCFDataType.STRING;
+                    break;
+            }
+            var name = fieldName;
+            var description = infoOrFormat[fieldName].Description;
+            dataFields.add(new VCFDataField({category:category, type:type, name:name, description:description}));
+        }
+    }
+
+    return dataFields;
 }

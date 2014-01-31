@@ -76,7 +76,7 @@ var InfoFilterTab = function (indexController) {
 
         addOne: function(infoDataField)
         {
-            var fieldID = infoDataField.get("id");
+            var fieldID = infoDataField.get("name");
             this.$el.append("<option value='"+fieldID+"'>"+fieldID+"</option>");
         },
 
@@ -87,7 +87,7 @@ var InfoFilterTab = function (indexController) {
 
         removeOne: function(infoDataField)
         {
-            var fieldID = infoDataField.get("id");
+            var fieldID = infoDataField.get("name");
             $("#info_field_list option[value='"+fieldID+"']").remove();
         },
 
@@ -112,7 +112,7 @@ var InfoFilterTab = function (indexController) {
     function getSelectedInfoField()
     {
         var fieldID = $('#info_field_list').val();
-        return infoFields.findWhere({id: fieldID});
+        return infoFields.findWhere({name: fieldID});
     }
 
     /**
@@ -126,7 +126,7 @@ var InfoFilterTab = function (indexController) {
 
         // get selected VCFDataField model
         var infoField = getSelectedInfoField();
-        var fieldID = infoField.get("id");
+        var fieldID = infoField.get("name");
 
         if (SETTINGS.showMissingIndexWarning && !indexController.isDataFieldIndexed(infoField))
         {
@@ -272,7 +272,7 @@ var InfoFilterTab = function (indexController) {
     function validate()
     {
         var infoField = getSelectedInfoField();
-        var fieldID = infoField.get("id");
+        var fieldID = infoField.get("name");
 
         switch (infoField.get("type"))
         {
@@ -416,7 +416,7 @@ var InfoFilterTab = function (indexController) {
         {
             // get selected VCFDataField
             var infoField = getSelectedInfoField();
-            var fieldID = infoField.get("id");
+            var fieldID = infoField.get("name");
 
             var filter = new Filter();
             filter.set("name", fieldID);

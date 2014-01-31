@@ -101,17 +101,17 @@ var DatabaseIndexController = function () {
             switch (vcfDataField.get("category"))
             {
                 case VCFDataCategory.GENERAL:
-                    indexNames.push(vcfDataField.get("id"));
+                    indexNames.push(vcfDataField.get("name"));
                     indexList = generalIndexes;
                     break;
                 case VCFDataCategory.INFO:
-                    indexNames.push(vcfDataField.get("id"));
+                    indexNames.push(vcfDataField.get("name"));
                     indexList = infoIndexes;
                     break;
                 case VCFDataCategory.FORMAT:
                     // 2 indexes per FORMAT field (min,max)
-                    indexNames.push("min."+vcfDataField.get("id"));
-                    indexNames.push("max."+vcfDataField.get("id"));
+                    indexNames.push("min."+vcfDataField.get("name"));
+                    indexNames.push("max."+vcfDataField.get("name"));
                     indexList = formatIndexes;
                     break;
             };

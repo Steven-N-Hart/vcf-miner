@@ -44,9 +44,9 @@ var VCFDataField = Backbone.Model.extend({
             category: VCFDataCategory.GENERAL,
 
             /**
-             * Name of the field, referred to as "ID"
+             * Name of the field
              */
-            id: "unknown",
+            name: "unknown",
 
             /**
              * Datatype for the field.
