@@ -195,7 +195,7 @@ var InfoFilterTab = function (indexController) {
                 opList.append(OPTION_EQ);
                 opList.append(OPTION_NE);
 
-                var values = getFieldValues(fieldID, SETTINGS.maxFilterValues + 1);
+                var values = getFieldValues(fieldID, parseInt(SETTINGS.maxFilterValues) + 1);
 
                 // use typahead if we have MORE values than specified as the max
                 if (values.length > SETTINGS.maxFilterValues)
