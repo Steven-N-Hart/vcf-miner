@@ -274,13 +274,19 @@ function sendQuery(query, displayCols)
                             rowValues.push("");
                         }
                     }
-                    else if (name === 'GenotypePostitiveCount')
+                    else if (name.substring(0, 6) === 'FORMAT')
                     {
-                        rowValues.push(variant['FORMAT'].GenotypePostitiveCount);
-                    }
-                    else if (name === 'GenotypePositiveList')
-                    {
-                        rowValues.push(variant['FORMAT'].GenotypePositiveList);
+                        // FORMAT column
+                        var formatFieldName = col.get("name").substring(7);
+                        var variantFormat = variant['FORMAT'];
+                        if(variantFormat[formatFieldName] !== undefined)
+                        {
+                            rowValues.push(variantFormat[formatFieldName]);
+                        }
+                        else
+                        {
+                            rowValues.push("");
+                        }
                     }
                     else
                     {
@@ -432,8 +438,8 @@ function setWorkspace(workspace)
             VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'ALT',    displayName:'ALT',    description:'Comma separated list of alternate non-reference alleles called on at least one of the samples.'}));
             VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:false, name:'QUAL',   displayName:'QUAL',   description:'Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).'}));
             VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:false, name:'FILTER', displayName:'FILTER', description:'PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
-            VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'GenotypePostitiveCount', displayName:'#_Samples', description:'The number of samples.'}));
-            VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'GenotypePositiveList',  displayName:'Samples',   description:'The names of samples.'}));
+            VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'FORMAT.GenotypePostitiveCount', displayName:'#_Samples', description:'The number of samples.'}));
+            VARIANT_TABLE_COLUMNS.add(new VariantTableColumn({visible:true,  name:'FORMAT.GenotypePositiveList',  displayName:'Samples',   description:'The names of samples.'}));
             // update VariantTableColumn models to include info fields
             _.each(infoDataFields.models, function(infoDataField) {
                 var infoFieldName = infoDataField.get("name");
