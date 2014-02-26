@@ -56,7 +56,7 @@ var Filter = Backbone.Model.extend({
 
         pojo.key = this.get("name");
 
-        pojo.value = this.get("value");
+        pojo.value = parseFloat(this.get("value"));
 
         pojo.comparator = this.toMongoNumberComparator(this.get("operator"));
 
@@ -112,7 +112,7 @@ var Filter = Backbone.Model.extend({
 
         pojo.key = "INFO." + this.get("name");
 
-        pojo.value = this.get("value");
+        pojo.value = parseFloat(this.get("value"));
 
         pojo.comparator = this.toMongoNumberComparator(this.get("operator"));
         pojo.includeNulls = this.get("includeNulls");
