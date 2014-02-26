@@ -20,7 +20,7 @@
       <dependency>
           <groupId>edu.mayo.mongo_svr</groupId>
           <artifactId>mongo_svr</artifactId>
-          <version>1.0-SNAPSHOT</version>
+          <version>1.0</version>
       </dependency>
     </dependencies>
 
