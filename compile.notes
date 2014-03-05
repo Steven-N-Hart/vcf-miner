@@ -1,0 +1,14 @@
+The project is set up to not run the tests, so that debugging and adding features is a lot faster in intellij, but to really test, you need to run this at the command line:
+
+Run the entire compile:
+mvn clean install
+
+Run only the unit tests (no functional tests)
+mvn clean package
+
+Skip tests:
+mvn install -Dmaven.test.skip=true
+
+Deploy directory:
+/data2/bsi/RandD/test/variant_miner/installer/<version>
+

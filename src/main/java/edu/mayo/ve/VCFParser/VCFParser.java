@@ -1,0 +1,633 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package edu.mayo.ve.VCFParser;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.mongodb.*;
+import com.mongodb.util.JSON;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import com.tinkerpop.pipes.Pipe;
+import com.tinkerpop.pipes.PipeFunction;
+import com.tinkerpop.pipes.transform.IdentityPipe;
+import com.tinkerpop.pipes.transform.TransformFunctionPipe;
+import com.tinkerpop.pipes.util.Pipeline;
+
+import edu.mayo.concurency.ProcessTerminatedException;
+import edu.mayo.concurency.Task;
+import edu.mayo.pipes.MergePipe;
+import edu.mayo.pipes.PrintPipe;
+import edu.mayo.pipes.WritePipe;
+import edu.mayo.pipes.JSON.InjectIntoJsonPipe;
+import edu.mayo.pipes.JSON.inject.ColumnArrayInjector;
+import edu.mayo.pipes.JSON.inject.ColumnInjector;
+import edu.mayo.pipes.JSON.inject.Injector;
+import edu.mayo.pipes.JSON.inject.JsonType;
+import edu.mayo.pipes.JSON.inject.LiteralInjector;
+import edu.mayo.pipes.UNIX.CatPipe;
+import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
+import edu.mayo.pipes.bioinformatics.vocab.CoreAttributes;
+import edu.mayo.pipes.bioinformatics.vocab.Type;
+import edu.mayo.pipes.history.HCutPipe;
+import edu.mayo.pipes.history.History;
+import edu.mayo.pipes.history.HistoryInPipe;
+import edu.mayo.pipes.util.GenomicObjectUtils;
+import edu.mayo.ve.VCFParser.type.TypeAhead;
+import edu.mayo.ve.index.Index;
+import edu.mayo.ve.resources.MetaData;
+import edu.mayo.ve.util.SystemProperties;
+import java.io.IOException;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
+import org.apache.log4j.Logger;
+
+//import edu.mayo.cli.CommandPlugin; TO DO! get this to work :(
+import edu.mayo.pipes.ReplaceAllPipe;
+import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.ve.util.Tokens;
+import java.sql.Timestamp;
+import java.util.Date;
+
+
+/**
+ *
+ * @author m102417
+ */
+public class VCFParser {
+
+    private Mongo m = MongoConnection.getMongo();
+    /** testingCollection contains all of the objects placed into the workspace from parsing the VCF */
+    HashMap<Integer,String> testingCollection = new HashMap<Integer,String>();
+    JsonObject json = null;
+    TypeAhead typeAhead;
+    
+    public static void usage(){ 
+            System.out.println("This program will parse a VCF file, obtain the 'schema' for that VCF and populate a MongoDB database with the variants in the VCF.");
+            System.out.println("");
+            System.out.println("Make sure to check your sys.properties file fo the MongoDB IP/Port combination, otherwised this script may fail");
+            System.out.println("usage: VCFParser <input.vcf> <workspace_id>");
+           
+    }
+    
+    public static void main(String[] args) throws IOException, ProcessTerminatedException {
+        SystemProperties sysprops = new SystemProperties();
+        String mongoPort = sysprops.get("mongo_port");
+        VCFParser parser = new VCFParser();
+        if( args.length != 2 ) {
+            usage();
+            System.exit(1);
+        }
+
+        String infile = args[0];        
+        String workspace = args[1];
+//        String infile = "/data/VCFExamples/BATCH4.vcf";
+//        String outfile = "/data/VCFExamples/BATCH4.json";
+//        String workspace = "w7ee29742ff80d61953d5e6f84e1686957fbe36f7";
+
+        System.out.println("#Input File:  " + infile);  
+        System.out.println("#Workspace:  " + workspace); 
+        System.out.println("#mongo_server: " + sysprops.get("mongo_server") );
+        System.out.println("#mongo port: " + new Integer(sysprops.get("mongo_port")));
+        int datalines = parser.parse(null, infile, workspace, 50000, false, true, true);
+        parser.checkAndUpdateLoadStatus(workspace, datalines, true,  true);
+        parser.m.close();
+        //note the following will only work if you have a document in mongo like:
+        //{ "_id" : { "$oid" : "51afa2710364d3ebd97b533a"} , "owner" : "steve" , "alias" : "foo" , "key" : "w7ee29742ff80d61953d5e6f84e1686957fbe36f7"}
+        //parser.updateMetadata(workspace, "{ \"hosting\" : \"hostA\" , \"clients\" : \"888\" , \"type\" : \"vps\"}");
+    }
+
+
+
+    public void parse(Task context, String infile, String workspace, int typeAheadCacheSize) throws ProcessTerminatedException {
+        parse(context, infile, workspace, typeAheadCacheSize, false, false, true);
+    }
+
+    public void parse(Task context, String infile, String workspace, int typeAheadCacheSize, boolean testing) throws ProcessTerminatedException{
+        parse(context, infile, workspace, typeAheadCacheSize, testing, false, true);
+    }
+
+    /**
+     * parse the infile, which is a raw vcf and put it into the mongo workspace
+     * @param context - the execution context (so we can kill the process if needed)  -- can be null
+     * @param infile
+     * @param workspace
+     * @param typeAheadCacheSize - the number of values to cache for strings
+     * @param testing    -- populate testingCollection instead of Mongo.
+     * @param reporting - if verbose output is desired (much slower and not for production use, use when debugging)
+     * @param saveSamples - if the samples : [{sample1},{sample2},...] array should be saved (default true)
+     * @return lines processed.
+     */
+    public int parse(Task context, String infile, String workspace, int typeAheadCacheSize, boolean testing, boolean reporting, boolean saveSamples) throws ProcessTerminatedException{
+        VCF2VariantPipe vcf 	= new VCF2VariantPipe(true, false);
+        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DBCollection col = db.getCollection(workspace);
+        typeAhead = new TypeAhead("INFO", typeAheadCacheSize, reporting);
+        if(reporting) System.out.println("Setting up Pipeline....");
+        Pipe p = new Pipeline(new CatPipe(),
+                             new ReplaceAllPipe("\\{",""),
+                             new ReplaceAllPipe("\\}",""),
+                             new HistoryInPipe(),
+                             vcf,
+                             new MergePipe("\t"),
+                             new ReplaceAllPipe("^.*\t\\{", "{"),
+                             new ReplaceAllPipe("\"_id\":","\"_ident\":"),
+                             new ReplaceAllPipe("Infinity","2147483648"),
+                             //new PrintPipe(),
+                             new IdentityPipe()
+                );
+        p.setStarts(Arrays.asList(infile));
+        int i;
+        for(i=0; p.hasNext(); i++){
+            if(context!=null){ if(context.isTerminated()) throw new ProcessTerminatedException(); }
+            if(reporting) System.out.println(col.count());
+            String s = (String) p.next();
+            //System.out.println(s);
+            BasicDBObject bo = (BasicDBObject) JSON.parse(s);
+            typeAhead.addCache(bo);
+
+            if(saveSamples == false){
+                bo = removeSamples(bo);
+            }
+
+            if(reporting){
+                System.out.println("row before removing dots:"); System.out.println(s);  }
+            if(testing){
+                testingCollection.put(new Integer(i), s);
+            }else {//production
+                //System.out.println(bo.toString());
+                col.save(removeDots(bo, reporting));
+            }
+            if(reporting){
+                System.out.println("i:" + i + "\ts:" + s.length());
+            }
+        }
+
+        json = vcf.getJSONMetadata();
+
+        //do some small fixes to the metadata before continuing...
+        //if(reporting){System.out.println("Updating metadata with type-ahead informaton");}
+        //DEPRICATED!!!
+        //json = updateMetadataWTypeAhead(json, typeAhead.getOverunFields());
+        if(reporting){System.out.println("Changing the structure of the FORMAT metadata");}
+        metadata = this.fixFormat((DBObject)JSON.parse(json.toString()));
+
+        if(!testing){
+            if(reporting){System.out.println("Updating metadata in database...");}
+            updateMetadata(workspace, metadata.toString(), reporting);
+            if(reporting){System.out.println("indexing...");}
+            index(workspace, vcf, typeAhead, reporting);
+            if(reporting){System.out.println("saving type-ahead results to the database");}
+            typeAhead.save(m,workspace);
+        }
+        if(reporting){ System.out.println("done!");}
+        //m.close();
+        return i; //the number of records processed
+    }
+
+    private DBObject metadata = null;
+    /**
+     * for testing...
+     */
+    public DBObject getMetadata(){
+        return metadata;
+    }
+
+    public BasicDBObject removeSamples(BasicDBObject o){
+        o.removeField("samples");
+        return o;
+    }
+
+    /**
+     * This needs to be called after a parse to ensure that the load gets correctly registered by the UI
+     * checks to see if the load worked or if it failed
+     * @param workspace - the key for the workspace
+     * @param datalines - the number of lines of data in the load file
+     * @param force - force the status as successful
+     * @param reporting - if reporting is true, information will be logged, otherwise it will be silent
+     * @return true if it worked, false if it failed.
+     */
+    public boolean checkAndUpdateLoadStatus(String workspace, int datalines, boolean force, boolean reporting){
+        MetaData metaData = new MetaData();
+        if(force){
+            if(reporting) System.out.println("Force flag set, the workspace will be flagged as ready!");
+            metaData.flagAsReady(workspace);
+        }
+        if(reporting) System.out.println("Checking the status of the load");
+
+        //the first way the load could have failed is if the number of records in the workspace != the number of data lines
+
+        BasicDBObject query = new BasicDBObject(); //empty for all
+        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DBCollection col = db.getCollection(workspace);
+        long linesLoaded = col.count(query);
+        if(linesLoaded != datalines){
+            metaData.flagAsFailed(workspace, "The load failed, the number of records in the workspace (" + linesLoaded + ") does not equal the number of data lines in the original file (" + datalines +")" );
+            return false;
+        }
+
+        //are there other ways we could check / need to check that a load failed?
+
+        //everything looks ok,
+        //now flag the workspace as ready so the UI knows
+        if(reporting) System.out.println("Flagging the workspace as ready");
+
+        metaData.flagAsReady(workspace);
+        return true;
+    }
+
+    private class TrackNode {
+        public TrackNode(DBObject node, boolean discovered){
+            this.node = node;
+            this.discovered = discovered;
+        }
+        public DBObject node;      // the position in the JSON structure where the dfs is pointing
+        public DBObject shaddow;   // shaddow is the new node in the copy structure
+        public boolean discovered = false;
+    }
+
+    /**
+     * removeDots uses Depth First Search to traverse the json object hiarchy and replace any keys with a dot (.) in them
+     * with keys that have an underscore (_).  This way mongo can load the key.
+     * @param bo
+     * @param reporting
+     * @return
+     */
+    public DBObject removeDots(DBObject bo, boolean reporting){
+        if(bo == null) return bo;
+        if(bo.keySet().size() < 1) return bo;
+        //Generic non-recursive DFS algorithm is:
+        // 1  procedure DFS-iterative(G,v):
+        // 2      let S be a stack
+        // 3      S.push(v)
+        // 4      while S is not empty
+        // 5            v ← S.pop()
+        // 6            if v is not labeled as discovered:
+        // 7                label v as discovered
+        // 8                for all edges from v to w in G.adjacentEdges(v) do
+        // 9                    S.push(w)
+        Stack<TrackNode> s = new Stack<TrackNode>();
+        TrackNode v = new TrackNode(bo, false);
+        s.push(v);
+        while( s.size() > 0){
+            v = s.pop();
+            if(v.discovered == false){
+                v.discovered = true;
+                ArrayList<String> keyset = new ArrayList<String>();
+                for(String key : v.node.keySet()){
+                    //System.out.println(key);
+                    keyset.add(key);
+                    Object o = v.node.get(key);
+                    if(o instanceof DBObject){
+                        DBObject d = (DBObject) o;
+                        s.push(new TrackNode(d,false));
+                    }//else it is data
+                }
+                for(String key : keyset){
+                    if(key.contains(".")){
+                        Object o = v.node.get(key);
+                        v.node = fixDBObjectDotKey(key, v.node);
+                    }
+                }
+            }
+        }
+        if(reporting){
+            System.out.println("removedDotsResult");
+            System.out.println(bo.toString());
+            System.out.println("end");
+        }
+        return bo;
+    }
+
+    public String getNth(String prefix, Set<String> keys, int index){
+        int count =0;
+        for(String key : keys){
+            if(index == count) return key;
+            count++;
+        }
+        return null;
+    }
+
+    public DBObject removeDots2(DBObject bo, boolean reporting){
+        if(reporting) System.out.println("removeDots");
+        //first, check to see if the top level directory has any dots
+        for(String key : bo.keySet()){
+            //first, check all the leafs (one dir down only)!
+            Object o = bo.get(key);
+            if(o instanceof BasicDBObject){
+                BasicDBObject dboo = (BasicDBObject) o;
+                //deal with this concurent modification problem...
+                List<String> keys = new ArrayList();
+                for(String zkey : dboo.keySet()){
+                    keys.add(zkey);
+                }
+                for(String k2 : keys){
+                    if(k2.contains(".")){
+                        fixDBObjectDotKey(k2,dboo);
+                    }
+                }
+            }
+        }
+        //now fix and check the branches (can't do in the same loop because of this concurency bug
+        for(String key : bo.keySet()){
+            //then check the branch
+            if(key.contains(".")){
+                fixDBObjectDotKey(key, bo);
+            }
+        }
+        if(null != bo.get(".")){
+            bo.removeField(".");
+        }
+        if(null != bo.get("INFO")){
+            Object o = bo.get("INFO");
+            if(o instanceof DBObject){
+                if(  ((DBObject)o).get(".") != null  ){
+                    ((DBObject)o).removeField(".");
+                    if(  ((DBObject)o).keySet().size() == 0   ){
+                        bo.put("INFO", ".");
+                    }
+                }
+            }
+
+        }
+        if(reporting){
+            System.out.println("removedDotsResult");
+            System.out.println(bo.toString());
+            System.out.println("end");
+        }
+        return bo;
+    }
+
+    public DBObject fixDBObjectDotKey(String key, DBObject dbo){
+        String newkey = key.replaceAll("\\.", "_");
+        Object o = dbo.get(key);
+        if(o instanceof String){
+            String value = (String) o;
+            dbo.removeField(key);
+            dbo.put(newkey, value);
+            return dbo;
+        }
+        if(o instanceof BasicDBObject){
+            BasicDBObject value = (BasicDBObject) o;
+            dbo.removeField(key);
+            dbo.put(newkey, value);
+            return dbo;
+        }
+        if(o instanceof Integer){
+            Integer value = (Integer) o;
+            dbo.removeField(key);
+            dbo.put(newkey, value);
+            return dbo;
+        }
+        if(o instanceof Double){
+            Double value = (Double) o;
+            dbo.removeField(key);
+            dbo.put(newkey, value);
+            return dbo;
+        }
+        if(o instanceof Boolean){
+            Boolean value = (Boolean) o;
+            dbo.removeField(key);
+            dbo.put(newkey,value);
+            return dbo;
+        }
+        if(o instanceof BasicDBList){
+            BasicDBList value = (BasicDBList) o;
+            dbo.removeField(key);
+            dbo.put(newkey,value);
+            return dbo;
+        }
+        return dbo;
+    }
+
+
+    public void index(String workspace, VCF2VariantPipe vcf, TypeAhead thead, boolean reporting){
+        JsonObject json = vcf.getJSONMetadata();
+        if(json == null){
+            return;
+        }
+        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DBCollection col = db.getCollection(workspace);
+
+        //auto-index all reserved columns (as needed by the app)
+        indexReserved(col, reporting);
+        //auto-index all SNPEFF columns
+        indexSNPEFF(col, json, reporting);
+        //index format
+        indexFormat(vcf.getFormatKeys().keySet(), col, reporting);
+    }
+
+    /**
+     * index the reserved fields that we already know about...
+     * @param col
+     * @param reporting
+     */
+    private void indexReserved(DBCollection col, boolean reporting){
+        indexField("FORMAT.GenotypePostitiveCount", col, reporting);
+        indexField("FORMAT.GenotypePositiveList",col, reporting);
+    }
+
+
+    private void indexSNPEFF(DBCollection col, JsonObject json, boolean reporting){
+        //indexField("INFO.SNPEFF_GENE_NAME", col);
+        for(String key: getSNPEFFColsFromJsonObj(json)){
+            indexField("INFO." + key, col, reporting);
+        }
+    }
+
+    /**
+     *
+     * @param json - the json metadata object
+     * @return
+     */
+    public List<String> getSNPEFFColsFromJsonObj(JsonObject json){
+        ArrayList<String> a = new ArrayList<String>();
+        JsonObject header = json.getAsJsonObject("HEADER");
+        if(header == null) return a;
+        JsonObject info = header.getAsJsonObject("INFO");
+        if(info == null) return a;
+        Iterator<Map.Entry<String,JsonElement>> itter =info.entrySet().iterator();
+        while(itter.hasNext()){
+            Map.Entry<String, JsonElement> next = itter.next();
+            String key = next.getKey();
+            //System.out.println(key); //all keys in info
+            if(key.contains("SNPEFF")){
+                a.add(key);
+            }
+        }
+        return a;
+    }
+
+    /**
+     *
+     * @param formatFields      - a list of fields to index (all format fields)
+     * @param col       - the collection/workspace
+     * @param reporting - if we want to show what is going on in the tomcat log
+     */
+    private void indexFormat(Set<String> formatFields, DBCollection col, boolean reporting){
+        for(String field : formatFields){
+            // FORMAT + . + . + field
+            String ikey = "FORMAT." + "min." + field;
+            String xkey = "FORMAT." + "max." + field;
+            if(reporting){  System.out.println( "Trying to index: " + ikey);  }
+            indexField(ikey, col, reporting);
+            if(reporting){  System.out.println( "Trying to index: " + xkey);  }
+            indexField(xkey, col, reporting);
+        }
+    }
+
+    private void indexFieldReplacingDot(String field, DBCollection col, boolean reporting){ //don't think this is ever used...
+        if(field.contains(".")){
+            field = field.replace(".","_");
+        }
+        indexField(field, col, reporting);
+    }
+
+    private Index indexUtil = new Index(); //use the indexUtil instead of the raw interface to prevent duplicate indexes!
+    private void indexField(String field, DBCollection col, boolean reporting){
+        if(reporting) System.out.println("index: " + field);
+        DBObject status = indexUtil.indexField(field,col);
+        if(reporting) System.out.println(status.toString());
+    }
+
+
+    public void updateMetadata(String workspace, String jsonUpdate, boolean reporting){
+        if(reporting) System.out.println("Saving Metadata to Workspace: " + workspace);
+        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DBCollection col = db.getCollection(Tokens.METADATA_COLLECTION); 
+        String query = "{\"key\":\""+workspace+"\"}";
+        BasicDBObject bo = (BasicDBObject) JSON.parse(query); //JSON2BasicDBObject
+        DBCursor dbc = col.find(bo);
+        DBObject result = null;
+        while(dbc.hasNext()){
+            result = dbc.next();
+            break;   //there will only be one that matches!
+        }
+
+        String owner = result.get(Tokens.OWNER).toString();
+        String id = result.get("_id").toString();
+        String alias = result.get(Tokens.WORKSPACE_ALIAS).toString();
+        //key = workspace, passed in so we have that!
+        col.remove(bo);
+        //System.out.println("result: " + result.toString());
+        
+        //note, we want to destroy whatever was in there with the new data (in case they try to load multiple times)
+        //but we have to keep owner, id, and key.
+        BasicDBObject replace = (BasicDBObject) JSON.parse(jsonUpdate);
+        //we need to remove any dot keys before we save the metadata to mongo.
+        DBObject replaceWODots = removeDots(replace, reporting);
+        //now add the new keys
+        replaceWODots.put(Tokens.OWNER, owner);
+        replaceWODots.put("key", workspace);
+        replaceWODots.put("_id", id);
+        replaceWODots.put("timestamp", getISONow()); //The last time the workspace was touched.
+        replaceWODots.put(Tokens.WORKSPACE_ALIAS, alias);
+        if(reporting) System.out.println(replaceWODots.toString());
+        col.save(replaceWODots);
+    }
+
+
+    /**
+     * In the metadata returned, the format field from the vcf-variant pipe looks something like this:
+     *
+     * "FORMAT": {
+     * "PL": 1,
+     * "AD": 1,
+     * "GT": 1,
+     * "GQ": 1,
+     * "DP": 1,
+     * "MLPSAF": 1,
+     * "MLPSAC": 1
+     * }
+     *
+     * This method transforms it into this (which is what mongodb will store):
+     * "FORMAT": {
+     *      "min": {
+     *          "PL": 1,
+     *          "AD": 1,
+     *          "GT": 1,
+     *          "GQ": 1,
+     *          "DP": 1,
+     *          "MLPSAF": 1,
+     *          "MLPSAC": 1
+     *      }
+     *      "max": {
+     *          "PL": 1,
+     *          "AD": 1,
+     *          "GT": 1,
+     *          "GQ": 1,
+     *          "DP": 1,
+     *          "MLPSAF": 1,
+     *          "MLPSAC": 1
+     *      }
+     * }
+     *
+     * @param input
+     * @return
+     */
+    public DBObject fixFormat(DBObject input){
+        DBObject output = input;
+        DBObject oldformat = (DBObject) input.removeField("FORMAT");
+        if(oldformat != null){
+            DBObject min = new BasicDBObject();
+            DBObject max = new BasicDBObject();
+            for(String s : oldformat.keySet()){
+                min.put(s,1);
+                max.put(s,1);
+            }
+            DBObject format = new BasicDBObject();
+            if(min.keySet().size() > 0 && max.keySet().size()>0){
+                format.put("min", min);
+                format.put("max", max);
+            }
+            output.put("FORMAT", format);
+        }
+        return output;
+    }
+
+
+    /**
+     *
+     * @return the current time in iso format
+     */
+    public String getISONow(){
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
+        df.setTimeZone(tz);
+        String nowAsISO = df.format(new Date());
+        return nowAsISO;
+    }
+
+
+    public HashMap<Integer, String> getTestingCollection() {
+        return testingCollection;
+    }
+
+    public void setTestingCollection(HashMap<Integer, String> testingCollection) {
+        this.testingCollection = testingCollection;
+    }
+
+    public JsonObject getJson() {
+        return json;
+    }
+
+    public void setJson(JsonObject json) {
+        this.json = json;
+    }
+
+    public Mongo getM() {
+        return m;
+    }
+
+    public void setM(Mongo m) {
+        this.m = m;
+    }
+}
+
+

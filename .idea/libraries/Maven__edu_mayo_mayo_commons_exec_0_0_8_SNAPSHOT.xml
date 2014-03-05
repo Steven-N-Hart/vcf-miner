@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: edu.mayo:mayo-commons-exec:0.0.8-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/edu/mayo/mayo-commons-exec/0.0.8-SNAPSHOT/mayo-commons-exec-0.0.8-20140214.005122-59.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/edu/mayo/mayo-commons-exec/0.0.8-SNAPSHOT/mayo-commons-exec-0.0.8-20140214.005122-59-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/edu/mayo/mayo-commons-exec/0.0.8-SNAPSHOT/mayo-commons-exec-0.0.8-20140214.005122-59-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
