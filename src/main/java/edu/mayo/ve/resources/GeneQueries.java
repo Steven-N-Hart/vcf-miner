@@ -3,7 +3,7 @@ package edu.mayo.ve.resources;
 import com.mongodb.*;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.index.Index;
-import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
 
 import javax.ws.rs.GET;

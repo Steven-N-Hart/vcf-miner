@@ -2,7 +2,7 @@ package edu.mayo.ve.resources;
 
 import com.mongodb.*;
 import com.mongodb.util.JSON;
-import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
 
 import javax.ws.rs.*;

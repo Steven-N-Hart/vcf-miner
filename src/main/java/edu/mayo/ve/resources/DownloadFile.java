@@ -7,7 +7,7 @@ import edu.mayo.ve.message.DisplayedFilterVariants;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.message.QuerryDownload;
 import edu.mayo.ve.message.Rresults;
-import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
 
 import javax.servlet.http.HttpServletResponse;

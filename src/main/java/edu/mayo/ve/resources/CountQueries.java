@@ -8,7 +8,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
-import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

@@ -5,7 +5,7 @@
 package edu.mayo.ve.index;
 
 import com.mongodb.*;
-import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
 
 import java.util.ArrayList;

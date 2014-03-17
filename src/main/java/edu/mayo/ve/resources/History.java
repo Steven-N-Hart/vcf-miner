@@ -6,7 +6,7 @@ import com.mongodb.util.JSON;
 import edu.mayo.ve.message.FilterHistory;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.util.HashUtil;
-import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
 import org.bson.types.ObjectId;
 

@@ -50,7 +50,7 @@ import org.apache.log4j.Logger;
 
 //import edu.mayo.cli.CommandPlugin; TO DO! get this to work :(
 import edu.mayo.pipes.ReplaceAllPipe;
-import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
 import java.sql.Timestamp;
 import java.util.Date;

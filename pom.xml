@@ -12,14 +12,14 @@
     <dependencies>
         <!-- MongoDB SUPPORT -->
         <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>2.10.1</version>
+            <groupId>edu.mayo</groupId>
+            <artifactId>mayo-commons-mongodb</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo</groupId>
             <artifactId>pipes</artifactId>
-            <version>2.2.4</version>
+            <version>2.2.5</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -116,6 +116,23 @@
             <type>jar</type>
         </dependency>
     </dependencies>
+
+
+    <!-- Distribution through Nexus -->
+    <distributionManagement>
+        <repository>
+            <id>mayo-nexus-bsi</id>
+            <name> Mayo Internal BSI Nexus releases</name>
+            <url>http://nexus.mayo.edu/content/repositories/hsr_bsi/</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>mayo-nexus-bsi</id>
+            <name>Mayo Internal BSI Nexus snapshots</name>
+            <url>http://nexus.mayo.edu/content/repositories/hsr_bsi-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <repositories>
         <repository>
             <id>maven2-repository.dev.java.net</id>

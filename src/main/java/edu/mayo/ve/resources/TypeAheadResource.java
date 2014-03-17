@@ -4,7 +4,7 @@ package edu.mayo.ve.resources;
 import com.mongodb.*;
 import edu.mayo.ve.CacheMissException;
 import edu.mayo.ve.util.LastHit;
-import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.SystemProperties;
 import edu.mayo.ve.util.Tokens;
 

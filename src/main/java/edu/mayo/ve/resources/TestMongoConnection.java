@@ -5,7 +5,7 @@
 package edu.mayo.ve.resources;
 
 import com.mongodb.Mongo;
-import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.SystemProperties;
 import java.io.IOException;
 import java.util.Iterator;

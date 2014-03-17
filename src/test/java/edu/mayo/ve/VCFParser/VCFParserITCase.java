@@ -10,7 +10,7 @@ import edu.mayo.concurency.ProcessTerminatedException;
 import edu.mayo.pipes.PrintPipe;
 import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.ve.resources.*;
-import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
 import org.junit.AfterClass;
 import org.junit.Before;

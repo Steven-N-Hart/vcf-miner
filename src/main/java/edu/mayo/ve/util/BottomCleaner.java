@@ -2,6 +2,7 @@ package edu.mayo.ve.util;
 
 import com.google.common.collect.Sets;
 import com.mongodb.*;
+import edu.mayo.util.MongoConnection;
 
 import java.util.*;
 

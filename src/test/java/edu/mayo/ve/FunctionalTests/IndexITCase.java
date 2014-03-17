@@ -4,7 +4,7 @@ import com.mongodb.*;
 import edu.mayo.concurency.ProcessTerminatedException;
 import edu.mayo.concurency.Worker;
 import edu.mayo.ve.index.Index;
-import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

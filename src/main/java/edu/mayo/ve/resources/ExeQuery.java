@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.mongodb.*;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.message.Rresults;
-import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
 
 import javax.ws.rs.Consumes;

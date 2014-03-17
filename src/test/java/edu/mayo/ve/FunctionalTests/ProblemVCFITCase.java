@@ -10,7 +10,7 @@ import edu.mayo.ve.resources.ExeQuery;
 import edu.mayo.ve.resources.Provision;
 import edu.mayo.ve.resources.TypeAheadResource;
 import edu.mayo.ve.resources.Workspace;
-import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -37,6 +37,21 @@ public class ProblemVCFITCase {
     Mongo m = MongoConnection.getMongo();
     private String user = "test";
     private int overflowThreshold = 50000;
+
+
+//    @Test
+//    public void testZhifu() throws IOException, ProcessTerminatedException{
+//        String vcf = "/data/VCFExamples/zs002.variants.vcf";
+//        load(vcf, false);
+//        delete(vcf);
+//    }
+
+    @Test
+    public void testAsif100G() throws IOException, ProcessTerminatedException{
+        String vcf = "src/test/resources/testData/Asif1000G.vcf";
+        load(vcf, false);
+        delete(vcf);
+    }
 
     @Test
     public void testCaseControlSNPEFFHGVSAnnovar() throws IOException, ProcessTerminatedException {

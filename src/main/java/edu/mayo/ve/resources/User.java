@@ -21,7 +21,7 @@ import com.mongodb.DBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.util.JSON;
 import edu.mayo.ve.util.CreateUser;
-import edu.mayo.ve.util.MongoConnection;
+import edu.mayo.util.MongoConnection;
 import java.net.UnknownHostException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
