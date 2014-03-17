@@ -245,21 +245,25 @@
 </div>
 
 <!-- Modal -->
-<div id="add_workspace_modal" class="modal modal-350wide hide fade" tabindex="-1" role="dialog"aria-hidden="true">
+<div id="add_workspace_modal" class="modal hide fade" tabindex="-1" role="dialog"aria-hidden="true">
     <div class="modal-header">
         <h3>Import VCF File</h3>
     </div>
     <div class="modal-body">
-        <div class="container-fluid">
-            <div class="row-fluid">
-                <div class="span12">
-                    <p>Import the following VCF file:</p>
-                    <div class="input-append">
-                        <input id="vcf_file_upload" type="file" class="filestyle"/>
-                    </div>
+        <form class="form-horizontal">
+            <div class="control-group">
+                <label class="control-label" for="vcf_file_upload">File</label>
+                <div class="controls">
+                    <input id="vcf_file_upload" type="file" class="filestyle"/>
                 </div>
             </div>
-        </div>
+            <div class="control-group">
+                <label class="control-label" for="vcf_name_field">Name</label>
+                <div class="controls">
+                    <input type="text" id="vcf_name_field" placeholder="user defined name">
+                </div>
+            </div>
+        </form>
     </div>
     <div class="modal-footer">
         <button class="btn btn-primary" aria-hidden="true" id="import_workspace_button">Import</button>

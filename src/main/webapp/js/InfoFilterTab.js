@@ -13,10 +13,6 @@ var InfoFilterTab = function (indexController) {
     var OPTION_LTEQ = "<option value='lteq'>&#x2264;</option>";
     var OPTION_NE   = "<option value='ne'>&#x2260;</option>";
 
-    // TODO: this supposed to be here?
-    // initialize the file input field
-    $(":file").filestyle({buttonText: ''});
-
     // jQuery validate plugin config
     $('#info_tab_form').validate(
         {

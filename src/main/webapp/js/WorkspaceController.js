@@ -26,6 +26,25 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
         addWorkspace();
     });
 
+    // initialize the file input field, blank out button text
+    $(":file").filestyle({buttonText: ''});
+
+    // listen for when the user selects a file
+    $( "#vcf_file_upload" ).change( function()
+    {
+        var uploadFile = $( '#vcf_file_upload' )[0].files[0]
+
+        // some browsers put C:\\fakepath\\ on the front
+        var name = uploadFile.name.replace("C:\\fakepath\\", "");
+
+        // by default, set the name to be the filename
+        $('#vcf_name_field').val(name);
+
+        // focus on input field and highlight text
+        $('#vcf_name_field').focus();
+        $('#vcf_name_field').select();
+    });
+
     new WorkspaceTableView(
         {
             "el": $('#workspaces_table_div'),
@@ -159,8 +178,7 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
 
         var uploadFile = $( '#vcf_file_upload' )[0].files[0]
 
-        // some browsers put C:\\fakepath\\ on the front
-        var name = uploadFile.name.replace("C:\\fakepath\\", "");
+        var name = $("#vcf_name_field").val();
         console.debug("Adding workspace with name=" + name);
 
         // progress on transfers from the server to the client (downloads)
