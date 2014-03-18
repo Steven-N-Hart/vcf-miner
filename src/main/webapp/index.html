@@ -246,29 +246,29 @@
 
 <!-- Modal -->
 <div id="add_workspace_modal" class="modal hide fade" tabindex="-1" role="dialog"aria-hidden="true">
-    <div class="modal-header">
-        <h3>Import VCF File</h3>
-    </div>
-    <div class="modal-body">
-        <form class="form-horizontal">
+    <form id="import_vcf_form" action="" class="form-horizontal">
+        <div class="modal-header">
+            <h3>Import VCF File</h3>
+        </div>
+        <div class="modal-body">
             <div class="control-group">
                 <label class="control-label" for="vcf_file_upload">File</label>
                 <div class="controls">
-                    <input id="vcf_file_upload" type="file" class="filestyle"/>
+                    <input id="vcf_file_upload" name="vcf_file_upload" type="file" class="filestyle"/>
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="vcf_name_field">Name</label>
                 <div class="controls">
-                    <input type="text" id="vcf_name_field" placeholder="user defined name">
+                    <input type="text" id="vcf_name_field" name="vcf_name_field" placeholder="user defined name">
                 </div>
             </div>
-        </form>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" aria-hidden="true" id="import_workspace_button">Import</button>
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-    </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" aria-hidden="true" id="import_workspace_button">Import</button>
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        </div>
+    </form>
 </div>
 
 <!-- Modal -->

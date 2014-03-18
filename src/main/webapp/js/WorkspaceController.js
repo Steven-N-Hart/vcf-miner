@@ -21,9 +21,37 @@ var WorkspaceController = function (fnSetWorkspaceCallback) {
     var TIMER_INTERVAL = 10000; // 10 seconds
     setInterval(updateNotReadyWorkspaces, TIMER_INTERVAL);
 
+    // jQuery validate plugin config
+    $('#import_vcf_form').validate(
+        {
+            rules:
+            {
+                vcf_file_upload:
+                {
+                    required: true,
+                    minlength: 1
+                },
+                vcf_name_field:
+                {
+                    required: true,
+                    minlength: 1
+                }
+            },
+            submitHandler: function(form) {
+                addWorkspace();
+                $('#add_workspace_modal').modal('hide')
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('control-group error');
+            },
+            success: function(element) {
+                $(element).parent().removeClass('control-group error');
+            }
+        }
+    );
+
     $('#import_workspace_button').click(function()
     {
-        addWorkspace();
     });
 
     // initialize the file input field, blank out button text
