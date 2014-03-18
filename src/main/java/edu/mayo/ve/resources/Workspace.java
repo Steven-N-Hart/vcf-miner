@@ -5,7 +5,6 @@
 package edu.mayo.ve.resources;
 
 import com.mongodb.WriteResult;
-import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,12 +19,10 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.util.JSON;
-import edu.mayo.ve.util.FixStrings;
+import edu.mayo.util.FixStrings;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
-import java.net.UnknownHostException;
 import java.util.Iterator;
-import java.util.Set;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;

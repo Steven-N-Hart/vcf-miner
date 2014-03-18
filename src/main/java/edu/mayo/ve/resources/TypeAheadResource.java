@@ -5,7 +5,7 @@ import com.mongodb.*;
 import edu.mayo.ve.CacheMissException;
 import edu.mayo.ve.util.LastHit;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.SystemProperties;
+import edu.mayo.util.SystemProperties;
 import edu.mayo.ve.util.Tokens;
 
 import javax.ws.rs.GET;
@@ -13,7 +13,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -347,7 +346,7 @@ public class TypeAheadResource {
     private final String time2liveToken = "_time2liveToken_";
     //private HashMap<String,HashMap<String,Long>> indexedCache = new HashMap<String,HashMap<String,Long>>();  //this is causing a major bug!
 
-    edu.mayo.ve.index.Index iutil = new edu.mayo.ve.index.Index();
+    edu.mayo.index.Index iutil = new edu.mayo.index.Index();
     public HashMap<String,Long> getCache(String workspaceID){
         long currentTime = System.currentTimeMillis();
         HashMap<String,Long> cache = null;//indexedCache.get(workspaceID);

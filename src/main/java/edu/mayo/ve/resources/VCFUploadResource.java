@@ -16,12 +16,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
-import edu.mayo.Factories.InputStreamBufferedReaderFactory;
 import edu.mayo.concurency.Task;
+import edu.mayo.pipes.Factories.InputStreamBufferedReaderFactory;
 import edu.mayo.pipes.iterators.Compressor;
 import edu.mayo.ve.VCFLoaderPool;
 import edu.mayo.ve.VCFParser.VCFLoadWorker;
-import edu.mayo.ve.util.SystemProperties;
+import edu.mayo.util.SystemProperties;
 import edu.mayo.ve.util.Tokens;
 import edu.mayo.concurency.WorkerPool;
 

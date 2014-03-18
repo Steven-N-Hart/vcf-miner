@@ -2,18 +2,13 @@ package edu.mayo.ve.FunctionalTests;
 
 import com.mongodb.*;
 import edu.mayo.concurency.ProcessTerminatedException;
-import edu.mayo.concurency.Worker;
-import edu.mayo.ve.index.Index;
+import edu.mayo.index.Index;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.

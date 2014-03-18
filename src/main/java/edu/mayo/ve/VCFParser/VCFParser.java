@@ -14,45 +14,25 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.tinkerpop.pipes.Pipe;
-import com.tinkerpop.pipes.PipeFunction;
 import com.tinkerpop.pipes.transform.IdentityPipe;
-import com.tinkerpop.pipes.transform.TransformFunctionPipe;
 import com.tinkerpop.pipes.util.Pipeline;
 
 import edu.mayo.concurency.ProcessTerminatedException;
 import edu.mayo.concurency.Task;
 import edu.mayo.pipes.MergePipe;
-import edu.mayo.pipes.PrintPipe;
-import edu.mayo.pipes.WritePipe;
-import edu.mayo.pipes.JSON.InjectIntoJsonPipe;
-import edu.mayo.pipes.JSON.inject.ColumnArrayInjector;
-import edu.mayo.pipes.JSON.inject.ColumnInjector;
-import edu.mayo.pipes.JSON.inject.Injector;
-import edu.mayo.pipes.JSON.inject.JsonType;
-import edu.mayo.pipes.JSON.inject.LiteralInjector;
 import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
-import edu.mayo.pipes.bioinformatics.vocab.CoreAttributes;
-import edu.mayo.pipes.bioinformatics.vocab.Type;
-import edu.mayo.pipes.history.HCutPipe;
-import edu.mayo.pipes.history.History;
 import edu.mayo.pipes.history.HistoryInPipe;
-import edu.mayo.pipes.util.GenomicObjectUtils;
 import edu.mayo.ve.VCFParser.type.TypeAhead;
-import edu.mayo.ve.index.Index;
+import edu.mayo.index.Index;
 import edu.mayo.ve.resources.MetaData;
-import edu.mayo.ve.util.SystemProperties;
+import edu.mayo.util.SystemProperties;
 import java.io.IOException;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
-import org.apache.log4j.Logger;
 
 //import edu.mayo.cli.CommandPlugin; TO DO! get this to work :(
 import edu.mayo.pipes.ReplaceAllPipe;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
-import java.sql.Timestamp;
 import java.util.Date;
 
 
@@ -67,15 +47,15 @@ public class VCFParser {
     HashMap<Integer,String> testingCollection = new HashMap<Integer,String>();
     JsonObject json = null;
     TypeAhead typeAhead;
-    
-    public static void usage(){ 
+
+    public static void usage(){
             System.out.println("This program will parse a VCF file, obtain the 'schema' for that VCF and populate a MongoDB database with the variants in the VCF.");
             System.out.println("");
             System.out.println("Make sure to check your sys.properties file fo the MongoDB IP/Port combination, otherwised this script may fail");
             System.out.println("usage: VCFParser <input.vcf> <workspace_id>");
-           
+
     }
-    
+
     public static void main(String[] args) throws IOException, ProcessTerminatedException {
         SystemProperties sysprops = new SystemProperties();
         String mongoPort = sysprops.get("mongo_port");
@@ -85,14 +65,14 @@ public class VCFParser {
             System.exit(1);
         }
 
-        String infile = args[0];        
+        String infile = args[0];
         String workspace = args[1];
 //        String infile = "/data/VCFExamples/BATCH4.vcf";
 //        String outfile = "/data/VCFExamples/BATCH4.json";
 //        String workspace = "w7ee29742ff80d61953d5e6f84e1686957fbe36f7";
 
-        System.out.println("#Input File:  " + infile);  
-        System.out.println("#Workspace:  " + workspace); 
+        System.out.println("#Input File:  " + infile);
+        System.out.println("#Workspace:  " + workspace);
         System.out.println("#mongo_server: " + sysprops.get("mongo_server") );
         System.out.println("#mongo port: " + new Integer(sysprops.get("mongo_port")));
         int datalines = parser.parse(null, infile, workspace, 50000, false, true, true);
@@ -500,7 +480,7 @@ public class VCFParser {
     public void updateMetadata(String workspace, String jsonUpdate, boolean reporting){
         if(reporting) System.out.println("Saving Metadata to Workspace: " + workspace);
         DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
-        DBCollection col = db.getCollection(Tokens.METADATA_COLLECTION); 
+        DBCollection col = db.getCollection(Tokens.METADATA_COLLECTION);
         String query = "{\"key\":\""+workspace+"\"}";
         BasicDBObject bo = (BasicDBObject) JSON.parse(query); //JSON2BasicDBObject
         DBCursor dbc = col.find(bo);
@@ -516,7 +496,7 @@ public class VCFParser {
         //key = workspace, passed in so we have that!
         col.remove(bo);
         //System.out.println("result: " + result.toString());
-        
+
         //note, we want to destroy whatever was in there with the new data (in case they try to load multiple times)
         //but we have to keep owner, id, and key.
         BasicDBObject replace = (BasicDBObject) JSON.parse(jsonUpdate);

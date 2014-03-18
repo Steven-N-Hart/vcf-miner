@@ -1,7 +1,6 @@
 package edu.mayo.ve.resources;
 
 import com.mongodb.*;
-import com.mongodb.util.JSON;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
 
@@ -17,7 +16,7 @@ import javax.ws.rs.*;
 @Path("/ve/index")
 public class Index {
     Mongo m = MongoConnection.getMongo();
-    edu.mayo.ve.index.Index index = new edu.mayo.ve.index.Index(); //this is the index utility class
+    edu.mayo.index.Index index = new edu.mayo.index.Index(); //this is the index utility class
 
     @GET
     @Path("/createFieldIndex/{workspaceid}/f/{field}")

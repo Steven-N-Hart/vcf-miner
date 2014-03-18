@@ -5,7 +5,7 @@ import edu.mayo.concurency.ProcessTerminatedException;
 import edu.mayo.concurency.Task;
 import edu.mayo.concurency.WorkerLogic;
 import edu.mayo.ve.resources.MetaData;
-import edu.mayo.ve.util.SystemProperties;
+import edu.mayo.util.SystemProperties;
 import edu.mayo.ve.util.Tokens;
 
 import java.io.File;

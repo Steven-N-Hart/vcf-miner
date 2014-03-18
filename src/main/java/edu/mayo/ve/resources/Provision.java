@@ -4,12 +4,10 @@
  */
 package edu.mayo.ve.resources;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
@@ -17,14 +15,10 @@ import com.mongodb.Mongo;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.DBCursor;
 import com.mongodb.WriteResult;
-import edu.mayo.ve.util.HashUtil;
+import edu.mayo.util.HashUtil;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
-import java.net.UnknownHostException;
-import java.util.Set;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import org.bson.types.ObjectId;
