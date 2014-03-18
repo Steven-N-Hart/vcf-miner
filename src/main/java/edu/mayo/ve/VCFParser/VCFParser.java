@@ -17,8 +17,8 @@ import com.tinkerpop.pipes.Pipe;
 import com.tinkerpop.pipes.transform.IdentityPipe;
 import com.tinkerpop.pipes.util.Pipeline;
 
-import edu.mayo.concurency.ProcessTerminatedException;
-import edu.mayo.concurency.Task;
+import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
+import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.pipes.MergePipe;
 import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;

@@ -1,9 +1,9 @@
 package edu.mayo.ve.VCFParser;
 
 import com.mongodb.*;
-import edu.mayo.concurency.ProcessTerminatedException;
-import edu.mayo.concurency.Task;
-import edu.mayo.concurency.WorkerLogic;
+import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
+import edu.mayo.concurrency.workerQueue.Task;
+import edu.mayo.concurrency.workerQueue.WorkerLogic;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.util.SystemProperties;
 import edu.mayo.ve.util.Tokens;
@@ -22,7 +22,7 @@ import java.util.HashMap;
  */
 public class VCFLoadWorker  implements WorkerLogic {
 
-       public static void main(String[] args)throws ProcessTerminatedException{
+       public static void main(String[] args)throws ProcessTerminatedException {
            VCFLoadWorker worker = new VCFLoadWorker(100000);
            Task t = new Task();
            HashMap<String,String> hm = new HashMap<String,String>();

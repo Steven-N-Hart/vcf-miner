@@ -5,8 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mongodb.BasicDBObject;
-import edu.mayo.concurency.Task;
-import edu.mayo.concurency.WorkerPool;
+import edu.mayo.concurrency.workerQueue.WorkerPool;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

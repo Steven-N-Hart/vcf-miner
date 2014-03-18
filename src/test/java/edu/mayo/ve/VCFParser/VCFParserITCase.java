@@ -6,7 +6,7 @@ import com.google.gson.JsonParser;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import com.tinkerpop.pipes.util.Pipeline;
-import edu.mayo.concurency.ProcessTerminatedException;
+import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.pipes.PrintPipe;
 import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.ve.resources.*;

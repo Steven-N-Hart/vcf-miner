@@ -2,7 +2,7 @@ package edu.mayo.ve.FunctionalTests;
 
 import com.mongodb.*;
 import com.mongodb.util.JSON;
-import edu.mayo.concurency.ProcessTerminatedException;
+import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.message.SampleNumberFilter;
@@ -47,7 +47,7 @@ public class ProblemVCFITCase {
 //    }
 
     @Test
-    public void testAsif100G() throws IOException, ProcessTerminatedException{
+    public void testAsif100G() throws IOException, ProcessTerminatedException {
         String vcf = "src/test/resources/testData/Asif1000G.vcf";
         load(vcf, false);
         delete(vcf);

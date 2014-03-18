@@ -1,7 +1,7 @@
 package edu.mayo.ve.resources;
 
 import com.tinkerpop.pipes.util.Pipeline;
-import edu.mayo.concurency.WorkerPool;
+import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.ve.VCFLoaderPool;
 import edu.mayo.ve.VCFParser.VCFLoadWorker;

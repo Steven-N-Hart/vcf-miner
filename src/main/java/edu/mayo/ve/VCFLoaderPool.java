@@ -6,7 +6,7 @@ package edu.mayo.ve; /**
  * To change this template use File | Settings | File Templates.
  */
 
-import edu.mayo.concurency.WorkerPool;
+import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.ve.VCFParser.VCFLoadWorker;
 import edu.mayo.ve.resources.WorkerPoolManager;
 import edu.mayo.ve.util.Tokens;

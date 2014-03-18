@@ -2,39 +2,36 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="be9f73b3-8806-4b29-b922-d6eef1649cf2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/GeneQueries.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/GeneQueries.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/History.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/History.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Index.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Index.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/ExportITCase.java" afterPath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/ExportITCase.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/IndexITCase.java" afterPath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/IndexITCase.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Provision.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Provision.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/TestMongoConnection.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/TestMongoConnection.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/TypeAheadResource.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/TypeAheadResource.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/ProblemVCFITCase.java" afterPath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/ProblemVCFITCase.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java" afterPath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/TypeAheadITCase.java" afterPath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/TypeAheadITCase.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFLoadWorker.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFLoadWorker.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFLoaderPool.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFLoaderPool.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFParser.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFParser.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/VCFParser/VCFParserITCase.java" afterPath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/VCFParser/VCFParserITCase.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Workspace.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Workspace.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mongo_svr.iml" afterPath="$PROJECT_DIR$/mongo_svr.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/mongo_svr_war_exploded.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/mongo_svr_war_exploded.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/resources/VCFUploadResourceTest.java" afterPath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/resources/VCFUploadResourceTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/WorkerPoolManager.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/WorkerPoolManager.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="mongo_svr.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395096244986" ignored="false" />
+    <file path="/Dummy.txt" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395106225892" ignored="false" />
     <file path="/DownloadFile.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1386880214925" ignored="false" />
     <file path="/Provision.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1382023155426" ignored="false" />
     <file path="/Tokens.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1391185109353" ignored="false" />
     <file path="/MetaData.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1392667942589" ignored="false" />
     <file path="/fragment.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395096039838" ignored="false" />
     <file path="/DownloadFileTest.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1381972716095" ignored="false" />
-    <file path="/VCFParser.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395092693853" ignored="false" />
+    <file path="/VCFParser.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395106720690" ignored="false" />
     <file path="/History.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1388758058374" ignored="false" />
     <file path="/VCF2VariantPipe.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1390405070804" ignored="false" />
     <file path="$PROJECT_DIR$/../pipes/src/test/java/edu/mayo/pipes/bioinformatics/VCF2VariantPipeTest.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1390426096285" ignored="false" />
     <file path="/VCF2VariantPipeTest.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1390426060367" ignored="false" />
     <file path="/VCFLoadWorker.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1390320994004" ignored="false" />
-    <file path="/VCFUploadResource.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1393021536663" ignored="false" />
+    <file path="/VCFUploadResource.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395158513922" ignored="false" />
     <file path="/VCFLoaderPool.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1388079696576" ignored="false" />
     <file path="$PROJECT_DIR$/../mongo_view/trunk/web/js/mongo_view.js" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1382624333928" ignored="false" />
     <file path="/VCFParserTest.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1390918294205" ignored="false" />
@@ -848,97 +845,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="VCFLoadWorker.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFLoadWorker.java">
+      <file leaf-file-name="TypeAheadITCase.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/TypeAheadITCase.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="7" column="16" selection-start="237" selection-end="237" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Workspace.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Workspace.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="71" selection-start="411" selection-end="411" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CreateUser.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/util/CreateUser.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="18" column="13" selection-start="437" selection-end="437" vertical-scroll-proportion="0.2722323">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="VCFUploadResource.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="15" selection-start="724" selection-end="724" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="VCFParser.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFParser.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="15" selection-start="852" selection-end="852" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#0#23087#0" expanded="true" />
-                <element signature="e#1371#1387#0" expanded="true" />
-                <element signature="e#11076#11087#0" expanded="true" />
-                <element signature="e#11345#11353#0" expanded="true" />
-                <element signature="e#16900#16908#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Provision.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Provision.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="18" column="15" selection-start="507" selection-end="507" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="History.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/History.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="13" column="45" selection-start="376" selection-end="376" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="web.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml">
-          <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleAssemblyDescriptorReferencesProvider">
-            <state />
-          </provider>
-          <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleAssemblyDescriptorProvider">
-            <state />
-          </provider>
-          <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleGeneralEditorProvider">
-            <state />
-          </provider>
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="68" selection-start="676" selection-end="676" vertical-scroll-proportion="-6.6666665">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TypeAheadResource.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/TypeAheadResource.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="234" column="44" selection-start="8716" selection-end="8716" vertical-scroll-proportion="0.0">
+            <state line="44" column="62" selection-start="1772" selection-end="1772" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -946,11 +856,97 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestMongoConnection.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/TestMongoConnection.java">
+      <file leaf-file-name="QuerryDownloadTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/message/QuerryDownloadTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="8" column="15" selection-start="211" selection-end="211" vertical-scroll-proportion="0.0">
+            <state line="15" column="13" selection-start="346" selection-end="346" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DownloadFileTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/resources/DownloadFileTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="16" column="13" selection-start="338" selection-end="338" vertical-scroll-proportion="0.0">
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GeneQueriesTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/resources/GeneQueriesTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="17" column="13" selection-start="368" selection-end="368" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VCFUploadResourceTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/resources/VCFUploadResourceTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="39" column="12" selection-start="1362" selection-end="1362" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LastHitTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/util/LastHitTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="17" column="13" selection-start="336" selection-end="336" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TypeAheadTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/VCFParser/type/TypeAheadTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="17" column="13" selection-start="378" selection-end="378" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VCFParserITCase.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/VCFParser/VCFParserITCase.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="110" column="47" selection-start="83441" selection-end="83441" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VCFParserTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/VCFParser/VCFParserTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="16" column="13" selection-start="413" selection-end="413" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="QuerryTest.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/QuerryTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="20" column="13" selection-start="434" selection-end="434" vertical-scroll-proportion="-3.2282004">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -965,22 +961,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/index/Index.java" />
-        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/IndexITCase.java" />
-        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/ProblemVCFITCase.java" />
-        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/VCFParser/VCFParserITCase.java" />
-        <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/../../mayo-commons-mongodb/src/main/java/edu/mayo/index/Index.java" />
-        <option value="$PROJECT_DIR$/../../mayo-commons-mongodb/src/main/java/edu/mayo/util/FixStrings.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/History.java" />
-        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" />
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/TypeAheadResource.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/TestMongoConnection.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Provision.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFParser.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFLoadWorker.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Workspace.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFParser.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/WorkerPoolManager.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFLoadWorker.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFLoaderPool.java" />
+        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/resources/VCFUploadResourceTest.java" />
+        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/ExportITCase.java" />
+        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/IndexITCase.java" />
+        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/ProblemVCFITCase.java" />
+        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java" />
+        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/TypeAheadITCase.java" />
+        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/VCFParser/VCFParserITCase.java" />
       </list>
     </option>
   </component>
@@ -1010,13 +1006,37 @@
           <option name="myItemId" value="" />
           <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
         </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="mongo_svr" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="mongo_svr" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Lifecycle" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$LifecycleNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
       </PATH>
     </treeState>
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="29" />
     <option name="y" value="22" />
-    <option name="width" value="1205" />
+    <option name="width" value="1537" />
     <option name="height" value="970" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
@@ -1413,10 +1433,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="mayo" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="ve" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -1440,10 +1456,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mayo" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -1474,10 +1486,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mayo" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -1515,10 +1523,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="mayo" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="ve" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -1549,11 +1553,11 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="mayo" />
+              <option name="myItemId" value="ve" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="concurency" />
+              <option name="myItemId" value="resources" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -2218,7 +2222,11 @@
       <created>1395084510109</created>
       <updated>1395084510109</updated>
     </task>
-    <option name="localTasksCounter" value="52" />
+    <task id="LOCAL-00052" summary="Down-factoring MongoDB based dependancies into a library for utilizing MongoDB in bioinformatics">
+      <created>1395106264101</created>
+      <updated>1395106264102</updated>
+    </task>
+    <option name="localTasksCounter" value="53" />
     <servers />
   </component>
   <component name="TodoView" selected-index="0">
@@ -2242,7 +2250,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="29" y="22" width="1205" height="970" extended-state="0" />
+    <frame x="29" y="22" width="1537" height="970" extended-state="0" />
     <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32689834" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -2256,16 +2264,16 @@
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.249694" sideWeight="0.28712872" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32920793" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3670588" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.36749116" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.249694" sideWeight="0.28712872" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34635416" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.13892289" sideWeight="0.6581986" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32959446" sideWeight="0.6321304" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2555332" sideWeight="0.7364706" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31176472" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.36324418" sideWeight="0.7352941" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2647059" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28236082" sideWeight="0.7364706" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26352942" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -2339,134 +2347,139 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Queries.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="22" selection-start="188" selection-end="188" vertical-scroll-proportion="0.0">
-          <folding />
+        <state line="48" column="11" selection-start="1704" selection-end="1704" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/CacheMissException.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFLoaderPool.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="13" selection-start="189" selection-end="189" vertical-scroll-proportion="0.22277227">
-          <folding />
+        <state line="7" column="0" selection-start="176" selection-end="176" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../mayo-commons-mongodb/src/main/java/edu/mayo/index/Index.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/ExportITCase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="91" selection-start="298" selection-end="298" vertical-scroll-proportion="0.22765599">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="69" selection-start="658" selection-end="658" vertical-scroll-proportion="0.0">
+        <state line="3" column="29" selection-start="96" selection-end="96" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/IndexITCase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="9" selection-start="1034" selection-end="1034" vertical-scroll-proportion="0.0">
+        <state line="26" column="59" selection-start="775" selection-end="775" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../mayo-commons-mongodb/src/main/java/edu/mayo/util/FixStrings.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/ProblemVCFITCase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="2" selection-start="272" selection-end="272" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/History.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="45" selection-start="376" selection-end="376" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml">
-      <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleAssemblyDescriptorReferencesProvider">
-        <state />
-      </provider>
-      <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleAssemblyDescriptorProvider">
-        <state />
-      </provider>
-      <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleGeneralEditorProvider">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="68" selection-start="676" selection-end="676" vertical-scroll-proportion="-6.6666665">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/TypeAheadResource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="234" column="44" selection-start="8716" selection-end="8716" vertical-scroll-proportion="0.0">
+        <state line="49" column="68" selection-start="1460" selection-end="1460" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/TestMongoConnection.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="15" selection-start="211" selection-end="211" vertical-scroll-proportion="0.0">
+        <state line="4" column="29" selection-start="128" selection-end="128" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/TypeAheadITCase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="15" selection-start="724" selection-end="724" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Provision.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="15" selection-start="507" selection-end="507" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFParser.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="15" selection-start="852" selection-end="852" vertical-scroll-proportion="0.0">
+        <state line="44" column="62" selection-start="1772" selection-end="1772" vertical-scroll-proportion="0.0">
           <folding>
-            <element signature="e#0#23087#0" expanded="true" />
-            <element signature="e#1371#1387#0" expanded="true" />
-            <element signature="e#11076#11087#0" expanded="true" />
-            <element signature="e#11345#11353#0" expanded="true" />
-            <element signature="e#16900#16908#0" expanded="true" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFLoadWorker.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/message/QuerryDownloadTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="16" selection-start="237" selection-end="237" vertical-scroll-proportion="0.0">
+        <state line="15" column="13" selection-start="346" selection-end="346" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/resources/DownloadFileTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="13" selection-start="338" selection-end="338" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Workspace.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/resources/GeneQueriesTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="71" selection-start="411" selection-end="411" vertical-scroll-proportion="0.0">
+        <state line="17" column="13" selection-start="368" selection-end="368" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/util/CreateUser.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/resources/VCFUploadResourceTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="13" selection-start="437" selection-end="437" vertical-scroll-proportion="0.2722323">
-          <folding />
+        <state line="39" column="12" selection-start="1362" selection-end="1362" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/util/LastHitTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="13" selection-start="336" selection-end="336" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/VCFParser/type/TypeAheadTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="13" selection-start="378" selection-end="378" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/VCFParser/VCFParserITCase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="110" column="47" selection-start="83441" selection-end="83441" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/VCFParser/VCFParserTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="13" selection-start="413" selection-end="413" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/QuerryTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="13" selection-start="434" selection-end="434" vertical-scroll-proportion="-3.2282004">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

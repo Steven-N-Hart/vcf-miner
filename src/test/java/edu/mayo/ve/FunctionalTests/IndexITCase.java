@@ -1,7 +1,7 @@
 package edu.mayo.ve.FunctionalTests;
 
 import com.mongodb.*;
-import edu.mayo.concurency.ProcessTerminatedException;
+import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.index.Index;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.util.Tokens;
