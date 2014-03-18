@@ -4,12 +4,12 @@ import com.mongodb.BasicDBList;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.CacheMissException;
 import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.resources.Provision;
 import edu.mayo.ve.resources.*;
 import edu.mayo.ve.resources.Workspace;
-import edu.mayo.ve.util.Tokens;
 import org.junit.*;
 
 import javax.ws.rs.PathParam;

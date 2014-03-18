@@ -9,7 +9,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
+import edu.mayo.util.Tokens;
 
 /**
  *
@@ -20,7 +20,7 @@ public class CreateUser {
     Mongo m = MongoConnection.getMongo();
 
     public void create_user(String username) {
-        DB db = m.getDB( Tokens.USER_DATABASE ); 
+        DB db = MongoConnection.getDB();
         DBCollection coll = db.getCollection( Tokens.USER_COLLECTION );
         DBObject user = coll.findOne(null);
         //if the user has created a workspace before

@@ -20,7 +20,6 @@ import com.mongodb.DBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.util.JSON;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Set;
@@ -59,7 +58,7 @@ public class TabResource {
          //System.out.println(tabFile);
          //System.out.println(workspaceID);
          String[] headers = null;
-         DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+         DB db = MongoConnection.getDB();
          DBCollection coll = db.getCollection(workspaceID);
          String[] lines = tabFile.split("\n");
          boolean header_parsed = false;

@@ -1,10 +1,10 @@
 package edu.mayo.ve.resources;
 
 import com.mongodb.*;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.index.Index;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -43,7 +43,7 @@ public class GeneQueries {
     @Produces("application/json")
     public String howAreGenesRepresentedInINFO(@PathParam("workspace_id") String workspaceID) {
         String ret = "";
-        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DB db = MongoConnection.getDB();
         DBCollection coll = db.getCollection(Tokens.METADATA_COLLECTION);
         BasicDBObject query = new BasicDBObject();
         query.put("key",workspaceID);
@@ -87,7 +87,7 @@ public class GeneQueries {
 
         //check to see if the index exists
         Index index = new Index();
-        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspaceID);
         if(index.hasIndex(col, "key", "INFO.SNPEFF_GENE_NAME")){
             return "{\"status\":\"index exists\"}";
@@ -114,7 +114,7 @@ public class GeneQueries {
         }
         //get all the distinct genes... in mongo this is expressed as thus:
         //db.w098898c6cce952e98923db053bb526c9d603f40d.distinct( 'INFO.SNPEFF_GENE_NAME' )
-        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DB db = MongoConnection.getDB();
         DBCollection coll = db.getCollection(workspaceID);
         BasicDBObject query = new BasicDBObject();
 

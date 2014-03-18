@@ -3,6 +3,7 @@ package edu.mayo.ve.util;
 import com.google.common.collect.Sets;
 import com.mongodb.*;
 import edu.mayo.util.MongoConnection;
+import edu.mayo.util.Tokens;
 
 import java.util.*;
 
@@ -23,7 +24,7 @@ public class BottomCleaner {
      */
     public List<String> allWorkspaceCollections(){
         ArrayList<String> ret = new ArrayList<String>();
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         Set<String> colls = db.getCollectionNames();
         for(String s : colls){
             if(s.startsWith("w")){
@@ -41,7 +42,7 @@ public class BottomCleaner {
      * @return a list of workspaces that don't have metadata
      */
     public HashMap<String,DBObject> allWorkspacesWithMetadata(){
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.METADATA_COLLECTION);
         List<String> workspaces = allWorkspaceCollections();
         HashMap<String,DBObject> workspacesWithMetadata = new HashMap<String,DBObject>();
@@ -65,7 +66,7 @@ public class BottomCleaner {
      * @param workspaces
      */
     public void dropWorkspacesWOMetadata(List<String> workspaces){
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         for(String w : workspaces){
             DBCollection col = db.getCollection(w);
             col.dropIndexes();

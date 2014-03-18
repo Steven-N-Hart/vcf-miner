@@ -5,7 +5,6 @@ import com.mongodb.*;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.message.Rresults;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -29,7 +28,7 @@ public class ExeQuery {
     @Produces("application/json")
     @Consumes(MediaType.APPLICATION_JSON)
     public String handleBasicQuerry(Querry q){
-        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(q.getWorkspace());
         DBObject query = q.createQuery();
         Rresults results = new Rresults();

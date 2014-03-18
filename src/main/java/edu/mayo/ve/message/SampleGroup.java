@@ -2,7 +2,7 @@ package edu.mayo.ve.message;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import edu.mayo.ve.util.Tokens;
+import edu.mayo.util.Tokens;
 
 import java.util.ArrayList;
 

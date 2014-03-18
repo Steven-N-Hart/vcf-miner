@@ -3,12 +3,12 @@ package edu.mayo.ve.resources;
 import com.google.gson.Gson;
 import com.mongodb.*;
 import com.sun.jersey.api.representation.Form;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.message.DisplayedFilterVariants;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.message.QuerryDownload;
 import edu.mayo.ve.message.Rresults;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
@@ -129,7 +129,7 @@ public class DownloadFile {
 
     private void writeData(OutputStream output, final QuerryDownload q) throws IOException, WebApplicationException {
         int i = 0;
-        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(q.getWorkspace());
         DBObject query = q.createQuery();
         //System.out.println(q.getCustomReturnSelect().toString());
@@ -159,7 +159,7 @@ public class DownloadFile {
         return new StreamingOutput() {
             public void write(OutputStream output) throws IOException, WebApplicationException {
                 try {
-                    DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+                    DB db = MongoConnection.getDB();
                     DBCollection col = db.getCollection(q.getWorkspace());
                     DBObject query = q.createQuery();
                     //System.out.println(q.getCustomReturnSelect().toString());

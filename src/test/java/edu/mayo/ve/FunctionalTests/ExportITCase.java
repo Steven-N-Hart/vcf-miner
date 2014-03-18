@@ -8,7 +8,6 @@ import edu.mayo.ve.message.QuerryDownload;
 import edu.mayo.ve.resources.DownloadFile;
 import edu.mayo.ve.resources.Provision;
 import edu.mayo.ve.resources.Workspace;
-import edu.mayo.ve.util.Tokens;
 import junit.framework.Assert;
 import org.junit.After;
 import org.junit.AfterClass;

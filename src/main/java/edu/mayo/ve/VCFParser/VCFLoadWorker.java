@@ -4,9 +4,9 @@ import com.mongodb.*;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerLogic;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.util.SystemProperties;
-import edu.mayo.ve.util.Tokens;
 
 import java.io.File;
 import java.io.IOException;
@@ -113,7 +113,7 @@ public class VCFLoadWorker  implements WorkerLogic {
             try {
                 Mongo m = new MongoClient(host , port);
                 parser.setM(m);
-//                DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+//                DB db = MongoConnection.getDB();
 //                DBCollection col = db.getCollection("meta");
 //                DBCursor dbc = col.find();
 //                while(dbc.hasNext()){

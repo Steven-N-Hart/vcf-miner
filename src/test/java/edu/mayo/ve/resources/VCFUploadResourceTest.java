@@ -3,9 +3,9 @@ package edu.mayo.ve.resources;
 import com.tinkerpop.pipes.util.Pipeline;
 import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.pipes.UNIX.CatPipe;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.VCFLoaderPool;
 import edu.mayo.ve.VCFParser.VCFLoadWorker;
-import edu.mayo.ve.util.Tokens;
 import org.junit.Test;
 
 import java.io.*;

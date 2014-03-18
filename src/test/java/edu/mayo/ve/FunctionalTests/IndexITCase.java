@@ -4,7 +4,9 @@ import com.mongodb.*;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.index.Index;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
+import edu.mayo.util.Tokens;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -23,13 +25,13 @@ public class IndexITCase {
     private static TypeAheadITCase theadit = new TypeAheadITCase();
     private static String workspace = "wd5e9246fe1060d7fd0ca53628039ae006389a40a";
 
-    //@BeforeClass
+    @BeforeClass
     public static void setup() throws IOException, ProcessTerminatedException {
         theadit.setUp();
         workspace = theadit.getWorkspaceID();
     }
 
-    //@AfterClass
+    @AfterClass
     public static void tearDown(){
         theadit.tearDown();
     }
@@ -79,7 +81,7 @@ public class IndexITCase {
 
         @Override
         public void run() {
-            DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+            DB db = MongoConnection.getDB();
             DBCollection col = db.getCollection(workspace);
             DBObject bo = new BasicDBObject();
             bo.put(field,1);

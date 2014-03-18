@@ -17,14 +17,15 @@ import com.tinkerpop.pipes.Pipe;
 import com.tinkerpop.pipes.transform.IdentityPipe;
 import com.tinkerpop.pipes.util.Pipeline;
 
+import edu.mayo.TypeAhead.TypeAhead;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.pipes.MergePipe;
 import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
 import edu.mayo.pipes.history.HistoryInPipe;
-import edu.mayo.ve.VCFParser.type.TypeAhead;
 import edu.mayo.index.Index;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.util.SystemProperties;
 import java.io.IOException;
@@ -32,7 +33,6 @@ import java.io.IOException;
 //import edu.mayo.cli.CommandPlugin; TO DO! get this to work :(
 import edu.mayo.pipes.ReplaceAllPipe;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
 import java.util.Date;
 
 
@@ -106,7 +106,7 @@ public class VCFParser {
      */
     public int parse(Task context, String infile, String workspace, int typeAheadCacheSize, boolean testing, boolean reporting, boolean saveSamples) throws ProcessTerminatedException{
         VCF2VariantPipe vcf 	= new VCF2VariantPipe(true, false);
-        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspace);
         typeAhead = new TypeAhead("INFO", typeAheadCacheSize, reporting);
         if(reporting) System.out.println("Setting up Pipeline....");
@@ -204,7 +204,7 @@ public class VCFParser {
         //the first way the load could have failed is if the number of records in the workspace != the number of data lines
 
         BasicDBObject query = new BasicDBObject(); //empty for all
-        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspace);
         long linesLoaded = col.count(query);
         if(linesLoaded != datalines){
@@ -392,7 +392,7 @@ public class VCFParser {
         if(json == null){
             return;
         }
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspace);
 
         //auto-index all reserved columns (as needed by the app)
@@ -479,7 +479,7 @@ public class VCFParser {
 
     public void updateMetadata(String workspace, String jsonUpdate, boolean reporting){
         if(reporting) System.out.println("Saving Metadata to Workspace: " + workspace);
-        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.METADATA_COLLECTION);
         String query = "{\"key\":\""+workspace+"\"}";
         BasicDBObject bo = (BasicDBObject) JSON.parse(query); //JSON2BasicDBObject

@@ -3,6 +3,7 @@ package edu.mayo.ve.FunctionalTests;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.message.SampleNumberFilter;
@@ -11,7 +12,6 @@ import edu.mayo.ve.resources.Provision;
 import edu.mayo.ve.resources.TypeAheadResource;
 import edu.mayo.ve.resources.Workspace;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -105,7 +105,7 @@ public class ProblemVCFITCase {
 
     private long count(String workspace){
         ExeQuery q = new ExeQuery();
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspace);
         long count = q.countResults(col, new BasicDBObject());
         return count;
@@ -138,7 +138,7 @@ public class ProblemVCFITCase {
         String vcf = "src/test/resources/testData/Case.control.snpeff.hgvs.annovar.part300.vcf.gz";
         String workspace = load(vcf, false);
         //tests.... (note this problem should create an error if it surfaces again)
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspace);
         assertEquals(197, col.count());
 

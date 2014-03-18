@@ -20,6 +20,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.util.JSON;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.util.CreateUser;
 import edu.mayo.util.MongoConnection;
 import java.net.UnknownHostException;
@@ -28,7 +29,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 
-import edu.mayo.ve.util.Tokens;
 import org.bson.types.ObjectId;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -61,7 +61,7 @@ public class User {
      */
     public List<String> getAllUsersFromMeta(){
         HashSet<String> allUsers = new HashSet<String>();
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.METADATA_COLLECTION);
         BasicDBObject everything = new BasicDBObject();
         BasicDBObject returnUsersOnly = new BasicDBObject();

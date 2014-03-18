@@ -7,7 +7,7 @@ package edu.mayo.ve.resources;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
+import edu.mayo.util.Tokens;
 
 import javax.ws.rs.*;
 
@@ -46,7 +46,7 @@ public class MetaData {
     public DBObject queryMeta(String key, String id){
         //System.out.println("key: " + key + " : " + "id: " + id );
         BasicDBObject dbo = new BasicDBObject();
-        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DB db = MongoConnection.getDB();
         DBCollection coll = db.getCollection(Tokens.METADATA_COLLECTION);
         BasicDBObject query = new BasicDBObject();
         BasicDBObject bo = (BasicDBObject) JSON.parse("{ "+key+" :\"" + id + "\" }"); //JSON2BasicDBObject
@@ -64,7 +64,7 @@ public class MetaData {
     public String isReady(@PathParam("workspaceid") String workspaceID) {
         BasicDBObject ret = new BasicDBObject();
         ret.put(Tokens.READY_TOKEN, 0);
-        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DB db = MongoConnection.getDB();
         DBCollection coll = db.getCollection(Tokens.METADATA_COLLECTION);
         BasicDBObject query = new BasicDBObject();
         query.put(Tokens.KEY,workspaceID);
@@ -135,7 +135,7 @@ public class MetaData {
         //return flag(workspaceID, failMessage, -1);
 
         //get all of the
-        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DB db = MongoConnection.getDB();
         DBCollection coll = db.getCollection(Tokens.METADATA_COLLECTION);
         BasicDBObject query = new BasicDBObject();
         query.append("alias", alias);
@@ -165,7 +165,7 @@ public class MetaData {
     }
 
     private String flag(String workspaceID, String message, int readyStatus){
-        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DB db = MongoConnection.getDB();
         DBCollection coll = db.getCollection(Tokens.METADATA_COLLECTION);
 
         BasicDBObject query = new BasicDBObject().append(Tokens.KEY, workspaceID);

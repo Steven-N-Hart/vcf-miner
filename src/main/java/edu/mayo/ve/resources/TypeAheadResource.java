@@ -2,11 +2,11 @@ package edu.mayo.ve.resources;
 
 
 import com.mongodb.*;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.CacheMissException;
 import edu.mayo.ve.util.LastHit;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.util.SystemProperties;
-import edu.mayo.ve.util.Tokens;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -30,7 +30,7 @@ public class TypeAheadResource {
     @Path("/w/{workspace_id}")
     @Produces("application/json")
     public String getTypeAhead(@PathParam("workspace_id") String workspaceID){
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.TYPEAHEAD_COLLECTION);
         BasicDBObject dbo = new BasicDBObject();
         dbo.put(Tokens.KEY, workspaceID);
@@ -51,7 +51,7 @@ public class TypeAheadResource {
         if(field.startsWith("INFO")){
             field = field.substring(5);
         }
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.TYPEAHEAD_COLLECTION);
         BasicDBObject dbo = new BasicDBObject();
         dbo.put(Tokens.KEY, workspaceID);
@@ -78,7 +78,7 @@ public class TypeAheadResource {
      * @return
      */
     public BasicDBList getTypeAheadFromMongoCache(String workspace,String field,String prefix, int maxValues) throws CacheMissException {
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.TYPEAHEAD_COLLECTION);
         String newField;
         if(field.startsWith("INFO.")){   //type-ahead does not store the INFO.
@@ -143,7 +143,7 @@ public class TypeAheadResource {
         }
         //get all the distinct values for a field (e.g. gene)... in mongo this is expressed as thus:
         //db.w098898c6cce952e98923db053bb526c9d603f40d.distinct( 'INFO.SNPEFF_GENE_NAME' )
-        DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspace);
         BasicDBObject query = constructQuery(sfield, prefix);
 
@@ -313,7 +313,7 @@ public class TypeAheadResource {
         }
         //else, we have to go to disk to satisfy the request...
         try {
-            DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+            DB db = MongoConnection.getDB();
 
             //if the field is not indexed --- later optimization -> AND cache was NOT overflown on load
             if(!this.isIndexed(workspaceID, field)){
@@ -367,7 +367,7 @@ public class TypeAheadResource {
      * @return
      */
     public HashMap<String,Long> updateCache(String workspaceID){
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspaceID);
         HashMap<String,Long> cache = new HashMap<String,Long>();
         //update the cache with the most up-to-date information from the MongoDB indexes
@@ -391,7 +391,7 @@ public class TypeAheadResource {
      * @return
      */
     public HashMap<String,Long> updateCacheMetaData(HashMap<String,Long> hm){
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         //DBCollection col = db.getCollection(workspaceID);
         return hm;
     }

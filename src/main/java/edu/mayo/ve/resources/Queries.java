@@ -26,9 +26,9 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.util.JSON;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.util.BottomCleaner;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Set;
@@ -58,8 +58,8 @@ public class Queries {
      public String getWorkspaceJSON(@PathParam("user_id") String userID) {
          bottomCleaner.dropWorkspacesWOMetadata(); //deal with a strange bug where some workspaces exist even after they are deleted... if this is too slow, consider spawning up a workerpool to do it in the background
          //System.out.println("getWorkspaceJSON: " + userID);
-         DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
-         DBCollection coll = db.getCollection(Tokens.METADATA_COLLECTION);                   
+         DB db = MongoConnection.getDB();
+         DBCollection coll = db.getCollection(Tokens.METADATA_COLLECTION);
          BasicDBObject query = new BasicDBObject();
          query.append(Tokens.OWNER, userID);
          DBCursor workspaces = coll.find(query);
@@ -82,7 +82,7 @@ public class Queries {
          JsonObject ret = new JsonObject();
          JsonArray results = new JsonArray();
          //System.out.println("getWorkspaceJSON: " + userID);
-         DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+         DB db = MongoConnection.getDB();
          DBCollection coll = db.getCollection(workspaceID);                   
          BasicDBObject query = new BasicDBObject();
 

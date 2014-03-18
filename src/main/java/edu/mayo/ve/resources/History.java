@@ -4,10 +4,10 @@ import com.google.gson.Gson;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import edu.mayo.util.HashUtil;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.message.FilterHistory;
 import edu.mayo.util.HashUtil;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
 import org.bson.types.ObjectId;
 
 import javax.ws.rs.*;
@@ -51,7 +51,7 @@ public class History {
     public String save(FilterHistory filterHistory) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         //populate timestamp
         filterHistory.setTimestamp(timestamp());
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.FILTER_HISTORY_COLLECTION);
         String json = gson.toJson(filterHistory);
         BasicDBObject dbo = (BasicDBObject) JSON.parse(json);
@@ -83,7 +83,7 @@ public class History {
     @Produces("application/json")
     public String get(@PathParam("workspaceID") String workspaceID){
         List<DBObject> ret = new ArrayList<DBObject>();
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.FILTER_HISTORY_COLLECTION);
         BasicDBObject dbo = new BasicDBObject();
         dbo.put(Tokens.KEY, workspaceID);
@@ -110,7 +110,7 @@ public class History {
     @Path("/delete/{fileHistoryID}/")
     @Produces("application/json")
     public String delete(@PathParam("fileHistoryID") String fileHistoryID){
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.FILTER_HISTORY_COLLECTION);
         BasicDBObject del = new BasicDBObject();
         del.put("id",fileHistoryID);

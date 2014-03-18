@@ -21,13 +21,14 @@ import com.mongodb.DBCursor;
 import com.mongodb.util.JSON;
 import edu.mayo.util.FixStrings;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
 import java.util.Iterator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
+
+import edu.mayo.util.Tokens;
 import org.bson.types.ObjectId;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -57,7 +58,7 @@ public class Workspace {
          //System.out.println(jsonString);
          jsonString = FixStrings.usr2mongo(jsonString);
          System.out.println(jsonString);
-         DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+         DB db = MongoConnection.getDB();
          DBCollection coll = db.getCollection(workspaceID);
          BasicDBObject bo = (BasicDBObject) JSON.parse(jsonString);
          WriteResult save = coll.save(bo);
@@ -79,7 +80,7 @@ public class Workspace {
          //System.out.println(workspaceID);
          //System.out.println(jsonString);
          jsonString = FixStrings.usr2mongo(jsonString);
-         DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+         DB db = MongoConnection.getDB();
          DBCollection coll = db.getCollection(workspaceID);
          BasicDBObject bo = (BasicDBObject) JSON.parse(jsonString);
          WriteResult save = coll.save(bo);
@@ -94,7 +95,7 @@ public class Workspace {
      @Path("/delete_workspace/{workspaceid}")
      @Produces("application/json")
      public String deleteWorkspace(@PathParam("workspaceid") String workspaceID){
-         DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+         DB db = MongoConnection.getDB();
          //first delete the data in the workspace
          DBCollection coll = db.getCollection(workspaceID);
          coll.dropIndexes(); //drop all indexes on the workspace
@@ -123,8 +124,8 @@ public class Workspace {
      @DELETE 
      @Path("/delete/{workspaceid}/document/{documentid}")
      @Produces("application/json")
-     public String deleteDocument(@PathParam("workspaceid") String workspaceID, @PathParam("documentid") String documentID){        
-         DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+     public String deleteDocument(@PathParam("workspaceid") String workspaceID, @PathParam("documentid") String documentID){
+         DB db = MongoConnection.getDB();
          DBCollection coll = db.getCollection(workspaceID);
          DBObject deleteme = findbyIDquery(coll, documentID);
          coll.remove(deleteme);
@@ -172,7 +173,7 @@ public class Workspace {
          System.out.println(workspaceID);
          System.out.println(jsonString);
          int counter = 0;
-         DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+         DB db = MongoConnection.getDB();
          DBCollection coll = db.getCollection(workspaceID);
          BasicDBObject query = (BasicDBObject) JSON.parse(jsonString); //FixStrings.usr2mongo(jsonString)
          System.out.println("query: " + query.toString());
@@ -200,8 +201,8 @@ public class Workspace {
      @Path("/documents/{workspaceid}")
      @Produces("application/json")
      public JSONObject getDocIDs(@PathParam("workspaceid") String workspaceID) {
-         
-         DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+
+         DB db = MongoConnection.getDB();
          
          DBCollection coll = db.getCollection(workspaceID);
          DBCursor documents = coll.find();

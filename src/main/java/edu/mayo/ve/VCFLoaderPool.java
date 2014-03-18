@@ -7,9 +7,9 @@ package edu.mayo.ve; /**
  */
 
 import edu.mayo.concurrency.workerQueue.WorkerPool;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.VCFParser.VCFLoadWorker;
 import edu.mayo.ve.resources.WorkerPoolManager;
-import edu.mayo.ve.util.Tokens;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;

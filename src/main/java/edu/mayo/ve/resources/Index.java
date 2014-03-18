@@ -2,7 +2,7 @@ package edu.mayo.ve.resources;
 
 import com.mongodb.*;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
+
 
 import javax.ws.rs.*;
 
@@ -22,7 +22,7 @@ public class Index {
     @Path("/createFieldIndex/{workspaceid}/f/{field}")
     @Produces("application/json")
     public String createFieldIndex(@PathParam("workspaceid") String workspaceID, @PathParam("field") String field) {
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspaceID);
         return index.indexField(field, col).toString();
     }
@@ -31,7 +31,7 @@ public class Index {
     @Path("/dropFieldIndex/{workspaceid}/f/{field}")
     @Produces("application/json")
     public String dropFieldIndex(@PathParam("workspaceid") String workspaceID, @PathParam("field") String field) {
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspaceID);
         return index.dropIndexField(field,col).toString();
     }
@@ -40,7 +40,7 @@ public class Index {
     @Path("/getIndexes/{workspaceid}")
     @Produces("application/json")
     public String getIndexes(@PathParam("workspaceid") String workspaceID) {
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspaceID);
         return index.getIndexedFields(col).toString();
     }

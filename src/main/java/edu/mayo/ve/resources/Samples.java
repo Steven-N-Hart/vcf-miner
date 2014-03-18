@@ -6,9 +6,9 @@ package edu.mayo.ve.resources;
 
 import com.mongodb.*;
 import com.mongodb.util.JSON;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.message.SampleGroup;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -44,7 +44,7 @@ public class Samples {
                                 @PathParam("value") String value
         ) {
          BasicDBObject dbo = new BasicDBObject(); 
-         DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+         DB db = MongoConnection.getDB();
          DBCollection coll = db.getCollection(workspace);
          BasicDBObject query = (BasicDBObject) JSON.parse(cJSON(field, comparitor, value)); //JSON2BasicDBObject
          long count = coll.getCount(query);
@@ -87,7 +87,7 @@ public class Samples {
         ) {
          String workspaceJSON = meta.getWorkspaceJSON(workspace);
          //BasicDBObject dbo = new BasicDBObject(); 
-         //DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
+         //DB db = MongoConnection.getDB();
          //DBCollection coll = db.getCollection(workspace);
          //BasicDBObject query = (BasicDBObject) JSON.parse(cJSON(field, comparitor, value)); //JSON2BasicDBObject
          //DBCursor find = coll.find(query);
@@ -104,7 +104,7 @@ public class Samples {
     public String getGroupsForWorkspace(@PathParam("workspace_id") String workspace){
         BasicDBObject ret = new BasicDBObject();
         BasicDBList l = new BasicDBList();
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.SAMPLE_GROUP_COLLECTION);
         BasicDBObject q = new BasicDBObject();
         q.put(Tokens.KEY,workspace);
@@ -125,7 +125,7 @@ public class Samples {
     @Produces("application/json")
     @Consumes(MediaType.APPLICATION_JSON)
     public String saveGroupsToWorkspace(SampleGroup group){
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.SAMPLE_GROUP_COLLECTION);
         BasicDBObject q = group.getBasicDBObject();
         WriteResult wr = col.insert(q);
@@ -137,7 +137,7 @@ public class Samples {
     @Produces("application/json")
     @Consumes(MediaType.APPLICATION_JSON)
     public String deleteGroup(SampleGroup group){
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
+        DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.SAMPLE_GROUP_COLLECTION);
         BasicDBObject q = group.getBasicDBObject();
         WriteResult wr = col.remove(q);

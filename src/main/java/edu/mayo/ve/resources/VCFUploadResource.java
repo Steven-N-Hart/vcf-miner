@@ -20,10 +20,10 @@ import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.pipes.Factories.InputStreamBufferedReaderFactory;
 import edu.mayo.pipes.iterators.Compressor;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.VCFLoaderPool;
 import edu.mayo.ve.VCFParser.VCFLoadWorker;
 import edu.mayo.util.SystemProperties;
-import edu.mayo.ve.util.Tokens;
 
 /**
  * Created with IntelliJ IDEA.

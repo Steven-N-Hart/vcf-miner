@@ -18,9 +18,10 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.WriteResult;
 import edu.mayo.util.HashUtil;
 import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.util.Tokens;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
+
+import edu.mayo.util.Tokens;
 import org.bson.types.ObjectId;
 
 
@@ -69,8 +70,8 @@ public class Provision {
         BasicDBObject dbo = new BasicDBObject(); 
         try {
             // Return some cliched textual content
-            DB db = m.getDB( Tokens.WORKSPACE_DATABASE );
-            DBCollection coll = db.getCollection(Tokens.METADATA_COLLECTION);     
+            DB db = MongoConnection.getDB();
+            DBCollection coll = db.getCollection(Tokens.METADATA_COLLECTION);
             dbo.put(Tokens.OWNER, ownerID); 
             dbo.put(Tokens.WORKSPACE_ALIAS, alias);
             if(ready){
@@ -100,7 +101,7 @@ public class Provision {
  * 
  *             String output = "";
             Mongo m = MongoConnection.getMongo();
-            DB db = m.getDB( Tokens.WORKSPACE_DATABASE );            
+            DB db = MongoConnection.getDB();
             Set<String> colls = db.getCollectionNames();
             if(colls.size() < 1) return "[]";
             for (String s : colls) {
