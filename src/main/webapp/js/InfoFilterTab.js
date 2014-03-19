@@ -36,19 +36,6 @@ var InfoFilterTab = function (indexController) {
         }
     );
 
-    // popover for the info dropdown
-    $('#info_field_list').popover(
-        {
-            placement: 'bottom',
-            trigger: 'hover',
-            html: true,
-            content: function() {
-                return getSelectedInfoField().get("description");
-            },
-            delay: {show: 1000}
-        }
-    );
-
     var ListView = Backbone.View.extend({
 
         initialize: function()
@@ -73,7 +60,8 @@ var InfoFilterTab = function (indexController) {
         addOne: function(infoDataField)
         {
             var fieldID = infoDataField.get("name");
-            this.$el.append("<option value='"+fieldID+"'>"+fieldID+"</option>");
+            var desc = infoDataField.get("description");
+            this.$el.append("<option value='"+fieldID+"' title='"+desc+"'>"+fieldID+"</option>");
         },
 
         selectionChanged: function(e)
@@ -117,9 +105,6 @@ var InfoFilterTab = function (indexController) {
      */
     function infoFieldChanged()
     {
-        // get rid of popover if it's currently shown
-        $('#info_field_list').popover('hide');
-
         // get selected VCFDataField model
         var infoField = getSelectedInfoField();
         var fieldID = infoField.get("name");

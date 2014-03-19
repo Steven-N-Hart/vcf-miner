@@ -22,19 +22,6 @@ var SampleFilterTab = function (groups) {
         createGroupDialog.show();
     });
 
-    // popover for the dropdown
-    $('#sample_field_list').popover(
-        {
-            placement: 'bottom',
-            trigger: 'hover',
-            html: true,
-            content: function() {
-                return getSelectedFilter().get("description");
-            },
-            delay: {show: 1000}
-        }
-    );
-
     var groupListView = new GroupListView(
         {
             "el": $('#group_list'),
@@ -102,8 +89,9 @@ var SampleFilterTab = function (groups) {
         addOne: function(filter)
         {
             var filterID = filter.get("id");
-            var filterName = filter.get("name")
-            this.$el.append("<option value='"+filterID+"'>"+filterName+"</option>");
+            var filterName = filter.get("name");
+            var desc = filter.get("description");
+            this.$el.append("<option value='"+filterID+"' title='"+desc+"'>"+filterName+"</option>");
         },
 
         selectionChanged: function(e)
@@ -126,9 +114,6 @@ var SampleFilterTab = function (groups) {
 
     function sampleFieldChanged()
     {
-        // get rid of popover if it's currently shown
-        $('#sample_field_list').popover('hide');
-
         // get selected filter
         var filter = getSelectedFilter();
 
