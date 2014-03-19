@@ -312,11 +312,15 @@ var InfoFilterTab = function (indexController) {
     /**
      * Fetches values for the given field, up to the specified max cutoff.
      * @param fieldID
-     * @param max
+     * @param maxCutoff
      * @returns {Array}
      */
     function getFieldValues(fieldID, maxCutoff)
     {
+        // TODO: REST Call currently has issue where it returns 1 LESS than maxCutoff
+        // TODO: Add 1 to compensate.  REMOVE THIS when the back end call is fixed.
+        maxCutoff = maxCutoff + 1;
+
         var values = new Array();
         // perform synchronous AJAX call
         $.ajax({
