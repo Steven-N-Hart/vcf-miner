@@ -452,7 +452,7 @@ var InfoFilterTab = function (indexController) {
                     if ($('#info_str_value_area').length > 0)
                     {
                         // grab values from text area
-                        valueArr = $('#info_str_value_area').val().split("\n");
+                        valueArr = $('#info_str_value_area').val().trim().split("\n");
                     }
                     else
                     {
