@@ -27,6 +27,7 @@ public class LoadWorker implements WorkerLogic {
 
     ParserInterface parser = null;
     private boolean deleteAfterLoad = true;
+    private boolean logStackTrace = true;
 
        public static void main(String[] args)throws ProcessTerminatedException {
            VCFParser parser = new VCFParser();
@@ -78,7 +79,7 @@ public class LoadWorker implements WorkerLogic {
                 System.out.println("__LOADTIME__ Loading to workspace: " + workspace + " LOADFILE: " + loadfile + " total time (millis): " + totalTime);
 
             }catch(Throwable e){   //this thread is working in the background... so we need to make sure that it outputs an error if one came up
-                e.printStackTrace();
+                if(logStackTrace){ e.printStackTrace(); }
                 MetaData meta = new MetaData();
                 meta.flagAsFailed(workspace,"The Load Failed with Exception: " + e.getMessage());
             }
@@ -143,4 +144,13 @@ public class LoadWorker implements WorkerLogic {
             }
 
         }
+
+
+    public boolean isLogStackTrace() {
+        return logStackTrace;
     }
+
+    public void setLogStackTrace(boolean logStackTrace) {
+        this.logStackTrace = logStackTrace;
+    }
+}

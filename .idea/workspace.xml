@@ -2,20 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="be9f73b3-8806-4b29-b922-d6eef1649cf2" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/resources/testData/Asif1000G.vcf" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/FailedLoadITCase.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFLoadWorker.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/LoadWorker.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFLoaderPool.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFLoaderPool.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFParser.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFParser.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/VCFParser/VCFParserITCase.java" afterPath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/VCFParser/VCFParserITCase.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/resources/VCFUploadResourceTest.java" afterPath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/resources/VCFUploadResourceTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/resources/testData/foo.tsv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/FailedLoadITCase.java" afterPath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/FailedLoadITCase.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/LoadWorker.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/LoadWorker.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="mongo_svr.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395169399143" ignored="false" />
+    <file path="/Dummy.txt" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395320706529" ignored="false" />
     <file path="/DownloadFile.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1386880214925" ignored="false" />
     <file path="/Provision.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395166801219" ignored="false" />
     <file path="/Tokens.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1391185109353" ignored="false" />
@@ -324,8 +318,9 @@
     <file path="/GeneQueries.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395160969298" ignored="false" />
     <file path="/Samples.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395166932151" ignored="false" />
     <file path="/a.dummy" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395168456559" ignored="false" />
-    <file path="/FailedLoadITCase.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395319545100" ignored="false" />
-    <file path="/LoadWorker.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395264934243" ignored="false" />
+    <file path="/FailedLoadITCase.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395325864570" ignored="false" />
+    <file path="/LoadWorker.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395325909711" ignored="false" />
+    <file path="/foo.tsv" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395323573061" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -806,6 +801,21 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/FailedLoadITCase.java" line="133" class="edu.mayo.ve.FunctionalTests.FailedLoadITCase" package="edu.mayo.ve.FunctionalTests">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
     </line_breakpoints>
     <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
@@ -853,22 +863,34 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="FailedLoadITCase.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="FailedLoadITCase.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/FailedLoadITCase.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="61" selection-start="515" selection-end="515" vertical-scroll-proportion="0.4347826">
+            <state line="182" column="0" selection-start="6794" selection-end="6794" vertical-scroll-proportion="0.0">
               <folding>
-                <element signature="e#2521#2538#0" expanded="true" />
-                <element signature="e#2589#2604#0" expanded="true" />
+                <element signature="imports" expanded="true" />
+                <element signature="e#2519#2536#0" expanded="true" />
+                <element signature="e#2587#2602#0" expanded="true" />
+                <element signature="e#5999#6016#0" expanded="true" />
+                <element signature="e#6067#6082#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LoadWorker.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="foo.tsv" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/resources/testData/foo.tsv">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="2" column="9" selection-start="29" selection-end="29" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LoadWorker.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/LoadWorker.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="80" column="16" selection-start="3706" selection-end="3706" vertical-scroll-proportion="0.0">
+            <state line="81" column="32" selection-start="3764" selection-end="3764" vertical-scroll-proportion="0.9625935">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -885,10 +907,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Provision.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Provision.java">
+      <file leaf-file-name="sys.properties" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/sys.properties">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="45" column="13" selection-start="1314" selection-end="1314" vertical-scroll-proportion="0.0">
+            <state line="6" column="0" selection-start="150" selection-end="150" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -939,15 +961,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Samples.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Samples.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="22" column="13" selection-start="550" selection-end="550" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FindManager">
@@ -958,7 +971,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/DownloadFile.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/GeneQueries.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/MetaData.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Provision.java" />
@@ -972,8 +984,9 @@
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFLoaderPool.java" />
         <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/resources/VCFUploadResourceTest.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/LoadWorker.java" />
+        <option value="$PROJECT_DIR$/src/test/resources/testData/foo.tsv" />
         <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/FailedLoadITCase.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/LoadWorker.java" />
       </list>
     </option>
   </component>
@@ -1000,8 +1013,8 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="125" />
-    <option name="y" value="22" />
+    <option name="x" value="269" />
+    <option name="y" value="90" />
     <option name="width" value="1537" />
     <option name="height" value="966" />
   </component>
@@ -1645,35 +1658,7 @@
       </UpdatedFiles>
     </UpdateInfo>
   </component>
-  <component name="RunManager" selected="JUnit.FailedLoadITCase.testIOException">
-    <configuration default="false" name="ProblemVCFITCase.testZhifu" type="JUnit" factoryName="JUnit" temporary="true">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
-        <pattern>
-          <option name="PATTERN" value="edu.mayo.ve.FunctionalTests.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <module name="mongo_svr" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="edu.mayo.ve.FunctionalTests" />
-      <option name="MAIN_CLASS_NAME" value="edu.mayo.ve.FunctionalTests.ProblemVCFITCase" />
-      <option name="METHOD_NAME" value="testZhifu" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <envs />
-      <patterns />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
+  <component name="RunManager" selected="JUnit.FailedLoadITCase.testLoadJunk">
     <configuration default="false" name="IndexITCase.testIndexProgress" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
@@ -1789,6 +1774,40 @@
       <envs />
       <patterns />
       <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="FailedLoadITCase.testLoadJunk" type="JUnit" factoryName="JUnit" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="edu.mayo.ve.FunctionalTests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <module name="mongo_svr" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="edu.mayo.ve.FunctionalTests" />
+      <option name="MAIN_CLASS_NAME" value="edu.mayo.ve.FunctionalTests.FailedLoadITCase" />
+      <option name="METHOD_NAME" value="testLoadJunk" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
@@ -2000,19 +2019,19 @@
     </configuration>
     <list size="6">
       <item index="0" class="java.lang.String" itemvalue="Tomcat Server.Default" />
-      <item index="1" class="java.lang.String" itemvalue="JUnit.ProblemVCFITCase.testZhifu" />
-      <item index="2" class="java.lang.String" itemvalue="JUnit.IndexITCase.testIndexProgress" />
-      <item index="3" class="java.lang.String" itemvalue="JUnit.ProblemVCFITCase.testProblemDotMetadata" />
-      <item index="4" class="java.lang.String" itemvalue="JUnit.FailedLoadITCase.testIOException" />
-      <item index="5" class="java.lang.String" itemvalue="JUnit.FailedLoadITCase" />
+      <item index="1" class="java.lang.String" itemvalue="JUnit.IndexITCase.testIndexProgress" />
+      <item index="2" class="java.lang.String" itemvalue="JUnit.ProblemVCFITCase.testProblemDotMetadata" />
+      <item index="3" class="java.lang.String" itemvalue="JUnit.FailedLoadITCase.testIOException" />
+      <item index="4" class="java.lang.String" itemvalue="JUnit.FailedLoadITCase" />
+      <item index="5" class="java.lang.String" itemvalue="JUnit.FailedLoadITCase.testLoadJunk" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="JUnit.FailedLoadITCase.testIOException" />
-        <item index="1" class="java.lang.String" itemvalue="JUnit.FailedLoadITCase" />
-        <item index="2" class="java.lang.String" itemvalue="JUnit.ProblemVCFITCase.testProblemDotMetadata" />
-        <item index="3" class="java.lang.String" itemvalue="JUnit.IndexITCase.testIndexProgress" />
-        <item index="4" class="java.lang.String" itemvalue="JUnit.ProblemVCFITCase.testZhifu" />
+        <item index="0" class="java.lang.String" itemvalue="JUnit.FailedLoadITCase.testLoadJunk" />
+        <item index="1" class="java.lang.String" itemvalue="JUnit.FailedLoadITCase.testIOException" />
+        <item index="2" class="java.lang.String" itemvalue="JUnit.FailedLoadITCase" />
+        <item index="3" class="java.lang.String" itemvalue="JUnit.ProblemVCFITCase.testProblemDotMetadata" />
+        <item index="4" class="java.lang.String" itemvalue="JUnit.IndexITCase.testIndexProgress" />
       </list>
     </recent_temporary>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
@@ -2289,7 +2308,11 @@
       <created>1395169418101</created>
       <updated>1395169418101</updated>
     </task>
-    <option name="localTasksCounter" value="55" />
+    <task id="LOCAL-00055" summary="Adding an update to include several refactorings, including the ability to inject a parser into the loadworker and I inject a fail parser into the worker causing it to fail, and thus test the reseting of load status on the workspace under failure.">
+      <created>1395320721101</created>
+      <updated>1395320721102</updated>
+    </task>
+    <option name="localTasksCounter" value="56" />
     <servers />
   </component>
   <component name="TodoView" selected-index="0">
@@ -2313,7 +2336,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="125" y="22" width="1537" height="966" extended-state="0" />
+    <frame x="269" y="90" width="1537" height="966" extended-state="0" />
     <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32689834" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -2322,7 +2345,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3270366" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.58087367" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35224587" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.249694" sideWeight="0.28712872" order="2" side_tool="true" content_ui="tabs" />
@@ -2335,7 +2358,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.13892289" sideWeight="0.6581986" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25486252" sideWeight="0.67294115" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31176472" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3108747" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28236082" sideWeight="0.54964536" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4503546" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
@@ -2386,7 +2409,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="This version of the code passes all unit tests" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding an update to include several refactorings, including the ability to inject a parser into the loadworker and I inject a fail parser into the worker causing it to fail, and thus test the reseting of load status on the workspace under failure." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -2403,6 +2426,7 @@
     <MESSAGE value="Down-factoring MongoDB based dependancies into a library for utilizing MongoDB in bioinformatics" />
     <MESSAGE value="Down-factoring concurency loading code" />
     <MESSAGE value="This version of the code passes all unit tests" />
+    <MESSAGE value="Adding an update to include several refactorings, including the ability to inject a parser into the loadworker and I inject a fail parser into the worker causing it to fail, and thus test the reseting of load status on the workspace under failure." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -2412,13 +2436,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$MAVEN_REPOSITORY$/edu/mayo/mayo-commons-mongodb/1.0.0-SNAPSHOT/mayo-commons-mongodb-1.0.0-SNAPSHOT.jar!/edu/mayo/util/MongoConnection.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="33" selection-start="676" selection-end="676" vertical-scroll-proportion="-5.76">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/2.10.1/mongo-java-driver-2.10.1.jar!/com/mongodb/Bytes.class">
       <provider selected="true" editor-type-id="text-editor">
         <state line="35" column="8" selection-start="1393" selection-end="1393" vertical-scroll-proportion="-3.72">
@@ -2489,13 +2506,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/MetaData.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="163" column="0" selection-start="5848" selection-end="5848" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="31" column="13" selection-start="831" selection-end="831" vertical-scroll-proportion="0.0">
@@ -2503,21 +2513,45 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/LoadWorker.java">
+    <entry file="file://$PROJECT_DIR$/src/main/resources/sys.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="80" column="16" selection-start="3706" selection-end="3706" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state line="6" column="0" selection-start="150" selection-end="150" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/resources/testData/foo.tsv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="9" selection-start="29" selection-end="29" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/MetaData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="163" column="0" selection-start="5848" selection-end="5848" vertical-scroll-proportion="0.0">
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/FailedLoadITCase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="61" selection-start="515" selection-end="515" vertical-scroll-proportion="0.4347826">
+        <state line="182" column="0" selection-start="6794" selection-end="6794" vertical-scroll-proportion="0.0">
           <folding>
-            <element signature="e#2521#2538#0" expanded="true" />
-            <element signature="e#2589#2604#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+            <element signature="e#2519#2536#0" expanded="true" />
+            <element signature="e#2587#2602#0" expanded="true" />
+            <element signature="e#5999#6016#0" expanded="true" />
+            <element signature="e#6067#6082#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/LoadWorker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="81" column="32" selection-start="3764" selection-end="3764" vertical-scroll-proportion="0.9625935">
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
