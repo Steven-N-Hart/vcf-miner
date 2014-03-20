@@ -1,9 +1,11 @@
 package edu.mayo.ve.VCFParser;
 
 import com.mongodb.*;
+import edu.mayo.TypeAhead.TypeAhead;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerLogic;
+import edu.mayo.parsers.ParserInterface;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.util.SystemProperties;
@@ -18,12 +20,17 @@ import java.util.HashMap;
  * User: m102417
  * Date: 9/19/13
  * Time: 10:25 PM
- * To change this template use File | Settings | File Templates.
+ * LoadWorker loads files into the MongoDB database (e.g. VCFFiles)
+ * The Parser passed to the constructor (e.g. VCFParser) determines the type of file that is loaded by the LoadWorker.
  */
-public class VCFLoadWorker  implements WorkerLogic {
+public class LoadWorker implements WorkerLogic {
+
+    ParserInterface parser = null;
+    private boolean deleteAfterLoad = true;
 
        public static void main(String[] args)throws ProcessTerminatedException {
-           VCFLoadWorker worker = new VCFLoadWorker(100000);
+           VCFParser parser = new VCFParser();
+           LoadWorker worker = new LoadWorker(parser, 100000);
            Task t = new Task();
            HashMap<String,String> hm = new HashMap<String,String>();
            hm.put(Tokens.VCF_LOAD_FILE,"src/test/resources/testData/example.vcf");
@@ -33,17 +40,18 @@ public class VCFLoadWorker  implements WorkerLogic {
        }
 
         private int theadCache;
-        public VCFLoadWorker(int lookAheadCacheSize){
+        public LoadWorker(ParserInterface parser, int lookAheadCacheSize){
+            this.parser = parser;
             this.theadCache = lookAheadCacheSize;
         }
 
         boolean report = false;
-        public VCFLoadWorker(int lookAheadCacheSize, boolean reporting){
+        public LoadWorker(ParserInterface parser, int lookAheadCacheSize, boolean reporting){
+            this.parser = parser;
             this.theadCache = lookAheadCacheSize;
             this.report = reporting;
         }
 
-        VCFParser parser = new VCFParser();
         public Task compute(Task t) throws ProcessTerminatedException {
             //System.out.println("Started up a worker");
             HashMap<String,String> context = (HashMap) t.getCommandContext();
@@ -55,7 +63,8 @@ public class VCFLoadWorker  implements WorkerLogic {
                 if(report) System.out.println("Setting up the mongo connection");
                 setMongo();
                 if(report) System.out.println("I am working on loading this file: " + loadfile);
-                parser.parse(t, loadfile,workspace,theadCache,false, report, loadSamples); //make the third to last one false in production!   make the second to last one false in production!
+                TypeAhead thead = new TypeAhead("INFO", theadCache, report);
+                parser.parse(t, loadfile,workspace,thead,false, report); //make the third to last one false in production!   make the second to last one false in production!
                 if(report) System.out.println("File loading done");
 
                 if(report) System.out.println("Checking to see if the file upload worked or failed.");
@@ -68,16 +77,18 @@ public class VCFLoadWorker  implements WorkerLogic {
                 //change to logger!
                 System.out.println("__LOADTIME__ Loading to workspace: " + workspace + " LOADFILE: " + loadfile + " total time (millis): " + totalTime);
 
-            }catch(Exception e){   //this thread is working in the background... so we need to make sure that it outputs an error if one came up
+            }catch(Throwable e){   //this thread is working in the background... so we need to make sure that it outputs an error if one came up
                 e.printStackTrace();
                 MetaData meta = new MetaData();
                 meta.flagAsFailed(workspace,"The Load Failed with Exception: " + e.getMessage());
             }
             //delete the load file
-            if(report) System.out.println("Now I am deleting the file");
-            File file = new File(loadfile);
-            file.delete();
-            //t.setResultContext(new Long(sum)); //put the result in result context, if needed
+            if(deleteAfterLoad){
+                if(report) System.out.println("Now I am deleting the file");
+                File file = new File(loadfile);
+                file.delete();
+                //t.setResultContext(new Long(sum)); //put the result in result context, if needed
+            }
             return t;
         }
 
@@ -90,7 +101,15 @@ public class VCFLoadWorker  implements WorkerLogic {
     }
 
     public static void setLoadSamples(boolean loadSamples) {
-        VCFLoadWorker.loadSamples = loadSamples;
+        LoadWorker.loadSamples = loadSamples;
+    }
+
+    public boolean isDeleteAfterLoad() {
+        return deleteAfterLoad;
+    }
+
+    public void setDeleteAfterLoad(boolean deleteAfterLoad) {
+        this.deleteAfterLoad = deleteAfterLoad;
     }
 
     private static String host = "localhost";

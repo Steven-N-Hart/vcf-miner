@@ -2,19 +2,15 @@ package edu.mayo.ve.resources;
 
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerPool;
@@ -22,8 +18,9 @@ import edu.mayo.pipes.Factories.InputStreamBufferedReaderFactory;
 import edu.mayo.pipes.iterators.Compressor;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.VCFLoaderPool;
-import edu.mayo.ve.VCFParser.VCFLoadWorker;
+import edu.mayo.ve.VCFParser.LoadWorker;
 import edu.mayo.util.SystemProperties;
+import edu.mayo.ve.VCFParser.VCFParser;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,7 +42,7 @@ public class VCFUploadResource {
 
     public static void main(String[] args) throws IOException {
         VCFUploadResource uploadResource = new VCFUploadResource();
-        VCFLoadWorker logic = new VCFLoadWorker(maxTypeAheadCache);//do we want to let them pass this value?
+        LoadWorker logic = new LoadWorker(new VCFParser(), maxTypeAheadCache);//do we want to let them pass this value?
         WorkerPool wp = new WorkerPool(logic, 1);
         VCFLoaderPool.setWp(wp);
         WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);

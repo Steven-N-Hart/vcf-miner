@@ -8,7 +8,8 @@ package edu.mayo.ve; /**
 
 import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.util.Tokens;
-import edu.mayo.ve.VCFParser.VCFLoadWorker;
+import edu.mayo.ve.VCFParser.LoadWorker;
+import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.resources.WorkerPoolManager;
 
 import javax.servlet.ServletContextEvent;
@@ -37,7 +38,7 @@ public class VCFLoaderPool implements ServletContextListener,
       */
         //initialize the worker pool if this is the first load
         if(wp == null){
-            VCFLoadWorker logic = new VCFLoadWorker(maxCache);//do we want to let them pass this value?
+            LoadWorker logic = new LoadWorker(new VCFParser(), maxCache);//do we want to let them pass this value?
             wp = new WorkerPool(logic, 1);
             WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
         }
@@ -97,14 +98,14 @@ public class VCFLoaderPool implements ServletContextListener,
     }
 
     public static void setReportingTrueAndResetPool(int typeAheadCacheSize){
-        VCFLoadWorker logic = new VCFLoadWorker(typeAheadCacheSize, true);
+        LoadWorker logic = new LoadWorker(new VCFParser(), typeAheadCacheSize, true);
         wp = new WorkerPool(logic, 1);
         WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
         return;
     }
 
     public static void reset(int typeAheadCacheSize){
-        VCFLoadWorker logic = new VCFLoadWorker(typeAheadCacheSize);//do we want to let them pass this value?
+        LoadWorker logic = new LoadWorker(new VCFParser(), typeAheadCacheSize);//do we want to let them pass this value?
         wp = new WorkerPool(logic, 1);
         WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
         return;

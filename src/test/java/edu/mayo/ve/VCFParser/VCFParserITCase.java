@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import com.tinkerpop.pipes.util.Pipeline;
+import edu.mayo.TypeAhead.TypeAhead;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.pipes.PrintPipe;
 import edu.mayo.pipes.UNIX.CatPipe;
@@ -181,7 +182,10 @@ public class VCFParserITCase {
         System.out.println("VCFParserITCase.Loading data into a new workspace...");
         VCFParser parser = new VCFParser();
         //false,false at the end of this call are correct for loading to MongoDB
-        parser.parse(null, VCF, workspaceID, overflowThreshold, false, true, true);  //put true in the second to last param for verbose load reporting
+        parser.setSaveSamples(true);
+        boolean reporting = true;
+        TypeAhead thead = new TypeAhead("INFO", overflowThreshold, reporting);
+        parser.parse(null, VCF, workspaceID, thead, false, reporting);  //put true in the second to last param for verbose load reporting
 
         //test that the metadata was loaded correctly
         System.out.println(parser.getMetadata().toString()); //workspace as it is in memory in the parser

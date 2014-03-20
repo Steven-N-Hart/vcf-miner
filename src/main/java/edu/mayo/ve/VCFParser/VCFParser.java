@@ -20,6 +20,7 @@ import com.tinkerpop.pipes.util.Pipeline;
 import edu.mayo.TypeAhead.TypeAhead;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
+import edu.mayo.parsers.ParserInterface;
 import edu.mayo.pipes.MergePipe;
 import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
@@ -40,13 +41,14 @@ import java.util.Date;
  *
  * @author m102417
  */
-public class VCFParser {
+public class VCFParser implements ParserInterface {
 
     private Mongo m = MongoConnection.getMongo();
     /** testingCollection contains all of the objects placed into the workspace from parsing the VCF */
     HashMap<Integer,String> testingCollection = new HashMap<Integer,String>();
     JsonObject json = null;
     TypeAhead typeAhead;
+    private boolean saveSamples = false;
 
     public static void usage(){
             System.out.println("This program will parse a VCF file, obtain the 'schema' for that VCF and populate a MongoDB database with the variants in the VCF.");
@@ -84,13 +86,21 @@ public class VCFParser {
     }
 
 
-
-    public void parse(Task context, String infile, String workspace, int typeAheadCacheSize) throws ProcessTerminatedException {
-        parse(context, infile, workspace, typeAheadCacheSize, false, false, true);
+    /** legacy interface, keep it in place for testing */
+    public int parse(Task context, String infile, String workspace, int typeAheadCacheSize) throws ProcessTerminatedException {
+        return parse(context, infile, workspace, typeAheadCacheSize, false, false, true);
     }
 
-    public void parse(Task context, String infile, String workspace, int typeAheadCacheSize, boolean testing) throws ProcessTerminatedException{
-        parse(context, infile, workspace, typeAheadCacheSize, testing, false, true);
+    /** legacy interface, keep it in place for testing */
+    public int parse(Task context, String infile, String workspace, int typeAheadCacheSize, boolean testing) throws ProcessTerminatedException{
+        return parse(context, infile, workspace, typeAheadCacheSize, testing, false, true);
+    }
+
+    /** legacy interface, keep it in place for testing */
+    public int parse(Task context, String infile, String workspace, int typeAheadCacheSize, boolean testing, boolean reporting, boolean saveSamples) throws ProcessTerminatedException {
+        TypeAhead typeAhead = new TypeAhead("INFO", typeAheadCacheSize, reporting);
+        this.saveSamples = saveSamples;
+        return parse(context, infile, workspace, typeAhead, testing, reporting);
     }
 
     /**
@@ -98,17 +108,16 @@ public class VCFParser {
      * @param context - the execution context (so we can kill the process if needed)  -- can be null
      * @param infile
      * @param workspace
-     * @param typeAheadCacheSize - the number of values to cache for strings
+     * @param typeAhead - the implementation for where value sets will be stored for providing type-ahead functionality.
      * @param testing    -- populate testingCollection instead of Mongo.
      * @param reporting - if verbose output is desired (much slower and not for production use, use when debugging)
-     * @param saveSamples - if the samples : [{sample1},{sample2},...] array should be saved (default true)
      * @return lines processed.
      */
-    public int parse(Task context, String infile, String workspace, int typeAheadCacheSize, boolean testing, boolean reporting, boolean saveSamples) throws ProcessTerminatedException{
+    public int parse(Task context, String infile, String workspace, TypeAhead typeAhead, boolean testing, boolean reporting) throws ProcessTerminatedException{
         VCF2VariantPipe vcf 	= new VCF2VariantPipe(true, false);
         DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspace);
-        typeAhead = new TypeAhead("INFO", typeAheadCacheSize, reporting);
+        this.typeAhead = typeAhead;
         if(reporting) System.out.println("Setting up Pipeline....");
         Pipe p = new Pipeline(new CatPipe(),
                              new ReplaceAllPipe("\\{",""),
@@ -607,6 +616,14 @@ public class VCFParser {
 
     public void setM(Mongo m) {
         this.m = m;
+    }
+
+    public boolean isSaveSamples() {
+        return saveSamples;
+    }
+
+    public void setSaveSamples(boolean saveSamples) {
+        this.saveSamples = saveSamples;
     }
 }
 

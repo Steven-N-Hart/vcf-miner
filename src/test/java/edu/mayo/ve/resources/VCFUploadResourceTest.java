@@ -5,7 +5,8 @@ import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.VCFLoaderPool;
-import edu.mayo.ve.VCFParser.VCFLoadWorker;
+import edu.mayo.ve.VCFParser.LoadWorker;
+import edu.mayo.ve.VCFParser.VCFParser;
 import org.junit.Test;
 
 import java.io.*;
@@ -36,7 +37,7 @@ public class VCFUploadResourceTest {
     public void testUploadCompressedFile() throws Exception {
         VCFUploadResource up = new VCFUploadResource();
         String compressedFile = "src/test/resources/testData/Annotated.functional.vcf.gz";
-        VCFLoadWorker logic = new VCFLoadWorker(50000);//do we want to let them pass this value?
+        LoadWorker logic = new LoadWorker(new VCFParser(), 50000);//do we want to let them pass this value?
         WorkerPool wp = new WorkerPool(logic, 1);
         VCFLoaderPool.setWp(wp);
         WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
