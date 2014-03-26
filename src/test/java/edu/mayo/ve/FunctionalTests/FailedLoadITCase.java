@@ -102,18 +102,33 @@ public class FailedLoadITCase {
 
         private boolean loadStatus = true;
         @Override
-        public int parse(Task task, String s, String s2, TypeAhead typeAhead, boolean b, boolean b2) throws ProcessTerminatedException {
+        public int parse(String s, String s2) throws ProcessTerminatedException {
             throw new RuntimeException("FailParser: fail all over, this error is expected and for testing");
         }
 
         @Override
-        public boolean checkAndUpdateLoadStatus(String s, int i, boolean b, boolean b2) {
+        public boolean checkAndUpdateLoadStatus(String s, int i, boolean b) {
             return loadStatus;
         }
 
         @Override
         public void setM(Mongo mongo) {
             //do nothing
+        }
+
+        @Override
+        public void setReporting(boolean b) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public void setTesting(boolean b) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public void setTypeAhead(TypeAhead typeAhead) {
+            //To change body of implemented methods use File | Settings | File Templates.
         }
 
         public boolean isLoadStatus() {

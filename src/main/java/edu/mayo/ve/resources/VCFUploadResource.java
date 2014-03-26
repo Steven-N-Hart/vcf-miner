@@ -12,9 +12,11 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 import com.sun.jersey.multipart.FormDataParam;
+import com.tinkerpop.pipes.util.Pipeline;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.pipes.Factories.InputStreamBufferedReaderFactory;
+import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.pipes.iterators.Compressor;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.VCFLoaderPool;
@@ -50,15 +52,20 @@ public class VCFUploadResource {
         uploadResource.uploadFileNoReport("steve", "foo","", is);  //an example if there is no compression
     }
 
-        public static final String UPLOAD_DIR = "/tmp";
+    //define something incase sysproperties does not exist
+    public static final String UPLOAD_DIR = "/tmp";
+    private static boolean init = false;
 
     public VCFUploadResource() throws IOException {
-        sysprop = new SystemProperties();
-        if(sysprop.get("TEMPDIR") != null){
-            this.fileroot = sysprop.get("TEMPDIR");
-        }
-        if(sysprop.get(Tokens.TYPE_AHEAD_OVERUN) != null){
-            maxTypeAheadCache = new Integer(sysprop.get(Tokens.TYPE_AHEAD_OVERUN));  //user may even want to configure this paramater via REST, for now at least it is in a property file
+        if(!init){
+            init = true;
+            sysprop = new SystemProperties();
+            if(sysprop.get("TEMPDIR") != null){
+                this.fileroot = sysprop.get("TEMPDIR");
+            }
+            if(sysprop.get(Tokens.TYPE_AHEAD_OVERUN) != null){
+                maxTypeAheadCache = new Integer(sysprop.get(Tokens.TYPE_AHEAD_OVERUN));  //user may even want to configure this paramater via REST, for now at least it is in a property file
+            }
         }
     }
 
@@ -156,9 +163,98 @@ public class VCFUploadResource {
         return uploadedFileLocation;
     }
 
+    /**
+     * Collect basic statistics on the input file
+     */
+    public  HashMap<String,Integer> collectStatistics(String fileroot){
+        HashMap<String,Integer> filecounts = new HashMap<String, Integer>();
+        int comments = 0;
+        int lines = 0;
+
+        Pipeline p = new Pipeline(new CatPipe());
+        p.setStarts(Arrays.asList(fileroot));
+        while(p.hasNext()){
+            String line = (String) p.next();
+            lines++;
+            if(line.startsWith("#")){
+                comments++;
+            }
+        }
+        filecounts.put(Tokens.TOTAL_LINE_COUNT, lines);
+        filecounts.put(Tokens.HEADER_LINE_COUNT, comments);
+        filecounts.put(Tokens.DATA_LINE_COUNT, lines-comments);
+
+        return filecounts;
+    }
+
+    /**
+     * Computes the Task object for a LoadWorker
+     * @param filenamepath  -- the name of the VCF file we want to ETL into mongodb
+     * @param json          -- the json returned from the provision operation
+     * @return
+     */
+    public Task computeTask(String filenamepath, String json){
+        HashMap workspaceMeta = gson.fromJson(json, java.util.HashMap.class);
+        String wkspID =(String) workspaceMeta.get(Tokens.KEY);
+
+        if(reporting){System.out.println("Collecting file statistics");}
+        HashMap<String,Integer> filecounts =  collectStatistics(filenamepath);
+
+        //schedule the ETL for load on the worker queue
+        Task<HashMap,HashMap> t = new Task<HashMap,HashMap>();
+        //add the file location of the load file to the new task
+        workspaceMeta.put(Tokens.VCF_LOAD_FILE,filenamepath);
+        //add the linecounts to the workspaceMeta object so the worker can access them
+        for(String key : filecounts.keySet()){
+            workspaceMeta.put(key, filecounts.get(key));
+        }
+        t.setCommandContext(workspaceMeta);
+        return t;
+    }
+
+
+    private boolean reporting = false;
+    /**
+     * This version of process file assumes that the file is already on the filesystem.
+     * This is used in the servelet version of the upload (see UploadVCFServelet
+     * @param user
+     * @param alias
+     * @param reporting
+     */
+    public boolean processFile(String filenamepath, String compression, String user, String alias, boolean reporting, boolean deleteAfterLoad){
+        reportingset = reporting;
+        WorkerPool wp = VCFLoaderPool.getWp();
+
+        //figure out compression based on the filename
+
+        if(reportingset){System.out.println("Loading: " + filenamepath);}
+
+        if(reportingset){System.out.println("Trying to provision a new workspace. ");}
+        String json = provision.provision(user, alias);
+
+        Task t = computeTask(filenamepath, json);
+        String workspace = ( (HashMap<String,String>)t.getCommandContext() ).get(Tokens.KEY);
+
+        if(reportingset){System.out.println("Workspace provisioned with key: " + workspace);}
+        //set the workspace's status to not ready
+        if(reportingset){System.out.println("Setting the workspace status to not ready: ");}
+        MetaData meta = new MetaData();
+        meta.flagAsNotReady(workspace);
+
+        if(turnOffLoading==false){
+            wp.addTask(t);           //this will add the UUID to the task
+            wp.startTask(t.getId());
+        }
+
+        String output = "File uploaded and workspace constructed : " + json;
+        if(reportingset){ System.out.println(output); }
+
+        return true;  // it loaded correctly
+    }
+
         private Gson gson = new Gson();
         private Provision provision = new Provision();
-        private SystemProperties sysprop;
+        private static SystemProperties sysprop;
         private String fileroot = "/tmp/";
         private boolean reportingset = false;
         @POST
@@ -197,6 +293,9 @@ public class VCFUploadResource {
 
             //add the filelocation to the hash for use in the Task later
             workspaceMeta.put(Tokens.VCF_LOAD_FILE,uploadedFileLocation);
+
+            //add the workspace to the hash for use in the Task later
+            workspaceMeta.put(Tokens.KEY, wkspID);
 
             //write file to temp space
             HashMap<String,Integer> filecounts = writeFile(uploadedInputStream, uploadedFileLocation); //need to send this back if front end is to have a status bar...
@@ -331,7 +430,7 @@ public class VCFUploadResource {
 
 
     /**
-     * if we want the file complete with headers (usually for debugging purposes
+     * if we want the file complete with headers (usually for debugging purposes)
      */
     private static boolean writeDirect = false;
     public void writeFileDirect(BufferedReader br, BufferedWriter out ) throws IOException {

@@ -99,6 +99,7 @@ public class VCFLoaderPool implements ServletContextListener,
 
     public static void setReportingTrueAndResetPool(int typeAheadCacheSize){
         LoadWorker logic = new LoadWorker(new VCFParser(), typeAheadCacheSize, true);
+        logic.setLogStackTrace(true);
         wp = new WorkerPool(logic, 1);
         WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
         return;
