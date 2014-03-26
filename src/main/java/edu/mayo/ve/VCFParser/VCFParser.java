@@ -22,6 +22,7 @@ import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.parsers.ParserInterface;
 import edu.mayo.pipes.MergePipe;
+import edu.mayo.pipes.PrintPipe;
 import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
 import edu.mayo.pipes.history.HistoryInPipe;
@@ -43,12 +44,21 @@ import java.util.Date;
  */
 public class VCFParser implements ParserInterface {
 
+
+    private int cacheSize = 50000;
     private Mongo m = MongoConnection.getMongo();
     /** testingCollection contains all of the objects placed into the workspace from parsing the VCF */
     HashMap<Integer,String> testingCollection = new HashMap<Integer,String>();
     JsonObject json = null;
-    TypeAhead typeAhead;
     private boolean saveSamples = false;
+    /** @param context                 - the execution context (so we can kill the process if needed)  -- can be null */
+    private Task context = null;
+    /** @param typeAhead               - the implementation for where value sets will be stored for providing type-ahead functionality. */
+    private TypeAhead typeAhead = new TypeAhead("INFO", cacheSize, true);
+    /**  @param testing    -- populate in-memoryt testingCollection instead of Mongo.  */
+    private boolean testing = false;
+    /** @param reporting - if verbose output is desired (much slower and not for production use, use when debugging) */
+    private boolean reporting = false;
 
     public static void usage(){
             System.out.println("This program will parse a VCF file, obtain the 'schema' for that VCF and populate a MongoDB database with the variants in the VCF.");
@@ -77,8 +87,9 @@ public class VCFParser implements ParserInterface {
         System.out.println("#Workspace:  " + workspace);
         System.out.println("#mongo_server: " + sysprops.get("mongo_server") );
         System.out.println("#mongo port: " + new Integer(sysprops.get("mongo_port")));
+        parser.setReporting(true);
         int datalines = parser.parse(null, infile, workspace, 50000, false, true, true);
-        parser.checkAndUpdateLoadStatus(workspace, datalines, true,  true);
+        parser.checkAndUpdateLoadStatus(workspace, datalines, true);
         parser.m.close();
         //note the following will only work if you have a document in mongo like:
         //{ "_id" : { "$oid" : "51afa2710364d3ebd97b533a"} , "owner" : "steve" , "alias" : "foo" , "key" : "w7ee29742ff80d61953d5e6f84e1686957fbe36f7"}
@@ -98,27 +109,34 @@ public class VCFParser implements ParserInterface {
 
     /** legacy interface, keep it in place for testing */
     public int parse(Task context, String infile, String workspace, int typeAheadCacheSize, boolean testing, boolean reporting, boolean saveSamples) throws ProcessTerminatedException {
-        TypeAhead typeAhead = new TypeAhead("INFO", typeAheadCacheSize, reporting);
+        typeAhead = new TypeAhead("INFO", typeAheadCacheSize, reporting);
         this.saveSamples = saveSamples;
-        return parse(context, infile, workspace, typeAhead, testing, reporting);
+        this.reporting = reporting;
+        this.testing = testing;
+        return parse(infile, workspace);
     }
 
     /**
+     * This is the simple direct interface that just works when we need a simple parser.
      * parse the infile, which is a raw vcf and put it into the mongo workspace
-     * @param context - the execution context (so we can kill the process if needed)  -- can be null
-     * @param infile
-     * @param workspace
-     * @param typeAhead - the implementation for where value sets will be stored for providing type-ahead functionality.
-     * @param testing    -- populate testingCollection instead of Mongo.
-     * @param reporting - if verbose output is desired (much slower and not for production use, use when debugging)
+     * @param infile     - the raw complete (cononical) path to the file we want to parse as a string.
+     * @param workspace  - the key for the workspace where we will put the data
      * @return lines processed.
      */
-    public int parse(Task context, String infile, String workspace, TypeAhead typeAhead, boolean testing, boolean reporting) throws ProcessTerminatedException{
-        VCF2VariantPipe vcf 	= new VCF2VariantPipe(true, false);
+    public int parse(String infile, String workspace) throws ProcessTerminatedException{
+
+        if(reporting){ System.out.println("Getting the vcf-miner database from mongo"); }
         DB db = MongoConnection.getDB();
+        if(reporting){ System.out.println("Getting the workspace collection from mongo"); }
         DBCollection col = db.getCollection(workspace);
-        this.typeAhead = typeAhead;
-        if(reporting) System.out.println("Setting up Pipeline....");
+        if(reporting){
+            System.out.println("Setting up Pipeline,\n input file: " + infile);
+            System.out.println("Workspace: " + workspace);
+            System.out.println("TypeAhead: " + typeAhead);
+            System.out.println("Testing: " + testing);
+            System.out.println("Reporting: " + reporting);
+        }
+        VCF2VariantPipe vcf 	= new VCF2VariantPipe(true, false);
         Pipe p = new Pipeline(new CatPipe(),
                              new ReplaceAllPipe("\\{",""),
                              new ReplaceAllPipe("\\}",""),
@@ -133,6 +151,7 @@ public class VCFParser implements ParserInterface {
                 );
         p.setStarts(Arrays.asList(infile));
         int i;
+        if(reporting) System.out.println("Processing Data....");
         for(i=0; p.hasNext(); i++){
             if(context!=null){ if(context.isTerminated()) throw new ProcessTerminatedException(); }
             if(reporting) System.out.println(col.count());
@@ -193,16 +212,26 @@ public class VCFParser implements ParserInterface {
         return o;
     }
 
+    public int parse(Task task, String inputVCFFile, String workspace, TypeAhead typeAhead, boolean testing) throws ProcessTerminatedException {
+        if(task != null)
+            context = task;
+        if(typeAhead != null){
+            this.typeAhead = typeAhead;
+        }
+        this.testing = testing;
+        this.reporting = reporting;
+        return parse(inputVCFFile, workspace);
+    }
+
     /**
      * This needs to be called after a parse to ensure that the load gets correctly registered by the UI
      * checks to see if the load worked or if it failed
      * @param workspace - the key for the workspace
      * @param datalines - the number of lines of data in the load file
      * @param force - force the status as successful
-     * @param reporting - if reporting is true, information will be logged, otherwise it will be silent
      * @return true if it worked, false if it failed.
      */
-    public boolean checkAndUpdateLoadStatus(String workspace, int datalines, boolean force, boolean reporting){
+    public boolean checkAndUpdateLoadStatus(String workspace, int datalines, boolean force){
         MetaData metaData = new MetaData();
         if(force){
             if(reporting) System.out.println("Force flag set, the workspace will be flagged as ready!");
@@ -625,6 +654,60 @@ public class VCFParser implements ParserInterface {
     public void setSaveSamples(boolean saveSamples) {
         this.saveSamples = saveSamples;
     }
+
+    public int getCacheSize() {
+        return cacheSize;
+    }
+
+    public void setCacheSize(int cacheSize) {
+        this.cacheSize = cacheSize;
+    }
+
+    public Task getContext() {
+        return context;
+    }
+
+    public void setContext(Task context) {
+        this.context = context;
+    }
+
+    public TypeAhead getTypeAhead() {
+        return typeAhead;
+    }
+
+    public void setTypeAhead(TypeAhead typeAhead) {
+        this.typeAhead = typeAhead;
+    }
+
+    public boolean isTesting() {
+        return testing;
+    }
+
+    public void setTesting(boolean testing) {
+        this.testing = testing;
+    }
+
+    public boolean isReporting() {
+        return reporting;
+    }
+
+    public void setReporting(boolean reporting) {
+        this.reporting = reporting;
+    }
+
+    public void setMetadata(DBObject metadata) {
+        this.metadata = metadata;
+    }
+
+    public Index getIndexUtil() {
+        return indexUtil;
+    }
+
+    public void setIndexUtil(Index indexUtil) {
+        this.indexUtil = indexUtil;
+    }
+
+
 }
 
 
