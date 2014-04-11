@@ -1,9 +1,31 @@
-var AddFilterDialog = function (searchedFilters, sampleGroups, indexController) {
+/**
+ *
+ * @param workspaceKey
+ *      The workspace key.
+ * @param sampleNames
+ *      An array of strings, each string representing a sample name.
+ * @param vcfDataFields
+ * @param indexController
+ * @returns {{initialize: Function, show: Function}}
+ * @constructor
+ */
+var AddFilterDialog = function (workspace, indexController) {
 
     // private variables
-    var workspaceKey;
-    var sampleFilterTab = new SampleFilterTab(sampleGroups);
+    var sampleFilterTab = new SampleFilterTab();
     var infoFilterTab   = new InfoFilterTab(indexController);
+
+    $('#add_filter_tabs a').click(function (e)
+    {
+        e.preventDefault();
+        $(this).tab('show');
+    })
+
+
+    // will cause the modal to initialize itself every time it is shown
+    $('#add_filter_modal').on('hidden', function(){
+        $(this).data('modal', null);
+    });
 
     $('#add_filter').click(function()
     {
@@ -46,47 +68,28 @@ var AddFilterDialog = function (searchedFilters, sampleGroups, indexController) 
         if (typeof filter !== 'undefined')
         {
             filter.setFilterDisplay();
-            searchedFilters.add(filter);
+            MongoApp.trigger("filterAdd", filter);
             $("#add_filter_close").click();
             $('#add_filter_modal').modal('hide')
         }
     }
 
-    function reset()
+    function reset(workspace)
     {
+        sampleFilterTab.initialize(workspace.get("key"), workspace.get("sampleNames"), workspace.get("dataFields"), workspace.get("sampleGroups"));
+        infoFilterTab.initialize(workspace.get("key"), workspace.get("dataFields"));
     }
 
     // public API
     return {
+
         /**
-         * Resets the state of the dialog.
          *
-         * @param ws
-         *      The workspace key.
-         * @param sampleNames
-         *      An array of strings, each string representing a sample name.
+         * @param workspace
          */
-        initialize: function(ws, sampleNames, vcfDataFields)
+        show: function(workspace)
         {
-            workspaceKey = ws;
-
-            sampleFilterTab.initialize(workspaceKey, sampleNames, vcfDataFields);
-            infoFilterTab.initialize(workspaceKey, vcfDataFields);
-        },
-
-        /**
-         * Shows the dialog
-         */
-        show: function()
-        {
-            reset();
-
-            $('#add_filter_tabs a').click(function (e)
-            {
-                e.preventDefault();
-                $(this).tab('show');
-            })
-
+            reset(workspace);
             $('#add_filter_modal').modal();
         }
     };

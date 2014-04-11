@@ -4,7 +4,7 @@
  * @returns {{initialize: Function, validate: Function, getFilter: Function}}
  * @constructor
  */
-var SampleFilterTab = function (groups) {
+var SampleFilterTab = function () {
 
     // private variables
     var filters = new FilterList();
@@ -16,19 +16,13 @@ var SampleFilterTab = function (groups) {
     var count = $('#group_sample_count');
     var list = $('#group_sample_names_list');
 
-    var createGroupDialog = new CreateGroupDialog(groups);
+    var groupListView;
+    var createGroupDialog = new CreateGroupDialog();
     $('#new_group_button').click(function (e)
     {
         createGroupDialog.show();
     });
 
-    var groupListView = new GroupListView(
-        {
-            "el": $('#group_list'),
-            "model": groups,
-            "fnGroupChangeCallback": groupChanged
-        }
-    );
 
     // add custom validation method for the group drowdown to make sure a group
     // is selected
@@ -197,9 +191,22 @@ var SampleFilterTab = function (groups) {
          *      The workspace key.
          * @param allSampleNames
          *      An array of strings, each string representing a sample name.
+         * @param groups
          */
-        initialize: function(ws, allSampleNames, vcfDataFields)
+        initialize: function(ws, allSampleNames, vcfDataFields, groups)
         {
+            // destroy and recreate view
+            if (groupListView != undefined) {
+                groupListView.remove();
+            }
+            groupListView = new GroupListView(
+                {
+                    "el": $('#group_list'),
+                    "model": groups,
+                    "fnGroupChangeCallback": groupChanged
+                }
+            );
+
             createGroupDialog.initialize(ws, allSampleNames);
 
             filters.reset();

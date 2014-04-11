@@ -1,16 +1,21 @@
 /**
  *
- * @param sampleGroups
  * @returns {{initialize: Function, show: Function}}
  * @constructor
  */
-var CreateGroupDialog = function (sampleGroups) {
+var CreateGroupDialog = function () {
 
     // private variables
     var workspaceKey;
     var allSampleNames;
     var availableSamplesList = $('#available_samples_list');
     var groupSamplesList = $('#group_samples_list');
+    var sampleGroups;
+
+    // register for Marionette events
+    MongoApp.on("workspaceChange", function (workspace) {
+        this.sampleGroups = workspace.get("sampleGroups");
+    });
 
     // jQuery validate plugin config
     $('#create_group_form').validate(

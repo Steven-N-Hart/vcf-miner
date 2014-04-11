@@ -366,7 +366,8 @@ var Filter = Backbone.Model.extend({
             numMatches:      0,
             category:        FilterCategory.UNKNOWN,
             id:              guid(),
-            includeNulls:    false
+            includeNulls:    false,
+            removable:       false
         };
     }
 });

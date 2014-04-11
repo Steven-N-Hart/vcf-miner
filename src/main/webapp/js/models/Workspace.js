@@ -16,7 +16,10 @@ var Workspace = Backbone.Model.extend({
             alias:  "NA",
             user:   "NA",
             status: ReadyStatus.UNKNOWN,
-            id:     guid()
+            id:     guid(),
+            dataFields: new VCFDataFieldList(),
+            sampleNames: new Array(),
+            sampleGroups: new SampleGroupList()
         };
     }
 });

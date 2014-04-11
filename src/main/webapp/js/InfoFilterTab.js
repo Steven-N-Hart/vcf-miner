@@ -109,21 +109,6 @@ var InfoFilterTab = function (indexController) {
         var infoField = getSelectedInfoField();
         var fieldID = infoField.get("name");
 
-        if (SETTINGS.showMissingIndexWarning && !indexController.isDataFieldIndexed(infoField))
-        {
-            var confirmDialog = new ConfirmDialog(
-                "",
-                fieldID + " does not have an index.  Would you like to create a new index to boost filtering performance?",
-                "Create Index",
-                function()
-                {
-                    // confirm
-                    indexController.createIndex(infoField);
-                }
-            );
-            confirmDialog.show();
-        }
-
         // value DIV area
         var valueDiv = $("#info_value_div");
         // clear div value area
@@ -176,10 +161,10 @@ var InfoFilterTab = function (indexController) {
                 opList.append(OPTION_EQ);
                 opList.append(OPTION_NE);
 
-                var values = getFieldValues(fieldID, parseInt(SETTINGS.maxFilterValues) + 1);
+                var values = getFieldValues(fieldID, parseInt(MongoApp.settings.maxFilterValues) + 1);
 
                 // use typahead if we have MORE values than specified as the max
-                if (values.length > SETTINGS.maxFilterValues)
+                if (values.length > MongoApp.settings.maxFilterValues)
                 {
                     valueDiv.append('<input id="info_str_typeahead" type="text" placeholder="enter value here" autocomplete="off" spellcheck="false"/>');
                     valueDiv.append('<textarea id="info_str_value_area" rows="7" wrap="off" placeholder="" autocomplete="off" spellcheck="false"/>');
@@ -332,7 +317,7 @@ var InfoFilterTab = function (indexController) {
      */
     function useTypeAheadWidget(fieldID)
     {
-        var maxValues = SETTINGS.maxFilterValues;
+        var maxValues = MongoApp.settings.maxFilterValues;
 
         var useTypeAhead = false;
         // perform synchronous AJAX call
@@ -483,6 +468,22 @@ var InfoFilterTab = function (indexController) {
                 }
             }
             filter.set("operator", operator);
+
+            if (MongoApp.settings.showMissingIndexWarning && !MongoApp.indexController.isDataFieldIndexed(infoField))
+            {
+                var confirmDialog = new ConfirmDialog(
+                    "",
+                    fieldID + " does not have an index.  Would you like to create a new index to boost filtering performance?",
+                    "Create Index",
+                    function()
+                    {
+                        // confirm
+                        MongoApp.indexController.createIndex(MongoApp.indexController.getIndexByDataField(infoField));
+                    }
+                );
+                confirmDialog.show();
+            }
+
             return filter;
         }
     };

@@ -4,7 +4,7 @@
  * @returns {{setWorkspace: Function, setDisplayCols: Function}}
  * @constructor
  */
-var SearchedView = function (filters) {
+var SearchFilterView = function (filters) {
 
     // private variables
     var workspaceKey;

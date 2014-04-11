@@ -2,7 +2,7 @@
  *
  * @type {*}
  */
-var VariantTableDataView = Backbone.View.extend({
+var VariantTableDataView = Backbone.Marionette.ItemView.extend({
 
     /**
      * Called when the view is first created
@@ -29,11 +29,12 @@ var VariantTableDataView = Backbone.View.extend({
         "click #columns_button":  "configColumns"
     },
 
+    download: function() {
+        MongoApp.trigger("download", null);
+    },
+
     render: function()
     {
-        // remove previous table if present
-        this.$el.empty();
-
         // construct a new HTML table and add to DOM
         var table = $('<table>').attr(
             {
@@ -77,7 +78,7 @@ var VariantTableDataView = Backbone.View.extend({
             {
                 // set tooltip 'title' attribute for all TH elements that correspond to visible columns
                 var colIdx = 0;
-                _.each(that.getVisibleColumns().models, function(col)
+                _.each(that.options.columns.getVisibleColumns().models, function(col)
                 {
                     $('th:eq('+ colIdx +')', nHead).attr('title', col.get("description"));
                     colIdx++;
@@ -85,10 +86,18 @@ var VariantTableDataView = Backbone.View.extend({
 
             }
         });
+    },
 
-        var showButton = $('<button id="west-opener" title="Show Filters" type="button" class="showButton hide btn btn-mini"><i class="fa fa-arrow-right"></i> Show</button>');
+    /**
+     * Triggered after the view has been rendered, has been shown in the DOM via a Marionette.Region, and has been re-rendered.
+     */
+    onShow: function(){
+        // dynamically add 'show' button to the <div> with class '.show'
+        var showButton = $('<button id="west-opener" title="Show Search" type="button" class="hide btn btn-mini"><i class="fa fa-arrow-right"></i> Show</button>');
         this.$('.show').append(showButton);
-        $('#jquery-ui-container').layout().addOpenBtn("#west-opener", "west");
+
+//        $('#jquery-ui-container').layout().addOpenBtn("#west-opener", "west");
+        MongoApp.layout.addOpenBtn("#west-opener", "west");
 
         var toolbar = $("#table_toolbar").clone();
         this.$('.toolbar').append(toolbar);
@@ -163,83 +172,6 @@ var VariantTableDataView = Backbone.View.extend({
         }
 
         return displayValue;
-    },
-
-    /**
-     * Gets the columns that are currently visible in the table.
-     *
-     * @returns {VariantTableColumnList}
-     *      A collection of VariantTableColumn models that are visible in the table.
-     */
-    getVisibleColumns: function()
-    {
-        var visibleCols = new VariantTableColumnList();
-        _.each(this.options.columns.models, function(col)
-        {
-            if (col.get("visible"))
-            {
-                visibleCols.add(col);
-            }
-        });
-        return visibleCols;
-    },
-
-    /**
-     * Downloads data in TSV format for the given query and selected columns.
-     */
-    download: function()
-    {
-        // send query request to server
-        var query = buildQuery(this.options.filters, this.options.workspaceKey);
-
-        var returnFields = new Array();
-        var displayFields = new Array();
-        _.each(this.getVisibleColumns().models, function(visibleCol)
-        {
-            returnFields.push(visibleCol.get("name"));
-            displayFields.push(visibleCol.get("displayName"));
-        });
-        query.returnFields = returnFields;
-        query.displayFields = displayFields;
-
-        var displayFiltersApplied = new Array();
-        _.each(this.options.filters.models, function(filter)
-        {
-            displayFiltersApplied.push(
-                {
-                    filterText: filter.getNameAsASCII() + " " + filter.getOperatorAsASCII() + " " + filter.getValueAsASCII(),
-                    numberVariantsRemaining: filter.get("numMatches")
-                }
-            );
-        });
-        query.displayFiltersApplied = displayFiltersApplied;
-
-        var jsonStr = JSON.stringify(query)
-
-        console.debug("Sending download request to server with the following JSON:" + jsonStr);
-
-        // dynamically add HTML form that is hidden
-        var form = $('<form>').attr(
-            {
-                id:      'export_form',
-                method:  'POST',
-                action:  '/mongo_svr/download',
-                enctype: 'application/x-www-form-urlencoded'
-            });
-        var input = $('<input>').attr(
-            {
-                type: 'hidden',
-                name: 'json',
-                value: jsonStr
-            });
-        form.append(input);
-        $("body").append(form);
-
-        // programmatically submit form to perform download
-        $('#export_form').submit();
-
-        // remove form
-        $('#export_form').remove();
     },
 
     /**

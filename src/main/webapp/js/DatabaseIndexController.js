@@ -92,35 +92,36 @@ var DatabaseIndexController = function () {
         infoIndexes.reset();
         formatIndexes.reset();
         overallStatus.set("numReady", 0);
+        notReadyIndexes = new Array();
 
         // create Index models
         _.each(dataFields.models, function(vcfDataField) {
 
-            var indexNames = new Array(); // a single data field may have 0 or more indexes
+            var fieldIndexNames = new Array(); // a single data field may have 0 or more indexes
             var indexList;
             switch (vcfDataField.get("category"))
             {
                 case VCFDataCategory.GENERAL:
-                    indexNames.push(vcfDataField.get("name"));
+                    fieldIndexNames.push(vcfDataField.get("name"));
                     indexList = generalIndexes;
                     break;
                 case VCFDataCategory.INFO:
-                    indexNames.push(vcfDataField.get("name"));
+                    fieldIndexNames.push(vcfDataField.get("name"));
                     indexList = infoIndexes;
                     break;
                 case VCFDataCategory.FORMAT:
                     // 2 indexes per FORMAT field (min,max)
-                    indexNames.push("min."+vcfDataField.get("name"));
-                    indexNames.push("max."+vcfDataField.get("name"));
+                    fieldIndexNames.push("min."+vcfDataField.get("name"));
+                    fieldIndexNames.push("max."+vcfDataField.get("name"));
                     indexList = formatIndexes;
                     break;
             };
 
             var status;
             var progress = 0; // TODO
-            for (var i=0; i < indexNames.length; i++ )
+            for (var i=0; i < fieldIndexNames.length; i++ )
             {
-                var name = indexNames[i];
+                var name = fieldIndexNames[i];
                 var index = new DatabaseIndex({name: name, dataField: vcfDataField, status: status, progress:progress});
                 if (isIndexed(index)) {
 
@@ -290,7 +291,9 @@ var DatabaseIndexController = function () {
 
         createIndex: createIndex,
 
-        deleteIndex: deleteIndex
+        deleteIndex: deleteIndex,
+
+        getIndexByDataField: getIndexByDataField
     };
 
 };
