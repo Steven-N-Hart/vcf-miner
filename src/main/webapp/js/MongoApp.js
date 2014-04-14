@@ -12,6 +12,8 @@ var MongoApp = new Backbone.Marionette.Application();
  */
 MongoApp.addRegions({
     workspaceRegion:     '#workspaceRegion',
+    searchNameRegion:    '#searchNameRegion',
+    searchTableRegion:   '#searchTableRegion',
     searchFiltersRegion: '#searchFiltersRegion',
     variantDataRegion:   '#variantDataRegion'
 });
@@ -121,7 +123,9 @@ MongoApp.addInitializer(function () {
     settingsController.showSettingsTab({region: MongoApp.TODO });
 
     var searchController = new SearchController();
-    searchController.showSearchTable({region: MongoApp.searchFiltersRegion });
+    searchController.showSearchName({region: MongoApp.searchNameRegion });
+    searchController.showSearchTable({region: MongoApp.searchTableRegion });
+    searchController.showSearchFilterTable({region: MongoApp.searchFiltersRegion });
 
     new VariantDataController();
 
@@ -133,6 +137,7 @@ MongoApp.addInitializer(function () {
     MongoApp.on("workspaceChange", function (workspace) {
 
         this.workspace = workspace;
+        this.search.set("key", this.workspace.get("key"));
         MongoApp.trigger("filterAdd", searchController.FILTER_NONE);
 
     });

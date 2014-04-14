@@ -58,70 +58,11 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
      */
     refreshData: function(workspace, search) {
         // send query request to server
-        var query = this.buildQuery(search.get("filters"), workspace.get("key"));
+        var query = buildQuery(search.get("filters"), workspace.get("key"));
         this.sendQuery(query, this.varTableCols);
     },
 
-    /**
-     * Builds a query object.
-     *
-     * @param filterList Backbone collection of filter models.
-     * @param workspaceKey
-     * @returns {Object} Query object
-     */
-    buildQuery: function(filterList, workspaceKey) {
-        // build query from FILTER model
-        var query = new Object();
-        query.numberResults = MongoApp.settings.maxFilteredVariants;
 
-        query.workspace = workspaceKey;
-
-        var sampleGroups        = new Array();
-        var infoFlagFilters     = new Array();
-        var infoNumberFilters   = new Array();
-        var infoStringFilters   = new Array();
-        var sampleNumberFilters = new Array();
-
-        // loop through filter collection
-        _.each(filterList.models, function(filter) {
-            // assign filter value to correct query object attribute
-            switch (filter.get("category"))
-            {
-                case FilterCategory.INFO_FLAG:
-                    infoFlagFilters.push(filter.toInfoFlagFilterPojo());
-                    break;
-                case FilterCategory.INFO_INT:
-                case FilterCategory.INFO_FLOAT:
-                    infoNumberFilters.push(filter.toInfoNumberFilterPojo());
-                    break;
-                case FilterCategory.INFO_STR:
-                    infoStringFilters.push(filter.toInfoStringFilterPojo());
-                    break;
-                case FilterCategory.IN_GROUP:
-                case FilterCategory.NOT_IN_GROUP:
-                    // lookup SampleGroup model that corresponds to name
-                    var group = MongoApp.workspace.get("sampleGroups").findWhere({name: filter.get("value")});
-                    var inSample;
-                    if (filter.get("category") == FilterCategory.IN_GROUP)
-                        inSample = true;
-                    if (filter.get("category") == FilterCategory.NOT_IN_GROUP)
-                        inSample = false;
-                    sampleGroups.push(group.toSampleGroupPOJO(workspaceKey, inSample));
-                    break;
-                case FilterCategory.FORMAT:
-                    sampleNumberFilters.push(filter.toSampleNumberFilterPojo());
-                    break;
-            }
-        });
-
-        query.sampleGroups        = sampleGroups;
-        query.infoFlagFilters     = infoFlagFilters;
-        query.infoNumberFilters   = infoNumberFilters;
-        query.infoStringFilters   = infoStringFilters;
-        query.sampleNumberFilters = sampleNumberFilters;
-
-        return query;
-    },
 
     /**
      * Sends query to server via AJAX.
@@ -272,7 +213,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
     download: function()
     {
         // send query request to server
-        var query = this.buildQuery(MongoApp.search.get("filters"), MongoApp.workspace.get("key"));
+        var query = buildQuery(MongoApp.search.get("filters"), MongoApp.workspace.get("key"));
 
         var returnFields = new Array();
         var displayFields = new Array();

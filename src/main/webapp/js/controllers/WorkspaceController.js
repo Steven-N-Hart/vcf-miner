@@ -124,7 +124,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                             ws.set("alias", json[attr].alias);
                             ws.set("user",  user);
                             ws.set("status", json[attr].ready);
-                            ws.set("date", self.getDateString(json[attr].timestamp));
+                            ws.set("date", getDateString(json[attr].timestamp));
 
                             // load extra information about workspace
                             self.loadMetadata(ws);
@@ -172,7 +172,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                             if($.inArray(key, self.notReadyKeys) != -1) {
                                 console.log("updating status for key " + key);
                                 ws.set("status", json[attr].ready);
-                                ws.set("date", self.getDateString(json[attr].timestamp));
+                                ws.set("date", getDateString(json[attr].timestamp));
 
                                 if ((ws.get("status") == ReadyStatus.READY) ||
                                     (ws.get("status") == ReadyStatus.FAILED)) {
@@ -273,22 +273,6 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 MongoApp.trigger("error", JSON.stringify(jqXHR));
             }
         });
-    },
-
-    /**
-     * Translate given timestamp object into a human readable string.
-     *
-     * @param timestamp
-     * @returns {string}
-     */
-    getDateString: function(timestamp)
-    {
-        var dateStr = '';
-        if (typeof timestamp !== "undefined")
-        {
-            dateStr = moment(timestamp).format('MM/DD/YYYY h:mm A'); ;
-        }
-        return dateStr;
     },
 
     /**

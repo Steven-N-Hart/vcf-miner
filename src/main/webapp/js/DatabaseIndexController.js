@@ -37,7 +37,7 @@ var DatabaseIndexController = function () {
             },
             error: function(jqXHR, textStatus) {
 
-                $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+                MongoApp.trigger("error", JSON.stringify(jqXHR));
             }
         });
     }
@@ -55,8 +55,7 @@ var DatabaseIndexController = function () {
                 console.log("created index " + indexName + " with return status: " + json.status);
             },
             error: function(jqXHR, textStatus) {
-
-                $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+                MongoApp.trigger("error", JSON.stringify(jqXHR));
             }
         });
     }
@@ -74,8 +73,7 @@ var DatabaseIndexController = function () {
                 console.log("dropped index " + indexName + " with return status: " + json.status);
             },
             error: function(jqXHR, textStatus) {
-
-                $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+                MongoApp.trigger("error", JSON.stringify(jqXHR));
             }
         });
     }

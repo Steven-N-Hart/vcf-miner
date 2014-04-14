@@ -103,6 +103,53 @@
         </table>
     </script>
 
+    <script id="search-name-template" type="text/template">
+        <div class="dropdown pull-left">
+            <a class="searchName dropdown-toggle" data-toggle="dropdown" href="#"><h3><%=name%></h3></a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                <li role="presentation"><a class="searchNameChange" role="menuitem" tabindex="-1"><i class="fa fa-pencil"></i> Rename</a></li>
+                <li role="presentation"><a class="searchSave" role="menuitem" tabindex="-1"><i class="fa fa-save"></i> Save</a></li>
+                <li role="presentation"><a class="searchImport" role="menuitem" tabindex="-1"><i class="icon-remove"></i> Delete</a></li>
+                <li role="presentation"><a class="searchConfigure" role="menuitem" tabindex="-1"><i class="fa fa-folder-open-o"></i> Open a saved Search</a></li>
+                <li role="presentation" class="divider"></li>
+                <li role="presentation"><a class="searchExport" role="menuitem" tabindex="-1"><i class="icon-download"></i> Export to a file</a></li>
+                <li role="presentation"><a class="searchImport" role="menuitem" tabindex="-1"><i class="icon-upload"></i> Import from a file</a></li>
+            </ul>
+        </div>
+    </script>
+
+    <script id="search-name-change-popover-template" type="text/template">
+        <div class="input-append">
+            <input name="search_name_field" type="text" class="input-medium" placeholder="<%=name%>">
+            <button class="btn searchNameApply" title="Apply new name">Apply</button>
+        </div>
+    </script>
+
+    <!-- single row in the search table -->
+    <script id="search-row-template" type="text/template">
+        <span class="label"><td><%=name%></td></span>
+        <span class="label"><td><%=user%></td></span>
+        <span class="label"><td><%=getDateString(timestamp)%></td></span>
+        <td><button title="Open this Search" type="button" class="btn btn-mini open">Open</button></td>
+    </script>
+
+    <!-- the search table -->
+    <script id="search-table-template" type="text/html">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>User</th>
+                <th>Last Saved</th>
+                <th></th>
+            </tr>
+            </thead>
+
+            <!-- want to insert collection items, here -->
+            <tbody></tbody>
+        </table>
+    </script>
+
     <!-- single row in the search filter table -->
     <script id="search-filter-row-template" type="text/template">
         <span class="label"><td><%=displayName%></td></span>
@@ -184,8 +231,6 @@
     <script src="moment-2.4.0/moment.min.js"></script>
     <script src="Acquisio-bootstrap-dropdown-checkbox-5f2ad8d/js/bootstrap-dropdown-checkbox.js"></script>
 
-    <!--<script src="js/views/SearchFilterView.js" type="text/javascript"></script>-->
-
     <script src="js/models/VCFDataField.js" type="text/javascript"></script>
     <script src="js/collections/VCFDataFieldList.js" type="text/javascript"></script>
 
@@ -226,20 +271,21 @@
     <script src="js/views/VariantTableColumnView.js" type="text/javascript"></script>
     <script src="js/views/VariantTableDataView.js" type="text/javascript"></script>
 
-    <script src="js/splitter_layout.js" type="text/javascript"></script>
     <script src="js/mongo_util.js" type="text/javascript"></script>
-    <!--<script src="js/SettingsTab.js" type="text/javascript"></script>-->
-    <!--<script src="js/mongo_view.js" type="text/javascript"></script>-->
     <script src="js/customized-bootstrap-dropdown-checkbox.js" type="text/javascript"></script>
 
     <!-- Marionette Application -->
     <script src="js/models/Search.js"></script>
+    <script src="js/collections/SearchList.js"></script>
     <script src="js/controllers/SearchController.js"></script>
     <script src="js/controllers/SettingsController.js"></script>
     <script src="js/controllers/VariantDataController.js"></script>
     <script src="js/controllers/WorkspaceController.js"></script>
+    <script src="js/views/SearchTableRowView.js"></script>
+    <script src="js/views/SearchTableView.js"></script>
     <script src="js/views/SearchFilterRowView.js"></script>
     <script src="js/views/SearchFilterTableView.js"></script>
+    <script src="js/views/SearchNameView.js"></script>
     <script src="js/views/WorkspaceTableRowView.js"></script>
     <script src="js/views/WorkspaceTableView.js"></script>
     <script src="js/MongoApp.js"></script>
@@ -256,9 +302,6 @@
 
 <body>
 <div id="message_area"></div>
-
-<!-- west pane show button -->
-<!--<button id="west-opener" title="Show Filters" type="button" class="showButton btn btn-mini"><i class="fa fa-arrow-right"></i> Show</button>-->
 
 <!-- Table Toolbar -->
 <div id="table_toolbar" class="btn-group hide">
@@ -330,55 +373,16 @@
 </div>
 
 <!-- Modal -->
-<div id="manage_searches_modal" class="modal hide fade" tabindex="-1" role="dialog"aria-hidden="true">
+<div id="searches_modal" class="modal hide fade" tabindex="-1" role="dialog"aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3>Searches</h3>
     </div>
     <div class="modal-body">
-
-        <table>
-            <tr>
-                <td><div class="span12"><button class="btn">Import</button> a previously exported search.</div></td>
-            </tr>
-            <tr><td><br/></td></tr>
-            <tr>
-                <table class="table" id="session_table">
-                    <tr>
-                        <th>Name</th>
-                        <th>User</th>
-                        <th>Default</th>
-                        <th>Last Saved</th>
-                        <th>Actions</th>
-                    </tr>
-                    <tr>
-                        <td>Session Foobar</td>
-                        <td>duffp</td>
-                        <td><input type="radio"/></td>
-                        <td>03/13/2014 11:53 AM</td>
-                        <td>
-                            <button type="button" class="btn">Load</button>
-                            <button type="button" class="btn">Export</button>
-                            <button type="button" class="btn">Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Study FOO Analysis</td>
-                        <td>m012345</td>
-                        <td><input type="radio"/></td>
-                        <td>03/22/2014 06:23 PM</td>
-                        <td>
-                            <button type="button" class="btn">Load</button>
-                            <button type="button" class="btn">Export</button>
-                            <button type="button" class="btn">Delete</button>
-                        </td>
-                    </tr>
-                </table>
-            </tr>
-        </table>
+        <div id="searchTableRegion"></div>
     </div>
     <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
     </div>
 </div>
 
@@ -855,10 +859,8 @@
                     </div>
                 </div>
 
-                <div id="searched_view">
-                    <div class="row-fluid">
-                        <div class="span12"><h4><a>My Search</a> ( <a>save</a> | <a onclick="$('#manage_searches_modal').modal();"> more...</a> )</h4></div>
-                    </div>
+                <div>
+                    <div id="searchNameRegion"></div>
 
                     <div id="searchFiltersRegion"></div>
 
