@@ -212,12 +212,14 @@ var SearchController = Backbone.Marionette.Controller.extend({
         search.set('key', filterHistory.user);
         search.set('timestamp', filterHistory.timestamp);
 
-        for (var i = 0; i < filterHistory.filters.length; i++) {
-            var querry = filterHistory.filters[i];
+        if (filterHistory.filters != undefined) {
+            for (var i = 0; i < filterHistory.filters.length; i++) {
+                var querry = filterHistory.filters[i];
 
-            // each Querry object is a Filter model
-            var filter = this.querryToFilter(querry);
-            search.get("filters").add(filter);
+                // each Querry object is a Filter model
+                var filter = this.querryToFilter(querry);
+                search.get("filters").add(filter);
+            }
         }
 
         return search;
