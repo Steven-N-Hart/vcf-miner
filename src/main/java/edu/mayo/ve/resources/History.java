@@ -96,7 +96,7 @@ public class History {
             ret.add(next);
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("{ filterHistories : ");
+        sb.append("{ \"filterHistories\" : ");
         sb.append(gson.toJson(ret));
         sb.append(" }");
         return sb.toString();
