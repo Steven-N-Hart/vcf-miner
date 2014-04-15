@@ -189,14 +189,17 @@ public class FailedLoadITCase {
             //the parser will throw an InvalidPipeInputException (Invalid VCF data) we want to ensure that this gets logged to MongoDB as a fail
             worker.compute(t);
         } catch (ProcessTerminatedException e) {
-            //should never get here
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            fail();
+            //should never get here, the worker will
+            //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
         //verify that the failure status was updated...
         readyStatus = meta.isReady(workspace);
         System.out.println(readyStatus);
         assertTrue(readyStatus.contains(" \"ready\" : 0"));
+
+        //check that the workerpool
 
 
     }

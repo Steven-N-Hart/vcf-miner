@@ -23,6 +23,7 @@ import edu.mayo.ve.VCFLoaderPool;
 import edu.mayo.ve.VCFParser.LoadWorker;
 import edu.mayo.util.SystemProperties;
 import edu.mayo.ve.VCFParser.VCFParser;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -298,7 +299,18 @@ public class VCFUploadResource {
             workspaceMeta.put(Tokens.KEY, wkspID);
 
             //write file to temp space
-            HashMap<String,Integer> filecounts = writeFile(uploadedInputStream, uploadedFileLocation); //need to send this back if front end is to have a status bar...
+            //HashMap<String,Integer> filecounts = writeFile(uploadedInputStream, uploadedFileLocation); //need to send this back if front end is to have a status bar...
+            File outputFile = new File(uploadedFileLocation);
+            OutputStream outStream = new FileOutputStream(outputFile);
+            try {
+                // copy data to file system
+                IOUtils.copyLarge(uploadedInputStream, outStream);
+            } finally {
+                outStream.close();
+            }
+
+            //collect statistics on the input file...
+            HashMap<String,Integer> filecounts = this.collectStatistics(uploadedFileLocation);
 
             if(turnOffLoading==false){
                 //schedule the ETL for load on the worker queue

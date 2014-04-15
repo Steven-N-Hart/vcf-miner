@@ -193,9 +193,10 @@ public class VCFParser implements ParserInterface {
             index(workspace, vcf, typeAhead, reporting);
             if(reporting){System.out.println("saving type-ahead results to the database");}
             typeAhead.save(m,workspace);
+            //free the memory for the type-ahead
+            typeAhead = null;
         }
         if(reporting){ System.out.println("done!");}
-        //m.close();
         return i; //the number of records processed
     }
 
@@ -448,7 +449,10 @@ public class VCFParser implements ParserInterface {
      */
     private void indexReserved(DBCollection col, boolean reporting){
         indexField("FORMAT.GenotypePostitiveCount", col, reporting);
-        indexField("FORMAT.GenotypePositiveList",col, reporting);
+        indexField("FORMAT.GenotypePositiveList",col, reporting); //don't need to index this as soon as the query is refactored
+        //indexField("FORMAT.HeterozygousList",col, reporting);
+        //indexField("FORMAT.HomozygousList",col, reporting);
+
     }
 
 

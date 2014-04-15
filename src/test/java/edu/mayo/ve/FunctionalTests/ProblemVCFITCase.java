@@ -34,6 +34,12 @@ import static org.junit.Assert.assertTrue;
  * This tests VCF files that have been a problem in the past.
  */
 public class ProblemVCFITCase {
+    
+//    public static void main(String[] args) throws IOException, ProcessTerminatedException{
+//        ProblemVCFITCase pvcf = new ProblemVCFITCase();
+//        pvcf.testAsif100G();
+//    }
+    
     Mongo m = MongoConnection.getMongo();
     private String user = "test";
     private int overflowThreshold = 50000;
@@ -157,7 +163,8 @@ public class ProblemVCFITCase {
 
         System.out.println("ProblemVCF.Loading data into a new workspace...");
         VCFParser parser = new VCFParser();
-        parser.parse(null, inputVCF, workspaceID, overflowThreshold, false, reporting, true);  //put true in the second to last param for verbose load reporting
+        parser.parse(null, inputVCF, workspaceID, overflowThreshold, false, reporting, false);  //put true in the second to last param for verbose load reporting
+        parser.setTypeAhead(null);//remove the type-ahead, because it could be consuming too much ram...
         return workspaceID;
     }
 

@@ -151,6 +151,15 @@
                     <skipTests>${skipTests}</skipTests>
                 </configuration>
             </plugin>
+            <!-- set the build to 1.6 as production versions of tomcat/RCF are not up to 1.7 yet -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
