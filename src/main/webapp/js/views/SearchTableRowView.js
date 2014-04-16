@@ -23,7 +23,9 @@ SearchTableRowView = Backbone.Marionette.ItemView.extend({
     },
 
     openSearch: function() {
-        // TODO:
+        MongoApp.trigger("changeSearch", this.model);
+
+        $('#searches_modal').modal('hide');
     }
 
 });

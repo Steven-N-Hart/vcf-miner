@@ -23,6 +23,7 @@ MongoApp.addRegions({
  */
 MongoApp.addInitializer(function () {
 
+    // GLOBAL
     this.settings =
     {
         maxFilteredVariants: 0,
@@ -31,8 +32,8 @@ MongoApp.addInitializer(function () {
         showMissingIndexWarning: false
     };
 
+    // GLOBAL
     this.indexController = new DatabaseIndexController();
-    this.workspace = null; // set dynamically when user picks a workspace
     this.search = new Search();
 });
 
@@ -136,10 +137,30 @@ MongoApp.addInitializer(function () {
     });
     MongoApp.on("workspaceChange", function (workspace) {
 
+        // GLOBAL
         this.workspace = workspace;
-        this.search.set("key", this.workspace.get("key"));
-        MongoApp.trigger("filterAdd", searchController.FILTER_NONE);
 
+        // default search for workspace
+        // TODO: enhance to be the 'default' search for the workspace
+        var search = new Search();
+        search.set("key", this.workspace.get("key"));
+        MongoApp.trigger("changeSearch", search);
+    });
+    MongoApp.on("changeSearch", function (newSearch) {
+
+        var filters = newSearch.get("filters");
+        newSearch.unset("filters");
+
+        // GLOBAL
+        this.search.set(newSearch.attributes);
+
+        this.search.get("filters").reset();
+        MongoApp.trigger("filterAdd", searchController.FILTER_NONE);
+        _.each(filters.models, function(filter) {
+            MongoApp.trigger("filterAdd", filter);
+        });
+
+        MongoApp.search.set("saved", true);
     });
 });
 

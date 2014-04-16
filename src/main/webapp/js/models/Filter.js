@@ -39,8 +39,7 @@ var Filter = Backbone.Model.extend({
      *
      * @param filter
      */
-    setFilterDisplay: function()
-    {
+    setFilterDisplay: function() {
         this.set("displayName", $.trim(this.getNameAsHTML()));
         this.set("displayValue", $.trim(this.getValueAsHTML()));
         this.set("displayOperator", this.getOperatorAsHTML());
@@ -50,8 +49,7 @@ var Filter = Backbone.Model.extend({
      * Translates this model into a SampleNumberFilter server-side object.
      * @returns {Object}
      */
-    toSampleNumberFilterPojo: function()
-    {
+    toSampleNumberFilterPojo: function() {
         var pojo = new Object();
 
         pojo.key = this.get("name");
@@ -60,8 +58,7 @@ var Filter = Backbone.Model.extend({
 
         pojo.comparator = this.toMongoNumberComparator(this.get("operator"));
 
-        switch(this.get("valueFunction"))
-        {
+        switch(this.get("valueFunction")) {
             case FilterValueFunction.MIN:
                 pojo.minORmax='min';
                 break;
@@ -78,46 +75,82 @@ var Filter = Backbone.Model.extend({
     },
 
     /**
+     * Translates a SampleNumberFilter server-side object into a Filter model.
+     * @param pojo
+     */
+    fromSampleNumberFilterPojo: function(pojo) {
+        var filter = new Filter();
+
+        filter.set("name", pojo.key);
+        filter.set("value", pojo.value);
+        filter.set("operator", this.toFilterOperator(pojo.comparator));
+
+        if (pojo.minORmax == 'min') {
+            filter.set("valueFunction", FilterValueFunction.MIN);
+        }
+        else if (pojo.minORmax == 'max') {
+            filter.set("valueFunction", FilterValueFunction.MAX);
+        }
+        filter.set("category", FilterCategory.FORMAT);
+
+        return filter;
+    },
+
+    /**
      * Translates this model into a InfoFlagFilter server-side object.
      */
-    toInfoFlagFilterPojo: function()
-    {
+    toInfoFlagFilterPojo: function() {
         var pojo = new Object();
 
         pojo.key = "INFO." + this.get("name");
-
         pojo.value = this.get("value");
-
-//        var comparator;
-//        switch(this.get("operator"))
-//        {
-//            case FilterOperator.EQ:
-//                comparator='';
-//                break;
-//            case FilterOperator.NE:
-//                comparator = '$ne';
-//                break;
-//        }
-//        pojo.comparator = comparator;
 
         return pojo;
     },
 
     /**
+     * Translates InfoFlagFilter server-side object into a Filter model.
+     * @param pojo
+     */
+    fromInfoFlagFilterPojo: function(pojo) {
+        var filter = new Filter();
+
+        filter.set("name", pojo.key.substring(5));
+        filter.set("value", pojo.value);
+        filter.set("category", FilterCategory.INFO_FLAG);
+
+        return filter;
+    },
+
+    /**
      * Translates this model into a InfoNumberFilter server-side object.
      */
-    toInfoNumberFilterPojo: function()
-    {
+    toInfoNumberFilterPojo: function() {
         var pojo = new Object();
 
         pojo.key = "INFO." + this.get("name");
-
         pojo.value = parseFloat(this.get("value"));
 
         pojo.comparator = this.toMongoNumberComparator(this.get("operator"));
         pojo.includeNulls = this.get("includeNulls");
 
         return pojo;
+    },
+
+    /**
+     * Transflates InfoNumberFilter server-side object into a Filter model.
+     * @param pojo
+     */
+    fromInfoNumberFilterPojo: function(pojo) {
+        var filter = new Filter();
+
+        filter.set("name", pojo.key.substring(5));
+        filter.set("value", pojo.value);
+        filter.set("operator", this.toFilterOperator(pojo.comparator));
+        filter.set("includeNulls", pojo.includeNulls);
+        filter.set("category", FilterCategory.INFO_FLOAT); // TODO: tell if INT or FLOAT?
+
+        return filter;
     },
 
     /**
@@ -150,7 +183,7 @@ var Filter = Backbone.Model.extend({
                 comparator='$in';
                 break;
             case FilterOperator.NE:
-                comparator = '$ne';
+                comparator = '$nin';
                 break;
         }
         pojo.comparator = comparator;
@@ -160,7 +193,29 @@ var Filter = Backbone.Model.extend({
     },
 
     /**
-     * Translates FilterOperator into a MONGO equivalent comparator.
+     * Translates InfoStringFilter server-side object into a Filter model.
+     * @returns {Filter}
+     */
+    fromInfoStringFilterPojo: function(pojo)
+    {
+        var filter = new Filter();
+
+        filter.set("name", pojo.key.substring(5));
+        filter.set("value", pojo.values);
+        filter.set("includeNulls", pojo.includeNulls);
+
+        if (pojo.comparator == '$in') {
+            filter.set("operator", FilterOperator.EQ);
+        }
+        else if (pojo.comparator == '$nin') {
+            filter.set("operator", FilterOperator.NE);
+        }
+        filter.set("category", FilterCategory.INFO_STR);
+        return filter;
+    },
+
+    /**
+     * Translates Filter operator into a MONGO equivalent comparator.
      */
     toMongoNumberComparator: function(filterOperator)
     {
@@ -187,6 +242,29 @@ var Filter = Backbone.Model.extend({
                 break;
         }
         return comparator;
+    },
+
+    /**
+     * Translates Filter operator into a MONGO equivalent comparator.
+     */
+    toFilterOperator: function(mongoNumberComparator)
+    {
+        var operator;
+
+        if (mongoNumberComparator == '')
+            operator = FilterOperator.EQ;
+        else if (mongoNumberComparator == '$gt')
+            operator = FilterOperator.GT;
+        else if (mongoNumberComparator == '$gte')
+            operator = FilterOperator.GTEQ;
+        else if (mongoNumberComparator == '$lt')
+            operator = FilterOperator.LT;
+        else if (mongoNumberComparator == '$lte')
+            operator = FilterOperator.LTEQ;
+        else if (mongoNumberComparator == '$ne')
+            operator = FilterOperator.NE;
+
+        return operator;
     },
 
     getNameAsHTML: function()

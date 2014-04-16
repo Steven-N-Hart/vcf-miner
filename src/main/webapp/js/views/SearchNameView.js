@@ -8,7 +8,10 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
         "click .searchNameChange" : "showNameChangePopover",
         "click .searchNameApply" : "applySearchName",
         "click .searchSave" : "saveSearch",
-        "click .searchConfigure" : "configureSearch"
+        "click .searchDelete" : "deleteSearch",
+        "click .searchConfigure" : "configureSearch",
+        "click .searchExport" : "exportSearch",
+        "click .searchImport" : "importSearch"
     },
 
     /**
@@ -24,6 +27,34 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
         this.options = options;
 
         this.listenTo(this.model, 'change', this.render);
+
+        // jQuery validate plugin config
+        $('#import_search_form').validate( {
+            rules: {
+                search_file_upload: {
+                    required: true,
+                    minlength: 1
+                }
+            },
+            submitHandler: function(form) {
+                var files = $('input#search_file_upload')[0].files;
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    MongoApp.trigger("importSearch", reader.result);
+                    $('#import_search_modal').modal('hide')
+                }
+                // async call
+                reader.readAsText(files[0]);
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('control-group error');
+            },
+            success: function(element) {
+                $(element).parent().removeClass('control-group error');
+            }
+        });
+
     },
 
     showNameChangePopover: function(e) {
@@ -63,6 +94,7 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
     applySearchName: function(e) {
         var textInput = this.$el.find('input');
         this.model.set("name", textInput.val());
+        this.model.set("saved", false);
 
         var anchor = this.$el.find('.searchNameChange');
         anchor.popover('destroy');
@@ -80,7 +112,42 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
      * Fire event to be handled by controller
      * @param e
      */
+    deleteSearch: function(e) {
+        var self = this;
+        var confirmDialog = new ConfirmDialog(
+            "Delete Search",
+            "Delete " + self.model.get("name")  + "?",
+            "Delete",
+            function()
+            {
+                // confirm
+                MongoApp.trigger("deleteSearch", self.model);
+            }
+        );
+        confirmDialog.show();
+    },
+
+    /**
+     * Fire event to be handled by controller
+     * @param e
+     */
     configureSearch: function(e) {
         MongoApp.trigger("configureSearch", MongoApp.search);
+    },
+
+    /**
+     * Fire event to be handled by controller
+     * @param e
+     */
+    exportSearch: function(e) {
+        MongoApp.trigger("exportSearch", MongoApp.search);
+    },
+
+    /**
+     * Fire event to be handled by controller
+     * @param e
+     */
+    importSearch: function(e) {
+        $('#import_search_modal').modal();
     }
 });

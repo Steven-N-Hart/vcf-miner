@@ -8,7 +8,8 @@ var Search = Backbone.Model.extend({
             user:   "NA",
             filters: new FilterList(),
             preload: false,
-            id:     guid()
+            id:     guid(),
+            saved: true
         };
 
     }

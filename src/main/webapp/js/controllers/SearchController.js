@@ -9,6 +9,10 @@ var SearchController = Backbone.Marionette.Controller.extend({
      */
     searches: new SearchList(),
 
+    searchNameView: null,
+
+    searchFilterView: null,
+
     FILTER_NONE: new Filter({name: 'none', displayName: 'none', operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'}),
 
     initialize: function (options) {
@@ -25,8 +29,17 @@ var SearchController = Backbone.Marionette.Controller.extend({
         MongoApp.on("saveSearch", function (search) {
             self.saveSearch(search);
         });
+        MongoApp.on("deleteSearch", function (search) {
+            self.deleteSearch(search);
+        });
         MongoApp.on("configureSearch", function (search) {
             self.configureSearch(search);
+        });
+        MongoApp.on("exportSearch", function (search) {
+            self.exportSearch(search);
+        });
+        MongoApp.on("importSearch", function (filterHistoryJsonText) {
+            self.importSearch(filterHistoryJsonText);
         });
 
         var addFilterDialog = new AddFilterDialog(MongoApp.indexController);
@@ -37,12 +50,9 @@ var SearchController = Backbone.Marionette.Controller.extend({
     },
 
     showSearchName: function(options) {
+        this.searchNameView = new SearchNameView({model: MongoApp.search});
 
-        var searchNameView = new SearchNameView({
-            model: MongoApp.search
-        });
-
-        options.region.show(searchNameView);
+        options.region.show(this.searchNameView);
     },
 
     showSearchTable: function (options) {
@@ -55,23 +65,26 @@ var SearchController = Backbone.Marionette.Controller.extend({
     },
 
     showSearchFilterTable: function (options) {
-
-        var searchFilterView = new SearchFilterTableView({
+        this.searchFilterView = new SearchFilterTableView({
             collection: MongoApp.search.get("filters")
         });
-
-        options.region.show(searchFilterView);
+        options.region.show(this.searchFilterView);
     },
 
     addFilter: function (filter) {
         MongoApp.search.get("filters").add(filter);
-        MongoApp.trigger("searchChanged", MongoApp.search);
+
+        if (filter.get('id') != this.FILTER_NONE.get('id'))
+            MongoApp.search.set("saved", false);
+
+        MongoApp.trigger("searchFilterAdded", MongoApp.search);
         this.updateFilterRemovable();
     },
 
     removeFilter: function (filter) {
         MongoApp.search.get("filters").remove(filter);
-        MongoApp.trigger("searchChanged", MongoApp.search);
+        MongoApp.search.set("saved", false);
+        MongoApp.trigger("searchFilterRemoved", MongoApp.search);
         this.updateFilterRemovable();
     },
 
@@ -118,8 +131,36 @@ var SearchController = Backbone.Marionette.Controller.extend({
             dataType: "json",
             success: function(json)
             {
-                // TODO: give user feedback
+                // give user feedback
+                search.set("saved", true);
                 console.log("save successful!");
+            },
+            error: function(jqXHR, textStatus) {
+                MongoApp.trigger("error", JSON.stringify(jqXHR));
+            }
+        });
+    },
+
+    /**
+     * Delete search from server.
+     *
+     * @param search
+     */
+    deleteSearch: function(search) {
+
+        $.ajax({
+            type: "DELETE",
+            url: "/mongo_svr/ve/filterHistory/delete/" + search.get('id'),
+            dataType: "json",
+            success: function(json)
+            {
+                console.log("delete successful!");
+                // TODO: give user feedback
+
+                // if the user deletes the current search, then reload the workspace w/ default search
+                if (search.get('id') == MongoApp.search.get('id')) {
+                    MongoApp.trigger("workspaceChange", MongoApp.workspace);
+                }
             },
             error: function(jqXHR, textStatus) {
                 MongoApp.trigger("error", JSON.stringify(jqXHR));
@@ -169,6 +210,46 @@ var SearchController = Backbone.Marionette.Controller.extend({
     },
 
     /**
+     * Import Search model from a file on client.
+     * @param JSON text for filter history javascript object.
+     */
+    importSearch: function(filterHistoryJsonText) {
+        var filterHistory = JSON.parse(filterHistoryJsonText);
+        var search = this.filterHistoryToSearch(filterHistory);
+        MongoApp.trigger("changeSearch", search);
+    },
+
+    /**
+     * Export Search model to a file on client.
+     *
+     * @param search
+     */
+    exportSearch: function(search) {
+        var filterHistory = this.searchToFilterHistory(search);
+        var data = JSON.stringify(filterHistory);
+
+        // Now we convert the data to a Data URI Scheme, which must be Base64 encoded
+        // make sure you use the appropriate method to Base64 encode your data depending
+        // on the library you chose to use.
+        // application/octet-stream simply tells your browser to treat the URL as
+        // arbitrary binary data, and won't try to display it in the browser window when
+        // opened.
+        var url = "data:application/octet-stream;base64," + $.base64('encode', data);
+
+        // To force the browser to download a file we need to use a custom method which
+        // creates a hidden iframe, which allows browsers to download any given file
+        var iframe = document.getElementById("hiddenDownloader");
+        if (iframe === null)
+        {
+            iframe = document.createElement('iframe');
+            iframe.id = "hiddenDownloader";
+            iframe.style.display = "none";
+            document.body.appendChild(iframe);
+        }
+        iframe.src = url;
+    },
+
+    /**
      * Translates a Search model into a edu.mayo.ve.message.FilterHistory object.
      * @param filterHistory
      */
@@ -185,14 +266,12 @@ var SearchController = Backbone.Marionette.Controller.extend({
         // translate Filter model to Querry object (except for NONE filter)
         _.each(search.get("filters").models, function(filter) {
 
-            if (filter.get("id") != "id-none") {
-                var filterList = new FilterList();
-                filterList.add(filter);
+            var filterList = new FilterList();
+            filterList.add(filter);
 
-                var querry = buildQuery(filterList, search.get("key"));
+            var querry = buildQuery(filterList, search.get("key"));
 
-                filterHistory.filters.push(querry);
-            }
+            filterHistory.filters.push(querry);
 
         });
 
@@ -212,14 +291,12 @@ var SearchController = Backbone.Marionette.Controller.extend({
         search.set('key', filterHistory.user);
         search.set('timestamp', filterHistory.timestamp);
 
-        if (filterHistory.filters != undefined) {
-            for (var i = 0; i < filterHistory.filters.length; i++) {
-                var querry = filterHistory.filters[i];
+        for (var i = 0; i < filterHistory.filters.length; i++) {
+            var querry = filterHistory.filters[i];
 
-                // each Querry object is a Filter model
-                var filter = this.querryToFilter(querry);
-                search.get("filters").add(filter);
-            }
+            // each Querry object is a Filter model
+            var filter = this.querryToFilter(querry);
+            search.get("filters").add(filter);
         }
 
         return search;
@@ -230,44 +307,35 @@ var SearchController = Backbone.Marionette.Controller.extend({
      * @param querry
      */
     querryToFilter: function(querry) {
-        var filter = new Filter();
-
-        var name;
-        var description;
-        var value;
-        var category;
+        var filter;
 
         if (querry.sampleGroups.length == 1) {
+            filter = new Filter();
+
             var sampleGroup = sampleGroups[0];
-            var value = sampleGroup.alias;
             var inSample = querry.sampleGroups.inSample;
             if (inSample) {
-                category = FilterCategory.IN_GROUP;
+                filter = SampleFilterTab.FILTER_IN_GROUP.clone();
             } else {
-                category = FilterCategory.NOT_IN_GROUP;
+                filter = SampleFilterTab.FILTER_NOT_IN_GROUP.clone();
             }
+            filter.set("value", sampleGroup.alias);
+        }
+        else if (querry.infoFlagFilters.length == 1) {
+            filter = new Filter().fromInfoFlagFilterPojo(querry.infoFlagFilters[0]);
+        }
+        else if (querry.infoNumberFilters.length == 1) {
+            filter = new Filter().fromInfoNumberFilterPojo(querry.infoNumberFilters[0]);
+        }
+        else if (querry.infoStringFilters.length == 1) {
+            filter = new Filter().fromInfoStringFilterPojo(querry.infoStringFilters[0]);
+        }
+        else if (querry.sampleNumberFilters.length == 1) {
+            filter = new Filter().fromSampleNumberFilterPojo(querry.sampleNumberFilters[0]);
         }
 
-        if (querry.infoFlagFilters.length == 1) {
-            var infoFlagFilter = querry.infoFlagFilters[0];
-            var name = infoFlagFilter.key; // TODO: chomp off INFO.
-            var value = infoFlagFilter.value;
-            category = FilterCategory.INFO_FLAG;
-        }
-
-        if (querry.infoStringFilters.length == 1) {
-            var infoFlagFilter = querry.infoFlagFilters[0];
-            var name = infoFlagFilter.key; // TODO: chomp off INFO.
-            var value = infoFlagFilter.value;
-            category = FilterCategory.INFO_FLAG;
-        }
-
-        // TODO: finish
-
-        filter.set("name", name);
-        filter.set("description", description);
-        filter.set("value", value);
-        filter.set("category", category);
+        if (filter != undefined)
+            filter.setFilterDisplay();
 
         return filter;
     }

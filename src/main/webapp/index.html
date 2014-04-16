@@ -105,11 +105,11 @@
 
     <script id="search-name-template" type="text/template">
         <div class="dropdown pull-left">
-            <a class="searchName dropdown-toggle" data-toggle="dropdown" href="#"><h3><%=name%></h3></a>
+            <a class="searchName dropdown-toggle lead" data-toggle="dropdown" href="#"><%=name%></a><% if(!saved){%> <sup>(Unsaved Changes)</sup><%}%>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                 <li role="presentation"><a class="searchNameChange" role="menuitem" tabindex="-1"><i class="fa fa-pencil"></i> Rename</a></li>
                 <li role="presentation"><a class="searchSave" role="menuitem" tabindex="-1"><i class="fa fa-save"></i> Save</a></li>
-                <li role="presentation"><a class="searchImport" role="menuitem" tabindex="-1"><i class="icon-remove"></i> Delete</a></li>
+                <li role="presentation"><a class="searchDelete" role="menuitem" tabindex="-1"><i class="icon-remove"></i> Delete</a></li>
                 <li role="presentation"><a class="searchConfigure" role="menuitem" tabindex="-1"><i class="fa fa-folder-open-o"></i> Open a saved Search</a></li>
                 <li role="presentation" class="divider"></li>
                 <li role="presentation"><a class="searchExport" role="menuitem" tabindex="-1"><i class="icon-download"></i> Export to a file</a></li>
@@ -216,6 +216,7 @@
     <script src="jquery.layout-1.3.0/jquery.layout-latest.js"></script>
     <script src="jquery-validation-1.11.1/jquery.validate.js"></script>
     <script src="jquery-validation-1.11.1/additional-methods.js"></script>
+    <script src="jquery.base64-0.0.2/jquery.base64.js"></script>
     <script src="bootstrap-2.3.2/js/bootstrap.js"></script>
     <script src="typeahead-0.9.3/typeahead.js"></script>
     <script src="DataTables-1.9.4/media/js/jquery.dataTables.js"></script>
@@ -277,10 +278,6 @@
     <!-- Marionette Application -->
     <script src="js/models/Search.js"></script>
     <script src="js/collections/SearchList.js"></script>
-    <script src="js/controllers/SearchController.js"></script>
-    <script src="js/controllers/SettingsController.js"></script>
-    <script src="js/controllers/VariantDataController.js"></script>
-    <script src="js/controllers/WorkspaceController.js"></script>
     <script src="js/views/SearchTableRowView.js"></script>
     <script src="js/views/SearchTableView.js"></script>
     <script src="js/views/SearchFilterRowView.js"></script>
@@ -288,6 +285,10 @@
     <script src="js/views/SearchNameView.js"></script>
     <script src="js/views/WorkspaceTableRowView.js"></script>
     <script src="js/views/WorkspaceTableView.js"></script>
+    <script src="js/controllers/SearchController.js"></script>
+    <script src="js/controllers/SettingsController.js"></script>
+    <script src="js/controllers/VariantDataController.js"></script>
+    <script src="js/controllers/WorkspaceController.js"></script>
     <script src="js/MongoApp.js"></script>
     <script type="text/javascript">
         $( document ).ready(function() {
@@ -371,6 +372,27 @@
         </div>
     </form>
 </div>
+
+<div id="import_search_modal" class="modal hide fade" tabindex="-1" role="dialog"aria-hidden="true">
+    <form id="import_search_form" action="" class="form-horizontal">
+        <div class="modal-header">
+            <h3>Import Search</h3>
+        </div>
+        <div class="modal-body">
+            <div class="control-group">
+                <label class="control-label" for="vcf_file_upload">File</label>
+                <div class="controls">
+                    <input id="search_file_upload" name="search_file_upload" type="file" class="filestyle"/>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" aria-hidden="true" id="import_search_button">Import</button>
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        </div>
+    </form>
+</div>
+
 
 <!-- Modal -->
 <div id="searches_modal" class="modal hide fade" tabindex="-1" role="dialog"aria-hidden="true">

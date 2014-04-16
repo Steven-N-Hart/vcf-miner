@@ -19,7 +19,10 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        MongoApp.on("searchChanged", function (search) {
+        MongoApp.on("searchFilterAdded", function (search) {
+            self.changedSearch(search);
+        });
+        MongoApp.on("searchFilterRemoved", function (search) {
             self.changedSearch(search);
         });
         MongoApp.on("workspaceChange", function (workspace) {
