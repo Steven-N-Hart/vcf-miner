@@ -68,7 +68,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
 
 
     /**
-     * Sends query to server via AJAX.
+     * Sends query to server via AJAX.  Note that this is synchronous.
      *
      * @param query
      * @param displayCols
@@ -90,6 +90,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
             contentType: "application/json",
             data: JSON.stringify(query),
             dataType: "json",
+            async: false,
             success: function(json)
             {
                 console.debug("Query returned " + json.totalResults + " results");
