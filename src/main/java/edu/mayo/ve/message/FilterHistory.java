@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class FilterHistory {
     /** an ordered list of the queries performed by the user 1st element in the list = 1st query and so on */
-    List<Querry> Filters = new ArrayList<Querry>();
+    List<Querry> filters = new ArrayList<Querry>();
     /** when the user created the filter history */
     String timestamp;
     /** the user that created the filter history */
@@ -45,11 +45,11 @@ public class FilterHistory {
     }
 
     public List<Querry> getFilters() {
-        return Filters;
+        return filters;
     }
 
     public void setFilters(List<Querry> filters) {
-        Filters = filters;
+        this.filters = filters;
     }
 
     public String getTimestamp() {

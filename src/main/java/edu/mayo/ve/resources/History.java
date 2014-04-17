@@ -56,15 +56,32 @@ public class History {
         String json = gson.toJson(filterHistory);
         BasicDBObject dbo = (BasicDBObject) JSON.parse(json);
 
-        //get a unique value and push it into the id field
-        WriteResult wr = col.save(dbo);
-        ObjectId id = dbo.getObjectId("_id");
-        //System.out.println("ID: " + id.toString());
-        String key = "f" + HashUtil.SHA1(HashUtil.randcat(id.toString())); //we need to add w so we don't get keys that are invalid such as 7foobar
-        //System.out.println("ID: " + key);
-        dbo.put("id", key);
-        BasicDBObject query = new BasicDBObject(); query.put("_id", id);
-        col.update(query, dbo);
+        if (dbo.containsField("id") &&
+                dbo.getString("id").startsWith("f") &&
+                (dbo.getString("id").length()==41)) {
+            // existing FilterHistory, update it
+
+            // query collection based on workspace key and filter history id
+            BasicDBObject query = new BasicDBObject();
+            query.put("id", dbo.getString("id"));
+            query.put(Tokens.KEY, dbo.getString("key"));
+
+            // update the object in collection
+            col.update(query, dbo);
+        }
+        else {
+            // brandnew FilterHistory, create it
+
+            //get a unique value and push it into the id field
+            WriteResult wr = col.save(dbo);
+            ObjectId id = dbo.getObjectId("_id");
+            //System.out.println("ID: " + id.toString());
+            String key = "f" + HashUtil.SHA1(HashUtil.randcat(id.toString())); //we need to add w so we don't get keys that are invalid such as 7foobar
+            //System.out.println("ID: " + key);
+            dbo.put("id", key);
+            BasicDBObject query = new BasicDBObject(); query.put("_id", id);
+            col.update(query, dbo);
+        }
 
         return "{\"filterHistorySaved\":1}\n";
     }
@@ -116,6 +133,6 @@ public class History {
         del.put("id",fileHistoryID);
         System.out.println(del.toString());
         WriteResult remove = col.remove(del);
-        return "{\"fileHistoryID\" : " + fileHistoryID + "\"status\" : " + remove.toString() + "}";
+        return "{\"fileHistoryID\" : \"" + fileHistoryID + "\", \"status\" : \"" + remove.toString() + "\"}";
     }
 }
