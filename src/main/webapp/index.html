@@ -105,23 +105,22 @@
 
     <script id="search-name-template" type="text/template">
         <div class="dropdown pull-left">
-            <a class="searchName dropdown-toggle lead" data-toggle="dropdown" href="#"><%=name%></a><% if(!saved){%> <sup class="text-error">(Unsaved Changes)</sup><%}%>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                <li role="presentation"><a class="searchNameChange" role="menuitem" tabindex="-1"><i class="fa fa-pencil"></i> Rename</a></li>
-                <li role="presentation"><a class="searchSave" role="menuitem" tabindex="-1"><i class="fa fa-save"></i> Save</a></li>
-                <li role="presentation"><a class="searchDelete" role="menuitem" tabindex="-1"><i class="icon-remove"></i> Delete</a></li>
-                <li role="presentation"><a class="searchConfigure" role="menuitem" tabindex="-1"><i class="fa fa-folder-open-o"></i> Open a saved Search</a></li>
-                <li role="presentation" class="divider"></li>
-                <li role="presentation"><a class="searchExport" role="menuitem" tabindex="-1"><i class="icon-download"></i> Export to a file</a></li>
-                <li role="presentation"><a class="searchImport" role="menuitem" tabindex="-1"><i class="icon-upload"></i> Import from a file</a></li>
-            </ul>
-        </div>
-    </script>
-
-    <script id="search-name-change-popover-template" type="text/template">
-        <div class="input-append">
-            <input name="search_name_field" type="text" class="input-medium" placeholder="<%=name%>">
-            <button class="btn searchNameApply" title="Apply new name">Apply</button>
+            <div id="search_rename_div" class="hide">
+                <input type="text" class="input-large">
+            </div>
+            <div id="search_name_div">
+                <a class="dropdown-toggle lead" data-toggle="dropdown" href="#"><%=name%></a><% if(!saved){%> <sup class="text-error">(Unsaved Changes)</sup><%}%>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                    <li title="Start over with a new Search" role="presentation"><a class="searchNew" role="menuitem" tabindex="-1"><i class="fa fa-file-o"></i> New</a></li>
+                    <li title="Change the Search name" role="presentation"><a class="searchNameChange" role="menuitem" tabindex="-1"><i class="fa fa-pencil"></i> Rename</a></li>
+                    <li title="Save this Search" role="presentation"><a class="searchSave" role="menuitem" tabindex="-1"><i class="fa fa-save"></i> Save</a></li>
+                    <li title="Delete this Search" role="presentation"><a class="searchDelete" role="menuitem" tabindex="-1"><i class="icon-remove"></i> Delete</a></li>
+                    <li title="Open a previously saved Search" role="presentation"><a class="searchConfigure" role="menuitem" tabindex="-1"><i class="fa fa-folder-open-o"></i> Open a saved Search</a></li>
+                    <li role="presentation" class="divider"></li>
+                    <li title="Export this Search to a file" role="presentation"><a class="searchExport" role="menuitem" tabindex="-1"><i class="icon-download"></i> Export to a file</a></li>
+                    <li title="Import a previously exported Search file" role="presentation"><a class="searchImport" role="menuitem" tabindex="-1"><i class="icon-upload"></i> Import from a file</a></li>
+                </ul>
+            </div>
         </div>
     </script>
 
@@ -130,7 +129,7 @@
         <span class="label"><td><%=name%></td></span>
         <span class="label"><td><%=user%></td></span>
         <span class="label"><td><%=getDateString(timestamp)%></td></span>
-        <td><button title="Open this Search" type="button" class="btn btn-mini open">Open</button></td>
+        <td><button title="Open this Search" type="button" class="btn open">Open</button></td>
     </script>
 
     <!-- the search table -->

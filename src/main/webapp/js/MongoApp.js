@@ -35,6 +35,11 @@ MongoApp.addInitializer(function () {
     // GLOBAL
     this.indexController = new DatabaseIndexController();
     this.search = new Search();
+
+    // constants
+    this.FILTER_NONE         = new Filter({name: 'none', displayName: 'none', operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'}),
+    this.FILTER_IN_GROUP     = new Filter({name: 'Samples in Group',     operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.IN_GROUP, description:'Filters variants based on matching samples'});
+    this.FILTER_NOT_IN_GROUP = new Filter({name: 'Samples not in Group', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.NOT_IN_GROUP, description:'Filters variants based on non-matching samples'});
 });
 
 /**
@@ -155,7 +160,7 @@ MongoApp.addInitializer(function () {
         this.search.set(newSearch.attributes);
 
         this.search.get("filters").reset();
-        MongoApp.trigger("filterAdd", searchController.FILTER_NONE);
+        MongoApp.trigger("filterAdd", this.FILTER_NONE);
         _.each(filters.models, function(filter) {
             MongoApp.trigger("filterAdd", filter);
         });

@@ -9,10 +9,6 @@ var SampleFilterTab = function () {
     // private variables
     var filters = new FilterList();
 
-    // constants
-    var FILTER_IN_GROUP        = new Filter({name: 'Samples in Group',     operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.IN_GROUP, description:'Filters variants based on matching samples'});
-    var FILTER_NOT_IN_GROUP    = new Filter({name: 'Samples not in Group', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.NOT_IN_GROUP, description:'Filters variants based on non-matching samples'});
-
     var count = $('#group_sample_count');
     var list = $('#group_sample_names_list');
 
@@ -230,8 +226,8 @@ var SampleFilterTab = function () {
             });
 
             // standard group filters added last
-            filters.add(FILTER_IN_GROUP);
-            filters.add(FILTER_NOT_IN_GROUP);
+            filters.add(MongoApp.FILTER_IN_GROUP);
+            filters.add(MongoApp.FILTER_NOT_IN_GROUP);
 
             // simulate user choosing the 1st field
             sampleFieldChanged();

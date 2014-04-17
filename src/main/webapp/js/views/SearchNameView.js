@@ -5,7 +5,8 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
     template: '#search-name-template',
 
     events: {
-        "click .searchNameChange" : "showNameChangePopover",
+        "click .searchNew" : "newSearch",
+        "click .searchNameChange" : "makeNameEditable",
         "click .searchNameApply" : "applySearchName",
         "click .searchSave" : "saveSearch",
         "click .searchDelete" : "deleteSearch",
@@ -23,6 +24,8 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
      */
     initialize: function(options)
     {
+        var self = this;
+
         // rebind so that options can be access in other functions
         this.options = options;
 
@@ -54,37 +57,56 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
                 $(element).parent().removeClass('control-group error');
             }
         });
-
     },
 
-    showNameChangePopover: function(e) {
-        var anchor = this.$el.find('.searchName');
+    makeNameEditable: function(e) {
+        var renameDiv = this.$el.find('#search_rename_div');
+        var nameDiv = this.$el.find('#search_name_div');
 
-        anchor.popover('destroy');
+        renameDiv.toggle(true);
+        nameDiv.toggle(false);
 
-        var templateData = {
-            name: this.model.get("name")
+        var renameInput = renameDiv.find('input');
+        renameInput.val(this.model.get('name'));
+        renameInput.focus(); // request focus
+        renameInput.select(); // select all text
+
+        var self = this;
+        var applyNewName = function() {
+            if (renameInput.val().length == 0) {
+                // do nothing if no value
+                return;
+            }
+
+            self.model.set('name', renameInput.val());
+            self.model.set("saved", false);
+            renameDiv.toggle(false);
+            nameDiv.toggle(true);
+        }
+        var undo = function() {
+            renameDiv.toggle(false);
+            nameDiv.toggle(true);
         };
 
-        anchor.popover({
-            trigger: 'manual',
-            placement: 'bottom',
-            html: true,
-            content: _.template($("#search-name-change-popover-template").html(), templateData)
+        // name is set either by:
+        // 1. ENTER key press
+        // 2. input field loses focus
+        renameInput.keypress(function (e) {
+            var charCode = e.charCode || e.keyCode || e.which;
+            if (charCode  == 13) { // ENTER
+                applyNewName();
+                return false;
+            }
         });
-
-//        // ENTER key press causes "Apply" button click
-//        popoverParentContainer.find('input').keypress(function (e) {
-//            var charCode = e.charCode || e.keyCode || e.which;
-//            if (charCode  == 13) {
-//
-//                $('#apply_search_name').click();
-//
-//                return false;
-//            }
-//        });
-
-        anchor.popover('show');
+        renameInput.focusout(function() {
+            if (renameInput.is(':visible'))
+                applyNewName();
+        });
+        renameInput.keydown(function (e) {
+            if (e.keyCode == 27) { // ESC
+                undo();
+            }
+        });
     },
 
     /**
@@ -149,5 +171,14 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
      */
     importSearch: function(e) {
         $('#import_search_modal').modal();
+    },
+
+    /**
+     * Fire event to be handled by controller
+     * @param e
+     */
+    newSearch: function(e) {
+        MongoApp.trigger("workspaceChange", MongoApp.workspace);
     }
+
 });

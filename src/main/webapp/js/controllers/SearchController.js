@@ -13,8 +13,6 @@ var SearchController = Backbone.Marionette.Controller.extend({
 
     searchFilterView: null,
 
-    FILTER_NONE: new Filter({name: 'none', displayName: 'none', operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'}),
-
     initialize: function (options) {
 
         var self = this;
@@ -74,7 +72,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
     addFilter: function (filter) {
         MongoApp.search.get("filters").add(filter);
 
-        if (filter.get('id') != this.FILTER_NONE.get('id'))
+        if (filter.get('id') != MongoApp.FILTER_NONE.get('id'))
             MongoApp.search.set("saved", false);
 
         MongoApp.trigger("searchFilterAdded", MongoApp.search);
@@ -103,7 +101,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
         _.each(MongoApp.search.get("filters").models, function(filter)
         {
             var button =  $("#" + filter.get("id") + "_remove_button");
-            if ((filter.get("id") != self.FILTER_NONE.get("id")) &&
+            if ((filter.get("id") != MongoApp.FILTER_NONE.get("id")) &&
                 (filter.get("id") == lastFilter.get("id")))
             {
                 filter.set("removable", true);
@@ -123,6 +121,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
 
         var filterHistory = this.searchToFilterHistory(search);
 
+        var self = this;
         $.ajax({
             type: "POST",
             url: "/mongo_svr/ve/filterHistory/save",
@@ -131,8 +130,8 @@ var SearchController = Backbone.Marionette.Controller.extend({
             dataType: "json",
             success: function(json)
             {
-                // give user feedback
-                search.set("saved", true);
+                var savedSearch = self.filterHistoryToSearch(json);
+                MongoApp.trigger("changeSearch", savedSearch);
                 console.log("save successful!");
             },
             error: function(jqXHR, textStatus) {
@@ -254,14 +253,12 @@ var SearchController = Backbone.Marionette.Controller.extend({
      * @param filterHistory
      */
     searchToFilterHistory: function(search) {
-        var filterHistory = {
-            name: search.get("name"),
-            user: search.get("user"),
-            key:  search.get("key"),
-            filters: new Array()
-        };
-
-        var self = this;
+        var filterHistory = new Object();
+        filterHistory.id      = search.get("id");
+        filterHistory.name    = search.get("name");
+        filterHistory.user    = search.get("user");
+        filterHistory.key     = search.get("key");
+        filterHistory.filters = new Array();
 
         // translate Filter model to Querry object (except for NONE filter)
         _.each(search.get("filters").models, function(filter) {
@@ -288,7 +285,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
         search.set('id', filterHistory.id);
         search.set('name', filterHistory.name);
         search.set('user', filterHistory.user);
-        search.set('key', filterHistory.user);
+        search.set('key', filterHistory.key);
         search.set('timestamp', filterHistory.timestamp);
 
         for (var i = 0; i < filterHistory.filters.length; i++) {
@@ -312,12 +309,12 @@ var SearchController = Backbone.Marionette.Controller.extend({
         if (querry.sampleGroups.length == 1) {
             filter = new Filter();
 
-            var sampleGroup = sampleGroups[0];
+            var sampleGroup = querry.sampleGroups[0];
             var inSample = querry.sampleGroups.inSample;
             if (inSample) {
-                filter = SampleFilterTab.FILTER_IN_GROUP.clone();
+                filter = MongoApp.FILTER_IN_GROUP.clone();
             } else {
-                filter = SampleFilterTab.FILTER_NOT_IN_GROUP.clone();
+                filter = MongoApp.FILTER_NOT_IN_GROUP.clone();
             }
             filter.set("value", sampleGroup.alias);
         }

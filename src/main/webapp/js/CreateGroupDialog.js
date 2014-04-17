@@ -14,7 +14,7 @@ var CreateGroupDialog = function () {
 
     // register for Marionette events
     MongoApp.on("workspaceChange", function (workspace) {
-        this.sampleGroups = workspace.get("sampleGroups");
+        sampleGroups = workspace.get("sampleGroups");
     });
 
     // jQuery validate plugin config
