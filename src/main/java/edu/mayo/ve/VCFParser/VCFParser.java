@@ -712,6 +712,8 @@ public class VCFParser implements ParserInterface {
     }
 
 
+
+
 }
 
 
