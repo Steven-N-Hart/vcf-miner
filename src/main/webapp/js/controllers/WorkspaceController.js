@@ -119,16 +119,12 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                     // each workspace object has an increment num as the attr name
                     for (var attr in json) {
                         if (json.hasOwnProperty(attr)) {
-                            var ws = new Workspace();
-                            ws.set("key",   json[attr].key);
-                            ws.set("alias", json[attr].alias);
-                            ws.set("user",  user);
-                            ws.set("status", json[attr].ready);
-                            ws.set("date", getDateString(json[attr].timestamp));
 
-                            // load extra information about workspace
-                            self.loadMetadata(ws);
-                            self.loadSampleGroups(ws);
+                            var workspaceJSON = json[attr];
+
+                            var ws = new Workspace();
+
+                            self.initWorkspace(user, workspaceJSON, ws);
 
                             self.workspaces.add(ws);
 
@@ -144,6 +140,19 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 }
             });
         }
+    },
+
+    initWorkspace: function(user, workspaceJSON, ws) {
+        // each workspace object has an increment num as the attr name
+        ws.set("key",   workspaceJSON.key);
+        ws.set("alias", workspaceJSON.alias);
+        ws.set("user",  user);
+        ws.set("status", workspaceJSON.ready);
+        ws.set("date", getDateString(workspaceJSON.timestamp));
+
+        // load extra information about workspace
+        this.loadMetadata(ws);
+        this.loadSampleGroups(ws);
     },
 
     updateNotReadyWorkspaces: function()
@@ -166,13 +175,13 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                     // each workspace object has an increment num as the attr name
                     for (var attr in json) {
                         if (json.hasOwnProperty(attr)) {
-                            var key = json[attr].key;
-                            var ws = self.workspaces.findWhere({key: key});
+                            var workspaceJSON = json[attr];
+                            var key = workspaceJSON.key;
 
                             if($.inArray(key, self.notReadyKeys) != -1) {
                                 console.log("updating status for key " + key);
-                                ws.set("status", json[attr].ready);
-                                ws.set("date", getDateString(json[attr].timestamp));
+                                var ws = self.workspaces.findWhere({key: key});
+                                self.initWorkspace(user, workspaceJSON, ws);
 
                                 if ((ws.get("status") == ReadyStatus.READY) ||
                                     (ws.get("status") == ReadyStatus.FAILED)) {
@@ -184,7 +193,6 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                                     console.log("Removing auto-updates for key "  + key);
                                 }
                             }
-
                         }
                     }
                 },
@@ -297,14 +305,17 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 generalDataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, name:'QUAL',   description:'Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).'}));
                 generalDataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, name:'FILTER', description:'PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
 
-                var infoDataFields = self.toDataFields(json.HEADER.INFO, VCFDataCategory.INFO);
-                var formatDataFields = self.toDataFields(json.HEADER.FORMAT, VCFDataCategory.FORMAT);
 
-                // merge all data fields together into 1 collection
-                workspace.get("dataFields").reset();
-                workspace.get("dataFields").add(generalDataFields.models);
-                workspace.get("dataFields").add(infoDataFields.models);
-                workspace.get("dataFields").add(formatDataFields.models);
+                if (json.HEADER != undefined) {
+                    var infoDataFields = self.toDataFields(json.HEADER.INFO, VCFDataCategory.INFO);
+                    var formatDataFields = self.toDataFields(json.HEADER.FORMAT, VCFDataCategory.FORMAT);
+
+                    // merge all data fields together into 1 collection
+                    workspace.get("dataFields").reset();
+                    workspace.get("dataFields").add(generalDataFields.models);
+                    workspace.get("dataFields").add(infoDataFields.models);
+                    workspace.get("dataFields").add(formatDataFields.models);
+                }
 
                 var allSamples = new Array();
                 for (var key in json.SAMPLES)
