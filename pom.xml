@@ -14,14 +14,4 @@
         <finalName>vcf-miner</finalName>
     </build>
 
-    <dependencies> 
-      <!-- Explicitly State that this project depends on the backend REST interface, 
-	   this is used by the root project to determine BSU project structure  -->
-      <dependency>
-          <groupId>edu.mayo.mongo_svr</groupId>
-          <artifactId>mongo_svr</artifactId>
-          <version>1.0</version>
-      </dependency>
-    </dependencies>
-
 </project>
