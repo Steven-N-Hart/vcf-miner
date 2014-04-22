@@ -469,10 +469,7 @@
                                             <tr>
                                                 <td></td>
                                                 <td>
-                                                    <p>The FORMAT field GT:GQ:DP indicates that the samples contain information regarding the genotype, genotype quality and read depth for each sample.
-                                                        Let's say each sample has an entry for depth of coverage and there are 3 samples in your VCF.
-                                                        SampleA DP=20, SampleB DP=25, and SampleC DP=10. VCF-miner is capable of querying numeric values such as these.
-                                                        If you filter that the DP should be >=20, the row</p>
+                                                    <p>The FORMAT field GT:GQ:DP indicates that the samples contain information regarding the genotype, genotype quality and read depth for each sample. Let's say each sample has an entry for depth of coverage and there are 3 samples in your VCF. SampleA DP=20, SampleB DP=25, and SampleC DP=10. VCF-miner is capable of querying numeric values such as these. If you apply the MAX DP >=20 filter, the entire row will be returned. If you apply the MIN DP >=20 filter, then the row will NOT be returned because the minimum DP in this row is 10.</p>
                                                 </td>
                                             </tr>
                                             <tr>
