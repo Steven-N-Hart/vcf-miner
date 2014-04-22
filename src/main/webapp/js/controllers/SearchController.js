@@ -227,25 +227,51 @@ var SearchController = Backbone.Marionette.Controller.extend({
         var filterHistory = this.searchToFilterHistory(search);
         var data = JSON.stringify(filterHistory);
 
-        // Now we convert the data to a Data URI Scheme, which must be Base64 encoded
-        // make sure you use the appropriate method to Base64 encode your data depending
-        // on the library you chose to use.
-        // application/octet-stream simply tells your browser to treat the URL as
-        // arbitrary binary data, and won't try to display it in the browser window when
-        // opened.
-        var url = "data:application/octet-stream;base64," + $.base64('encode', data);
+        // use Data URI to save
+        //window.open("data:text/json;charset=utf-8," + encodeURIComponent(data));
 
-        // To force the browser to download a file we need to use a custom method which
-        // creates a hidden iframe, which allows browsers to download any given file
-        var iframe = document.getElementById("hiddenDownloader");
-        if (iframe === null)
-        {
-            iframe = document.createElement('iframe');
-            iframe.id = "hiddenDownloader";
-            iframe.style.display = "none";
-            document.body.appendChild(iframe);
-        }
-        iframe.src = url;
+        // dynamically add HTML form that is hidden
+        var form = $('<form>').attr(
+            {
+                id:      'export_search_form',
+                method:  'POST',
+                action:  '/mongo_svr/client_download_proxy',
+                enctype: 'application/x-www-form-urlencoded'
+            });
+        form.append($('<input>').attr({type: 'hidden', name: 'filename', value: search.get("name") + '.json'}));
+        form.append($('<input>').attr({type: 'hidden', name: 'mimeType', value: 'application/json'}));
+        form.append($('<input>').attr({type: 'hidden', name: 'content', value: data}));
+        $("body").append(form);
+
+        // programmatically submit form to perform download
+        $('#export_search_form').submit();
+
+        // remove form
+        $('#export_search_form').remove();
+
+
+//
+//
+//
+//        // Now we convert the data to a Data URI Scheme, which must be Base64 encoded
+//        // make sure you use the appropriate method to Base64 encode your data depending
+//        // on the library you chose to use.
+//        // application/octet-stream simply tells your browser to treat the URL as
+//        // arbitrary binary data, and won't try to display it in the browser window when
+//        // opened.
+//        var url = "data:application/octet-stream;base64," + $.base64('encode', data);
+//
+//        // To force the browser to download a file we need to use a custom method which
+//        // creates a hidden iframe, which allows browsers to download any given file
+//        var iframe = document.getElementById("hiddenDownloader");
+//        if (iframe === null)
+//        {
+//            iframe = document.createElement('iframe');
+//            iframe.id = "hiddenDownloader";
+//            iframe.style.display = "none";
+//            document.body.appendChild(iframe);
+//        }
+//        iframe.src = url;
     },
 
     /**
