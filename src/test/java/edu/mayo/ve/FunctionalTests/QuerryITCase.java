@@ -8,6 +8,7 @@ import edu.mayo.util.Tokens;
 import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.message.InfoStringFilter;
 import edu.mayo.ve.message.Querry;
+import edu.mayo.ve.message.SampleGroup;
 import edu.mayo.ve.message.SampleNumberFilter;
 import edu.mayo.ve.resources.ExeQuery;
 import edu.mayo.ve.resources.Provision;
@@ -114,6 +115,33 @@ public class QuerryITCase {
         String resultQ = "{ \"$and\" : [ { \"$and\" : [ { \"FORMAT.min.nSC\" : { \"$gte\" : 30.0}} , { \"FORMAT.max.uRP\" : { \"$lte\" : 77.0}}]} , { \"INFO.SVTYPE\" : { \"$in\" : [ \"BND\"]}}]}";
         assertEquals(resultQ, q.createQuery().toString());
         //feel free to make this functional test more complex to handle more scenarios!
+    }
+
+    @Test
+    public void testSampleGroups(){
+        testSampleGroup("heterozygous",79);
+        testSampleGroup("homozygous",0);
+
+        //r = runQueryAndExtractResults(q, 30);
+    }
+
+    public void testSampleGroup(String zygocity, int expectedNumber){
+        Querry q = new Querry();
+        DBObject r = null;
+        q.setWorkspace(workspaceID);
+        q.setNumberResults(10);//give back at most 10 results
+
+        //setup samples
+        SampleGroup sampleGroup = new SampleGroup();
+        ArrayList<String> samp = new ArrayList<String>();
+        samp.add("NA12878.chr1.vcf"); samp.add("NA12891.chr1.vcf");  samp.add("NA12892.chr1.vcf");
+        sampleGroup.setSamples(samp);
+        sampleGroup.setZygosity(zygocity);
+
+        ArrayList<SampleGroup> samples = new ArrayList<SampleGroup>();
+        samples.add(sampleGroup);
+        q.setSampleGroups(samples);
+        r = runQueryAndExtractResults(q, expectedNumber);
     }
 
     /**

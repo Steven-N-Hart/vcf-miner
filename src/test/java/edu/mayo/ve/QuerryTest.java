@@ -244,4 +244,41 @@ public class QuerryTest {
         assertEquals("{ \"$and\" : [ { \"INFO.foo\" : true} , { \"INFO.bar\" :  null }]}", q.createQuery().toString());
 
     }
+
+    /**
+     * this test is similar to the sample group query, but it is based on the homo/hetro arrays instead of genotype positivie array
+     */
+    @Test
+    public void testZygosity(){
+        Querry q = new Querry();
+        SampleGroup sampleGroup = new SampleGroup();
+        ArrayList<String> samp = new ArrayList<String>();
+        samp.add("X"); samp.add("Y");
+        sampleGroup.setSamples(samp);
+        sampleGroup.setZygosity("heterozygous");
+        ArrayList<SampleGroup> samples = new ArrayList<SampleGroup>();
+        samples.add(sampleGroup);
+        q.setSampleGroups(samples);
+        DBObject b = q.createQuery();
+        String e = "{ \"FORMAT.HeterozygousList\" : { \"$in\" : [ \"X\" , \"Y\"]}}";
+        assertEquals(e, b.toString());
+        sampleGroup.setInSample(false);
+        //String f = "{ \"$or\" : [ { \"samples\" : { \"$elemMatch\" : { \"sampleID\" : \"X\" , \"GenotypePositive\" : { \"$ne\" : 1}}}} , { \"samples\" : { \"$elemMatch\" : { \"sampleID\" : \"Y\" , \"GenotypePositive\" : { \"$ne\" : 1}}}}]}";
+        String f = "{ \"FORMAT.HeterozygousList\" : { \"$nin\" : [ \"X\" , \"Y\"]}}";
+        DBObject c = q.createQuery();
+        assertEquals(f, c.toString());
+        samples.remove(0);
+        sampleGroup.setInSample(true);
+        sampleGroup.setZygosity("homozygous");
+        samples.add(sampleGroup);
+        e = "{ \"FORMAT.HomozygousList\" : { \"$in\" : [ \"X\" , \"Y\"]}}";
+        b = q.createQuery();
+        assertEquals(e, b.toString());
+        f = "{ \"FORMAT.HomozygousList\" : { \"$nin\" : [ \"X\" , \"Y\"]}}";
+        sampleGroup.setInSample(false);
+        c = q.createQuery();
+        assertEquals(f, c.toString());
+
+
+    }
 }

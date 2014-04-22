@@ -497,8 +497,18 @@ public class Querry {
         }else {
             in.append("$nin",l);
         }
-        ret.append("FORMAT.GenotypePositiveList", in);
+        ret.append(getSearchFormatArray(sampleGroup), in);
         return ret;
+    }
+
+    public String getSearchFormatArray(SampleGroup sampleGroup){
+        if(sampleGroup.getZygosity().equalsIgnoreCase("heterozygous")){
+            return "FORMAT.HeterozygousList";
+        }else if(sampleGroup.getZygosity().equalsIgnoreCase("homozygous")){
+            return "FORMAT.HomozygousList";
+        } else {
+            return "FORMAT.GenotypePositiveList";
+        }
     }
 
     //db.<workspace>.find( {$and:[  {"samples":{$elemMatch:{GenotypePositive:1,sampleID:"X"}}}, {"samples":{$elemMatch:{GenotypePositive:{$ne:1},sampleID:"Y"}}}]}   ).pretty()

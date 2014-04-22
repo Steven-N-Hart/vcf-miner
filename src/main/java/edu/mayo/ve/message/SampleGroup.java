@@ -23,6 +23,7 @@ public class SampleGroup {
     String description;
     ArrayList<String> samples = new ArrayList<String>(); //in/out group of samples
     boolean inSample = true; //inSample == true means all of the samples must have the variant, inSample = false means that all samples must NOT have the variant
+    String zygosity = "either"; // homozygous/heterozygous/either
 
     public BasicDBObject getBasicDBObject(){
         BasicDBObject b = new BasicDBObject();
@@ -77,5 +78,13 @@ public class SampleGroup {
     public String getDescription()
     {
         return this.description;
+    }
+
+    public String getZygosity() {
+        return zygosity;
+    }
+
+    public void setZygosity(String zygosity) {
+        this.zygosity = zygosity;
     }
 }
