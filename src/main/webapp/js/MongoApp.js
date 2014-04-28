@@ -23,6 +23,23 @@ MongoApp.addRegions({
  */
 MongoApp.addInitializer(function () {
 
+    this.events = {
+        // system error has occurred
+        ERROR: 'error',
+
+        // User is choosing a different workspace
+        WKSP_LOAD: 'workspaceLoad',
+
+        // current Workspace model has been changed
+        WKSP_CHANGE: 'workspaceChange',
+
+        // User is choosing a different search
+        SEARCH_LOAD: 'searchLoad',
+
+        // current Search model has been changed
+        SEARCH_CHANGE: 'searchChange'
+    };
+
     // GLOBAL
     this.settings =
     {
@@ -35,6 +52,7 @@ MongoApp.addInitializer(function () {
     // GLOBAL
     this.indexController = new DatabaseIndexController();
     this.search = new Search();
+    this.workspace = new Workspace();
 
     // constants
     this.FILTER_NONE         = new Filter({name: 'none', displayName: 'none', operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'}),
@@ -136,36 +154,65 @@ MongoApp.addInitializer(function () {
     new VariantDataController();
 
     // Wire Marionette events to function callbacks
-    MongoApp.on("error", function (errorMessage) {
+    MongoApp.on(MongoApp.events.ERROR, function (errorMessage) {
         var ERROR_TEMPLATE = $("#error-message-template").html();
         window.open().document.write(_.template(ERROR_TEMPLATE, {message: errorMessage}))
     });
-    MongoApp.on("workspaceChange", function (workspace) {
 
-        // GLOBAL
-        this.workspace = workspace;
+    MongoApp.on(MongoApp.events.WKSP_LOAD, function (newWorkspace) {
+
+        // make copy that we can safely modify
+        var ws = newWorkspace.clone();
+
+        // detach backbone collection attributes
+        var dataFields = ws.get("dataFields");
+        ws.unset("dataFields");
+        var sampleGroups = ws.get("sampleGroups");
+        ws.unset("sampleGroups");
+
+        // carry over non-collection attributes
+        this.workspace.set(ws.attributes);
+
+        // rebuild backbone collection attributes
+        this.workspace.get("dataFields").reset();
+        _.each(dataFields.models, function(dataField) {
+            MongoApp.workspace.get("dataFields").add(dataField);
+        });
+        this.workspace.get("sampleGroups").reset();
+        _.each(sampleGroups.models, function(sampleGroup) {
+            MongoApp.workspace.get("sampleGroups").add(sampleGroup);
+        });
+
+        MongoApp.trigger(MongoApp.events.WKSP_CHANGE, this.workspace);
 
         // default search for workspace
         // TODO: enhance to be the 'default' search for the workspace
         var search = new Search();
         search.set("key", this.workspace.get("key"));
-        MongoApp.trigger("changeSearch", search);
+        MongoApp.trigger(MongoApp.events.SEARCH_LOAD, search);
     });
-    MongoApp.on("changeSearch", function (newSearch) {
 
-        var filters = newSearch.get("filters");
-        newSearch.unset("filters");
+    MongoApp.on(MongoApp.events.SEARCH_LOAD, function (newSearch) {
 
-        // GLOBAL
-        this.search.set(newSearch.attributes);
+        // make copy that we can safely modify
+        var s = newSearch.clone();
 
+        // detach backbone collection attributes
+        var filters = s.get("filters");
+        s.unset("filters");
+
+        // carry over non-collection attributes
+        this.search.set(s.attributes);
+
+        // rebuild backbone collection attributes
         this.search.get("filters").reset();
         MongoApp.trigger("filterAdd", this.FILTER_NONE);
         _.each(filters.models, function(filter) {
             MongoApp.trigger("filterAdd", filter);
         });
 
-        MongoApp.search.set("saved", true);
+        this.search.set("saved", true);
+        MongoApp.trigger(MongoApp.events.SEARCH_CHANGE, this.search);
     });
 });
 

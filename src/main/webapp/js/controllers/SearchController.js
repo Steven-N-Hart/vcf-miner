@@ -131,11 +131,11 @@ var SearchController = Backbone.Marionette.Controller.extend({
             success: function(json)
             {
                 var savedSearch = self.filterHistoryToSearch(json);
-                MongoApp.trigger("changeSearch", savedSearch);
+                MongoApp.trigger(MongoApp.events.SEARCH_LOAD, savedSearch);
                 console.log("save successful!");
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.trigger("error", JSON.stringify(jqXHR));
+                MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
             }
         });
     },
@@ -158,11 +158,11 @@ var SearchController = Backbone.Marionette.Controller.extend({
 
                 // if the user deletes the current search, then reload the workspace w/ default search
                 if (search.get('id') == MongoApp.search.get('id')) {
-                    MongoApp.trigger("workspaceChange", MongoApp.workspace);
+                    MongoApp.trigger("workspaceLoad", MongoApp.workspace);
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.trigger("error", JSON.stringify(jqXHR));
+                MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
             }
         });
     },
@@ -192,7 +192,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.trigger("error", JSON.stringify(jqXHR));
+                MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
             }
         });
     },
@@ -215,7 +215,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
     importSearch: function(filterHistoryJsonText) {
         var filterHistory = JSON.parse(filterHistoryJsonText);
         var search = this.filterHistoryToSearch(filterHistory);
-        MongoApp.trigger("changeSearch", search);
+        MongoApp.trigger(MongoApp.events.SEARCH_LOAD, search);
     },
 
     /**
@@ -336,7 +336,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
             filter = new Filter();
 
             var sampleGroup = querry.sampleGroups[0];
-            var inSample = querry.sampleGroups.inSample;
+            var inSample = sampleGroup.inSample;
             if (inSample) {
                 filter = MongoApp.FILTER_IN_GROUP.clone();
             } else {

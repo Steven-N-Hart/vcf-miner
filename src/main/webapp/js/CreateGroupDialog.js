@@ -13,7 +13,9 @@ var CreateGroupDialog = function () {
     var sampleGroups;
 
     // register for Marionette events
-    MongoApp.on("workspaceChange", function (workspace) {
+    MongoApp.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
+        workspaceKey = workspace.get("key");
+        allSampleNames = workspace.get("sampleNames");
         sampleGroups = workspace.get("sampleGroups");
     });
 
@@ -77,33 +79,7 @@ var CreateGroupDialog = function () {
         var sampleNames = $.map($('#group_samples_list').find('option'), function(e) { return e.value; });
         group.set("sampleNames", sampleNames);
 
-        sampleGroups.add(group);
-        saveSampleGroup(group);
-    }
-
-    function saveSampleGroup(group)
-    {
-        // translate backbone model to pojo expected by server
-        var pojo = group.toSampleGroupPOJO(workspaceKey);
-
-        console.debug("Saving group: " + JSON.stringify(pojo));
-
-        //noinspection JSUnusedLocalSymbols
-        $.ajax({
-            type: "POST",
-            url: "/mongo_svr/ve/samples/savegroup",
-            contentType: "application/json",
-            data: JSON.stringify(pojo),
-            dataType: "json",
-            success: function(json)
-            {
-                console.debug("saved group: " + pojo.alias);
-            },
-            error: function(jqXHR, textStatus)
-            {
-                $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
-            }
-        });
+        MongoApp.trigger("workspaceGroupCreate", group);
     }
 
     function reset()
@@ -122,20 +98,6 @@ var CreateGroupDialog = function () {
 
     // public API
     return {
-        /**
-         * Resets the state of the dialog.
-         *
-         * @param ws
-         *      The workspace key.
-         * @param sampleNames
-         *      An array of strings, each string representing a sample name.
-         */
-        initialize: function(ws, sampleNames)
-        {
-            workspaceKey = ws;
-            allSampleNames = sampleNames;
-        },
-
         /**
          * Shows the dialog
          */

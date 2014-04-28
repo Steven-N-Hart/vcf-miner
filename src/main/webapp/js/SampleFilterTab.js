@@ -12,7 +12,14 @@ var SampleFilterTab = function () {
     var count = $('#group_sample_count');
     var list = $('#group_sample_names_list');
 
-    var groupListView;
+    var groupListView = new GroupListView(
+        {
+            "el": $('#group_list'),
+            "model": MongoApp.workspace.get("sampleGroups"),
+            "fnGroupChangeCallback": groupChanged
+        }
+    );
+
     var createGroupDialog = new CreateGroupDialog();
     $('#new_group_button').click(function (e)
     {
@@ -191,20 +198,6 @@ var SampleFilterTab = function () {
          */
         initialize: function(ws, allSampleNames, vcfDataFields, groups)
         {
-            // destroy and recreate view
-            if (groupListView != undefined) {
-                groupListView.remove();
-            }
-            groupListView = new GroupListView(
-                {
-                    "el": $('#group_list'),
-                    "model": groups,
-                    "fnGroupChangeCallback": groupChanged
-                }
-            );
-
-            createGroupDialog.initialize(ws, allSampleNames);
-
             filters.reset();
 
             // translate FORMAT related VCFDataField models into Filter models

@@ -25,7 +25,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         MongoApp.on("searchFilterRemoved", function (search) {
             self.changedSearch(search);
         });
-        MongoApp.on("workspaceChange", function (workspace) {
+        MongoApp.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
             self.changeWorkspace(workspace);
         });
         MongoApp.on("download", function () {
@@ -162,7 +162,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.trigger("error", JSON.stringify(jqXHR));
+                MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
             },
             complete: function(jqXHR, textStatus) {
                 pleaseWaitDiv.modal('hide');

@@ -13,7 +13,7 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
         // register event listeners
         $(document).on('click', '#' + workspace.get("id") + '_load_button', function() {
             console.debug("User selected workspace: " + workspace.get("key"));
-            MongoApp.trigger("workspaceChange", workspace);
+            MongoApp.trigger(MongoApp.events.WKSP_LOAD, workspace);
         });
 
         $(document).on('click', '#' + workspace.get("id") + '_delete_button', function() {

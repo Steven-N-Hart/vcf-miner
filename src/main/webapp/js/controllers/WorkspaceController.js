@@ -27,6 +27,9 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         MongoApp.on("workspaceRemove", function (workspace) {
             self.removeWorkspace(workspace);
         });
+        MongoApp.on("workspaceGroupCreate", function (group) {
+            self.createSampleGroup(group, MongoApp.workspace);
+        });
 
         // TODO: users hardcoded
         this.users.push('steve');
@@ -136,7 +139,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                     }
                 },
                 error: function(jqXHR, textStatus) {
-                    MongoApp.trigger("error", JSON.stringify(jqXHR));
+                    MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
                 }
             });
         }
@@ -197,7 +200,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                     }
                 },
                 error: function(jqXHR, textStatus) {
-                    MongoApp.trigger("error", JSON.stringify(jqXHR));
+                    MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
                 }
             });
         }
@@ -244,7 +247,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
                 self.refreshAllWorkspaces();
             } else {
-                MongoApp.trigger("error", "Error " + xhr.status + " occurred uploading your file.");
+                MongoApp.trigger(MongoApp.events.ERROR, "Error " + xhr.status + " occurred uploading your file.");
             }
             $('#upload_vcf_progress_modal').modal('hide');
         };
@@ -278,7 +281,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 self.workspaces.remove(workspace);
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.trigger("error", JSON.stringify(jqXHR));
+                MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
             }
         });
     },
@@ -331,7 +334,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
             },
             error: function(jqXHR, textStatus)
             {
-                MongoApp.trigger("error", JSON.stringify(jqXHR));
+                MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
             }
         });
     },
@@ -400,9 +403,36 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.trigger("error", JSON.stringify(jqXHR));
+                MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+            }
+        });
+    },
+
+    createSampleGroup: function(group, workspace)
+    {
+        // translate backbone model to pojo expected by server
+        var pojo = group.toSampleGroupPOJO(workspace.get("key"));
+
+        console.debug("Saving group: " + JSON.stringify(pojo));
+
+        $.ajax({
+            type: "POST",
+            url: "/mongo_svr/ve/samples/savegroup",
+            contentType: "application/json",
+            data: JSON.stringify(pojo),
+            dataType: "json",
+            success: function(json)
+            {
+                console.debug("saved group: " + pojo.alias);
+
+                workspace.get("sampleGroups").add(group);
+            },
+            error: function(jqXHR, textStatus)
+            {
+                MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
             }
         });
     }
+
 
 });

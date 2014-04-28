@@ -178,7 +178,7 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
      * @param e
      */
     newSearch: function(e) {
-        MongoApp.trigger("workspaceChange", MongoApp.workspace);
+        MongoApp.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspace);
     }
 
 });
