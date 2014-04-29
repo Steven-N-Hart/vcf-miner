@@ -3,7 +3,6 @@ var InfoFilterTab = function (indexController) {
     // private variables
     var workspaceKey;
     var view;
-    var infoFields = new VCFDataFieldList();
 
     // constants for operator options
     var OPTION_EQ   = "<option value='eq'>=</option>";
@@ -12,6 +11,30 @@ var InfoFilterTab = function (indexController) {
     var OPTION_LT   = "<option value='lt'>&lt;</option>";
     var OPTION_LTEQ = "<option value='lteq'>&#x2264;</option>";
     var OPTION_NE   = "<option value='ne'>&#x2260;</option>";
+
+    var infoFields = new VCFDataFieldList();
+
+    // register for Marionette events
+    MongoApp.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
+
+        workspaceKey = workspace.get("key");
+
+        // pick out the INFO data fields
+        infoFields.reset();
+        _.each(workspace.get("dataFields").models, function(vcfDataField) {
+            if (vcfDataField.get("category") == VCFDataCategory.INFO)
+            {
+                infoFields.add(vcfDataField);
+            }
+        });
+
+        // check to see whether we have any INFO annotation
+        if (infoFields.length > 0)
+            $('#no_info_annotation_warning').toggle(false);
+        else
+            $('#no_info_annotation_warning').toggle(true);
+
+    });
 
     // jQuery validate plugin config
     $('#info_tab_form').validate(
@@ -344,30 +367,8 @@ var InfoFilterTab = function (indexController) {
 
     // public API
     return {
-        /**
-         *
-         * @param workspaceKey
-         */
-        initialize: function(ws, vcfDataFields)
+        initialize: function()
         {
-            workspaceKey = ws;
-
-            // pick out the INFO data fields
-            infoFields.reset();
-            _.each(vcfDataFields.models, function(vcfDataField) {
-                if (vcfDataField.get("category") == VCFDataCategory.INFO)
-                {
-                    infoFields.add(vcfDataField);
-                }
-            });
-
-            // check to see whether we have any INFO annotation
-            if (infoFields.length > 0)
-                $('#no_info_annotation_warning').toggle(false);
-            else
-                $('#no_info_annotation_warning').toggle(true);
-
-
             // simulate user choosing the 1st INFO field
             infoFieldChanged();
         },

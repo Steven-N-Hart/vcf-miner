@@ -43,7 +43,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
         var addFilterDialog = new AddFilterDialog(MongoApp.indexController);
         $('#show_add_filter_dialog_button').click(function (e)
         {
-            addFilterDialog.show(MongoApp.workspace);
+            addFilterDialog.show();
         });
     },
 
@@ -158,7 +158,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
 
                 // if the user deletes the current search, then reload the workspace w/ default search
                 if (search.get('id') == MongoApp.search.get('id')) {
-                    MongoApp.trigger("workspaceLoad", MongoApp.workspace);
+                    MongoApp.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspace);
                 }
             },
             error: function(jqXHR, textStatus) {

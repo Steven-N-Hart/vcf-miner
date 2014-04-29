@@ -426,6 +426,8 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 console.debug("saved group: " + pojo.alias);
 
                 workspace.get("sampleGroups").add(group);
+
+                MongoApp.trigger(MongoApp.events.WKSP_CHANGE, workspace);
             },
             error: function(jqXHR, textStatus)
             {
@@ -433,6 +435,4 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
             }
         });
     }
-
-
 });

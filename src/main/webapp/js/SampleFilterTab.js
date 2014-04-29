@@ -8,6 +8,40 @@ var SampleFilterTab = function () {
 
     // private variables
     var filters = new FilterList();
+    var sampleGroups = new SampleGroupList();
+
+    // register for Marionette events
+    MongoApp.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
+
+        sampleGroups.reset();
+        _.each(workspace.get("sampleGroups").models, function(group) {
+            sampleGroups.add(group);
+        });
+
+        filters.reset();
+
+        // translate FORMAT related VCFDataField models into Filter models
+        _.each(workspace.get("dataFields").models, function(vcfDataField) {
+            if (vcfDataField.get("category") == VCFDataCategory.FORMAT)
+            {
+                filters.add(new Filter(
+                    {
+                        name: vcfDataField.get("name"),
+                        description: vcfDataField.get("description"),
+                        operator: FilterOperator.EQ,
+                        value: '0',
+                        displayValue: '0',
+                        category: FilterCategory.FORMAT,
+                        valueFunction: FilterValueFunction.MAX
+                    }
+                ));
+            }
+        });
+
+        // standard group filters added last
+        filters.add(MongoApp.FILTER_IN_GROUP);
+        filters.add(MongoApp.FILTER_NOT_IN_GROUP);
+    });
 
     var count = $('#group_sample_count');
     var list = $('#group_sample_names_list');
@@ -15,7 +49,7 @@ var SampleFilterTab = function () {
     var groupListView = new GroupListView(
         {
             "el": $('#group_list'),
-            "model": MongoApp.workspace.get("sampleGroups"),
+            "model": sampleGroups,
             "fnGroupChangeCallback": groupChanged
         }
     );
@@ -189,39 +223,9 @@ var SampleFilterTab = function () {
     return {
         /**
          * Resets the state of this tab.
-         *
-         * @param ws
-         *      The workspace key.
-         * @param allSampleNames
-         *      An array of strings, each string representing a sample name.
-         * @param groups
          */
-        initialize: function(ws, allSampleNames, vcfDataFields, groups)
+        initialize: function()
         {
-            filters.reset();
-
-            // translate FORMAT related VCFDataField models into Filter models
-            _.each(vcfDataFields.models, function(vcfDataField) {
-                if (vcfDataField.get("category") == VCFDataCategory.FORMAT)
-                {
-                    filters.add(new Filter(
-                        {
-                            name: vcfDataField.get("name"),
-                            description: vcfDataField.get("description"),
-                            operator: FilterOperator.EQ,
-                            value: '0',
-                            displayValue: '0',
-                            category: FilterCategory.FORMAT,
-                            valueFunction: FilterValueFunction.MAX
-                        }
-                    ));
-                }
-            });
-
-            // standard group filters added last
-            filters.add(MongoApp.FILTER_IN_GROUP);
-            filters.add(MongoApp.FILTER_NOT_IN_GROUP);
-
             // simulate user choosing the 1st field
             sampleFieldChanged();
         },

@@ -74,10 +74,10 @@ var AddFilterDialog = function (workspace, indexController) {
         }
     }
 
-    function reset(workspace)
+    function reset()
     {
-        sampleFilterTab.initialize(workspace.get("key"), workspace.get("sampleNames"), workspace.get("dataFields"), workspace.get("sampleGroups"));
-        infoFilterTab.initialize(workspace.get("key"), workspace.get("dataFields"));
+        sampleFilterTab.initialize();
+        infoFilterTab.initialize();
     }
 
     // public API
@@ -87,9 +87,9 @@ var AddFilterDialog = function (workspace, indexController) {
          *
          * @param workspace
          */
-        show: function(workspace)
+        show: function()
         {
-            reset(workspace);
+            reset();
             $('#add_filter_modal').modal();
         }
     };

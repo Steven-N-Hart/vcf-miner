@@ -52,7 +52,9 @@ MongoApp.addInitializer(function () {
     // GLOBAL
     this.indexController = new DatabaseIndexController();
     this.search = new Search();
-    this.workspace = new Workspace();
+
+    // the key of the currently loaded Workspace model
+    this.workspaceKey = null;
 
     // constants
     this.FILTER_NONE         = new Filter({name: 'none', displayName: 'none', operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'}),
@@ -139,8 +141,8 @@ MongoApp.addInitializer(function() {
  * Marionette controllers
  */
 MongoApp.addInitializer(function () {
-    var workspaceController = new WorkspaceController();
-    workspaceController.showWorkspaceTable({region: MongoApp.workspaceRegion });
+    this.workspaceController = new WorkspaceController();
+    this.workspaceController.showWorkspaceTable({region: MongoApp.workspaceRegion });
 
     var settingsController = new SettingsController();
     // TODO: fix region
@@ -160,28 +162,7 @@ MongoApp.addInitializer(function () {
     });
 
     MongoApp.on(MongoApp.events.WKSP_LOAD, function (newWorkspace) {
-
-        // make copy that we can safely modify
-        var ws = newWorkspace.clone();
-
-        // detach backbone collection attributes
-        var dataFields = ws.get("dataFields");
-        ws.unset("dataFields");
-        var sampleGroups = ws.get("sampleGroups");
-        ws.unset("sampleGroups");
-
-        // carry over non-collection attributes
-        this.workspace.set(ws.attributes);
-
-        // rebuild backbone collection attributes
-        this.workspace.get("dataFields").reset();
-        _.each(dataFields.models, function(dataField) {
-            MongoApp.workspace.get("dataFields").add(dataField);
-        });
-        this.workspace.get("sampleGroups").reset();
-        _.each(sampleGroups.models, function(sampleGroup) {
-            MongoApp.workspace.get("sampleGroups").add(sampleGroup);
-        });
+        this.workspace = newWorkspace;
 
         MongoApp.trigger(MongoApp.events.WKSP_CHANGE, this.workspace);
 
