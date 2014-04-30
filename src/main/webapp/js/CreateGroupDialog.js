@@ -13,7 +13,7 @@ var CreateGroupDialog = function () {
     var sampleGroups;
 
     // register for Marionette events
-    MongoApp.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
+    MongoApp.vent.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
         workspaceKey = workspace.get("key");
         allSampleNames = workspace.get("sampleNames");
         sampleGroups = workspace.get("sampleGroups");
@@ -79,7 +79,7 @@ var CreateGroupDialog = function () {
         var sampleNames = $.map($('#group_samples_list').find('option'), function(e) { return e.value; });
         group.set("sampleNames", sampleNames);
 
-        MongoApp.trigger(MongoApp.events.WKSP_GROUP_CREATE, group, MongoApp.workspace);
+        MongoApp.vent.trigger(MongoApp.events.WKSP_GROUP_CREATE, group, MongoApp.workspace);
     }
 
     function reset()

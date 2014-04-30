@@ -44,7 +44,7 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
                 var reader = new FileReader();
 
                 reader.onload = function(e) {
-                    MongoApp.trigger(MongoApp.events.SEARCH_IMPORT, reader.result);
+                    MongoApp.vent.trigger(MongoApp.events.SEARCH_IMPORT, reader.result);
                     $('#import_search_modal').modal('hide')
                 }
                 // async call
@@ -127,7 +127,7 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
      * @param e
      */
     saveSearch: function(e) {
-        MongoApp.trigger(MongoApp.events.SEARCH_SAVE, MongoApp.search);
+        MongoApp.vent.trigger(MongoApp.events.SEARCH_SAVE, MongoApp.search);
     },
 
     /**
@@ -143,7 +143,7 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
             function()
             {
                 // confirm
-                MongoApp.trigger(MongoApp.events.SEARCH_DELETE, self.model);
+                MongoApp.vent.trigger(MongoApp.events.SEARCH_DELETE, self.model);
             }
         );
         confirmDialog.show();
@@ -154,7 +154,7 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
      * @param e
      */
     showSearchDialog: function(e) {
-        MongoApp.trigger(MongoApp.events.SEARCH_SHOW_DIALOG);
+        MongoApp.vent.trigger(MongoApp.events.SEARCH_SHOW_DIALOG);
     },
 
     /**
@@ -162,7 +162,7 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
      * @param e
      */
     exportSearch: function(e) {
-        MongoApp.trigger(MongoApp.events.SEARCH_EXPORT, MongoApp.search);
+        MongoApp.vent.trigger(MongoApp.events.SEARCH_EXPORT, MongoApp.search);
     },
 
     /**
@@ -178,7 +178,7 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
      * @param e
      */
     newSearch: function(e) {
-        MongoApp.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspace);
+        MongoApp.vent.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspace);
     }
 
 });

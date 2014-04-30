@@ -24,6 +24,6 @@ SearchFilterRowView = Backbone.Marionette.ItemView.extend({
     },
 
     removeFilter: function(e) {
-        MongoApp.trigger(MongoApp.events.SEARCH_FILTER_REMOVE, this.model);
+        MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_REMOVE, this.model);
     }
 });

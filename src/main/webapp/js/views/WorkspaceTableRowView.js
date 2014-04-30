@@ -13,7 +13,7 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
         // register event listeners
         $(document).on('click', '#' + workspace.get("id") + '_load_button', function() {
             console.debug("User selected workspace: " + workspace.get("key"));
-            MongoApp.trigger(MongoApp.events.WKSP_LOAD, workspace);
+            MongoApp.vent.trigger(MongoApp.events.WKSP_LOAD, workspace);
         });
 
         $(document).on('click', '#' + workspace.get("id") + '_delete_button', function() {
@@ -22,7 +22,7 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
                 "Delete " + workspace.get('alias') + "?",
                 "Delete",
                 function() {
-                    MongoApp.trigger(MongoApp.events.WKSP_REMOVE, workspace);
+                    MongoApp.vent.trigger(MongoApp.events.WKSP_REMOVE, workspace);
                 }
             );
             confirmDialog.show();

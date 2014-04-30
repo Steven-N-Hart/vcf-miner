@@ -11,7 +11,7 @@ var SampleFilterTab = function () {
     var sampleGroups = new SampleGroupList();
 
     // register for Marionette events
-    MongoApp.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
+    MongoApp.vent.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
 
         // remember what the user has selected
         var selectedFilter = getSelectedFilter();

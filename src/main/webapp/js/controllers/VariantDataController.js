@@ -19,16 +19,16 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        MongoApp.on(MongoApp.events.SEARCH_FILTER_ADDED, function (search) {
+        MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_ADDED, function (search) {
             self.changedSearch(search);
         });
-        MongoApp.on(MongoApp.events.SEARCH_FILTER_REMOVED, function (search) {
+        MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_REMOVED, function (search) {
             self.changedSearch(search);
         });
-        MongoApp.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
+        MongoApp.vent.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
             self.changeWorkspace(workspace);
         });
-        MongoApp.on(MongoApp.events.WKSP_DOWNLOAD, function (workspace, search) {
+        MongoApp.vent.on(MongoApp.events.WKSP_DOWNLOAD, function (workspace, search) {
             self.download(workspace, search);
         });
     },
@@ -159,7 +159,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+                MongoApp.vent.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
             },
             complete: function(jqXHR, textStatus) {
                 setTimeout(function(){ pleaseWaitDiv.modal('hide');}, 500);

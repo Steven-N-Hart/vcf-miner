@@ -89,9 +89,6 @@ MongoApp.addInitializer(function () {
     this.indexController = new DatabaseIndexController();
     this.search = new Search();
 
-    // the key of the currently loaded Workspace model
-    this.workspaceKey = null;
-
     // constants
     this.FILTER_NONE         = new Filter({name: 'none', displayName: 'none', operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'}),
     this.FILTER_IN_GROUP     = new Filter({name: 'Samples in Group',     operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.IN_GROUP, description:'Filters variants based on matching samples'});
@@ -192,24 +189,24 @@ MongoApp.addInitializer(function () {
     new VariantDataController();
 
     // Wire Marionette events to function callbacks
-    MongoApp.on(MongoApp.events.ERROR, function (errorMessage) {
+    MongoApp.vent.on(MongoApp.events.ERROR, function (errorMessage) {
         var ERROR_TEMPLATE = $("#error-message-template").html();
         window.open().document.write(_.template(ERROR_TEMPLATE, {message: errorMessage}))
     });
 
-    MongoApp.on(MongoApp.events.WKSP_LOAD, function (newWorkspace) {
-        this.workspace = newWorkspace;
+    MongoApp.vent.on(MongoApp.events.WKSP_LOAD, function (newWorkspace) {
+        MongoApp.workspace = newWorkspace;
 
-        MongoApp.trigger(MongoApp.events.WKSP_CHANGE, this.workspace);
+        MongoApp.vent.trigger(MongoApp.events.WKSP_CHANGE, MongoApp.workspace);
 
         // default search for workspace
         // TODO: enhance to be the 'default' search for the workspace
         var search = new Search();
-        search.set("key", this.workspace.get("key"));
-        MongoApp.trigger(MongoApp.events.SEARCH_LOAD, search);
+        search.set("key", MongoApp.workspace.get("key"));
+        MongoApp.vent.trigger(MongoApp.events.SEARCH_LOAD, search);
     });
 
-    MongoApp.on(MongoApp.events.SEARCH_LOAD, function (newSearch) {
+    MongoApp.vent.on(MongoApp.events.SEARCH_LOAD, function (newSearch) {
 
         // make copy that we can safely modify
         var s = newSearch.clone();
@@ -219,17 +216,17 @@ MongoApp.addInitializer(function () {
         s.unset("filters");
 
         // carry over non-collection attributes
-        this.search.set(s.attributes);
+        MongoApp.search.set(s.attributes);
 
         // rebuild backbone collection attributes
-        this.search.get("filters").reset();
-        MongoApp.trigger(MongoApp.events.SEARCH_FILTER_ADD, this.FILTER_NONE);
+        MongoApp.search.get("filters").reset();
+        MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_ADD, MongoApp.FILTER_NONE);
         _.each(filters.models, function(filter) {
-            MongoApp.trigger(MongoApp.events.SEARCH_FILTER_ADD, filter);
+            MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_ADD, filter);
         });
 
-        this.search.set("saved", true);
-        MongoApp.trigger(MongoApp.events.SEARCH_CHANGE, this.search);
+        MongoApp.search.set("saved", true);
+        MongoApp.vent.trigger(MongoApp.events.SEARCH_CHANGE, MongoApp.search);
     });
 });
 

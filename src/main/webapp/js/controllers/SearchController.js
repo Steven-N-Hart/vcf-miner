@@ -18,25 +18,25 @@ var SearchController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        MongoApp.on(MongoApp.events.SEARCH_FILTER_ADD, function (filter) {
+        MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_ADD, function (filter) {
             self.addFilter(filter);
         });
-        MongoApp.on(MongoApp.events.SEARCH_FILTER_REMOVE, function (filter) {
+        MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_REMOVE, function (filter) {
             self.removeFilter(filter);
         });
-        MongoApp.on(MongoApp.events.SEARCH_SAVE, function (search) {
+        MongoApp.vent.on(MongoApp.events.SEARCH_SAVE, function (search) {
             self.saveSearch(search);
         });
-        MongoApp.on(MongoApp.events.SEARCH_DELETE, function (search) {
+        MongoApp.vent.on(MongoApp.events.SEARCH_DELETE, function (search) {
             self.deleteSearch(search);
         });
-        MongoApp.on(MongoApp.events.SEARCH_SHOW_DIALOG, function () {
+        MongoApp.vent.on(MongoApp.events.SEARCH_SHOW_DIALOG, function () {
             self.showSearchDialog();
         });
-        MongoApp.on(MongoApp.events.SEARCH_EXPORT, function (search) {
+        MongoApp.vent.on(MongoApp.events.SEARCH_EXPORT, function (search) {
             self.exportSearch(search);
         });
-        MongoApp.on(MongoApp.events.SEARCH_IMPORT, function (filterHistoryJsonText) {
+        MongoApp.vent.on(MongoApp.events.SEARCH_IMPORT, function (filterHistoryJsonText) {
             self.importSearch(filterHistoryJsonText);
         });
 
@@ -75,14 +75,14 @@ var SearchController = Backbone.Marionette.Controller.extend({
         if (filter.get('id') != MongoApp.FILTER_NONE.get('id'))
             MongoApp.search.set("saved", false);
 
-        MongoApp.trigger(MongoApp.events.SEARCH_FILTER_ADDED, MongoApp.search);
+        MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_ADDED, MongoApp.search);
         this.updateFilterRemovable();
     },
 
     removeFilter: function (filter) {
         MongoApp.search.get("filters").remove(filter);
         MongoApp.search.set("saved", false);
-        MongoApp.trigger(MongoApp.events.SEARCH_FILTER_REMOVED, MongoApp.search);
+        MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_REMOVED, MongoApp.search);
         this.updateFilterRemovable();
     },
 
@@ -131,11 +131,11 @@ var SearchController = Backbone.Marionette.Controller.extend({
             success: function(json)
             {
                 var savedSearch = self.filterHistoryToSearch(json);
-                MongoApp.trigger(MongoApp.events.SEARCH_LOAD, savedSearch);
+                MongoApp.vent.trigger(MongoApp.events.SEARCH_LOAD, savedSearch);
                 console.log("save successful!");
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+                MongoApp.vent.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
             }
         });
     },
@@ -158,11 +158,11 @@ var SearchController = Backbone.Marionette.Controller.extend({
 
                 // if the user deletes the current search, then reload the workspace w/ default search
                 if (search.get('id') == MongoApp.search.get('id')) {
-                    MongoApp.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspace);
+                    MongoApp.vent.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspace);
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+                MongoApp.vent.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
             }
         });
     },
@@ -192,7 +192,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+                MongoApp.vent.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
             }
         });
     },
@@ -214,7 +214,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
     importSearch: function(filterHistoryJsonText) {
         var filterHistory = JSON.parse(filterHistoryJsonText);
         var search = this.filterHistoryToSearch(filterHistory);
-        MongoApp.trigger(MongoApp.events.SEARCH_LOAD, search);
+        MongoApp.vent.trigger(MongoApp.events.SEARCH_LOAD, search);
     },
 
     /**

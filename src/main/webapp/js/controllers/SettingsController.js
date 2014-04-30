@@ -5,7 +5,7 @@ SettingsController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        MongoApp.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
+        MongoApp.vent.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
             self.changeWorkspace(workspace);
         });
 
