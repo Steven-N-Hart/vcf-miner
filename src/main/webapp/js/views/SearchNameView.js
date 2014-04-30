@@ -10,7 +10,7 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
         "click .searchNameApply" : "applySearchName",
         "click .searchSave" : "saveSearch",
         "click .searchDelete" : "deleteSearch",
-        "click .searchConfigure" : "configureSearch",
+        "click .showSearchDialog" : "showSearchDialog",
         "click .searchExport" : "exportSearch",
         "click .searchImport" : "importSearch"
     },
@@ -44,7 +44,7 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
                 var reader = new FileReader();
 
                 reader.onload = function(e) {
-                    MongoApp.trigger("importSearch", reader.result);
+                    MongoApp.trigger(MongoApp.events.SEARCH_IMPORT, reader.result);
                     $('#import_search_modal').modal('hide')
                 }
                 // async call
@@ -127,7 +127,7 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
      * @param e
      */
     saveSearch: function(e) {
-        MongoApp.trigger("saveSearch", MongoApp.search);
+        MongoApp.trigger(MongoApp.events.SEARCH_SAVE, MongoApp.search);
     },
 
     /**
@@ -143,7 +143,7 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
             function()
             {
                 // confirm
-                MongoApp.trigger("deleteSearch", self.model);
+                MongoApp.trigger(MongoApp.events.SEARCH_DELETE, self.model);
             }
         );
         confirmDialog.show();
@@ -153,8 +153,8 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
      * Fire event to be handled by controller
      * @param e
      */
-    configureSearch: function(e) {
-        MongoApp.trigger("configureSearch", MongoApp.search);
+    showSearchDialog: function(e) {
+        MongoApp.trigger(MongoApp.events.SEARCH_SHOW_DIALOG);
     },
 
     /**
@@ -162,7 +162,7 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
      * @param e
      */
     exportSearch: function(e) {
-        MongoApp.trigger("exportSearch", MongoApp.search);
+        MongoApp.trigger(MongoApp.events.SEARCH_EXPORT, MongoApp.search);
     },
 
     /**

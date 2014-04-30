@@ -30,7 +30,7 @@ var VariantTableDataView = Backbone.Marionette.ItemView.extend({
     },
 
     download: function() {
-        MongoApp.trigger("download", null);
+        MongoApp.trigger(MongoApp.events.WKSP_DOWNLOAD, MongoApp.workspace, MongoApp.search);
     },
 
     render: function()

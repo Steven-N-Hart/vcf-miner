@@ -13,6 +13,9 @@ var SampleFilterTab = function () {
     // register for Marionette events
     MongoApp.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
 
+        // remember what the user has selected
+        var selectedFilter = getSelectedFilter();
+
         sampleGroups.reset();
         _.each(workspace.get("sampleGroups").models, function(group) {
             sampleGroups.add(group);
@@ -41,6 +44,12 @@ var SampleFilterTab = function () {
         // standard group filters added last
         filters.add(MongoApp.FILTER_IN_GROUP);
         filters.add(MongoApp.FILTER_NOT_IN_GROUP);
+
+        // reselect
+        if (selectedFilter != undefined) {
+            var filterName = selectedFilter.get("name");
+            $("#sample_field_list option:contains('"+filterName+"')").prop('selected', true);
+        }
     });
 
     var count = $('#group_sample_count');

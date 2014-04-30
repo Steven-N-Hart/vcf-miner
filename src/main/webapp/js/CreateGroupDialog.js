@@ -79,7 +79,7 @@ var CreateGroupDialog = function () {
         var sampleNames = $.map($('#group_samples_list').find('option'), function(e) { return e.value; });
         group.set("sampleNames", sampleNames);
 
-        MongoApp.trigger("workspaceGroupCreate", group);
+        MongoApp.trigger(MongoApp.events.WKSP_GROUP_CREATE, group, MongoApp.workspace);
     }
 
     function reset()

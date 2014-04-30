@@ -68,7 +68,7 @@ var AddFilterDialog = function (workspace, indexController) {
         if (typeof filter !== 'undefined')
         {
             filter.setFilterDisplay();
-            MongoApp.trigger("filterAdd", filter);
+            MongoApp.trigger(MongoApp.events.SEARCH_FILTER_ADD, filter);
             $("#add_filter_close").click();
             $('#add_filter_modal').modal('hide')
         }

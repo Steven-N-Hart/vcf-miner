@@ -22,7 +22,7 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
                 "Delete " + workspace.get('alias') + "?",
                 "Delete",
                 function() {
-                    MongoApp.trigger("workspaceRemove", workspace);
+                    MongoApp.trigger(MongoApp.events.WKSP_REMOVE, workspace);
                 }
             );
             confirmDialog.show();

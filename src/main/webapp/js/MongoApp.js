@@ -33,11 +33,47 @@ MongoApp.addInitializer(function () {
         // current Workspace model has been changed
         WKSP_CHANGE: 'workspaceChange',
 
+        // signals that a new sample group should be created
+        WKSP_GROUP_CREATE: 'workspaceGroupCreate',
+
+        // signals that the given workspace should be removed
+        WKSP_REMOVE: 'workspaceRemove',
+
+        // download the current search results of the workspace
+        WKSP_DOWNLOAD: 'workspaceDownload',
+
         // User is choosing a different search
         SEARCH_LOAD: 'searchLoad',
 
         // current Search model has been changed
-        SEARCH_CHANGE: 'searchChange'
+        SEARCH_CHANGE: 'searchChange',
+
+        // signals that a new filter should be added to the search
+        SEARCH_FILTER_ADD: 'filterAdd',
+
+        // signals that a filter has been added to the search
+        SEARCH_FILTER_ADDED: 'searchFilterAdded',
+
+        // signals that an existing filter should be removed from the search
+        SEARCH_FILTER_REMOVE: 'filterRemove',
+
+        // signals that an existing filter has been removed from the search
+        SEARCH_FILTER_REMOVED: 'searchFilterRemoved',
+
+        // signals that the search should be saved to the server-side persistence store
+        SEARCH_SAVE: 'saveSearch',
+
+        // signals that the search should be deleted from the server-side persistence store
+        SEARCH_DELETE: 'deleteSearch',
+
+        // signals that the search should be exported to a file on the client
+        SEARCH_EXPORT: 'exportSearch',
+
+        // signals that the search should be imported from a file on the client
+        SEARCH_IMPORT: 'importSearch',
+
+        // signals that a dialog showing the search objects should be shown
+        SEARCH_SHOW_DIALOG: 'showSearchDialog'
     };
 
     // GLOBAL
@@ -187,9 +223,9 @@ MongoApp.addInitializer(function () {
 
         // rebuild backbone collection attributes
         this.search.get("filters").reset();
-        MongoApp.trigger("filterAdd", this.FILTER_NONE);
+        MongoApp.trigger(MongoApp.events.SEARCH_FILTER_ADD, this.FILTER_NONE);
         _.each(filters.models, function(filter) {
-            MongoApp.trigger("filterAdd", filter);
+            MongoApp.trigger(MongoApp.events.SEARCH_FILTER_ADD, filter);
         });
 
         this.search.set("saved", true);

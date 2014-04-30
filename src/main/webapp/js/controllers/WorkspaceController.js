@@ -24,11 +24,11 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        MongoApp.on("workspaceRemove", function (workspace) {
+        MongoApp.on(MongoApp.events.WKSP_REMOVE, function (workspace) {
             self.removeWorkspace(workspace);
         });
-        MongoApp.on("workspaceGroupCreate", function (group) {
-            self.createSampleGroup(group, MongoApp.workspace);
+        MongoApp.on(MongoApp.events.WKSP_GROUP_CREATE, function (group, workspace) {
+            self.createSampleGroup(group, workspace);
         });
 
         // TODO: users hardcoded

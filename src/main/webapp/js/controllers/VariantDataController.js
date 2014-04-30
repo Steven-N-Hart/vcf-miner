@@ -19,17 +19,17 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        MongoApp.on("searchFilterAdded", function (search) {
+        MongoApp.on(MongoApp.events.SEARCH_FILTER_ADDED, function (search) {
             self.changedSearch(search);
         });
-        MongoApp.on("searchFilterRemoved", function (search) {
+        MongoApp.on(MongoApp.events.SEARCH_FILTER_REMOVED, function (search) {
             self.changedSearch(search);
         });
         MongoApp.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
             self.changeWorkspace(workspace);
         });
-        MongoApp.on("download", function () {
-            self.download();
+        MongoApp.on(MongoApp.events.WKSP_DOWNLOAD, function (workspace, search) {
+            self.download(workspace, search);
         });
     },
 
@@ -146,7 +146,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
 
                 if (json.totalResults > MongoApp.settings.maxFilteredVariants) {
                     var m = 'Loaded only ' +  MongoApp.settings.maxFilteredVariants;
-                    numMatchesLabel = $('#' + lastFilter.get("id") + "_num_matches_label");
+                    var numMatchesLabel = $('#' + lastFilter.get("id") + "_num_matches_label");
                     numMatchesLabel.popover('destroy');
                     numMatchesLabel.popover(
                         {
@@ -155,17 +155,14 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
                         }
                     );
                     numMatchesLabel.popover('show');
-                    setTimeout(
-                        function(){numMatchesLabel.popover('hide');},
-                        MongoApp.settings.popupDuration * 1000
-                    );
+                    setTimeout(function(){ numMatchesLabel.popover('hide'); }, MongoApp.settings.popupDuration * 1000);
                 }
             },
             error: function(jqXHR, textStatus) {
                 MongoApp.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
             },
             complete: function(jqXHR, textStatus) {
-                pleaseWaitDiv.modal('hide');
+                setTimeout(function(){ pleaseWaitDiv.modal('hide');}, 500);
             }
         });
     },
@@ -214,10 +211,10 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
     /**
      * Downloads data in TSV format for the given query and selected columns.
      */
-    download: function()
+    download: function(workspace, search)
     {
         // send query request to server
-        var query = buildQuery(MongoApp.search.get("filters"), MongoApp.workspace.get("key"));
+        var query = buildQuery(search.get("filters"), workspace.get("key"));
 
         var returnFields = new Array();
         var displayFields = new Array();
@@ -230,7 +227,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         query.displayFields = displayFields;
 
         var displayFiltersApplied = new Array();
-        _.each(MongoApp.search.get("filters").models, function(filter)
+        _.each(search.get("filters").models, function(filter)
         {
             displayFiltersApplied.push(
                 {

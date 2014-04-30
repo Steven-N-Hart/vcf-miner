@@ -18,25 +18,25 @@ var SearchController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        MongoApp.on("filterAdd", function (filter) {
+        MongoApp.on(MongoApp.events.SEARCH_FILTER_ADD, function (filter) {
             self.addFilter(filter);
         });
-        MongoApp.on("filterRemove", function (filter) {
+        MongoApp.on(MongoApp.events.SEARCH_FILTER_REMOVE, function (filter) {
             self.removeFilter(filter);
         });
-        MongoApp.on("saveSearch", function (search) {
+        MongoApp.on(MongoApp.events.SEARCH_SAVE, function (search) {
             self.saveSearch(search);
         });
-        MongoApp.on("deleteSearch", function (search) {
+        MongoApp.on(MongoApp.events.SEARCH_DELETE, function (search) {
             self.deleteSearch(search);
         });
-        MongoApp.on("configureSearch", function (search) {
-            self.configureSearch(search);
+        MongoApp.on(MongoApp.events.SEARCH_SHOW_DIALOG, function () {
+            self.showSearchDialog();
         });
-        MongoApp.on("exportSearch", function (search) {
+        MongoApp.on(MongoApp.events.SEARCH_EXPORT, function (search) {
             self.exportSearch(search);
         });
-        MongoApp.on("importSearch", function (filterHistoryJsonText) {
+        MongoApp.on(MongoApp.events.SEARCH_IMPORT, function (filterHistoryJsonText) {
             self.importSearch(filterHistoryJsonText);
         });
 
@@ -75,14 +75,14 @@ var SearchController = Backbone.Marionette.Controller.extend({
         if (filter.get('id') != MongoApp.FILTER_NONE.get('id'))
             MongoApp.search.set("saved", false);
 
-        MongoApp.trigger("searchFilterAdded", MongoApp.search);
+        MongoApp.trigger(MongoApp.events.SEARCH_FILTER_ADDED, MongoApp.search);
         this.updateFilterRemovable();
     },
 
     removeFilter: function (filter) {
         MongoApp.search.get("filters").remove(filter);
         MongoApp.search.set("saved", false);
-        MongoApp.trigger("searchFilterRemoved", MongoApp.search);
+        MongoApp.trigger(MongoApp.events.SEARCH_FILTER_REMOVED, MongoApp.search);
         this.updateFilterRemovable();
     },
 
@@ -199,9 +199,8 @@ var SearchController = Backbone.Marionette.Controller.extend({
 
     /**
      * Show configure search dialog
-     * @param search
      */
-    configureSearch: function(search) {
+    showSearchDialog: function() {
 
         this.refreshSearches(MongoApp.workspace);
 
