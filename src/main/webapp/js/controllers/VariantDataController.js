@@ -19,11 +19,11 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_ADDED, function (search) {
-            self.changedSearch(search);
+        MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_ADDED, function (search, async) {
+            self.changedSearch(search, async);
         });
-        MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_REMOVED, function (search) {
-            self.changedSearch(search);
+        MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_REMOVED, function (search, async) {
+            self.changedSearch(search, async);
         });
         MongoApp.vent.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
             self.changeWorkspace(workspace);
@@ -48,8 +48,8 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         options.region.show(variantTableView);
     },
 
-    changedSearch: function (search) {
-        this.refreshData(MongoApp.workspace, search);
+    changedSearch: function (search, async) {
+        this.refreshData(MongoApp.workspace, search, async);
     },
 
     /**
@@ -58,22 +58,25 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
      *
      * @param workspace
      * @param search
+     * @param async
+     *      Determines whether this is executed asynchronously or not.
      */
-    refreshData: function(workspace, search) {
+    refreshData: function(workspace, search, async) {
         // send query request to server
         var query = buildQuery(search.get("filters"), workspace.get("key"));
-        this.sendQuery(query, this.varTableCols);
+        this.sendQuery(query, async);
     },
 
 
 
     /**
-     * Sends query to server via AJAX.  Note that this is synchronous.
+     * Sends query to server via AJAX.
      *
      * @param query
-     * @param displayCols
+     * @param async
+     *      Determines whether this is executed asynchronously or not.
      */
-    sendQuery: function(query, displayCols)
+    sendQuery: function(query, async)
     {
         this.varTableRows.reset();
 
@@ -90,7 +93,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
             contentType: "application/json",
             data: JSON.stringify(query),
             dataType: "json",
-            async: false,
+            async: async,
             success: function(json)
             {
                 console.debug("Query returned " + json.totalResults + " results");

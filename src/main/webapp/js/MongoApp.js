@@ -220,9 +220,14 @@ MongoApp.addInitializer(function () {
 
         // rebuild backbone collection attributes
         MongoApp.search.get("filters").reset();
-        MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_ADD, MongoApp.FILTER_NONE);
+        var async = false; // async is FALSE because we need to add multiple filters in sequence
+        if (filters.length == 0) {
+            // only have the NONE filter, okay to have it async
+            async = true;
+        }
+        MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_ADD, MongoApp.FILTER_NONE, async);
         _.each(filters.models, function(filter) {
-            MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_ADD, filter);
+            MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_ADD, filter, async);
         });
 
         MongoApp.search.set("saved", true);

@@ -18,8 +18,8 @@ var SearchController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_ADD, function (filter) {
-            self.addFilter(filter);
+        MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_ADD, function (filter, async) {
+            self.addFilter(filter, async);
         });
         MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_REMOVE, function (filter) {
             self.removeFilter(filter);
@@ -69,13 +69,13 @@ var SearchController = Backbone.Marionette.Controller.extend({
         options.region.show(this.searchFilterView);
     },
 
-    addFilter: function (filter) {
+    addFilter: function (filter, async) {
         MongoApp.search.get("filters").add(filter);
 
         if (filter.get('id') != MongoApp.FILTER_NONE.get('id'))
             MongoApp.search.set("saved", false);
 
-        MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_ADDED, MongoApp.search);
+        MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_ADDED, MongoApp.search, async);
         this.updateFilterRemovable();
     },
 

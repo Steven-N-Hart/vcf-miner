@@ -68,7 +68,8 @@ var AddFilterDialog = function (workspace, indexController) {
         if (typeof filter !== 'undefined')
         {
             filter.setFilterDisplay();
-            MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_ADD, filter);
+            var async = true; // asynchronous is TRUE so that the UI can nicely show the "please wait" dialog
+            MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_ADD, filter, async);
             $("#add_filter_close").click();
             $('#add_filter_modal').modal('hide')
         }
