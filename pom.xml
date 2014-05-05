@@ -14,7 +14,7 @@
         <dependency>
             <groupId>edu.mayo</groupId>
             <artifactId>mayo-commons-mongodb</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
         <!-- Web Application Support -->
         <dependency>
@@ -27,6 +27,12 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
+        </dependency>
+        <!-- GSON -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>1.7.1</version>
         </dependency>
         <!-- COMMONS -->
         <dependency>

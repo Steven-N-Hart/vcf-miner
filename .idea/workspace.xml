@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" readonly="true" id="be9f73b3-8806-4b29-b922-d6eef1649cf2" name="Default" comment="fixing build errors">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/resources/testData/zygosityTest.vcf" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/Querry.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/Querry.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java" afterPath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/QuerryTest.java" afterPath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/QuerryTest.java" />
+    <list default="true" readonly="true" id="be9f73b3-8806-4b29-b922-d6eef1649cf2" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/History.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/History.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__edu_mayo_mayo_commons_exec_0_0_8_SNAPSHOT.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__edu_mayo_mayo_commons_exec_0_0_8_SNAPSHOT.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/SampleGroup.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/SampleGroup.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mongo_svr.iml" afterPath="$PROJECT_DIR$/mongo_svr.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/mongo_svr_war.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/mongo_svr_war.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/mongo_svr_war_exploded.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/mongo_svr_war_exploded.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="mongo_svr.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1398874909363" ignored="false" />
+    <file path="/Dummy.txt" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1399321211661" ignored="false" />
     <file path="/DownloadFile.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1386880214925" ignored="false" />
     <file path="/Provision.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1398721282631" ignored="false" />
     <file path="/Tokens.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1398526858432" ignored="false" />
@@ -173,7 +169,7 @@
     <file path="/MongoDBCacheTestITCase.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1387398950677" ignored="false" />
     <file path="$PROJECT_DIR$/../mayo-commons-cache/src/main/java/edu/mayo/cache/backends/Hazelcast/HazelcastCache.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1387469838991" ignored="false" />
     <file path="/HazelcastCache.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1387246600515" ignored="false" />
-    <file path="/pom.xml" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1397588116201" ignored="false" />
+    <file path="/pom.xml" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1399321681522" ignored="false" />
     <file path="$PROJECT_DIR$/../mayo-commons-cache/src/test/java/edu/mayo/cache/backends/Hazelcast/HazelcastCacheTest.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1387470004262" ignored="false" />
     <file path="/HazelcastCacheTest.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1387200358331" ignored="false" />
     <file path="/Fasta2Tabix.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1391554119398" ignored="false" />
@@ -294,13 +290,13 @@
     <file path="$PROJECT_DIR$/../../SpringSecurityLDAP/src/main/webapp/WEB-INF/spring-security.xml" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1394826111850" ignored="false" />
     <file path="/RESTClientWholeStackITCase.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395067532506" ignored="false" />
     <file path="$PROJECT_DIR$/../../pipes/src/main/java/edu/mayo/pipes/WritePipe.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395077204928" ignored="false" />
-    <file path="$PROJECT_DIR$/../../pipes/pom.xml" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1398718964593" ignored="false" />
+    <file path="$PROJECT_DIR$/../../pipes/pom.xml" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1399322235965" ignored="false" />
     <file path="$PROJECT_DIR$/../../pipes/src/main/java/edu/mayo/pipes/bioinformatics/sequence/Fasta2Tabix.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395081194915" ignored="false" />
     <file path="/WritePipe.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395077108152" ignored="false" />
     <file path="$PROJECT_DIR$/../../pipes/src/main/java/edu/mayo/pipes/exceptions/WriteFailureException.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1396031973342" ignored="false" />
     <file path="/WriteFailureException.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395859499450" ignored="false" />
     <file path="$PROJECT_DIR$/../../mayo-commons-mongodb/src/main/resources/sys.properties" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1397572588766" ignored="false" />
-    <file path="$PROJECT_DIR$/../../mayo-commons-mongodb/pom.xml" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1399321189446" ignored="false" />
+    <file path="$PROJECT_DIR$/../../mayo-commons-mongodb/pom.xml" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1399322235965" ignored="false" />
     <file path="$PROJECT_DIR$/../../mayo-commons-mongodb/src/main/java/edu/mayo/util/MongoExample.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395084248504" ignored="false" />
     <file path="$PROJECT_DIR$/../../mayo-commons-mongodb/src/main/java/edu/mayo/parsers.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395084317259" ignored="false" />
     <file path="$PROJECT_DIR$/../../mayo-commons-mongodb/src/main/java/edu/mayo/parsers/ParserInterface.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1397572588766" ignored="false" />
@@ -1057,7 +1053,7 @@
       <file leaf-file-name="Querry.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/Querry.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="7.2">
               <folding>
                 <element signature="e#1322#1335#0" expanded="true" />
                 <element signature="e#24296#24309#0" expanded="true" />
@@ -1087,10 +1083,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SampleGroup.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="SampleGroup.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/SampleGroup.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="75" column="0" selection-start="2168" selection-end="2168" vertical-scroll-proportion="0.0">
+            <state line="27" column="30" selection-start="927" selection-end="927" vertical-scroll-proportion="0.4312115">
               <folding>
                 <element signature="e#2020#2028#0" expanded="true" />
               </folding>
@@ -1098,10 +1094,30 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="pom.xml" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="18" selection-start="432" selection-end="432" vertical-scroll-proportion="0.27">
+            <state line="35" column="21" selection-start="1268" selection-end="1268" vertical-scroll-proportion="-17.8">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ClientDownloadProxy.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/ClientDownloadProxy.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="15" column="13" selection-start="512" selection-end="512" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="History.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/History.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="5" column="23" selection-start="136" selection-end="136" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -1110,29 +1126,8 @@
       <file leaf-file-name="VCFParser.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFParser.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="138" column="42" selection-start="6403" selection-end="6418" vertical-scroll-proportion="0.0">
+            <state line="16" column="120" selection-start="424" selection-end="424" vertical-scroll-proportion="0.0">
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="VCF2VariantPipe.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../pipes/src/main/java/edu/mayo/pipes/bioinformatics/VCF2VariantPipe.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="235" column="0" selection-start="9089" selection-end="9089" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ReplaceAllPipe.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../pipes/src/main/java/edu/mayo/pipes/ReplaceAllPipe.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="22" column="21" selection-start="514" selection-end="514" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#0#661#0" expanded="false" />
-                <element signature="imports" expanded="false" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -1140,7 +1135,7 @@
       <file leaf-file-name="QuerryTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/QuerryTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="291" column="0" selection-start="12170" selection-end="12781" vertical-scroll-proportion="0.0">
+            <state line="285" column="115" selection-start="11971" selection-end="11971" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1081#1101#0" expanded="true" />
@@ -1166,7 +1161,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/UploadExample.java" />
         <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/VCFParser/VCFParserTest.java" />
         <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" />
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java" />
@@ -1177,11 +1171,12 @@
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Provision.java" />
         <option value="$PROJECT_DIR$/../../mayo-commons-mongodb/src/main/java/edu/mayo/util/MongoConnection.java" />
         <option value="$PROJECT_DIR$/src/test/resources/testData/zygosityTest.vcf" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/SampleGroup.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/Querry.java" />
         <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/QuerryTest.java" />
         <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/History.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/SampleGroup.java" />
       </list>
     </option>
   </component>
@@ -2373,7 +2368,11 @@
       <created>1398873354102</created>
       <updated>1398873354102</updated>
     </task>
-    <option name="localTasksCounter" value="64" />
+    <task id="LOCAL-00064" summary="version 1.1.0 release&#10;">
+      <created>1399321227100</created>
+      <updated>1399321227101</updated>
+    </task>
+    <option name="localTasksCounter" value="65" />
     <servers />
   </component>
   <component name="TodoView" selected-index="0">
@@ -2470,7 +2469,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="adding additional field for api" />
+    <option name="LAST_COMMIT_MESSAGE" value="version 1.1.0 release&#10;" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -2496,6 +2495,7 @@
     <MESSAGE value="adding hetro/homo query functonality" />
     <MESSAGE value="adding path for production tomcat deployments" />
     <MESSAGE value="adding additional field for api" />
+    <MESSAGE value="version 1.1.0 release&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2509,20 +2509,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$MAVEN_REPOSITORY$/edu/mayo/pipes/2.3.0/pipes-2.3.0.jar!/edu/mayo/pipes/ReplaceAllPipe.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="31" selection-start="455" selection-end="455" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.5/junit-4.5.jar!/org/junit/runners/BlockJUnit4ClassRunner.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.5/junit-4.5.jar!/org/junit/internal/runners/statements/RunAfters.class">
       <provider selected="true" editor-type-id="text-editor">
         <state line="13" column="16" selection-start="612" selection-end="612" vertical-scroll-proportion="0.40449437">
@@ -2558,27 +2544,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFParser.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="138" column="42" selection-start="6403" selection-end="6418" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/com/tinkerpop/pipes/2.0.0/pipes-2.0.0.jar!/com/tinkerpop/pipes/transform/IdentityPipe.class">
       <provider selected="true" editor-type-id="text-editor">
         <state line="9" column="16" selection-start="305" selection-end="305" vertical-scroll-proportion="0.19575857">
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../pipes/src/main/java/edu/mayo/pipes/ReplaceAllPipe.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="21" selection-start="514" selection-end="514" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#0#661#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2589,18 +2558,56 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/SampleGroup.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="75" column="0" selection-start="2168" selection-end="2168" vertical-scroll-proportion="0.0">
+        <state line="194" column="72" selection-start="7959" selection-end="7959" vertical-scroll-proportion="-12.08">
           <folding>
-            <element signature="e#2020#2028#0" expanded="true" />
+            <element signature="e#8748#8756#0" expanded="true" />
+            <element signature="e#9043#9056#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/ClientDownloadProxy.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="13" selection-start="512" selection-end="512" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="21" selection-start="1268" selection-end="1268" vertical-scroll-proportion="-17.8">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../pipes/src/main/java/edu/mayo/pipes/ReplaceAllPipe.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="21" selection-start="514" selection-end="514" vertical-scroll-proportion="0.54">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFParser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="120" selection-start="424" selection-end="424" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/History.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="23" selection-start="136" selection-end="136" vertical-scroll-proportion="0.0">
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/QuerryTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="291" column="0" selection-start="12170" selection-end="12781" vertical-scroll-proportion="0.0">
+        <state line="285" column="115" selection-start="11971" selection-end="11971" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1081#1101#0" expanded="true" />
@@ -2615,19 +2622,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="194" column="72" selection-start="7959" selection-end="7959" vertical-scroll-proportion="-12.08">
-          <folding>
-            <element signature="e#8748#8756#0" expanded="true" />
-            <element signature="e#9043#9056#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/Querry.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="7.2">
           <folding>
             <element signature="e#1322#1335#0" expanded="true" />
             <element signature="e#24296#24309#0" expanded="true" />
@@ -2635,10 +2632,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/SampleGroup.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="18" selection-start="432" selection-end="432" vertical-scroll-proportion="0.27">
-          <folding />
+        <state line="27" column="30" selection-start="927" selection-end="927" vertical-scroll-proportion="0.4312115">
+          <folding>
+            <element signature="e#2020#2028#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
