@@ -486,6 +486,47 @@ public class Querry {
      * @return
      */
     private BasicDBObject constructGroupFilter(SampleGroup sampleGroup){
+        if(sampleGroup.getAllAnySample().equalsIgnoreCase("ALL")){
+            return constructANDGroupFilter(sampleGroup);
+        }else {
+            return constructGroupFilterSimple(sampleGroup);
+        }
+    }
+
+    /**
+     * constructs a query like this:
+     * { $and : [{"FORMAT.HeterozygousList" : { $in : ["Y"] } }, {"FORMAT.HeterozygousList" : { $in : ["A"] } }] }";
+     * @param sampleGroup
+     * @return
+     */
+    private BasicDBObject constructANDGroupFilter(SampleGroup sampleGroup){
+        BasicDBObject and = new BasicDBObject();
+        BasicDBList andlist = new BasicDBList();
+        for(String s : sampleGroup.getSamples()){
+            DBObject andclause = constructANDClause(s, sampleGroup.getZygosity(), sampleGroup.isInSample());
+            if(andclause != null){
+                andlist.add(andclause);
+            }
+        }
+        and.put("$and", andlist);
+        return and;
+    }
+
+    private BasicDBObject constructANDClause(String sample, String zygocity, boolean inSample){
+        BasicDBObject clause = new BasicDBObject();
+        BasicDBObject in = new BasicDBObject();
+        BasicDBList l = new BasicDBList();
+        l.add(sample);
+        if(inSample){
+            in.append("$in",l);
+        }else {
+            in.append("$nin",l);
+        }
+        clause.append(getSearchFormatArray(zygocity), in);
+        return clause;
+    }
+
+    public BasicDBObject constructGroupFilterSimple(SampleGroup sampleGroup){
         BasicDBObject ret = new BasicDBObject();
         BasicDBObject in = new BasicDBObject();
         BasicDBList l = new BasicDBList();
@@ -502,9 +543,13 @@ public class Querry {
     }
 
     public String getSearchFormatArray(SampleGroup sampleGroup){
-        if(sampleGroup.getZygosity().equalsIgnoreCase("heterozygous")){
+        return getSearchFormatArray(sampleGroup.getZygosity());
+    }
+
+    public String getSearchFormatArray(String zygocity){
+        if(zygocity.equalsIgnoreCase("heterozygous")){
             return "FORMAT.HeterozygousList";
-        }else if(sampleGroup.getZygosity().equalsIgnoreCase("homozygous")){
+        }else if(zygocity.equalsIgnoreCase("homozygous")){
             return "FORMAT.HomozygousList";
         } else {
             return "FORMAT.GenotypePositiveList";
@@ -642,6 +687,14 @@ public class Querry {
 
     public void setSampleGroups(ArrayList<SampleGroup> sampleGroups) {
         this.sampleGroups = sampleGroups;
+    }
+
+    public void setSampleGroups(List<SampleGroup> sampleGroupList){
+        ArrayList<SampleGroup> rep = new ArrayList<SampleGroup>();
+        for(SampleGroup samp : sampleGroupList){
+            rep.add(samp);
+        }
+        this.sampleGroups = rep;
     }
 
     public ArrayList<InfoNumberFilter> getInfoNumberFilters() {

@@ -5,6 +5,7 @@ import com.mongodb.BasicDBObject;
 import edu.mayo.util.Tokens;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -61,6 +62,14 @@ public class SampleGroup {
 
     public void setSamples(ArrayList<String> samples) {
         this.samples = samples;
+    }
+
+    public void setSamples(List<String> samples){
+        ArrayList<String> rep = new ArrayList<String>();
+        for(String s : samples){
+            rep.add(s);
+        }
+        this.samples = rep;
     }
 
     public boolean isInSample() {

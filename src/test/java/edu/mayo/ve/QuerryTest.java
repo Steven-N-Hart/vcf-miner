@@ -278,6 +278,49 @@ public class QuerryTest {
         sampleGroup.setInSample(false);
         c = q.createQuery();
         assertEquals(f, c.toString());
+    }
+
+    @Test
+    public void testZygosityWithAnyOrAllSamples(){
+        //VCF
+        //#CHROM POS ID REF ALT QUAL FILTER INFO FORMAT X   Y   Z   A   B
+        //                                       GT     0/0 0/1 1/1 0/1 0/1
+
+        //Use Cases:
+        //Group[Y,Z,A]
+        //1. Show me my variant that has hetro in Z AND A -> returns nothing
+        String query1 = "{ \"$and\" : [{\"FORMAT.HeterozygousList\" : { \"$in\" : [\"Z\"] } }, {\"FORMAT.HeterozygousList\" : { \"$in\" : [\"A\"] } }] }";
+        Querry q1 = new Querry();
+        SampleGroup za = new SampleGroup();
+        za.setZygosity("heterozygous");
+        za.setAllAnySample("any");
+        za.setInSample(true);//the default, but lets make it explicit!
+        za.setSamples(Arrays.asList("Z", "A"));
+        za.setAllAnySample("all");
+        q1.setSampleGroups(Arrays.asList(za));
+        assertEquals(query1.replaceAll("\\s+",""), q1.createQuery().toString().replaceAll("\\s+",""));
+
+        //2. Show me any variant that has Z OR A hetro -> return one variant
+        String query2 = "{ \"FORMAT.HeterozygousList\" : { \"$in\" : [ \"X\" , \"A\"]}}";
+        Querry q2 = new Querry();
+        SampleGroup xa = new SampleGroup();
+        xa.setZygosity("heterozygous");
+        xa.setAllAnySample("any");
+        xa.setInSample(true);//the default, but lets make it explicit!
+        xa.setSamples(Arrays.asList("X", "A"));
+        q2.setSampleGroups(Arrays.asList(xa));
+        assertEquals(query2, q2.createQuery().toString());
+
+        //3. Show me any variant where A AND Y are hetro -> variant line
+        String query3 = "{ \"$and\" : [{\"FORMAT.HeterozygousList\" : { \"$in\" : [\"Y\"] } }, {\"FORMAT.HeterozygousList\" : { \"$in\" : [\"A\"] } }] }";
+        Querry q3 = new Querry();
+        SampleGroup ya = new SampleGroup();
+        ya.setZygosity("heterozygous");
+        ya.setAllAnySample("all");
+        ya.setInSample(true);
+        ya.setSamples(Arrays.asList("Y", "A"));
+        q3.setSampleGroups(Arrays.asList(ya));
+        assertEquals(query3.replaceAll("\\s+",""), q3.createQuery().toString().replaceAll("\\s+",""));
 
 
     }

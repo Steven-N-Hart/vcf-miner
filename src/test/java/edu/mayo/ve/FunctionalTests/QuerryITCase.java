@@ -22,6 +22,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -159,5 +160,77 @@ public class QuerryITCase {
         assertEquals(numberCheck, totalResults);
         return r;
     }
+
+    @Test
+    public void testSampleGroupsWithZygocityAndAnyVSAll() throws ProcessTerminatedException {
+        //this test needs to use its own vcf file and workspace...
+        //provison the workspace
+        Provision prov = new Provision();
+        String json = prov.provision(user,alias);
+        DBObject w = (DBObject) JSON.parse(json);
+        String vcf = "src/test/resources/testData/zygosityTest.vcf";
+        String workspace = (String) w.get(Tokens.KEY);
+        System.out.println("Workspace for " + vcf + " provisioned with key: " + workspace);
+
+        //load the VCF into the workspace
+        VCFParser parser = new VCFParser();
+        parser.setReporting(true);
+        parser.parse(vcf, workspace);
+
+        //
+        // Use Case 1:
+        //
+        // 1. Show me my variant that has hetro in Z AND A -> returns nothing
+        // db.we2f57f8275477cb26db93c42aa7323fd936d278b.find({ $and : [{"FORMAT.HeterozygousList" : { $in : ["Z"] } }, {"FORMAT.HeterozygousList" : { $in : ["A"] } }] } )
+        //
+        //
+        zygoAllVSAll(workspace, Arrays.asList("Z","A"), "all", 0);
+
+        //
+        // Use Case 2:
+        //
+        // 2. Show me any variant that has X OR A hetro -> return one variant
+        // db.we2f57f8275477cb26db93c42aa7323fd936d278b.find({"FORMAT.HeterozygousList" : { $in : ["X", "A"] } })
+        //
+        zygoAllVSAll(workspace, Arrays.asList("X","A"), "any", 1);
+
+        //
+        // Use Case 3:
+        //
+        // 3. Show me any variant where A AND Y are hetro -> variant line
+        // db.we2f57f8275477cb26db93c42aa7323fd936d278b.find({ $and : [{"FORMAT.HeterozygousList" : { $in : ["Y"] } }, {"FORMAT.HeterozygousList" : { $in : ["A"] } }] } )
+        //
+        zygoAllVSAll(workspace, Arrays.asList("Y","A"), "all", 1);
+
+
+    }
+
+    private void zygoAllVSAll(String workspace, List<String> sampleList, String allAny, int expectedNumberResults){
+        Querry q1 = new Querry();
+        DBObject r = null;
+        q1.setWorkspace(workspace);
+        q1.setNumberResults(3);//There is only one result for this file!
+
+        //setup samples
+        SampleGroup sampleGroup = new SampleGroup();
+        ArrayList<String> samp = new ArrayList<String>();
+        for(String s: sampleList){
+            samp.add(s);
+        }
+        sampleGroup.setSamples(samp);
+        sampleGroup.setZygosity("heterozygous");
+        sampleGroup.setAllAnySample(allAny);
+
+        //setup the query
+        ArrayList<SampleGroup> samples = new ArrayList<SampleGroup>();
+        samples.add(sampleGroup);
+        q1.setSampleGroups(samples);
+        System.out.println(q1.createQuery().toString());
+
+        //run the query
+        r = runQueryAndExtractResults(q1, expectedNumberResults);
+    }
+
+
 
 }
