@@ -84,6 +84,7 @@ public class VCFParserITCase {
             break;//we could do the entire list...
         }
 
+        System.out.println(parser.getJson().toString());
         //check that the metadata is correct
         assertEquals(metadata.get(0).replaceAll("\\s+",""), parser.getJson().toString().replaceAll("\\s+",""));
 
