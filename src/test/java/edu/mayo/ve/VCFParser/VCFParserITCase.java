@@ -118,7 +118,7 @@ public class VCFParserITCase {
         JsonParser gsonparser = new JsonParser();
         JsonElement jeJSON = gsonparser.parse(result);
         JsonElement expected = gsonparser.parse(expect);
-        assertEquals(expected, jeJSON);
+        assertEquals(expected.toString(), jeJSON.toString());
     }
 
 
