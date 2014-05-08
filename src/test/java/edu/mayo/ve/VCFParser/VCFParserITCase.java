@@ -85,7 +85,7 @@ public class VCFParserITCase {
         }
 
         //check that the metadata is correct
-        //assertEquals(metadata.get(0).replaceAll("\\s+",""), parser.getJson().toString().replaceAll("\\s+",""));
+        assertEquals(metadata.get(0).replaceAll("\\s+",""), parser.getJson().toString().replaceAll("\\s+",""));
 
         System.out.println("Ensuring that SNPEFF columns are identified for indexing correctly");
         int count =0;
