@@ -80,7 +80,7 @@ public class VCFParserITCase {
         for(Integer i : results.keySet()){
             String value = results.get(i);
             System.out.println(value);
-            //assertEquals(known.get(i).replaceAll("\\s+",""), results.get(i).replaceAll("\\s+",""));
+            assertEquals(known.get(i).replaceAll("\\s+",""), results.get(i).replaceAll("\\s+",""));
             break;//we could do the entire list...
         }
 
