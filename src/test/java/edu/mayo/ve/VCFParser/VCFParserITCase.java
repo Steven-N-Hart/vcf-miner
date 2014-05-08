@@ -76,7 +76,7 @@ public class VCFParserITCase {
 
         //test to see that the parser is performing to spec
         results = parser.getTestingCollection();
-        //assertEquals(826, results.size());
+        assertEquals(826, results.size());
         for(Integer i : results.keySet()){
             String value = results.get(i);
             System.out.println(value);
