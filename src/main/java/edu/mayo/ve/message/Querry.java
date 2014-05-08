@@ -300,6 +300,7 @@ public class Querry {
             q.append("FILTER",1);
             q.append("INFO",1);
             q.append("FORMAT",1);
+            q.append("CUSTOM",1);
 //            q.append("GenotypePostitiveCount",1);
 //            q.append("GenotypePositiveList",1);
 //            q.append("PLIntervalMin",1);

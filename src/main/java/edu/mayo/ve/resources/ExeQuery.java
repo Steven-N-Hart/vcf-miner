@@ -5,6 +5,7 @@ import com.mongodb.*;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.message.Rresults;
 import edu.mayo.util.MongoConnection;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -46,7 +47,9 @@ public class ExeQuery {
             results.addResult(next);
         }
 
-        return gson.toJson(results);
+        ObjectMapper mapper = new ObjectMapper();
+
+        return results.asJson();
     }
 
 

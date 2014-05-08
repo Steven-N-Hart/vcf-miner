@@ -104,8 +104,8 @@ public class ProblemVCFITCase {
         ArrayList<SampleNumberFilter> snfs = new ArrayList<SampleNumberFilter>( Arrays.asList(snf) );
         q.setSampleNumberFilters(snfs);
         String result = eq.handleBasicQuerry(q);
-        assertTrue(result.startsWith("{\"totalResults\":22747"));
-        System.out.println(result);
+        System.out.println(result.substring(0,200));
+        assertTrue(result.replaceAll("\\s+","").startsWith("{\"totalResults\":22747"));
         delete(vcf);
     }
 

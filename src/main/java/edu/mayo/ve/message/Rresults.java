@@ -37,4 +37,16 @@ public class Rresults {
     public void setMongoQuery(String mongoQuery) {
         this.mongoQuery = mongoQuery;
     }
+
+    public String asJson(){
+        BasicDBObject ret = new BasicDBObject();
+        ret.append("totalResults", totalResults);
+        ret.append("mongoQuery", mongoQuery);
+        BasicDBList results = new BasicDBList();
+        for(DBObject dbo : this.results){
+            results.add(dbo);
+        }
+        ret.append("results", results);
+        return ret.toString();
+    }
 }
