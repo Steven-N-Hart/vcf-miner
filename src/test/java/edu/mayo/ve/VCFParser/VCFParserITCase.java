@@ -59,7 +59,7 @@ public class VCFParserITCase {
 
     private Mongo m = MongoConnection.getMongo();
     String VCF = "src/test/resources/testData/TNBC_Cases_Controls.snpeff.annotation.vcf";
-    //@Test
+    @Test
     public void testParse() throws Exception {
         System.out.println("Running: edu.mayo.ve.VCFParser.VCFParserITCase.testParse");
         //set the testing collection to a new empty collection
@@ -85,7 +85,7 @@ public class VCFParserITCase {
         }
 
         //check that the metadata is correct
-        assertEquals(metadata.get(0), parser.getJson().toString());
+        assertEquals(metadata.get(0).replaceAll("\\s+",""), parser.getJson().toString().replaceAll("\\s+",""));
 
         System.out.println("Ensuring that SNPEFF columns are identified for indexing correctly");
         int count =0;

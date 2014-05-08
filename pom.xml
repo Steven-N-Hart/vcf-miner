@@ -28,12 +28,6 @@
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
         </dependency>
-        <!-- GSON -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>1.7.1</version>
-        </dependency>
         <!-- COMMONS -->
         <dependency>
             <groupId>commons-configuration</groupId>
