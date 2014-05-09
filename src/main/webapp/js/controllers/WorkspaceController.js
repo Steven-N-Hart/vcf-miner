@@ -139,7 +139,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                     }
                 },
                 error: function(jqXHR, textStatus) {
-                    MongoApp.vent.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+                    MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
                 }
             });
         }
@@ -200,7 +200,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                     }
                 },
                 error: function(jqXHR, textStatus) {
-                    MongoApp.vent.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+                    MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
                 }
             });
         }
@@ -281,7 +281,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 self.workspaces.remove(workspace);
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     },
@@ -334,7 +334,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
             },
             error: function(jqXHR, textStatus)
             {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     },
@@ -403,7 +403,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     },
@@ -435,7 +435,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
             },
             error: function(jqXHR, textStatus)
             {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     }

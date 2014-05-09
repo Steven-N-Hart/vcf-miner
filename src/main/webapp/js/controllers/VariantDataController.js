@@ -162,7 +162,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             },
             complete: function(jqXHR, textStatus) {
                 setTimeout(function(){ pleaseWaitDiv.modal('hide');}, 500);

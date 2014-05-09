@@ -190,6 +190,7 @@ MongoApp.addInitializer(function () {
 
     // Wire Marionette events to function callbacks
     MongoApp.vent.on(MongoApp.events.ERROR, function (errorMessage) {
+        // show error message in new browser window
         var ERROR_TEMPLATE = $("#error-message-template").html();
         window.open().document.write(_.template(ERROR_TEMPLATE, {message: errorMessage}))
     });

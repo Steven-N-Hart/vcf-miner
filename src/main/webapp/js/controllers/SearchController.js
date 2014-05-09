@@ -135,7 +135,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
                 console.log("save successful!");
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     },
@@ -162,7 +162,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     },
@@ -192,7 +192,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, JSON.stringify(jqXHR));
+                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     },

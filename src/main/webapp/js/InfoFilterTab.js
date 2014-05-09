@@ -326,7 +326,7 @@ var InfoFilterTab = function (indexController) {
             },
             error: function(jqXHR, textStatus)
             {
-                $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
         return values;
@@ -358,7 +358,7 @@ var InfoFilterTab = function (indexController) {
             },
             error: function(jqXHR, textStatus)
             {
-                $("#message_area").html(_.template(ERROR_TEMPLATE,{message: JSON.stringify(jqXHR)}));
+                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
 
