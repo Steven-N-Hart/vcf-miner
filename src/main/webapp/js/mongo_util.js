@@ -137,18 +137,20 @@ function buildQuery(filterList, workspaceKey) {
                 break;
             case FilterCategory.IN_GROUP:
             case FilterCategory.NOT_IN_GROUP:
-                // lookup SampleGroup model that corresponds to name
-                var group = MongoApp.workspace.get("sampleGroups").findWhere({name: filter.get("value")});
                 var inSample;
                 if (filter.get("category") == FilterCategory.IN_GROUP)
                     inSample = true;
                 if (filter.get("category") == FilterCategory.NOT_IN_GROUP)
                     inSample = false;
-                sampleGroups.push(group.toSampleGroupPOJO(workspaceKey, inSample));
+                sampleGroups.push(filter.toSampleGroupPOJO(workspaceKey, inSample));
                 break;
             case FilterCategory.FORMAT:
                 sampleNumberFilters.push(filter.toSampleNumberFilterPojo());
                 break;
+        }
+
+        if (filter instanceof GroupFilter) {
+            console.log("true");
         }
     });
 

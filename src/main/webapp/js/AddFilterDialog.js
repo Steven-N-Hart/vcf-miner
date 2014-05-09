@@ -14,6 +14,7 @@ var AddFilterDialog = function (workspace, indexController) {
     // private variables
     var sampleFilterTab = new SampleFilterTab();
     var infoFilterTab   = new InfoFilterTab(indexController);
+    var customFilterTab = new CustomFilterTab();
 
     $('#add_filter_tabs a').click(function (e)
     {
@@ -63,6 +64,10 @@ var AddFilterDialog = function (workspace, indexController) {
                 if (infoFilterTab.validate())
                     filter = infoFilterTab.getFilter();
                 break;
+            case "tab_content_custom":
+                if (customFilterTab.validate())
+                    filter = customFilterTab.getFilter();
+                break;
         }
 
         if (typeof filter !== 'undefined')
@@ -79,6 +84,7 @@ var AddFilterDialog = function (workspace, indexController) {
     {
         sampleFilterTab.initialize();
         infoFilterTab.initialize();
+        customFilterTab.initialize();
     }
 
     // public API

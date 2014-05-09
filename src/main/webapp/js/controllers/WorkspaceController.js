@@ -411,7 +411,11 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     createSampleGroup: function(group, workspace)
     {
         // translate backbone model to pojo expected by server
-        var pojo = group.toSampleGroupPOJO(workspace.get("key"));
+        var pojo = {};
+        pojo.workspace   = workspace.get("key");
+        pojo.alias       = group.get("name");
+        pojo.description = group.get("description");
+        pojo.samples     = group.get("sampleNames");
 
         console.debug("Saving group: " + JSON.stringify(pojo));
 

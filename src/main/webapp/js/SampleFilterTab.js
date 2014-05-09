@@ -8,18 +8,12 @@ var SampleFilterTab = function () {
 
     // private variables
     var filters = new FilterList();
-    var sampleGroups = new SampleGroupList();
 
     // register for Marionette events
     MongoApp.vent.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
 
         // remember what the user has selected
         var selectedFilter = getSelectedFilter();
-
-        sampleGroups.reset();
-        _.each(workspace.get("sampleGroups").models, function(group) {
-            sampleGroups.add(group);
-        });
 
         filters.reset();
 
@@ -41,48 +35,18 @@ var SampleFilterTab = function () {
             }
         });
 
-        // standard group filters added last
-        filters.add(MongoApp.FILTER_IN_GROUP);
-        filters.add(MongoApp.FILTER_NOT_IN_GROUP);
-
         // reselect
         if (selectedFilter != undefined) {
             var filterName = selectedFilter.get("name");
             $("#sample_field_list option:contains('"+filterName+"')").prop('selected', true);
         }
-    });
 
-    var count = $('#group_sample_count');
-    var list = $('#group_sample_names_list');
-
-    var groupListView = new GroupListView(
-        {
-            "el": $('#group_list'),
-            "model": sampleGroups,
-            "fnGroupChangeCallback": groupChanged
-        }
-    );
-
-    var createGroupDialog = new CreateGroupDialog();
-    $('#new_group_button').click(function (e)
-    {
-        createGroupDialog.show();
-    });
-
-
-    // add custom validation method for the group drowdown to make sure a group
-    // is selected
-    jQuery.validator.addMethod("checkGroup", function(value, element) {
-
-        if (typeof groupListView.getSelectedGroup() === 'undefined')
-        {
-            return false;
-        }
+        // check to see whether we have any INFO annotation
+        if (filters.length > 0)
+            $('#no_format_annotation_warning').toggle(false);
         else
-        {
-            return true;
-        }
-    }, "A group must be selected.");
+            $('#no_format_annotation_warning').toggle(true);
+    });
 
     // jQuery validate plugin config
     $('#sample_tab_form').validate({
@@ -90,12 +54,7 @@ var SampleFilterTab = function () {
                 sample_filter_value: {
                     required: true,
                     number:true
-                },
-
-                group_list: {
-                    checkGroup: true
                 }
-
             },
             highlight: function(element) {
                 $(element).parent().addClass('control-group error');
@@ -136,7 +95,7 @@ var SampleFilterTab = function () {
 
         selectionChanged: function(e)
         {
-            sampleFieldChanged();
+            // no op
         },
 
         removeAll: function()
@@ -151,66 +110,6 @@ var SampleFilterTab = function () {
             "model": filters
         }
     );
-
-    function sampleFieldChanged()
-    {
-        // get selected filter
-        var filter = getSelectedFilter();
-
-        switch(filter.get("category"))
-        {
-            case FilterCategory.IN_GROUP:
-            case FilterCategory.NOT_IN_GROUP:
-                // always make sure count and sample list
-                // are cleared if no group is selected
-                if (typeof groupListView.getSelectedGroup() == 'undefined')
-                {
-                    count.empty();
-                    list.empty();
-                }
-
-                // make sure a group is selected, otherwise it should show a
-                // validation warning to user
-                validate();
-
-                $('#group_value_div').toggle(true);
-                $('#sample_value_div').toggle(false);
-                $('#sample_field_op_list').toggle(false);
-                $('#sample_field_min_max_list').toggle(false);
-            break;
-
-            case FilterCategory.FORMAT:
-                // all other cases
-                $('#group_value_div').toggle(false);
-                $('#sample_value_div').toggle(true);
-                $('#sample_field_op_list').toggle(true);
-                $('#sample_field_min_max_list').toggle(true);
-                break;
-        }
-    }
-
-    /**
-     * Called when the selected group changes.
-     *
-     * @param group
-     */
-    function groupChanged(group)
-    {
-        count.empty();
-        list.empty();
-
-        count.append('Number of samples: <b>' + group.get("sampleNames").length + '</b>');
-
-        var listHTML = '<select size="8">';
-        for (var i=0; i < group.get("sampleNames").length; i++)
-        {
-            listHTML += "<option>" + group.get("sampleNames")[i] + "</option>";
-        }
-        listHTML += '</select>';
-        list.append(listHTML);
-
-        validate();
-    }
 
     function validate()
     {
@@ -235,8 +134,6 @@ var SampleFilterTab = function () {
          */
         initialize: function()
         {
-            // simulate user choosing the 1st field
-            sampleFieldChanged();
         },
 
         /**
@@ -257,11 +154,6 @@ var SampleFilterTab = function () {
 
             switch(filter.get("category"))
             {
-                case FilterCategory.IN_GROUP:
-                case FilterCategory.NOT_IN_GROUP:
-                    filter.set("value", groupListView.getSelectedGroup().get("name"));
-                    break;
-
                 case FilterCategory.FORMAT:
                     // get selected operator
                     var operator = FilterOperator.EQ; // default

@@ -369,8 +369,10 @@ var InfoFilterTab = function (indexController) {
     return {
         initialize: function()
         {
-            // simulate user choosing the 1st INFO field
-            infoFieldChanged();
+            if (infoFields.length > 0) {
+                // simulate user choosing the 1st INFO field
+                infoFieldChanged();
+            }
         },
 
         /**

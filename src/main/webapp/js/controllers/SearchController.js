@@ -332,16 +332,18 @@ var SearchController = Backbone.Marionette.Controller.extend({
         var filter;
 
         if (querry.sampleGroups.length == 1) {
-            filter = new Filter();
+            filter = new GroupFilter();
 
-            var sampleGroup = querry.sampleGroups[0];
-            var inSample = sampleGroup.inSample;
+            var sampleGroupPojo = querry.sampleGroups[0];
+            var inSample = sampleGroupPojo.inSample;
             if (inSample) {
                 filter = MongoApp.FILTER_IN_GROUP.clone();
             } else {
                 filter = MongoApp.FILTER_NOT_IN_GROUP.clone();
             }
-            filter.set("value", sampleGroup.alias);
+            filter.set("genotype", filter.toGenotype(sampleGroupPojo.zygosity));
+            filter.set("sampleStatus", filter.toSampleStatus(sampleGroupPojo.allAnySample));
+            filter.set("value", new SampleGroup().fromPojo(sampleGroupPojo));
         }
         else if (querry.infoFlagFilters.length == 1) {
             filter = new Filter().fromInfoFlagFilterPojo(querry.infoFlagFilters[0]);
