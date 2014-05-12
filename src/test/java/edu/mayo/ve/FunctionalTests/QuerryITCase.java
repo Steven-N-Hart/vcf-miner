@@ -40,23 +40,32 @@ public class QuerryITCase {
     private static final String user = "test";
     private static final String alias = "TypeAheadITCaseTestVCF";
     private static String workspaceID = "w34f826f14dd8dbde823345c4c7b1543bbf64658c";
+    private static final String kgenome = "src/test/resources/testData/Asif1000G.vcf";
+    private static String kgenomeworkspace = "";
+    private static final String kalias = "kgenome";
     private static int overflowThreshold = 20;  //look below (after the class) for an explanation of why this was selected, for this dataset, we get some that overflow and some that do not, exactly what we want!
 
     public String getWorkspaceID(){ return workspaceID; }
 
     @BeforeClass
     public static void setUp() throws IOException, ProcessTerminatedException {
+        workspaceID = load(softsearchVCF, alias);
+        kgenomeworkspace = load(kgenome, alias);
+    }
+
+    private static String load(String vcf, String alias) throws ProcessTerminatedException {
+        String workspace;
         System.out.println("QuerryITCase.Provision a new workspace...");
         Provision prov = new Provision();
         String json = prov.provision(user,alias);
         DBObject w = (DBObject) JSON.parse(json);
-        workspaceID = (String) w.get(Tokens.KEY);
-        System.out.println("Workspace provisioned with key: " + workspaceID);
+        workspace = (String) w.get(Tokens.KEY);
+        System.out.println("Workspace provisioned with key: " + workspace);
 
         System.out.println("QuerryITCase.Loading data into a new workspace...");
         VCFParser parser = new VCFParser();
-        parser.parse(null, softsearchVCF, workspaceID, overflowThreshold, reporting, false, true);  //put true in the second to last param for verbose load reporting
-
+        parser.parse(null, vcf, workspace, overflowThreshold, reporting, false, true);  //put true in the second to last param for verbose load reporting
+        return workspace;
     }
 
     ExeQuery exeQuery = new ExeQuery();
@@ -116,6 +125,22 @@ public class QuerryITCase {
         String resultQ = "{ \"$and\" : [ { \"$and\" : [ { \"FORMAT.min.nSC\" : { \"$gte\" : 30.0}} , { \"FORMAT.max.uRP\" : { \"$lte\" : 77.0}}]} , { \"INFO.SVTYPE\" : { \"$in\" : [ \"BND\"]}}]}";
         assertEquals(resultQ, q.createQuery().toString());
         //feel free to make this functional test more complex to handle more scenarios!
+    }
+
+    @Test
+    public void testCustomQuery(){
+        Querry q = new Querry();
+        DBObject r = null;
+        q.setWorkspace(kgenomeworkspace);
+        q.setNumberResults(10);//give back at most 10 results
+        //custom
+        ArrayList<SampleNumberFilter> customNumberFilters = new ArrayList<SampleNumberFilter>();
+        SampleNumberFilter custom = new SampleNumberFilter("max","AD",10.0,"$lt");
+        customNumberFilters.add(custom);
+        q.setCustomNumberFilters(customNumberFilters);
+
+        r = runQueryAndExtractResults(q, 374);
+
     }
 
     @Test

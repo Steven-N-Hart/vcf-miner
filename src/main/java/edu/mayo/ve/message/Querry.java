@@ -21,16 +21,7 @@ public class Querry {
     String workspace;
     Integer numberResults;
     Integer returnSampleInfo = 0; //1 for true
-    //The following are all depricated with SampleNumberFilter
-//    Double minAltReads = INFINITY;
-//    Double maxAltReads = 0.0;
-//    /** Show me only variants that are found in more than N samples */
-//    Double minNumSample = INFINITY;
-//    /** Show me only variants that are found in fewer than N samples */
-//    Double maxNumSample = 0.0;
-//    Double minAC = INFINITY;
-//    Double maxAC = 0.0;
-//    Double minPHRED = INFINITY;
+    ArrayList<SampleNumberFilter> customNumberFilters = new ArrayList<SampleNumberFilter>(); //customNumberFilters - these are number fields in the sample columns that have special logic applied to them
     ArrayList<SampleNumberFilter> sampleNumberFilters = new ArrayList<SampleNumberFilter>();
     ArrayList<String> genes = new ArrayList<String>();  //this probably should be depricated at this point
     ArrayList<SampleGroup> sampleGroups = new ArrayList<SampleGroup>();
@@ -76,7 +67,8 @@ public class Querry {
               INFONUMBERFILTER,
               INFOSTRINGFILTER,
               INFOFLAGFILTER,
-              SAMPLENUMBERFILTER
+              SAMPLENUMBERFILTER,
+              CUSTOMNUMBERFILTER
     }
     /**
      * A query has a collection of filters based on the status of the Querry object.  For example if:
@@ -114,6 +106,9 @@ public class Querry {
 //        }
         if(this.sampleNumberFilters.size() > 0){
             l.add(filters.SAMPLENUMBERFILTER.toString());
+        }
+        if(this.customNumberFilters.size() > 0){
+            l.add(filters.CUSTOMNUMBERFILTER.toString());
         }
         if(this.getGenes().size() > 0){
             l.add(filters.GENESFILTER.toString());
@@ -156,7 +151,10 @@ public class Querry {
             return this.constructInfoFlagFilters();
         }
         if(f.equalsIgnoreCase(filters.SAMPLENUMBERFILTER.toString())){
-            return this.constructSampleNumberFilters();
+            return this.constructSampleNumberFilters("FORMAT", this.sampleNumberFilters);
+        }
+        if(f.equalsIgnoreCase(filters.CUSTOMNUMBERFILTER.toString())){
+            return this.constructSampleNumberFilters("CUSTOM", this.customNumberFilters);
         }
         return null;
     }
@@ -351,17 +349,21 @@ public class Querry {
                 "NA12878.chr1.vcf"
         ]
      }
+
+     *
+     * @param subdocumentField = FORMAT, CUSTOM....
+     * @param numberFilters = this.sampleNumberFilters, this.customNumberFilters....
      * @return
      */
-    private DBObject constructSampleNumberFilters(){
-        if(this.sampleNumberFilters.size() == 1){
-            SampleNumberFilter snf = sampleNumberFilters.get(0);
-            return constructBasicFilterWithNulls(formatNumberFilterKey(snf), snf.getComparator(), snf.getValue(), snf.includeNulls);
+    private DBObject constructSampleNumberFilters(String subdocumentField, List<SampleNumberFilter> numberFilters){
+        if(numberFilters.size() == 1){
+            SampleNumberFilter snf = numberFilters.get(0);
+            return constructBasicFilterWithNulls(getNumberFilterKey(subdocumentField,snf), snf.getComparator(), snf.getValue(), snf.includeNulls);
         } else {
             BasicDBObject composite = new BasicDBObject();
             BasicDBList lcomposite = new BasicDBList();
             for(SampleNumberFilter snf : sampleNumberFilters){
-                lcomposite.add(constructBasicFilterWithNulls(formatNumberFilterKey(snf), snf.getComparator(), snf.getValue(), snf.includeNulls));
+                lcomposite.add(constructBasicFilterWithNulls(getNumberFilterKey(subdocumentField,snf), snf.getComparator(), snf.getValue(), snf.includeNulls));
             }
             composite.put("$and", lcomposite);
             return composite;
@@ -369,13 +371,14 @@ public class Querry {
     }
 
     /**
-     *
+     * @param subdocument - where in the document in the variant collection is this data going to be found (e.g. FORMAT, CUSTOM)
      * @param snf
      * @return a string like FORMAT.min.lSC
      */
-    private String formatNumberFilterKey(SampleNumberFilter snf){
+    private String getNumberFilterKey(String subdocument, SampleNumberFilter snf){
         StringBuilder key = new StringBuilder();
-        key.append("FORMAT.");
+        key.append(subdocument);
+        key.append(".");
         key.append(snf.getMinORmax().toLowerCase());
         key.append(".");
         key.append(snf.getKey());
@@ -720,5 +723,13 @@ public class Querry {
 
     public void setInfoFlagFilters(ArrayList<InfoFlagFilter> infoFlagFilters) {
         this.infoFlagFilters = infoFlagFilters;
+    }
+
+    public ArrayList<SampleNumberFilter> getCustomNumberFilters() {
+        return customNumberFilters;
+    }
+
+    public void setCustomNumberFilters(ArrayList<SampleNumberFilter> customNumberFilters) {
+        this.customNumberFilters = customNumberFilters;
     }
 }

@@ -120,6 +120,18 @@ public class QuerryTest {
     }
 
     @Test
+    public void testCustomQuery(){
+        String expected = "{ \"CUSTOM.max.AD\" : { \"$lt\" : 10.0}}";
+        Querry q = new Querry();
+        ArrayList<SampleNumberFilter> customNumberFilters = new ArrayList<SampleNumberFilter>();
+        SampleNumberFilter custom = new SampleNumberFilter("max","AD",10.0,"$lt");
+        customNumberFilters.add(custom);
+        q.setCustomNumberFilters(customNumberFilters);
+        assertEquals(expected,q.createQuery().toString());
+
+    }
+
+    @Test
     public void testInfoStringQuery(){
         Querry q = new Querry();
         ArrayList<InfoStringFilter> filters = new ArrayList<InfoStringFilter>();
