@@ -14,7 +14,7 @@
         <dependency>
             <groupId>edu.mayo</groupId>
             <artifactId>mayo-commons-mongodb</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
         </dependency>
         <!-- Web Application Support -->
         <dependency>
