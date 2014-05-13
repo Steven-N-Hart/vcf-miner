@@ -20,6 +20,7 @@ var CustomFilterTab = function () {
         // standard group filters added last
         filters.add(MongoApp.FILTER_IN_GROUP);
         filters.add(MongoApp.FILTER_NOT_IN_GROUP);
+        filters.add(MongoApp.FILTER_MIN_ALT_AD);
 
         // reselect
         if (selectedFilter != undefined) {
@@ -66,6 +67,11 @@ var CustomFilterTab = function () {
             rules: {
                 group_list: {
                     checkGroup: true
+                },
+                alt_ad_value_field: {
+                    required: true,
+                    number: true,
+                    min: 0
                 }
             },
             highlight: function(element) {
@@ -100,7 +106,13 @@ var CustomFilterTab = function () {
         addOne: function(filter)
         {
             var filterID = filter.get("id");
-            var filterName = filter.get("name");
+
+            var filterName;
+            if (filter === MongoApp.FILTER_MIN_ALT_AD)
+                filterName = 'Alternate Allele Depth';
+            else
+                filterName = filter.get("name");
+
             var desc = filter.get("description");
             this.$el.append("<option value='"+filterID+"' title='"+desc+"'>"+filterName+"</option>");
         },
@@ -128,10 +140,10 @@ var CustomFilterTab = function () {
         // get selected filter
         var filter = getSelectedFilter();
 
-        switch(filter.get("category"))
+        switch(filter)
         {
-            case FilterCategory.IN_GROUP:
-            case FilterCategory.NOT_IN_GROUP:
+            case MongoApp.FILTER_IN_GROUP:
+            case MongoApp.FILTER_NOT_IN_GROUP:
                 // always make sure count and sample sampleNameList
                 // are cleared if no group is selected
                 if (typeof groupListView.getSelectedGroup() == 'undefined')
@@ -140,16 +152,16 @@ var CustomFilterTab = function () {
                     sampleNameList.empty();
                 }
 
-                // make sure a group is selected, otherwise it should show a
-                // validation warning to user
-                validate();
-
-//                $('#group_value_div').toggle(true);
-//                $('#sample_value_div').toggle(false);
-//                $('#sample_field_op_list').toggle(false);
-//                $('#sample_field_min_max_list').toggle(false);
+                $('#group_value_div').toggle(true);
+                $('#alt_ad_value_div').toggle(false);
+                break;
+            case MongoApp.FILTER_MIN_ALT_AD:
+                $('#group_value_div').toggle(false);
+                $('#alt_ad_value_div').toggle(true);
                 break;
         }
+
+        validate();
     }
 
     /**
@@ -245,6 +257,9 @@ var CustomFilterTab = function () {
                     filter.set("sampleStatus", status);
 
                     filter.set("value", groupListView.getSelectedGroup());
+                    break;
+                case FilterCategory.ALT_ALLELE_DEPTH:
+                    filter.set("value", $('#alt_ad_value_field').val());
                     break;
             }
             return filter;

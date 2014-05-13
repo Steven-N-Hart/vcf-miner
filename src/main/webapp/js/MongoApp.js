@@ -93,6 +93,21 @@ MongoApp.addInitializer(function () {
     this.FILTER_NONE         = new Filter({name: 'none', displayName: 'none', operator: FilterOperator.UNKNOWN, displayOperator: '',  value: '' , displayValue: '', id:'id-none'}),
     this.FILTER_IN_GROUP     = new GroupFilter({name: 'Samples in Group',     operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.IN_GROUP, description:'Filters variants based on matching samples'});
     this.FILTER_NOT_IN_GROUP = new GroupFilter({name: 'Samples not in Group', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.NOT_IN_GROUP, description:'Filters variants based on non-matching samples'});
+
+    /**
+     * Override and customize how the name is displayed.
+     * @returns {string}
+     */
+    var MinAltAtFilter = Filter.extend({
+        getNameAsHTML: function() {
+            return'<label title="' + this.get("description") + '">Alternate Allele Depth</label>';
+        },
+        getNameAsASCII: function() {
+            return 'Alternate Allele Depth';
+        }
+    });
+    this.FILTER_MIN_ALT_AD = new MinAltAtFilter({name: 'AD', operator: FilterOperator.GTEQ, value: '0', displayValue: '0', category: FilterCategory.ALT_ALLELE_DEPTH, description:'Filters variants based on the number of alternate supporting reads', valueFunction: FilterValueFunction.MAX});
+
 });
 
 /**

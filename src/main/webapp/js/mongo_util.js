@@ -119,6 +119,7 @@ function buildQuery(filterList, workspaceKey) {
     var infoNumberFilters   = new Array();
     var infoStringFilters   = new Array();
     var sampleNumberFilters = new Array();
+    var customNumberFilters = new Array();
 
     // loop through filter collection
     _.each(filterList.models, function(filter) {
@@ -147,10 +148,9 @@ function buildQuery(filterList, workspaceKey) {
             case FilterCategory.FORMAT:
                 sampleNumberFilters.push(filter.toSampleNumberFilterPojo());
                 break;
-        }
-
-        if (filter instanceof GroupFilter) {
-            console.log("true");
+            case FilterCategory.ALT_ALLELE_DEPTH:
+                customNumberFilters.push(filter.toSampleNumberFilterPojo());
+                break;
         }
     });
 
@@ -159,6 +159,7 @@ function buildQuery(filterList, workspaceKey) {
     query.infoNumberFilters   = infoNumberFilters;
     query.infoStringFilters   = infoStringFilters;
     query.sampleNumberFilters = sampleNumberFilters;
+    query.customNumberFilters = customNumberFilters;
 
     return query;
 }

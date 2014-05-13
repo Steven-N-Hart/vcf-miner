@@ -8,7 +8,8 @@ var FilterCategory =
     INFO_INT:               4,
     INFO_FLOAT:             5,
     INFO_FLAG:              6,
-    INFO_STR:               7
+    INFO_STR:               7,
+    ALT_ALLELE_DEPTH:       8
 }
 
 // ENUM
