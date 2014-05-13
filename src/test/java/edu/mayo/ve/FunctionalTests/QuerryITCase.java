@@ -50,7 +50,7 @@ public class QuerryITCase {
     @BeforeClass
     public static void setUp() throws IOException, ProcessTerminatedException {
         workspaceID = load(softsearchVCF, alias);
-        kgenomeworkspace = load(kgenome, alias);
+        kgenomeworkspace = load(kgenome, "kgenomespart");
     }
 
     private static String load(String vcf, String alias) throws ProcessTerminatedException {
@@ -60,7 +60,7 @@ public class QuerryITCase {
         String json = prov.provision(user,alias);
         DBObject w = (DBObject) JSON.parse(json);
         workspace = (String) w.get(Tokens.KEY);
-        System.out.println("Workspace provisioned with key: " + workspace);
+        System.out.println("Workspace " + alias + " provisioned with key: " + workspace);
 
         System.out.println("QuerryITCase.Loading data into a new workspace...");
         VCFParser parser = new VCFParser();
@@ -81,6 +81,9 @@ public class QuerryITCase {
         System.out.println("Deleting Workspace: " + workspaceID);
         Workspace w = new Workspace();
         w.deleteWorkspace(workspaceID);
+
+        System.out.println("Deleting Workspace: " + kgenomeworkspace);
+        w.deleteWorkspace(kgenomeworkspace);
 
     }
 
@@ -135,11 +138,13 @@ public class QuerryITCase {
         q.setNumberResults(10);//give back at most 10 results
         //custom
         ArrayList<SampleNumberFilter> customNumberFilters = new ArrayList<SampleNumberFilter>();
-        SampleNumberFilter custom = new SampleNumberFilter("max","AD",10.0,"$lt");
+        SampleNumberFilter custom = new SampleNumberFilter("max","AD",10.0,"$gt");
         customNumberFilters.add(custom);
         q.setCustomNumberFilters(customNumberFilters);
+        System.out.println("Running query: ");
+        System.out.println(q.createQuery().toString());
 
-        r = runQueryAndExtractResults(q, 374);
+        r = runQueryAndExtractResults(q, 458);
 
     }
 

@@ -612,63 +612,6 @@ public class Querry {
         this.sampleNumberFilters = sampleNumberFilters;
     }
 
-    //Depricated...
-//    public Double getMinAltReads() {
-//        return minAltReads;
-//    }
-//
-//    public void setMinAltReads(Double minAltReads) {
-//        this.minAltReads = minAltReads;
-//    }
-//
-//    public Double getMinNumSample() {
-//        return minNumSample;
-//    }
-//
-//    public void setMinNumSample(Double minNumSample) {
-//        this.minNumSample = minNumSample;
-//    }
-//
-//    public Double getMaxNumSample() {
-//        return maxNumSample;
-//    }
-//
-//    public void setMaxNumSample(Double maxNumSample) {
-//        this.maxNumSample = maxNumSample;
-//    }
-//
-//    public Double getMinAC() {
-//        return minAC;
-//    }
-//
-//    public void setMinAC(Double minAC) {
-//        this.minAC = minAC;
-//    }
-//
-//    public Double getMaxAC() {
-//        return maxAC;
-//    }
-//
-//    public void setMaxAC(Double maxAC) {
-//        this.maxAC = maxAC;
-//    }
-//
-//    public Double getMinPHRED() {
-//        return minPHRED;
-//    }
-//
-//    public void setMinPHRED(Double minPHRED) {
-//        this.minPHRED = minPHRED;
-//    }
-//
-//    public Double getMaxAltReads() {
-//        return maxAltReads;
-//    }
-//
-//    public void setMaxAltReads(Double maxAltReads) {
-//        this.maxAltReads = maxAltReads;
-//    }
-
     public String getWorkspace() {
         return workspace;
     }
