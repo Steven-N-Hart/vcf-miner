@@ -108,8 +108,8 @@ var CustomFilterTab = function () {
             var filterID = filter.get("id");
 
             var filterName;
-            if (filter === MongoApp.FILTER_MIN_ALT_AD)
-                filterName = 'Alternate Allele Depth';
+            if (filter instanceof AltAlleleDepthFilter)
+                filterName = filter.displayName;
             else
                 filterName = filter.get("name");
 
@@ -140,25 +140,24 @@ var CustomFilterTab = function () {
         // get selected filter
         var filter = getSelectedFilter();
 
-        switch(filter)
-        {
-            case MongoApp.FILTER_IN_GROUP:
-            case MongoApp.FILTER_NOT_IN_GROUP:
-                // always make sure count and sample sampleNameList
-                // are cleared if no group is selected
-                if (typeof groupListView.getSelectedGroup() == 'undefined')
-                {
-                    count.empty();
-                    sampleNameList.empty();
-                }
+        if (filter instanceof GroupFilter) {
 
-                $('#group_value_div').toggle(true);
-                $('#alt_ad_value_div').toggle(false);
-                break;
-            case MongoApp.FILTER_MIN_ALT_AD:
-                $('#group_value_div').toggle(false);
-                $('#alt_ad_value_div').toggle(true);
-                break;
+            // always make sure count and sample sampleNameList
+            // are cleared if no group is selected
+            if (typeof groupListView.getSelectedGroup() == 'undefined')
+            {
+                count.empty();
+                sampleNameList.empty();
+            }
+
+            $('#group_value_div').toggle(true);
+            $('#alt_ad_value_div').toggle(false);
+
+        } else if (filter instanceof AltAlleleDepthFilter) {
+
+            $('#group_value_div').toggle(false);
+            $('#alt_ad_value_div').toggle(true);
+
         }
 
         validate();

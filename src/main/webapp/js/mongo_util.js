@@ -148,9 +148,10 @@ function buildQuery(filterList, workspaceKey) {
             case FilterCategory.FORMAT:
                 sampleNumberFilters.push(filter.toSampleNumberFilterPojo());
                 break;
-            case FilterCategory.ALT_ALLELE_DEPTH:
-                customNumberFilters.push(filter.toSampleNumberFilterPojo());
-                break;
+        }
+
+        if (filter instanceof AltAlleleDepthFilter) {
+            customNumberFilters.push(filter.toSampleNumberFilterPojo());
         }
     });
 

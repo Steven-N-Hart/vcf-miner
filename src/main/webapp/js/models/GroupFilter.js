@@ -33,9 +33,25 @@ var GroupFilter = Filter.extend({
         }
 
         var html = '<div class="text-left" title="'+tooltipStr+'">' + sampleGroup.get("name") + '</div>';
+        html += '<div class="text-left"><i>genotype:'+this.toGenotypeString(this.get("genotype"))+'</i></div>';
+        html += '<div class="text-left"><i>samples:'+this.toSampleStatusString(this.get("sampleStatus"))+'</i></div>';
 
+        return html;
+    },
+
+    getValueAsASCII: function() {
+        var sampleGroup = this.get("value");
+
+        var ascii = sampleGroup.get("name");
+        ascii += ' genotype:' + this.toGenotypeString(this.get("genotype"));
+        ascii += ' samples:' + this.toSampleStatusString(this.get("sampleStatus"));
+
+        return ascii;
+    },
+
+    toGenotypeString: function(genotype) {
         var genotypeStr;
-        switch (this.get("genotype")) {
+        switch (genotype) {
             case GroupFilterGenotype.UNKNOWN:
                 genotypeStr='?';
                 break;
@@ -49,10 +65,12 @@ var GroupFilter = Filter.extend({
                 genotypeStr='homozygous';
                 break;
         }
-        html += '<div class="text-left"><i>genotype:'+genotypeStr+'</i></div>';
+        return genotypeStr;
+    },
 
+    toSampleStatusString: function(sampleStatus) {
         var statusStr;
-        switch (this.get("sampleStatus")) {
+        switch (sampleStatus) {
             case GroupFilterSampleStatus.UNKNOWN:
                 statusStr='?';
                 break;
@@ -63,9 +81,7 @@ var GroupFilter = Filter.extend({
                 statusStr='all';
                 break;
         }
-        html += '<div class="text-left"><i>samples:'+statusStr+'</i></div>';
-
-        return html;
+        return statusStr;
     },
 
     toSampleGroupPOJO: function(workspaceKey, inSample)
@@ -74,8 +90,8 @@ var GroupFilter = Filter.extend({
 
         var pojo = {};
         pojo.workspace   = workspaceKey;
-        pojo.alias       = this.get("name");
-        pojo.description = this.get("description");
+        pojo.alias       = sampleGroup.get("name");
+        pojo.description = sampleGroup.get("description");
         pojo.samples     = sampleGroup.get("sampleNames");
         pojo.inSample    = inSample;
 
@@ -141,7 +157,7 @@ var GroupFilter = Filter.extend({
                 sampleStatus = GroupFilterSampleStatus.ALL;
                 break;
             case 'any':
-                sampleStatus = GroupFilterSampleStatus.ALL;
+                sampleStatus = GroupFilterSampleStatus.ANY;
                 break;
         }
 

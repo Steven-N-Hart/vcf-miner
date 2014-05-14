@@ -357,6 +357,10 @@ var SearchController = Backbone.Marionette.Controller.extend({
         else if (querry.sampleNumberFilters.length == 1) {
             filter = new Filter().fromSampleNumberFilterPojo(querry.sampleNumberFilters[0]);
         }
+        else if (querry.customNumberFilters.length == 1) {
+            filter = new AltAlleleDepthFilter();
+            filter.set("value", querry.customNumberFilters[0].value);
+        }
 
         if (filter != undefined)
             filter.setFilterDisplay();
