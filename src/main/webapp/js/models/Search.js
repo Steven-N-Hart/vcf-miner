@@ -3,7 +3,7 @@ var Search = Backbone.Model.extend({
 
         return {
             key:   null,
-            name:  "My Search",
+            name:  "My Analysis",
             timestamp:   null,
             user:   "NA",
             filters: new FilterList(),

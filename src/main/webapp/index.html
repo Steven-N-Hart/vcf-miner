@@ -82,6 +82,35 @@
         }
 
         .vertical-spacer {  margin-top: 40px; }
+
+        .border-frame {
+            position: relative;
+            margin: 15px 0;
+            padding: 39px 19px 14px;
+            *padding-top: 19px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
+        }
+
+            /* Echo out a label for the example */
+        .border-frame:after {
+            content: "Analysis";
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            padding: 3px 7px;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            color: #9da0a4;
+            -webkit-border-radius: 4px 0 4px 0;
+            -moz-border-radius: 4px 0 4px 0;
+            border-radius: 4px 0 4px 0;
+        }
     </style>
 
     <!-- underscorejs templates -->
@@ -104,23 +133,39 @@
     </script>
 
     <script id="search-name-template" type="text/template">
-        <div class="dropdown pull-left">
-            <div id="search_rename_div" class="hide">
-                <input type="text" class="input-large">
+        <div class="row-fluid">
+            <div class="span10">
+                <div id="search_rename_div" class="hide">
+                    <input type="text" class="input-large">
+                </div>
+                <div id="search_name_div">
+                    <strong class="lead">Name: </strong><a class="searchNameChange lead" title="Click to edit the name"><%=name%></a>
+                </div>
             </div>
-            <div id="search_name_div">
-                <a class="dropdown-toggle lead" data-toggle="dropdown" href="#"><%=name%></a><% if(!saved){%> <sup class="text-error">(Unsaved Changes)</sup><%}%>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                    <li title="Start over with a new Search" role="presentation"><a class="searchNew" role="menuitem" tabindex="-1"><i class="fa fa-file-o"></i> New</a></li>
-                    <li title="Change the Search name" role="presentation"><a class="searchNameChange" role="menuitem" tabindex="-1"><i class="fa fa-pencil"></i> Rename</a></li>
-                    <li title="Save this Search" role="presentation"><a class="searchSave" role="menuitem" tabindex="-1"><i class="fa fa-save"></i> Save</a></li>
-                    <li title="Delete this Search" role="presentation"><a class="searchDelete" role="menuitem" tabindex="-1"><i class="icon-remove"></i> Delete</a></li>
-                    <li title="Open a previously saved Search" role="presentation"><a class="showSearchDialog" role="menuitem" tabindex="-1"><i class="fa fa-folder-open-o"></i> Open a saved Search</a></li>
-                    <li role="presentation" class="divider"></li>
-                    <li title="Export this Search to a file" role="presentation"><a class="searchExport" role="menuitem" tabindex="-1"><i class="icon-download"></i> Export to a file</a></li>
-                    <li title="Import a previously exported Search file" role="presentation"><a class="searchImport" role="menuitem" tabindex="-1"><i class="icon-upload"></i> Import from a file</a></li>
-                </ul>
+            <div class="span2">
+                <div class="btn-group btn-mini pull-right">
+                    <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#" title="Analysis Actions">
+                        <i class="fa fa-gear"></i>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                        <li title="Start over with a new Analysis" role="presentation"><a class="searchNew" role="menuitem" tabindex="-1"><i class="fa fa-refresh"></i> Reset</a></li>
+                        <!--<li title="Change the Search name" role="presentation"><a class="searchNameChange" role="menuitem" tabindex="-1"><i class="fa fa-pencil"></i> Rename</a></li>-->
+                        <li title="Save this Analysis" role="presentation"><a class="searchSave" role="menuitem" tabindex="-1"><i class="fa fa-save"></i> Save</a></li>
+                        <li title="Delete this Analysis" role="presentation"><a class="searchDelete" role="menuitem" tabindex="-1"><i class="icon-remove"></i> Delete</a></li>
+                        <li title="Run a previously saved Analysis" role="presentation"><a class="showSearchDialog" role="menuitem" tabindex="-1"><i class="fa fa-play"></i> Run a different Analysis</a></li>
+                        <li role="presentation" class="divider"></li>
+                        <li title="Export this Analysis to a file" role="presentation"><a class="searchExport" role="menuitem" tabindex="-1"><i class="icon-download"></i> Export to a file</a></li>
+                        <li title="Import a previously exported Analysis file" role="presentation"><a class="searchImport" role="menuitem" tabindex="-1"><i class="icon-upload"></i> Import from a file</a></li>
+                    </ul>
+                </div>
             </div>
+        </div>
+        <div class="row-fluid">
+            <i>
+                <% if(saved && (timestamp != undefined)){%><br>Last saved <%=getDateString(timestamp)%><%}%>
+                <% if(!saved){%><br><p class="text-error">This Analysis has been modified.  Would you like to save your changes?  <button class="btn btn-mini searchSave"><i class="fa fa-save"></i> Save</button></p><%}%>
+            </i>
         </div>
     </script>
 
@@ -129,7 +174,7 @@
         <span class="label"><td><%=name%></td></span>
         <span class="label"><td><%=user%></td></span>
         <span class="label"><td><%=getDateString(timestamp)%></td></span>
-        <td><button title="Open this Search" type="button" class="btn open">Open</button></td>
+        <td><button title="Run this Analysis" type="button" class="btn open">Run</button></td>
     </script>
 
     <!-- the search table -->
@@ -155,7 +200,7 @@
         <span class="label"><td><%=displayOperator%></td></span>
         <span id="<%=id%>_display_value_label" class="label"><td><%=displayValue%></td></span>
         <td><span class="badge badge-info" id="<%=id%>_num_matches_label"><%=numMatches%></span></td>
-        <td><button title="Remove filter from your search" type="button" class="btn btn-mini remove" id="<%=id%>_remove_button" style="<% if(!removable){%> display: none <%}%>"><i class="icon-remove"></i></button></td>
+        <td><button title="Remove filter from your Analysis" type="button" class="btn btn-mini remove" id="<%=id%>_remove_button" style="<% if(!removable){%> display: none <%}%>"><i class="icon-remove"></i></button></td>
 
     </script>
 
@@ -378,7 +423,7 @@
 <div id="import_search_modal" class="modal hide fade" tabindex="-1" role="dialog"aria-hidden="true">
     <form id="import_search_form" action="" class="form-horizontal">
         <div class="modal-header">
-            <h3>Import Search</h3>
+            <h3>Import Analysis</h3>
         </div>
         <div class="modal-body">
             <div class="control-group">
@@ -400,7 +445,7 @@
 <div id="searches_modal" class="modal hide fade" tabindex="-1" role="dialog"aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3>Searches</h3>
+        <h3>Analyses</h3>
     </div>
     <div class="modal-body">
         <div class="pre-scrollable" id="searchTableRegion"></div>
@@ -1044,16 +1089,20 @@
             <ul class="nav nav-list">
                 <div class="nav-header">
                     <div class="row-fluid">
-                        <div class="span2 pull-right"><button id="west-closer" title="Hide Search" type="button" class="btn btn-mini"><i class="fa fa-arrow-left"></i> Hide</button></div>
+                        <div class="span2 pull-right"><button id="west-closer" title="Hide Analysis" type="button" class="btn btn-mini"><i class="fa fa-arrow-left"></i> Hide</button></div>
                     </div>
                 </div>
 
                 <div>
-                    <div id="searchNameRegion"></div>
+                    <div class="border-frame">
+                        <div id="searchNameRegion"></div>
 
-                    <div id="searchFiltersRegion"></div>
+                        <br>
 
-                    <button title="Add Filter to your search" class="btn btn-primary" id="show_add_filter_dialog_button">Add Filter</button>
+                        <div id="searchFiltersRegion"></div>
+
+                        <button title="Add Filter to your Analysis" class="btn btn-primary" id="show_add_filter_dialog_button">Add Filter</button>
+                    </div>
                 </div>
             </ul>
         </div>

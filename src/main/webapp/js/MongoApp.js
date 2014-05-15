@@ -126,13 +126,13 @@ MongoApp.addInitializer(function() {
 
         //	some pane-size settings
         ,	west__minSize:				200
-        ,	west__size: 				400
+        ,	west__size: 				450
         ,	west__spacing_closed:		5			// wider space when closed
         ,	west__togglerLength_closed:	-1			// -1 = full height
         ,	west__togglerAlign_closed:	"top"		// align to top of resizer
         ,	west__togglerLength_open:	0			// NONE - using custom togglers INSIDE west-pane
-        ,	west__togglerTip_open:		"Hide Search"
-        ,	west__togglerTip_closed:	"Show Search"
+        ,	west__togglerTip_open:		"Hide Analysis"
+        ,	west__togglerTip_closed:	"Show Analysis"
         ,	west__resizerTip_open:		"Resize Filter Pane"
         ,   west__togglerContent_closed: '<i class="fa fa-arrow-right"></i>'
         ,	west__slideTrigger_open:	"click" 	// default
