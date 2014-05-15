@@ -3,7 +3,7 @@ package edu.mayo.ve.FunctionalTests;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
-import edu.mayo.TypeAhead.TypeAhead;
+import edu.mayo.TypeAhead.TypeAheadInterface;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerPool;
@@ -127,9 +127,10 @@ public class FailedLoadITCase {
         }
 
         @Override
-        public void setTypeAhead(TypeAhead typeAhead) {
+        public void setTypeAhead(TypeAheadInterface typeAhead) {
             //To change body of implemented methods use File | Settings | File Templates.
         }
+
 
         public boolean isLoadStatus() {
             return loadStatus;

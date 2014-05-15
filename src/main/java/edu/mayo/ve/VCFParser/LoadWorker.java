@@ -1,7 +1,8 @@
 package edu.mayo.ve.VCFParser;
 
 import com.mongodb.*;
-import edu.mayo.TypeAhead.TypeAhead;
+import edu.mayo.TypeAhead.TypeAheadCollection;
+import edu.mayo.TypeAhead.TypeAheadInterface;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerLogic;
@@ -69,7 +70,7 @@ public class LoadWorker implements WorkerLogic {
                 if(report) System.out.println("I am working on loading this file: " + loadfile);
 
                 if(report) System.out.println("Setting up the parser...");
-                TypeAhead thead = new TypeAhead("INFO", theadCache, report);
+                TypeAheadInterface thead = new TypeAheadCollection();
                 parser.setTypeAhead(thead);
                 parser.setTesting(false);
                 parser.setReporting(report);

@@ -7,7 +7,8 @@ import com.google.gson.JsonParser;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import com.tinkerpop.pipes.util.Pipeline;
-import edu.mayo.TypeAhead.TypeAhead;
+import edu.mayo.TypeAhead.TypeAheadCollection;
+import edu.mayo.TypeAhead.TypeAheadInterface;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.pipes.PrintPipe;
 import edu.mayo.pipes.UNIX.CatPipe;
@@ -55,7 +56,15 @@ public class VCFParserITCase {
                 "SNPEFF_GENE_BIOTYPE"
     );
 
+    String workspace = "workspace1234";
+    @Before
+    public void clear(){
+        //TypeAheadCollection type = new TypeAheadCollection();
+        //type.clear();
+        Workspace wksp = new Workspace();
+        wksp.deleteWorkspace(workspace);
 
+    }
 
 
     private Mongo m = MongoConnection.getMongo();
@@ -67,11 +76,10 @@ public class VCFParserITCase {
         HashMap<Integer,String> results = new HashMap<Integer, String>();
 
         String collection = "thisshouldnot";
-        String workspace = "workspace1234";
         VCFParser parser = new VCFParser();
         parser.setTestingCollection(results);
         parser.setSaveSamples(false);
-        parser.setTesting(true);
+        parser.setTesting(true);   //typeahead won't work if this is true!
         parser.setReporting(false);
         parser.parse(VCF, workspace);
 
@@ -104,16 +112,10 @@ public class VCFParserITCase {
         }
 
         System.out.println("Test Cache: ");
-        String expectedCache = "{ \"key\" : \"workspace1234\" , \"GenotyperControls\" : [ \"Samtools-Pindel\" , \"Pindel\" , \"Samtools\"] , \"SNPEFF_FUNCTIONAL_CLASS\" : [ \"SILENT\" , \"MISSENSE\" , \"NONE\"] , \"SNPEFF_EFFECT\" : [ \"UTR_5_PRIME\" , \"UPSTREAM\" , \"EXON\" , \"CODON_INSERTION\" , \"SYNONYMOUS_CODING\" , \"NON_SYNONYMOUS_CODING\" , \"UTR_3_PRIME\" , \"DOWNSTREAM\" , \"INTERGENIC\" , \"CODON_CHANGE_PLUS_CODON_DELETION\" , \"INTRAGENIC\" , \"INTRON\" , \"FRAME_SHIFT\"] , \"SNPEFF_TRANSCRIPT_ID\" : [ \"NM_015658\" , \"NM_017891\" , \"NR_033183\" , \"NM_001199787\" , \"NM_030937\" , \"NM_001039577\" , \"NR_029834\" , \"NM_001160184\" , \"NM_001130413\" , \"NM_152486\" , \"NM_001256456\" , \"NM_024011\" , \"NM_000815\" , \"NM_001142467\" , \"NM_005101\" , \"NM_152228\" , \"NM_178545\" , \"NM_001256463\" , \"NM_016547\" , \"NM_001205252\" , \"NM_001198993\" , \"NM_016176\" , \"NM_030649\" , \"NM_001198995\" , \"NM_032348\" , \"NM_001080484\" , \"NM_022834\" , \"NR_027693\" , \"NM_153254\" , \"NM_001170535\" , \"NM_001110781\" , \"NM_001170536\" , \"NR_047524\" , \"NR_024540\" , \"NM_002074\" , \"NM_001170688\" , \"NM_014188\" , \"NM_198317\" , \"NR_024321\" , \"NM_001170686\" , \"NR_047526\" , \"NM_017971\" , \"NR_026874\" , \"NR_033908\" , \"NM_138705\" , \"NM_004421\" , \"NM_080605\" , \"NR_015368\" , \"NM_001146685\" , \"NM_001114748\" , \"NM_001039211\" , \"NM_002744\" , \"NM_033487\" , \"NM_182838\" , \"NM_033488\" , \"NM_001130045\" , \"NM_194457\" , \"NM_058167\" , \"NM_198576\" , \"NM_033493\" , \"NM_031921\" , \"NR_038869\" , \"NR_027055\" , \"NM_001127229\" , \"NR_046018\" , \"NM_001242659\" , \"NM_153339\" , \"NM_001014980\"] , \"set\" : [ \"Intersection\" , \"variant2\" , \"variant\"] , \"Genotyper\" : [ \"Samtools-Pindel\" , \"Pindel\" , \"Samtools\"] , \"SNPEFF_EXON_ID\" : [ \"NM_001198995.ex.1\" , \"NM_033488.ex.16\" , \"NM_005101.ex.1\" , \"NM_001130413.ex.3\" , \"NM_001039577.ex.6\" , \"NM_033493.ex.16\" , \"NM_001080484.ex.8\" , \"NM_178545.ex.5\" , \"NM_033493.ex.17\" , \"NM_178545.ex.3\" , \"NM_001130045.ex.15\" , \"NM_001160184.ex.13\" , \"NM_001205252.ex.1\" , \"NM_001080484.ex.1\" , \"NM_198576.ex.29\" , \"NM_024011.ex.17\" , \"NM_058167.ex.7\" , \"NM_198576.ex.22\" , \"NM_198576.ex.23\"] , \"Group\" : [ \"Cases\" , \"Intersection\" , \"Controls\"] , \"SNPEFF_GENE_NAME\" : [ \"KIAA1751\" , \"B3GALT6\" , \"AURKAIP1\" , \"TAS1R3\" , \"LINC00115\" , \"LOC643837\" , \"ATAD3C\" , \"ATAD3A\" , \"ATAD3B\" , \"ISG15\" , \"C1orf159\" , \"VWA1\" , \"OR4F16\" , \"UBE2J2\" , \"RNF223\" , \"NOC2L\" , \"CCNL2\" , \"TTLL10\" , \"TMEM240\" , \"KLHL17\" , \"ACAP3\" , \"GNB1\" , \"HES4\" , \"CDK11A\" , \"SLC35E2\" , \"MIB2\" , \"DDX11L1\" , \"CDK11B\" , \"FAM41C\" , \"TMEM88B\" , \"SSU72\" , \"CPSF3L\" , \"PRKCZ\" , \"MIR200A\" , \"SLC35E2B\" , \"PUSL1\" , \"FAM132A\" , \"MRPL20\" , \"LOC100288069\" , \"LOC254099\" , \"CALML6\" , \"AGRN\" , \"SDF4\" , \"SCNN1D\" , \"GABRD\" , \"C1orf170\" , \"SAMD11\" , \"TMEM52\" , \"NADK\" , \"MXRA8\" , \"LOC100133331\" , \"DVL1\" , \"LOC100130417\" , \"WASH7P\" , \"C1orf233\" , \"PLEKHN1\"] , \"SNPEFF_CODON_CHANGE\" : [ \"gaC/gaT\" , \"Gtc/Atc\" , \"gcG/gcA\" , \"ggC/ggT\" , \"ttC/ttT\" , \"gtG/gtA\" , \"gaC/gaG\" , \"cAt/cGt\" , \"gaA/gaG\" , \"-/G\" , \"aag/aaGAGg\" , \"gagggc/ggc\" , \"Gac/Cac\" , \"ctcctgccgctg/ctg\" , \"Gtg/Atg\" , \"Aga/Cga\" , \"cCc/cAc\" , \"-\" , \"gCg/gTg\" , \"cCg/cTg\" , \"-/AAGAAA\" , \"cGt/cCt\" , \"Tcc/Ccc\" , \"cGc/cAc\" , \"tcG/tcA\" , \"gaT/gaC\" , \"agA/agG\"] , \"SNPEFF_IMPACT\" : [ \"HIGH\" , \"MODERATE\" , \"LOW\" , \"MODIFIER\"] , \"SNPEFF_AMINO_ACID_CHANGE\" : [ \"EG413G\" , \"-738\" , \"-116KK\" , \"P242H\" , \"V1667M\" , \"K404KR\" , \"P1289L\" , \"-511\" , \"R494\" , \"H112R\" , \"P1240L\" , \"R452P\" , \"S45\" , \"A1711\" , \"V56\" , \"V1666I\" , \"R105\" , \"-508?\" , \"-509\" , \"D538H\" , \"A55\" , \"D248\" , \"R1699H\" , \"A1255V\" , \"F1690\" , \"-506?\" , \"D56E\" , \"S476P\" , \"LLPL23L\" , \"D512\" , \"E108\" , \"G1675\"]}";
+        //"{ \"key\" : \"workspace1234\" , \"GenotyperControls\" : [ \"Samtools-Pindel\" , \"Pindel\" , \"Samtools\"] , \"SNPEFF_FUNCTIONAL_CLASS\" : [ \"SILENT\" , \"MISSENSE\" , \"NONE\"] , \"SNPEFF_EFFECT\" : [ \"UTR_5_PRIME\" , \"UPSTREAM\" , \"EXON\" , \"CODON_INSERTION\" , \"SYNONYMOUS_CODING\" , \"NON_SYNONYMOUS_CODING\" , \"UTR_3_PRIME\" , \"DOWNSTREAM\" , \"INTERGENIC\" , \"CODON_CHANGE_PLUS_CODON_DELETION\" , \"INTRAGENIC\" , \"INTRON\" , \"FRAME_SHIFT\"] , \"SNPEFF_TRANSCRIPT_ID\" : [ \"NM_015658\" , \"NM_017891\" , \"NR_033183\" , \"NM_001199787\" , \"NM_030937\" , \"NM_001039577\" , \"NR_029834\" , \"NM_001160184\" , \"NM_001130413\" , \"NM_152486\" , \"NM_001256456\" , \"NM_024011\" , \"NM_000815\" , \"NM_001142467\" , \"NM_005101\" , \"NM_152228\" , \"NM_178545\" , \"NM_001256463\" , \"NM_016547\" , \"NM_001205252\" , \"NM_001198993\" , \"NM_016176\" , \"NM_030649\" , \"NM_001198995\" , \"NM_032348\" , \"NM_001080484\" , \"NM_022834\" , \"NR_027693\" , \"NM_153254\" , \"NM_001170535\" , \"NM_001110781\" , \"NM_001170536\" , \"NR_047524\" , \"NR_024540\" , \"NM_002074\" , \"NM_001170688\" , \"NM_014188\" , \"NM_198317\" , \"NR_024321\" , \"NM_001170686\" , \"NR_047526\" , \"NM_017971\" , \"NR_026874\" , \"NR_033908\" , \"NM_138705\" , \"NM_004421\" , \"NM_080605\" , \"NR_015368\" , \"NM_001146685\" , \"NM_001114748\" , \"NM_001039211\" , \"NM_002744\" , \"NM_033487\" , \"NM_182838\" , \"NM_033488\" , \"NM_001130045\" , \"NM_194457\" , \"NM_058167\" , \"NM_198576\" , \"NM_033493\" , \"NM_031921\" , \"NR_038869\" , \"NR_027055\" , \"NM_001127229\" , \"NR_046018\" , \"NM_001242659\" , \"NM_153339\" , \"NM_001014980\"] , \"set\" : [ \"Intersection\" , \"variant2\" , \"variant\"] , \"Genotyper\" : [ \"Samtools-Pindel\" , \"Pindel\" , \"Samtools\"] , \"SNPEFF_EXON_ID\" : [ \"NM_001198995.ex.1\" , \"NM_033488.ex.16\" , \"NM_005101.ex.1\" , \"NM_001130413.ex.3\" , \"NM_001039577.ex.6\" , \"NM_033493.ex.16\" , \"NM_001080484.ex.8\" , \"NM_178545.ex.5\" , \"NM_033493.ex.17\" , \"NM_178545.ex.3\" , \"NM_001130045.ex.15\" , \"NM_001160184.ex.13\" , \"NM_001205252.ex.1\" , \"NM_001080484.ex.1\" , \"NM_198576.ex.29\" , \"NM_024011.ex.17\" , \"NM_058167.ex.7\" , \"NM_198576.ex.22\" , \"NM_198576.ex.23\"] , \"Group\" : [ \"Cases\" , \"Intersection\" , \"Controls\"] , \"SNPEFF_GENE_NAME\" : [ \"KIAA1751\" , \"B3GALT6\" , \"AURKAIP1\" , \"TAS1R3\" , \"LINC00115\" , \"LOC643837\" , \"ATAD3C\" , \"ATAD3A\" , \"ATAD3B\" , \"ISG15\" , \"C1orf159\" , \"VWA1\" , \"OR4F16\" , \"UBE2J2\" , \"RNF223\" , \"NOC2L\" , \"CCNL2\" , \"TTLL10\" , \"TMEM240\" , \"KLHL17\" , \"ACAP3\" , \"GNB1\" , \"HES4\" , \"CDK11A\" , \"SLC35E2\" , \"MIB2\" , \"DDX11L1\" , \"CDK11B\" , \"FAM41C\" , \"TMEM88B\" , \"SSU72\" , \"CPSF3L\" , \"PRKCZ\" , \"MIR200A\" , \"SLC35E2B\" , \"PUSL1\" , \"FAM132A\" , \"MRPL20\" , \"LOC100288069\" , \"LOC254099\" , \"CALML6\" , \"AGRN\" , \"SDF4\" , \"SCNN1D\" , \"GABRD\" , \"C1orf170\" , \"SAMD11\" , \"TMEM52\" , \"NADK\" , \"MXRA8\" , \"LOC100133331\" , \"DVL1\" , \"LOC100130417\" , \"WASH7P\" , \"C1orf233\" , \"PLEKHN1\"] , \"SNPEFF_CODON_CHANGE\" : [ \"gaC/gaT\" , \"Gtc/Atc\" , \"gcG/gcA\" , \"ggC/ggT\" , \"ttC/ttT\" , \"gtG/gtA\" , \"gaC/gaG\" , \"cAt/cGt\" , \"gaA/gaG\" , \"-/G\" , \"aag/aaGAGg\" , \"gagggc/ggc\" , \"Gac/Cac\" , \"ctcctgccgctg/ctg\" , \"Gtg/Atg\" , \"Aga/Cga\" , \"cCc/cAc\" , \"-\" , \"gCg/gTg\" , \"cCg/cTg\" , \"-/AAGAAA\" , \"cGt/cCt\" , \"Tcc/Ccc\" , \"cGc/cAc\" , \"tcG/tcA\" , \"gaT/gaC\" , \"agA/agG\"] , \"SNPEFF_IMPACT\" : [ \"HIGH\" , \"MODERATE\" , \"LOW\" , \"MODIFIER\"] , \"SNPEFF_AMINO_ACID_CHANGE\" : [ \"EG413G\" , \"-738\" , \"-116KK\" , \"P242H\" , \"V1667M\" , \"K404KR\" , \"P1289L\" , \"-511\" , \"R494\" , \"H112R\" , \"P1240L\" , \"R452P\" , \"S45\" , \"A1711\" , \"V56\" , \"V1666I\" , \"R105\" , \"-508?\" , \"-509\" , \"D538H\" , \"A55\" , \"D248\" , \"R1699H\" , \"A1255V\" , \"F1690\" , \"-506?\" , \"D56E\" , \"S476P\" , \"LLPL23L\" , \"D512\" , \"E108\" , \"G1675\"]}";
+        List<String> expectedCache =  Arrays.asList("Samtools-Pindel","Pindel","Samtools");
         System.out.println("Ensure that the cache of String values is populated correctly (can't guarentee it got to mongo in this test)");
-        BasicDBObject dbo = parser.getTypeAhead().convertCacheToDBObj(workspace);
-        //assertEquals(expectedCache.replaceAll("\\s+",""), dbo.toString().replaceAll("\\s+",""));
-        System.out.println("*****************************************************");
-        System.out.println(expectedCache);
-        System.out.println("*****************************************************");
-        System.out.println(dbo.toString());
-        assertTrue(CompareJSON.equals(expectedCache, dbo.toString()));
-
+        //note typeahead no longer has a local cache of all values, so this test is no longer needed!
         System.out.println("*****************************************************");
         System.out.println("*****************************************************");
 
@@ -145,7 +147,6 @@ public class VCFParserITCase {
     public void testHang() throws ProcessTerminatedException {
         System.out.println("Running: edu.mayo.ve.VCFParser.VCFParserITCase.testHang");
         String collection = "thisshouldnot";
-        String workspace = "workspace1234";
         VCFParser parser = new VCFParser();
         parser.parse(null, "src/test/resources/testData/dbSNP4Variants.vcf",workspace,1000,true, reporting, true);
         HashMap<Integer, String> col = parser.getTestingCollection();
@@ -165,7 +166,6 @@ public class VCFParserITCase {
         System.out.println("Running: edu.mayo.ve.VCFParser.VCFParserITCase.testSoftSearch");
         String softSearchVCF = "src/test/resources/testData/SoftSearch_for_Dan.vcf";
         VCFParser parser = new VCFParser();
-        String workspace = "workspace1234";
         parser.parse(null, softSearchVCF,workspace,1000000,true, reporting, true);
         HashMap<Integer, String> col = parser.getTestingCollection();
 //        for(String s : col.values()){
@@ -211,14 +211,14 @@ public class VCFParserITCase {
     public void testParseAndLoad() throws ProcessTerminatedException {
         System.out.println("Running: edu.mayo.ve.VCFParser.VCFParserITCase.testParseAndLoad");
         String alias = "alias";
-        String workspaceID = provision(alias);;
+        String workspaceID = provision(alias);
 
 
         System.out.println("VCFParserITCase.Loading data into a new workspace...");
         VCFParser parser = new VCFParser();
         //false,false at the end of this call are correct for loading to MongoDB
         parser.setSaveSamples(true);
-        TypeAhead thead = new TypeAhead("INFO", overflowThreshold, reporting);
+        TypeAheadInterface thead = new TypeAheadCollection();
         parser.setReporting(reporting);
         parser.setTypeAhead(thead);
         parser.parse(VCF, workspaceID);  //put true in the second to last param for verbose load reporting

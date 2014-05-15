@@ -3,7 +3,7 @@ package edu.mayo.ve.VCFParser;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
-import edu.mayo.TypeAhead.TypeAhead;
+import edu.mayo.TypeAhead.TypeAheadCollection;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import org.junit.Test;
 
@@ -86,7 +86,7 @@ public class VCFParserTest {
         boolean reporting = true;
         String junkfile = "src/test/resources/testData/foo.tsv";
         VCFParser parser = new VCFParser();
-        parser.setTypeAhead(new TypeAhead(5000, reporting));
+        parser.setTypeAhead(new TypeAheadCollection());
         parser.setReporting(reporting);
         parser.setSaveSamples(false);
         parser.setTesting(true); //don't try to place it in mongo

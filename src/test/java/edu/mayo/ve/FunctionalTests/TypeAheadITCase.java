@@ -3,6 +3,7 @@ package edu.mayo.ve.FunctionalTests;
 import com.mongodb.BasicDBList;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
+import edu.mayo.TypeAhead.TypeAheadCollection;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.CacheMissException;
@@ -61,7 +62,6 @@ public class TypeAheadITCase {
     @Before
     public void setUpTest(){
         tar = new TypeAheadResource();
-        tar.setTypeAheadOverrun(overflowThreshold);
     }
 
     @AfterClass
@@ -71,64 +71,19 @@ public class TypeAheadITCase {
         System.out.println("Deleting Workspace: " + workspaceID);
         Workspace w = new Workspace();
         w.deleteWorkspace(workspaceID);
+        TypeAheadCollection tac = new TypeAheadCollection();
+        tac.clear();
 
     }
 
-    /**
-     * this index caching stuff caused HUGE problems with other REST endpoints, ALL rest endpoints would need to be syncronized to get this to work and there is not enoug time to do that right now
-     * if there are performanc problems, we will fix it.
-     */
-    @Test
-    public void testUpdateCache(){
-        System.out.println("TestUpdateCache");
-
-        HashMap<String, Long> icache = null; // tar.getIndexedCache().get(workspaceID);
-        assertTrue(icache == null);
-        icache = tar.updateCache(workspaceID);
-        //icache = tar.getIndexedCache().get(workspaceID);
-        assertTrue(icache.size() > 0); //now the cache should have something in it from Mongo!
-
-    }
-
-    private final String GenotyperControlsResult = "[ \"Samtools-Pindel\" , \"Pindel\" , \"Samtools\"]";
-    @Test
-    public void testGetTypeAhead(){
-        System.out.println("TestGetTypeAhead");
-        String r = tar.getTypeAhead(workspaceID);
-        DBObject result = (DBObject) JSON.parse(r);
-        assertNotNull(result);
-        assertTrue(result.keySet().size() > 0);
-//        for(String key: result.keySet()){
-//            System.out.println(key);
-//            System.out.println(result.get(key));
-//        }
-        assertEquals(15, result.keySet().size());
-        assertEquals(GenotyperControlsResult,result.get("GenotyperControls").toString());
-    }
-
+    private final String GenotyperControlsResult = "[ \"Samtools\" , \"Pindel\" , \"Samtools-Pindel\"]";
     @Test
     public void testGetTypeAhead4Value(){
         System.out.println("TestGetTypeAhead4Value");
         String json = tar.getTypeAhead4Value(workspaceID, "GenotyperControls");
         DBObject result = (DBObject) JSON.parse(json);
-        assertEquals(GenotyperControlsResult,result.get("GenotyperControls").toString());
-        assertTrue(result.keySet().size() == 2); //one for the ID and one for the specific attribute
-    }
-
-    @Test
-    public void testIsIndexed(){
-        System.out.println("TestIsIndexed");
-        boolean indexed = tar.isIndexed(workspaceID,"SNPEFF_EFFECT");
-        assertTrue(indexed);
-        boolean alsoindexed = tar.isIndexed(workspaceID,"INFO.SNPEFF_EFFECT");
-        assertTrue(alsoindexed);
-        boolean notindexed = tar.isIndexed(workspaceID,"HRun");
-        assertFalse(notindexed);
-    }
-
-    @Test
-    public void testUpdateCacheMetaData(){
-        System.out.println("TestUpdateCacheMetaData");
+        assertEquals(GenotyperControlsResult,result.get("INFO.GenotyperControls").toString());
+        assertTrue(result.keySet().size() == 1); //one for the specific attribute
     }
 
     /**
@@ -141,55 +96,55 @@ public class TypeAheadITCase {
      ]
      This test will make sure that we can get this from the cache (mongodb typeahead collection)
      */
-    @Test
-    public void testGetTypeAheadFromMongoCache() throws CacheMissException {
-        System.out.println("TestGetTypeAheadFromMongoCache");
-        BasicDBList result = tar.getTypeAheadFromMongoCache(workspaceID,"SNPEFF_IMPACT","",1000); //get all the values (there are 4)
-        String expected = "[ \"HIGH\" , \"MODERATE\" , \"LOW\" , \"MODIFIER\"]";
-        assertEquals(expected,result.toString());
-        //check if reducing max values returned works
-        result = tar.getTypeAheadFromMongoCache(workspaceID,"SNPEFF_IMPACT","",1); //get all the values (there are 4)
-        expected = "[ \"HIGH\"]";
-        assertEquals(expected,result.toString());
-        //check to see if prefix works
-        result = tar.getTypeAheadFromMongoCache(workspaceID,"SNPEFF_IMPACT","FOO",100); //get all the values (there are 4)
-        expected = "[ ]";
-        assertEquals(expected,result.toString());
-        result = tar.getTypeAheadFromMongoCache(workspaceID,"SNPEFF_IMPACT","MOD",1); //get all the values (there are 4)
-        expected = "[ \"MODERATE\"]";
-        assertEquals(expected,result.toString());
-        result = tar.getTypeAheadFromMongoCache(workspaceID,"SNPEFF_IMPACT","MOD",100); //get all the values (there are 4)
-        expected = "[ \"MODERATE\" , \"MODIFIER\"]";
-        assertEquals(expected,result.toString());
-    }
-
-    @Test
-    public void testGetTypeAheadFromMongoIndex() throws CacheMissException {
-        System.out.println("testGetTypeAheadFromMongoIndex");
-        BasicDBList result = tar.getTypeAheadFromMongoIndex(workspaceID,"SNPEFF_IMPACT","",1000);
-        String expected = "[ \"HIGH\" , \"LOW\" , \"MODERATE\" , \"MODIFIER\"]";
-        assertEquals(expected,result.toString());
-        result = tar.getTypeAheadFromMongoIndex(workspaceID,"SNPEFF_IMPACT","M",1000);
-        expected = "[ \"MODERATE\" , \"MODIFIER\"]";
-        assertEquals(expected,result.toString());
-        //check that it is case sensitive
-        result = tar.getTypeAheadFromMongoIndex(workspaceID,"SNPEFF_IMPACT","m",1000);
-        expected = "[ ]";
-        assertEquals(expected,result.toString());
-        result = tar.getTypeAheadFromMongoIndex(workspaceID,"SNPEFF_IMPACT","M",1);
-        expected = "[ \"MODERATE\"]";
-        assertEquals(expected,result.toString());
-        result = tar.getTypeAheadFromMongoIndex(workspaceID,"SNPEFF_GENE_NAME","M",1);
-        expected = "[ \"MIB2\"]";
-        assertEquals(expected,result.toString());
-    }
+//    @Test
+//    public void testGetTypeAheadFromMongoCache() throws CacheMissException {
+//        System.out.println("TestGetTypeAheadFromMongoCache");
+//        BasicDBList result = tar.getTypeAheadFromMongoCache(workspaceID,"SNPEFF_IMPACT","",1000); //get all the values (there are 4)
+//        String expected = "[ \"HIGH\" , \"MODERATE\" , \"LOW\" , \"MODIFIER\"]";
+//        assertEquals(expected,result.toString());
+//        //check if reducing max values returned works
+//        result = tar.getTypeAheadFromMongoCache(workspaceID,"SNPEFF_IMPACT","",1); //get all the values (there are 4)
+//        expected = "[ \"HIGH\"]";
+//        assertEquals(expected,result.toString());
+//        //check to see if prefix works
+//        result = tar.getTypeAheadFromMongoCache(workspaceID,"SNPEFF_IMPACT","FOO",100); //get all the values (there are 4)
+//        expected = "[ ]";
+//        assertEquals(expected,result.toString());
+//        result = tar.getTypeAheadFromMongoCache(workspaceID,"SNPEFF_IMPACT","MOD",1); //get all the values (there are 4)
+//        expected = "[ \"MODERATE\"]";
+//        assertEquals(expected,result.toString());
+//        result = tar.getTypeAheadFromMongoCache(workspaceID,"SNPEFF_IMPACT","MOD",100); //get all the values (there are 4)
+//        expected = "[ \"MODERATE\" , \"MODIFIER\"]";
+//        assertEquals(expected,result.toString());
+//    }
+//
+//    @Test
+//    public void testGetTypeAheadFromMongoIndex() throws CacheMissException {
+//        System.out.println("testGetTypeAheadFromMongoIndex");
+//        BasicDBList result = tar.getTypeAheadFromMongoIndex(workspaceID,"SNPEFF_IMPACT","",1000);
+//        String expected = "[ \"HIGH\" , \"LOW\" , \"MODERATE\" , \"MODIFIER\"]";
+//        assertEquals(expected,result.toString());
+//        result = tar.getTypeAheadFromMongoIndex(workspaceID,"SNPEFF_IMPACT","M",1000);
+//        expected = "[ \"MODERATE\" , \"MODIFIER\"]";
+//        assertEquals(expected,result.toString());
+//        //check that it is case sensitive
+//        result = tar.getTypeAheadFromMongoIndex(workspaceID,"SNPEFF_IMPACT","m",1000);
+//        expected = "[ ]";
+//        assertEquals(expected,result.toString());
+//        result = tar.getTypeAheadFromMongoIndex(workspaceID,"SNPEFF_IMPACT","M",1);
+//        expected = "[ \"MODERATE\"]";
+//        assertEquals(expected,result.toString());
+//        result = tar.getTypeAheadFromMongoIndex(workspaceID,"SNPEFF_GENE_NAME","M",1);
+//        expected = "[ \"MIB2\"]";
+//        assertEquals(expected,result.toString());
+//    }
 
     @Test
     public void testGetTypeAhead4Value4Params(){
         //test iterations where you hit the cache or the index!
         //example where you go to the index to get the values
         String result = tar.getTypeAhead4Value(workspaceID,"SNPEFF_GENE_NAME","M",100000);
-        String expected = "{ \"SNPEFF_GENE_NAME\" : [ \"MIB2\" , \"MIR200A\" , \"MRPL20\" , \"MXRA8\"]}";
+        String expected = "{ \"INFO.SNPEFF_GENE_NAME\" : [ \"MIB2\" , \"MIR200A\" , \"MRPL20\" , \"MXRA8\"]}";
         assertEquals(expected,result);
         //example where you go to the cache, because it it not indexed
         //	"GenotyperControls" : [
@@ -198,15 +153,15 @@ public class TypeAheadITCase {
         //        "Samtools"
         //],
         result = tar.getTypeAhead4Value(workspaceID,"GenotyperControls","",100000);
-        expected = "{ \"GenotyperControls\" : [ \"Samtools-Pindel\" , \"Pindel\" , \"Samtools\"]}";
+        expected = "{ \"INFO.GenotyperControls\" : [ \"Samtools\" , \"Pindel\" , \"Samtools-Pindel\"]}";
         assertEquals(expected,result);
         //Checking that prefixes work
         result = tar.getTypeAhead4Value(workspaceID,"GenotyperControls","Sam",100000);
-        expected = "{ \"GenotyperControls\" : [ \"Samtools-Pindel\" , \"Samtools\"]}";
+        expected = "{ \"INFO.GenotyperControls\" : [ \"Samtools\" , \"Samtools-Pindel\"]}";
         assertEquals(expected,result);
         //example where there are no values in the database to type-ahead
         result = tar.getTypeAhead4Value(workspaceID,"CGT","",100000);
-        expected = "{ \"CGT\" : [ ]}";  //all of the values for this are null, so this is the response
+        expected = "{ \"INFO.CGT\" : [ ]}";  //all of the values for this are null, so this is the response
         assertEquals(expected,result);
 
     }
@@ -234,9 +189,6 @@ public class TypeAheadITCase {
         //assertEquals(Integer.MAX_VALUE, count);
         assertEquals(0, count);
 
-        //field is NOT indexed and over-run, return infinity
-        //first, in this sample, there is NOTHING that is big but not indexed, so we need to remove the index and then put it back on
-        //remove the index
         Index index = new Index();
         String status = index.dropFieldIndex(workspaceID, "INFO.SNPEFF_AMINO_ACID_CHANGE");
         System.out.println(status);
@@ -244,28 +196,10 @@ public class TypeAheadITCase {
         json = tar.getDistinctCount4Field(workspaceID, "SNPEFF_AMINO_ACID_CHANGE");    //can prefix with INFO or not...
         r = (DBObject) JSON.parse(json);
         count = (Integer) r.get("count");
-        assertEquals(Integer.MAX_VALUE, count);
+        assertEquals(32, count);
         //place the index back
         status = index.createFieldIndex(workspaceID, "INFO.SNPEFF_AMINO_ACID_CHANGE");
         System.out.println(status);
-    }
-
-    //the following test will always fail until we implement a different type-ahead stratigy.
-    //@Test
-    public void testGetDistinctCount4FieldTestCache() throws IOException, CacheMissException {
-        //First, get the value when it is indexed (top 20 only)
-        String expectedJson = tar.getTypeAhead4Value(workspaceID, "INFO.SNPEFF_GENE_NAME", "A", 10);
-        tar.clearLastHit();
-
-        //tests if we drop an index and then try to get the values out of the cache using the standard call that it works
-        Index index = new Index();
-        String status = index.dropFieldIndex(workspaceID, "INFO.SNPEFF_GENE_NAME");
-        String json = tar.getTypeAhead4Value(workspaceID, "INFO.SNPEFF_GENE_NAME", "A", 10);
-        //System.out.println(json);
-        index.createFieldIndex(workspaceID,"INFO.SNPEFF_GENE_NAME");
-        BasicDBList expected = ((BasicDBList) ((DBObject) JSON.parse(expectedJson) ).get("INFO.SNPEFF_GENE_NAME"));
-        BasicDBList result = ((BasicDBList) ((DBObject) JSON.parse(json) ).get("INFO.SNPEFF_GENE_NAME"));
-        assertEquals(expected, result);
     }
 
 

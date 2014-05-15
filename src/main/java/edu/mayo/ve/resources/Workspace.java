@@ -19,6 +19,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.util.JSON;
+import edu.mayo.TypeAhead.TypeAheadCollection;
 import edu.mayo.util.FixStrings;
 import edu.mayo.util.MongoConnection;
 import java.util.Iterator;
@@ -111,10 +112,8 @@ public class Workspace {
          sg.put(Tokens.KEY, workspaceID);
          sgcol.remove(sg);
          //remove typeahead
-         DBCollection tacol =  db.getCollection(Tokens.TYPEAHEAD_COLLECTION);
-         BasicDBObject ta = new BasicDBObject();
-         ta.put(Tokens.KEY, workspaceID);
-         tacol.remove(ta);
+         TypeAheadCollection type = new TypeAheadCollection();
+         type.clear(workspaceID);
          //return the status of the deletion to the caller
          BasicDBObject bo = new BasicDBObject();
          bo.append("status", "workspace= " + workspaceID + " deleted");
