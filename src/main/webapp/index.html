@@ -514,22 +514,27 @@
                                         </table>
                                     </div>
                                     <div class="row-fluid"> <!-- header row -->
-                                        <div class="span6"><h4>Filter</h4></div>
-                                        <div class="span6"><h4>Value</h4></div>
+                                        <div class="span4"><h4>Filter</h4></div>
+                                        <div class="span2"></div>
+                                        <div class="span5"><h4>Value</h4></div>
                                     </div>
                                     <div class="row-fluid"> <!-- divider -->
-                                        <div class="span12"><hr></div>
+                                        <div class="span4"><hr></div>
+                                        <div class="span2"></div>
+                                        <div class="span5"><hr></div>
                                     </div>
                                     <div class="row-fluid">
-                                        <div class="span6">
-                                            <select class="span3" id="sample_field_min_max_list">
+                                        <div class="span4">
+                                            <select class="span4" id="sample_field_min_max_list">
                                                 <option value='max'>MAX</option>
                                                 <option value='min'>MIN</option>
                                             </select>
-                                            <select class="span6" id="sample_field_list">
+                                            <select class="span8" id="sample_field_list">
                                                 <!-- Dynamically added by javascript -->
                                             </select>
-                                            <select class="span3" id="sample_field_op_list">
+                                        </div>
+                                        <div class="span2">
+                                            <select class="span12" id="sample_field_op_list">
                                                 <option value='eq'>=</option>
                                                 <option value='gt'>&gt;</option>
                                                 <option value='gteq'>&#x2265;</option>
@@ -538,7 +543,7 @@
                                                 <option value='ne'>&#x2260;</option>
                                             </select>
                                         </div>
-                                        <div class="span6">
+                                        <div class="span5">
                                             <div class="row-fluid" id="sample_value_div">
                                                 <input name='sample_filter_value' class='input-mini' value='0'>
                                             </div>
@@ -609,7 +614,9 @@
                                         <div class="span6"><h4>Value</h4></div>
                                     </div>
                                     <div class="row-fluid"> <!-- divider -->
-                                        <div class="span12"><hr></div>
+                                        <div class="span4"><hr></div>
+                                        <div class="span2"></div>
+                                        <div class="span6"><hr></div>
                                     </div>
                                     <div class="row-fluid">
                                         <div class="span4">
@@ -686,35 +693,55 @@
                                     </div>
                                     <div class="row-fluid"> <!-- content area -->
                                         <div class="span4">
-                                            <fieldset>
-                                                <legend>Filter</legend>
-                                                <select class="input-large" id="custom_field_list">
+                                            <!-- header row -->
+                                            <div class="row-fluid"><h4>Filter</h4></div>
+                                            <!-- horizontal rule row -->
+                                            <div class="row-fluid"><hr></div>
+                                            <!-- information row -->
+                                            <div class="row-fluid">
+                                                <select class="span12" id="custom_field_list">
                                                     <!-- Dynamically added by javascript -->
                                                 </select>
-                                            </fieldset>
+                                            </div>
                                         </div>
-                                        <div class="span8">
-                                            <fieldset>
-                                                <legend>Value</legend>
-                                                <div class="row-fluid hide" id="group_value_div">
-                                                    <div class="span8"> <!-- group column -->
-                                                        <div class="row-fluid">
-                                                            <div class="span12">
-                                                                <div class="row-fluid">
-                                                                    <div class="input-append">
-                                                                        <button id="new_group_button" title="Create a new group of samples" type="button" class="btn"><i class="icon-plus"></i></button>
-                                                                        <select class="input-large" id="group_list" name="group_list"></select>
+                                        <div class="span8 hide" id="group_div">
+                                            <!-- header row -->
+                                            <div class="row-fluid">
+                                                <div class="span2"></div>
+                                                <div class="span10"><h4>Value</h4></div>
+                                            </div>
+                                            <!-- horizontal rule row -->
+                                            <div class="row-fluid">
+                                                <div class="span2"></div>
+                                                <div class="span10"><div class="span12"><hr></div></div>
+                                            </div>
+                                            <!-- information row -->
+                                            <div class="row-fluid">
+                                                <div class="span2">
+                                                    <select class="span12">
+                                                        <option value='eq'>=</option>
+                                                    </select>
+                                                </div>
+                                                <div class="span10">
+                                                    <div class="row-fluid">
+                                                        <div class="span8"> <!-- group column -->
+                                                            <div class="row-fluid">
+                                                                <div class="span12">
+                                                                    <div class="row-fluid">
+                                                                        <div class="input-append">
+                                                                            <button id="new_group_button" title="Create a new group of samples" type="button" class="btn"><i class="icon-plus"></i></button>
+                                                                            <select class="input-medium" id="group_list" name="group_list"></select>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <div class="row-fluid" id="group_sample_count"></div>
-                                                                <div class="row-fluid">
-                                                                    <select id="group_sample_names_list" size="8">
-                                                                    </select>
+                                                                    <div class="row-fluid" id="group_sample_count"></div>
+                                                                    <div class="row-fluid">
+                                                                        <select class="input-large" id="group_sample_names_list" size="8">
+                                                                        </select>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="span4"> <!-- genotype and status column -->
+                                                        <div class="span4"> <!-- genotype and status column -->
                                                             <h5>Genotype</h5>
                                                             <div>
                                                                 <label class="radio"><input type="radio" name="genotype" value="either" checked>Either</label>
@@ -726,12 +753,33 @@
                                                                 <label class="radio"><input type="radio" name="sample_status" value="any" checked>In any sample</label>
                                                                 <label class="radio"><input type="radio" name="sample_status" value="all">In all samples</label>
                                                             </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="row-fluid hide" id="alt_ad_value_div">
+                                            </div>
+                                        </div>
+                                        <div class="span8 hide" id="alt_ad_div">
+                                            <!-- header row -->
+                                            <div class="row-fluid">
+                                                <div class="span2"></div>
+                                                <div class="span10"><h4>Value</h4></div>
+                                            </div>
+                                            <!-- horizontal rule row -->
+                                            <div class="row-fluid">
+                                                <div class="span2"></div>
+                                                <div class="span10"><div class="span12"><hr></div></div>
+                                            </div>
+                                            <!-- information row -->
+                                            <div class="row-fluid">
+                                                <div class="span2">
+                                                    <select class="span12">
+                                                        <option value='gteq'>&#x2265;</option>
+                                                    </select>
+                                                </div>
+                                                <div class="span10">
                                                     <input class="input-mini" value='0' name="alt_ad_value_field" id="alt_ad_value_field">
                                                 </div>
-                                            </fieldset>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

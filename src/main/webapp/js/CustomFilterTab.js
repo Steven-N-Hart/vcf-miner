@@ -150,13 +150,13 @@ var CustomFilterTab = function () {
                 sampleNameList.empty();
             }
 
-            $('#group_value_div').toggle(true);
-            $('#alt_ad_value_div').toggle(false);
+            $('#group_div').toggle(true);
+            $('#alt_ad_div').toggle(false);
 
         } else if (filter instanceof AltAlleleDepthFilter) {
 
-            $('#group_value_div').toggle(false);
-            $('#alt_ad_value_div').toggle(true);
+            $('#group_div').toggle(false);
+            $('#alt_ad_div').toggle(true);
 
         }
 
