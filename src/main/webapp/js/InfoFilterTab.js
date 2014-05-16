@@ -1,4 +1,4 @@
-var InfoFilterTab = function (indexController) {
+var InfoFilterTab = function () {
 
     // private variables
     var workspaceKey;
@@ -22,8 +22,7 @@ var InfoFilterTab = function (indexController) {
         // pick out the INFO data fields
         infoFields.reset();
         _.each(workspace.get("dataFields").models, function(vcfDataField) {
-            if (vcfDataField.get("category") == VCFDataCategory.INFO)
-            {
+            if (vcfDataField.get("category") == VCFDataCategory.INFO) {
                 infoFields.add(vcfDataField);
             }
         });
@@ -37,32 +36,28 @@ var InfoFilterTab = function (indexController) {
     });
 
     // jQuery validate plugin config
-    $('#info_tab_form').validate(
-        {
-            rules:
-            {
-                int_field_value: {
-                    required: true,
-                    integer: true
-                },
-                float_field_value: {
-                    required: true,
-                    number: true
-                }
+    $('#info_tab_form').validate({
+        rules: {
+            int_field_value: {
+                required: true,
+                integer: true
             },
-            highlight: function(element) {
-                $(element).parent().addClass('control-group error');
-            },
-            success: function(element) {
-                $(element).parent().removeClass('control-group error');
+            float_field_value: {
+                required: true,
+                number: true
             }
+        },
+        highlight: function(element) {
+            $(element).parent().addClass('control-group error');
+        },
+        success: function(element) {
+            $(element).parent().removeClass('control-group error');
         }
-    );
+    });
 
     var ListView = Backbone.View.extend({
 
-        initialize: function()
-        {
+        initialize: function() {
             this.listenTo(this.model, 'add',    this.addOne);
             this.listenTo(this.model, 'remove', this.removeOne);
             this.listenTo(this.model, 'reset',  this.removeAll);
@@ -71,53 +66,44 @@ var InfoFilterTab = function (indexController) {
         /**
          * Delegated events
          */
-        events:
-        {
+        events: {
             "change" : "selectionChanged"
         },
 
-        render: function()
-        {
+        render: function() {
         },
 
-        addOne: function(infoDataField)
-        {
+        addOne: function(infoDataField) {
             var fieldID = infoDataField.get("name");
             var desc = infoDataField.get("description");
             this.$el.append("<option value='"+fieldID+"' title='"+desc+"'>"+fieldID+"</option>");
         },
 
-        selectionChanged: function(e)
-        {
+        selectionChanged: function(e) {
             infoFieldChanged();
         },
 
-        removeOne: function(infoDataField)
-        {
+        removeOne: function(infoDataField) {
             var fieldID = infoDataField.get("name");
             $("#info_field_list option[value='"+fieldID+"']").remove();
         },
 
-        removeAll: function()
-        {
+        removeAll: function() {
             this.$el.empty();
         }
     });
 
-    view = new ListView(
-        {
-            "el": $('#info_field_list'),
-            "model": infoFields
-        }
-    );
+    view = new ListView({
+        "el": $('#info_field_list'),
+        "model": infoFields
+    });
 
     /**
      * Gets the currently selected VCFDataField model.
      *
      * @returns {*}
      */
-    function getSelectedInfoField()
-    {
+    function getSelectedInfoField() {
         var fieldID = $('#info_field_list').val();
         return infoFields.findWhere({name: fieldID});
     }
@@ -126,8 +112,8 @@ var InfoFilterTab = function (indexController) {
      * Dynamically alters the tab's "operator" and "value" areas based on
      * the selected INFO field.
      */
-    function infoFieldChanged()
-    {
+    function infoFieldChanged() {
+
         // get selected VCFDataField model
         var infoField = getSelectedInfoField();
         var fieldID = infoField.get("name");
@@ -146,8 +132,7 @@ var InfoFilterTab = function (indexController) {
             //"<div class='row-fluid checkbox'><label><input type='checkbox' id='include_nulls'> Keep variants with missing annotation (+null)</label></div>";
         "<div class='row-fluid'><input type='checkbox' id='include_nulls'/> Keep variants with missing annotation (+null)</div>";
 
-        switch (infoField.get("type"))
-        {
+        switch (infoField.get("type")) {
             case VCFDataType.FLAG:
                 opList.append(OPTION_EQ);
                 //opList.append(OPTION_NE); // not supported by server-side
@@ -184,30 +169,30 @@ var InfoFilterTab = function (indexController) {
                 opList.append(OPTION_EQ);
                 opList.append(OPTION_NE);
 
-                var values = getFieldValues(fieldID, parseInt(MongoApp.settings.maxFilterValues) + 1);
+                var maxFilterValues = parseInt(MongoApp.settings.maxFilterValues);
+                var values = getFieldValues(fieldID, maxFilterValues + 1);
 
                 // use typahead if we have MORE values than specified as the max
-                if (values.length > MongoApp.settings.maxFilterValues)
-                {
+                if (values.length > maxFilterValues) {
+                    var maxTypeaheadValues = 1000; // TODO: have this max configurable?
                     valueDiv.append('<input id="info_str_typeahead" type="text" placeholder="enter value here" autocomplete="off" spellcheck="false"/>');
                     valueDiv.append('<textarea id="info_str_value_area" rows="7" wrap="off" placeholder="" autocomplete="off" spellcheck="false"/>');
                     $('#info_str_typeahead').typeahead({
-                        remote:
-                        {
-                            url: '/mongo_svr/ve/typeahead/w/'+workspaceKey+'/f/'+fieldID+'/p/%QUERY/x/100', //TODO: 100 max?
+                        remote: {
+                            url: '/mongo_svr/ve/typeahead/w/'+workspaceKey+'/f/INFO.'+fieldID+'/p/%QUERY/x/'+maxTypeaheadValues,
                             filter: function(parsedResponse) {
                                 var dataset = new Array();
-                                var values = parsedResponse[fieldID];
-                                for (var i = 0; i < values.length; i++) {
+                                var typeaheadValues = parsedResponse['INFO.'+fieldID];
+                                for (var i = 0; i < typeaheadValues.length; i++) {
                                     var datum = {
-                                        value: values[i]
+                                        value: typeaheadValues[i]
                                     };
                                     dataset.push(datum);
                                 }
                                 return dataset;
                             }
                         },
-                        limit: 10 // TODO: have this max configurable?
+                        limit: maxTypeaheadValues
                     });
 
                     // append typeahead value to the textarea
@@ -227,8 +212,7 @@ var InfoFilterTab = function (indexController) {
                         validate();
                     });
                 }
-                else
-                {
+                else {
                     // dropdown checkbox widget
                     valueDiv.append("<div class='row-fluid'><div class='dropdown' id='info_field_dropdown_checkbox' name='str_field_value'></div></div>");
 
@@ -236,8 +220,7 @@ var InfoFilterTab = function (indexController) {
                     values.sort(function(a,b) { return a.localeCompare(b) } );
 
                     var dropdownData = new Array();
-                    for (var i = 0; i < values.length; i++)
-                    {
+                    for (var i = 0; i < values.length; i++) {
                         dropdownData.push({id: i, label: values[i]});
                     }
 
@@ -258,38 +241,30 @@ var InfoFilterTab = function (indexController) {
         $('#info_tab_form').valid();
     }
 
-    function validate()
-    {
-        var infoField = getSelectedInfoField();
-        var fieldID = infoField.get("name");
+    function validate() {
 
-        switch (infoField.get("type"))
-        {
+        var infoField = getSelectedInfoField();
+
+        switch (infoField.get("type")) {
             case VCFDataType.STRING:
 
-                if ($('#info_str_value_area').length > 0)
-                {
-                    if ($('#info_str_value_area').val().trim().length > 0)
-                    {
+                if ($('#info_str_value_area').length > 0) {
+                    if ($('#info_str_value_area').val().trim().length > 0) {
                         $("#info_field_value_validation_warning").remove();
                         return true;
                     }
-                    else
-                    {
+                    else {
                         if ($("#info_field_value_validation_warning").length == 0)
                             $("#info_value_div").append('<div class="row-fluid" id="info_field_value_validation_warning"><div class="alert alert-error">At least 1 value should be entered.</div></div>');
                     }
                 }
-                else
-                {
+                else {
                     var numChecked = $("#info_field_dropdown_checkbox").dropdownCheckbox("checked").length;
-                    if(numChecked > 0)
-                    {
+                    if(numChecked > 0) {
                         $("#info_field_value_validation_warning").remove();
                         return true;
                     }
-                    else
-                    {
+                    else {
                         if ($("#info_field_value_validation_warning").length == 0)
                             $("#info_value_div").append('<div class="row-fluid" id="info_field_value_validation_warning"><div class="alert alert-error">At least 1 string should be checked.</div></div>');
 
@@ -305,70 +280,37 @@ var InfoFilterTab = function (indexController) {
     /**
      * Fetches values for the given field, up to the specified max cutoff.
      * @param fieldID
+     *      The field id that values will be retrieved for.  The id should not
+     *      have the 'INFO.' prefix.
      * @param maxCutoff
+     *      The max number of values to return
      * @returns {Array}
+     *      An array of string values
      */
-    function getFieldValues(fieldID, maxCutoff)
-    {
-        // TODO: REST Call currently has issue where it returns 1 LESS than maxCutoff
-        // TODO: Add 1 to compensate.  REMOVE THIS when the back end call is fixed.
-        maxCutoff = maxCutoff + 1;
+    function getFieldValues(fieldID, maxCutoff) {
 
         var values = new Array();
+
         // perform synchronous AJAX call
         $.ajax({
             async: false,
             url: "/mongo_svr/ve/typeahead/w/"+workspaceKey+"/f/INFO."+fieldID+"/x/"+maxCutoff,
             dataType: "json",
-            success: function(json)
-            {
+            success: function(json) {
                 values = json["INFO."+fieldID];
             },
-            error: function(jqXHR, textStatus)
-            {
+            error: function(jqXHR, textStatus) {
                 MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
+
         return values;
-    }
-
-    /**
-     * Determines whether the given field should use the typeahead widget (e.g. lots of values)
-     *
-     * @param field
-     * @returns {boolean}
-     */
-    function useTypeAheadWidget(fieldID)
-    {
-        var maxValues = MongoApp.settings.maxFilterValues;
-
-        var useTypeAhead = false;
-        // perform synchronous AJAX call
-        $.ajax({
-            async: false,
-            url: "/mongo_svr/ve/typeahead/w/"+workspaceKey+"/f/INFO."+fieldID,
-            dataType: "json",
-            success: function(json)
-            {
-                var valueArray = json[fieldID];
-                if ((valueArray == undefined) || (valueArray.length > maxValues))
-                {
-                    useTypeAhead = true;
-                }
-            },
-            error: function(jqXHR, textStatus)
-            {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            }
-        });
-
-        return useTypeAhead;
     }
 
     // public API
     return {
-        initialize: function()
-        {
+        initialize: function() {
+
             if (infoFields.length > 0) {
                 // simulate user choosing the 1st INFO field
                 infoFieldChanged();
@@ -385,8 +327,7 @@ var InfoFilterTab = function (indexController) {
          *
          * @return Filter model
          */
-        getFilter: function()
-        {
+        getFilter: function() {
             // get selected VCFDataField
             var infoField = getSelectedInfoField();
             var fieldID = infoField.get("name");
@@ -395,18 +336,14 @@ var InfoFilterTab = function (indexController) {
             filter.set("name", fieldID);
             filter.set("description", infoField.get("description"));
 
-            var valueDiv = $("#info_value_div");
-            switch (infoField.get("type"))
-            {
+            switch (infoField.get("type")) {
                 case VCFDataType.FLAG:
                     filter.set("category", FilterCategory.INFO_FLAG);
                     var radioId =  $('#info_flag_radio_group input[type=radio]:checked').attr('id');
-                    if (radioId == 'true')
-                    {
+                    if (radioId == 'true') {
                         filter.set("value", true);
                     }
-                    else
-                    {
+                    else {
                         filter.set("value", false);
                     }
                     break;
@@ -422,18 +359,15 @@ var InfoFilterTab = function (indexController) {
 
                     var valueArr;
 
-                    if ($('#info_str_value_area').length > 0)
-                    {
+                    if ($('#info_str_value_area').length > 0) {
                         // grab values from text area
                         valueArr = $('#info_str_value_area').val().trim().split("\n");
                     }
-                    else
-                    {
+                    else {
                         // grab values from dropdown checkbox widget
                         valueArr = new Array();
                         var checkedVals = $("#info_field_dropdown_checkbox").dropdownCheckbox("checked");
-                        for (var i=0; i < checkedVals.length; i++)
-                        {
+                        for (var i=0; i < checkedVals.length; i++) {
                             valueArr.push(checkedVals[i].label);
                         }
                     }
@@ -446,10 +380,8 @@ var InfoFilterTab = function (indexController) {
             // get selected operator
             var operator = FilterOperator.EQ; // default
             var selectedOperatorOpt = $('#info_operator_list');
-            if (typeof selectedOperatorOpt !== "undefined")
-            {
-                switch(selectedOperatorOpt.val())
-                {
+            if (typeof selectedOperatorOpt !== "undefined") {
+                switch(selectedOperatorOpt.val()) {
                     case 'eq':
                         operator = FilterOperator.EQ;
                         break;
@@ -472,14 +404,12 @@ var InfoFilterTab = function (indexController) {
             }
             filter.set("operator", operator);
 
-            if (MongoApp.settings.showMissingIndexWarning && !MongoApp.indexController.isDataFieldIndexed(infoField))
-            {
+            if (MongoApp.settings.showMissingIndexWarning && !MongoApp.indexController.isDataFieldIndexed(infoField)) {
                 var confirmDialog = new ConfirmDialog(
                     "",
                     fieldID + " does not have an index.  Would you like to create a new index to boost filtering performance?",
                     "Create Index",
-                    function()
-                    {
+                    function() {
                         // confirm
                         MongoApp.indexController.createIndex(MongoApp.indexController.getIndexByDataField(infoField));
                     }
