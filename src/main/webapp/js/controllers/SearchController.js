@@ -125,25 +125,61 @@ var SearchController = Backbone.Marionette.Controller.extend({
      */
     saveSearch: function(search) {
 
-        var filterHistory = this.searchToFilterHistory(search);
-
         var self = this;
-        $.ajax({
-            type: "POST",
-            url: "/mongo_svr/ve/filterHistory/save",
-            contentType: "application/json",
-            data: JSON.stringify(filterHistory),
-            dataType: "json",
-            success: function(json)
-            {
-                var savedSearch = self.filterHistoryToSearch(json);
-                MongoApp.vent.trigger(MongoApp.events.SEARCH_LOAD, savedSearch);
-                console.log("save successful!");
-            },
-            error: function(jqXHR, textStatus) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            }
-        });
+        var saveCallback = function() {
+            // update model name if user decided to change it
+            search.set("name",  $('#search_save_name_field').val());
+
+            var filterHistory = self.searchToFilterHistory(search);
+
+            $.ajax({
+                type: "POST",
+                url: "/mongo_svr/ve/filterHistory/save",
+                contentType: "application/json",
+                data: JSON.stringify(filterHistory),
+                dataType: "json",
+                success: function(json)
+                {
+                    var savedSearch = self.filterHistoryToSearch(json);
+                    MongoApp.vent.trigger(MongoApp.events.SEARCH_LOAD, savedSearch);
+                    console.log("save successful!");
+                },
+                error: function(jqXHR, textStatus) {
+                    MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+                }
+            });
+        }
+
+        var cancelCallback = function() {};
+
+        var shownCallback = function(okButton, cancelButton) {
+            // by default, set the name to be the model's name
+            $('#search_save_name_field').val(search.get("name"));
+
+            // focus on input field and highlight text
+            $('#search_save_name_field').focus();
+            $('#search_save_name_field').select();
+
+            // capture ENTER key event on form
+            $( "#search_save_form" ).submit(function( event ) {
+                // alias ENTER key to clicking on the confirm's OK button
+                okButton.click();
+                event.preventDefault();
+            });
+        };
+
+        var html =
+            '<form id="search_save_form" class="form-horizontal">' +
+            '   <div class="control-group">' +
+            '       <label class="control-label" for="search_save_name_field">Name</label>' +
+            '       <div class="controls">' +
+            '           <input type="text" id="search_save_name_field" name="search_save_name_field">' +
+            '       </div>' +
+            '   </div>'+
+            '</form>';
+
+        var confirmDialog = new ConfirmDialog("Save Analysis", html, "Save", saveCallback, cancelCallback, shownCallback);
+        confirmDialog.show();
     },
 
     /**
