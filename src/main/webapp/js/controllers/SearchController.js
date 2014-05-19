@@ -62,6 +62,12 @@ var SearchController = Backbone.Marionette.Controller.extend({
         options.region.show(searchTableView);
     },
 
+    showSearchSave: function(options) {
+        this.searchSaveView = new SearchSaveView({model: MongoApp.search});
+
+        options.region.show(this.searchSaveView);
+    },
+
     showSearchFilterTable: function (options) {
         this.searchFilterView = new SearchFilterTableView({
             collection: MongoApp.search.get("filters")

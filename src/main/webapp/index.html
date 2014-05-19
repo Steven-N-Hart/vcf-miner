@@ -161,10 +161,13 @@
                 </div>
             </div>
         </div>
+    </script>
+
+    <script id="search-save-template" type="text/template">
         <div class="row-fluid">
-            <i>
-                <% if(saved && (timestamp != undefined)){%><br>Last saved <%=getDateString(timestamp)%><%}%>
-                <% if(!saved){%><br><p class="text-error">This Analysis has been modified.  Would you like to save your changes?  <button class="btn btn-mini searchSave"><i class="fa fa-save"></i> Save</button></p><%}%>
+            <i class="pull-right">
+                <% if(saved && (timestamp != undefined)){%><small>Last saved <%=getDateString(timestamp)%></small><%}%>
+                <% if(!saved){%><button class="btn btn-success searchSave"><i class="fa fa-save"></i> Save Changes</button></p><%}%>
             </i>
         </div>
     </script>
@@ -330,6 +333,7 @@
     <script src="js/views/SearchFilterRowView.js"></script>
     <script src="js/views/SearchFilterTableView.js"></script>
     <script src="js/views/SearchNameView.js"></script>
+    <script src="js/views/SearchSaveView.js"></script>
     <script src="js/views/WorkspaceTableRowView.js"></script>
     <script src="js/views/WorkspaceTableView.js"></script>
     <script src="js/controllers/SearchController.js"></script>
@@ -349,7 +353,6 @@
 
 
 <body>
-<div id="message_area"></div>
 
 <!-- Table Toolbar -->
 <div id="table_toolbar" class="btn-group hide">
@@ -1089,7 +1092,7 @@
             <ul class="nav nav-list">
                 <div class="nav-header">
                     <div class="row-fluid">
-                        <div class="span2 pull-right"><button id="west-closer" title="Hide Analysis" type="button" class="btn btn-mini"><i class="fa fa-arrow-left"></i> Hide</button></div>
+                        <div class="pull-right"><button id="west-closer" title="Hide Analysis" type="button" class="btn btn-mini"><i class="fa fa-arrow-left"></i> Hide</button></div>
                     </div>
                 </div>
 
@@ -1099,9 +1102,13 @@
 
                         <br>
 
-                        <div id="searchFiltersRegion"></div>
+                        <div class="well">
+                            <div id="searchFiltersRegion"></div>
 
-                        <button title="Add Filter to your Analysis" class="btn btn-primary" id="show_add_filter_dialog_button">Add Filter</button>
+                            <button title="Add Filter to your Analysis" class="btn btn-primary" id="show_add_filter_dialog_button">Add Filter</button>
+                        </div>
+
+                        <div id="searchSaveRegion"></div>
                     </div>
                 </div>
             </ul>

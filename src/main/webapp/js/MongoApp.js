@@ -15,6 +15,7 @@ MongoApp.addRegions({
     searchNameRegion:    '#searchNameRegion',
     searchTableRegion:   '#searchTableRegion',
     searchFiltersRegion: '#searchFiltersRegion',
+    searchSaveRegion:    '#searchSaveRegion',
     variantDataRegion:   '#variantDataRegion'
 });
 
@@ -187,6 +188,7 @@ MongoApp.addInitializer(function () {
     searchController.showSearchName({region: MongoApp.searchNameRegion });
     searchController.showSearchTable({region: MongoApp.searchTableRegion });
     searchController.showSearchFilterTable({region: MongoApp.searchFiltersRegion });
+    searchController.showSearchSave({region: MongoApp.searchSaveRegion });
 
     new VariantDataController();
 
