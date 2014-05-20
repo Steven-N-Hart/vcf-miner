@@ -1,19 +1,8 @@
-/**
- *
- * @param workspaceKey
- *      The workspace key.
- * @param sampleNames
- *      An array of strings, each string representing a sample name.
- * @param vcfDataFields
- * @param indexController
- * @returns {{initialize: Function, show: Function}}
- * @constructor
- */
-var AddFilterDialog = function (workspace, indexController) {
+var AddFilterDialog = function () {
 
     // private variables
     var sampleFilterTab = new SampleFilterTab();
-    var infoFilterTab   = new InfoFilterTab(indexController);
+    var infoFilterTab   = new InfoFilterTab();
     var customFilterTab = new CustomFilterTab();
 
     $('#add_filter_tabs a').click(function (e)
@@ -22,6 +11,15 @@ var AddFilterDialog = function (workspace, indexController) {
         $(this).tab('show');
     })
 
+
+//    $('#add_filter_modal').on('show', function () {
+//        $(this).find('.modal-body').css({
+//            width:'1000px'
+//        });
+//        $(this).find('body').css({
+//            width:'1000px'
+//        });
+//    });
 
     // will cause the modal to initialize itself every time it is shown
     $('#add_filter_modal').on('hidden', function(){

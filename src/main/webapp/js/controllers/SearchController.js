@@ -40,7 +40,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
             self.importSearch(filterHistoryJsonText);
         });
 
-        var addFilterDialog = new AddFilterDialog(MongoApp.indexController);
+        var addFilterDialog = new AddFilterDialog();
         $('#show_add_filter_dialog_button').click(function (e)
         {
             addFilterDialog.show();

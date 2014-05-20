@@ -230,6 +230,10 @@ var InfoFilterTab = function () {
                         hideHeader: false,
                         data: dropdownData
                     });
+
+                    // set the max width of the dropdown checkbox widget to be that of the parent DIV container
+                    // this will prevent the widget from getting too wide when long string values are present
+                    dropdownCheckbox.find('.dropdown-menu').css('max-width', '100%');
                 }
 
                 valueDiv.append("<div class='row-fluid'><div class='span12'><hr></div></div>");
