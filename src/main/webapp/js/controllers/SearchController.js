@@ -53,6 +53,12 @@ var SearchController = Backbone.Marionette.Controller.extend({
         options.region.show(this.searchNameView);
     },
 
+    showSearchDescription: function(options) {
+        this.searchDescriptionView = new SearchDescriptionView({model: MongoApp.search});
+
+        options.region.show(this.searchDescriptionView);
+    },
+
     showSearchTable: function (options) {
 
         var searchTableView = new SearchTableView({
@@ -321,11 +327,12 @@ var SearchController = Backbone.Marionette.Controller.extend({
      */
     searchToFilterHistory: function(search) {
         var filterHistory = new Object();
-        filterHistory.id      = search.get("id");
-        filterHistory.name    = search.get("name");
-        filterHistory.user    = search.get("user");
-        filterHistory.key     = search.get("key");
-        filterHistory.filters = new Array();
+        filterHistory.id          = search.get("id");
+        filterHistory.name        = search.get("name");
+        filterHistory.description = search.get("description");
+        filterHistory.user        = search.get("user");
+        filterHistory.key         = search.get("key");
+        filterHistory.filters     = new Array();
 
         // translate Filter model to Querry object (except for NONE filter)
         _.each(search.get("filters").models, function(filter) {
@@ -351,6 +358,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
 
         search.set('id', filterHistory.id);
         search.set('name', filterHistory.name);
+        search.set('description', filterHistory.description);
         search.set('user', filterHistory.user);
         search.set('key', filterHistory.key);
         search.set('timestamp', filterHistory.timestamp);

@@ -13,6 +13,7 @@ var MongoApp = new Backbone.Marionette.Application();
 MongoApp.addRegions({
     workspaceRegion:     '#workspaceRegion',
     searchNameRegion:    '#searchNameRegion',
+    searchDescriptionRegion:    '#searchDescriptionRegion',
     searchTableRegion:   '#searchTableRegion',
     searchFiltersRegion: '#searchFiltersRegion',
     searchSaveRegion:    '#searchSaveRegion',
@@ -186,6 +187,7 @@ MongoApp.addInitializer(function () {
 
     var searchController = new SearchController();
     searchController.showSearchName({region: MongoApp.searchNameRegion });
+    searchController.showSearchDescription({region: MongoApp.searchDescriptionRegion });
     searchController.showSearchTable({region: MongoApp.searchTableRegion });
     searchController.showSearchFilterTable({region: MongoApp.searchFiltersRegion });
     searchController.showSearchSave({region: MongoApp.searchSaveRegion });

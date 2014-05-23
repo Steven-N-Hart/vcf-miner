@@ -4,6 +4,7 @@ var Search = Backbone.Model.extend({
         return {
             key:   null,
             name:  "My Analysis",
+            description: "This is the description of My Analysis.",
             timestamp:   null,
             user:   "NA",
             filters: new FilterList(),

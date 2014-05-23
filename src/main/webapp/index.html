@@ -16,6 +16,7 @@
     <link rel="stylesheet" type="text/css" href="font-awesome-4.0.3/css/font-awesome.css">
     <!--<link rel="stylesheet" type="text/css" href="typeahead-0.9.3/typeahead.css">-->
     <link rel="stylesheet" type="text/css" href="typeahead-0.9.3/typeahead.js-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap-wysihtml5-0.0.2/bootstrap-wysihtml5.css">
 
     <style>
         /*workaround for navbar overlapping site by 40 pixels */
@@ -139,7 +140,9 @@
                     <input type="text" class="input-large">
                 </div>
                 <div id="search_name_div">
-                    <strong class="lead">Name: </strong><a class="searchNameChange lead" title="Click to edit the name"><%=name%></a>
+                    <!--<span class="lead"><%=name%> </span><small><a class="" href="#" title="Edit Name">Edit</a></small>-->
+                    <h3 title="Analysis Name" style="display:inline;white-space:normal;"><%=name%> </h3><small><a class="searchNameChange" href="#" title="Edit Name">Edit</a></small>
+                    <!--<a class="searchNameChange lead" title="Click to edit the name"><%=name%></a>-->
                 </div>
             </div>
             <div class="span2">
@@ -158,6 +161,17 @@
                         <li title="Export this Analysis to a file" role="presentation"><a class="searchExport" role="menuitem" tabindex="-1"><i class="icon-download"></i> Export to a file</a></li>
                         <li title="Import a previously exported Analysis file" role="presentation"><a class="searchImport" role="menuitem" tabindex="-1"><i class="icon-upload"></i> Import from a file</a></li>
                     </ul>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script id="search-description-template" type="text/template">
+         <div class="row-fluid">
+            <div class="span12">
+                <div id="search_desc_div">
+                    <small title="Analysis Description"><%=description%> </small>
+                    <small><a class="searchDescriptionChange" href="#" title="Edit Description">Edit</a></small>
                 </div>
             </div>
         </div>
@@ -278,6 +292,8 @@
     <script src="bootstrap-filestyle-1.0.3/js/bootstrap-filestyle.min.js"></script>
     <script src="moment-2.4.0/moment.min.js"></script>
     <script src="Acquisio-bootstrap-dropdown-checkbox-5f2ad8d/js/bootstrap-dropdown-checkbox.js"></script>
+    <script src="xing-wysihtml5-0.3.0/wysihtml5-0.3.0.js"></script>
+    <script src="bootstrap-wysihtml5-0.0.2/bootstrap-wysihtml5.js"></script>
 
     <script src="js/models/VCFDataField.js" type="text/javascript"></script>
     <script src="js/collections/VCFDataFieldList.js" type="text/javascript"></script>
@@ -333,6 +349,7 @@
     <script src="js/views/SearchFilterRowView.js"></script>
     <script src="js/views/SearchFilterTableView.js"></script>
     <script src="js/views/SearchNameView.js"></script>
+    <script src="js/views/SearchDescriptionView.js"></script>
     <script src="js/views/SearchSaveView.js"></script>
     <script src="js/views/WorkspaceTableRowView.js"></script>
     <script src="js/views/WorkspaceTableView.js"></script>
@@ -1099,9 +1116,9 @@
                 <div>
                     <div class="border-frame">
                         <div id="searchNameRegion"></div>
-
                         <br>
-
+                        <div id="searchDescriptionRegion"></div>
+                        <br>
                         <div class="well">
                             <div id="searchFiltersRegion"></div>
 
