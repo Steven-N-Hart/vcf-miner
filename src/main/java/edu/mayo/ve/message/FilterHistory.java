@@ -27,6 +27,8 @@ public class FilterHistory {
     String name;
     /** the unique identifier used for the FilterHistory */
     String id;
+    /** description of the purpose of this filter history */
+    String description;
 
     public String getName() {
         return name;
@@ -74,5 +76,13 @@ public class FilterHistory {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
