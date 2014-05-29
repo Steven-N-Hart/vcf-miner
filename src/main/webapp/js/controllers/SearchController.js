@@ -135,6 +135,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
         var saveCallback = function() {
             // update model name if user decided to change it
             search.set("name",  $('#search_save_name_field').val());
+            search.set("description", $('#search_save_desc_field').val());
 
             var filterHistory = self.searchToFilterHistory(search);
 
@@ -158,31 +159,44 @@ var SearchController = Backbone.Marionette.Controller.extend({
 
         var cancelCallback = function() {};
 
+        var wysihtml5Initialized = false;
         var shownCallback = function(okButton, cancelButton) {
             // by default, set the name to be the model's name
             $('#search_save_name_field').val(search.get("name"));
+            $('#search_save_desc_field').val(search.get("description"));
 
             // focus on input field and highlight text
             $('#search_save_name_field').focus();
             $('#search_save_name_field').select();
 
             // capture ENTER key event on form
-            $( "#search_save_form" ).submit(function( event ) {
-                // alias ENTER key to clicking on the confirm's OK button
-                okButton.click();
-                event.preventDefault();
-            });
+//            $( "#search_save_form" ).submit(function( event ) {
+//                // alias ENTER key to clicking on the confirm's OK button
+//                okButton.click();
+//                event.preventDefault();
+//            });
+
+            if (wysihtml5Initialized == false) {
+                $('#search_save_desc_field').wysihtml5();
+                wysihtml5Initialized = true;
+            }
         };
 
         var html =
-            '<form id="search_save_form" class="form-horizontal">' +
-            '   <div class="control-group">' +
-            '       <label class="control-label" for="search_save_name_field">Name</label>' +
-            '       <div class="controls">' +
-            '           <input type="text" id="search_save_name_field" name="search_save_name_field">' +
-            '       </div>' +
-            '   </div>'+
-            '</form>';
+                '<div class="container-fluid">' +
+                '   <h4>Name</h4>' +
+                '   <div class="row-fluid">' +
+                '       <div class="span12">' +
+                '           <input type="text" id="search_save_name_field" name="search_save_name_field" class="input-medium">' +
+                '       </div>' +
+                '   </div>'+
+                '   <h4>Description</h4>' +
+                '   <div class="row-fluid">' +
+                '       <div class="span12">' +
+                '           <textarea id="search_save_desc_field" name="search_save_desc_field" class="textarea span12" rows="5"></textarea>'+
+                '       </div>' +
+                '   </div>'+
+                '</div>';
 
         var confirmDialog = new ConfirmDialog("Save Analysis", html, "Save", saveCallback, cancelCallback, shownCallback);
         confirmDialog.show();
