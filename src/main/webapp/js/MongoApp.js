@@ -185,12 +185,12 @@ MongoApp.addInitializer(function () {
     // TODO: fix region
     settingsController.showSettingsTab({region: MongoApp.TODO });
 
-    var searchController = new SearchController();
-    searchController.showSearchName({region: MongoApp.searchNameRegion });
-    searchController.showSearchDescription({region: MongoApp.searchDescriptionRegion });
-    searchController.showSearchTable({region: MongoApp.searchTableRegion });
-    searchController.showSearchFilterTable({region: MongoApp.searchFiltersRegion });
-    searchController.showSearchSave({region: MongoApp.searchSaveRegion });
+    this.searchController = new SearchController();
+    this.searchController.showSearchName({region: MongoApp.searchNameRegion });
+    this.searchController.showSearchDescription({region: MongoApp.searchDescriptionRegion });
+    this.searchController.showSearchTable({region: MongoApp.searchTableRegion });
+    this.searchController.showSearchFilterTable({region: MongoApp.searchFiltersRegion });
+    this.searchController.showSearchSave({region: MongoApp.searchSaveRegion });
 
     new VariantDataController();
 
@@ -201,14 +201,11 @@ MongoApp.addInitializer(function () {
         window.open().document.write(_.template(ERROR_TEMPLATE, {message: errorMessage}))
     });
 
-    MongoApp.vent.on(MongoApp.events.WKSP_LOAD, function (newWorkspace) {
+    MongoApp.vent.on(MongoApp.events.WKSP_LOAD, function (newWorkspace, search) {
         MongoApp.workspace = newWorkspace;
 
         MongoApp.vent.trigger(MongoApp.events.WKSP_CHANGE, MongoApp.workspace);
 
-        // default search for workspace
-        // TODO: enhance to be the 'default' search for the workspace
-        var search = new Search();
         search.set("key", MongoApp.workspace.get("key"));
         MongoApp.vent.trigger(MongoApp.events.SEARCH_LOAD, search);
     });

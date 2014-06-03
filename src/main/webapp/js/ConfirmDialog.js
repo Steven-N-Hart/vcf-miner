@@ -51,7 +51,9 @@ var ConfirmDialog = function (title, message, confirmButtonText, confirmCallback
             $('#confirm_modal').modal();
 
             $('#confirm_modal').on('shown', function () {
-                shownCallback($('#confirm_modal_ok'), $('#confirm_modal_cancel'));
+                if (shownCallback != undefined) {
+                    shownCallback($('#confirm_modal_ok'), $('#confirm_modal_cancel'));
+                }
             })
         }
     };

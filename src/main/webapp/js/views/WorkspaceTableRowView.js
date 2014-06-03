@@ -1,32 +1,18 @@
 WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
 
+    searches: new SearchList(),
+
     /**
      * Override to default implementation
      *
      * @returns {*}
      */
     render: function() {
+
         var workspace = this.model;
 
         $('#workspace_table').dataTable().fnAddData(this.toAaDataRow(workspace));
 
-        // register event listeners
-        $(document).on('click', '#' + workspace.get("id") + '_load_button', function() {
-            console.debug("User selected workspace: " + workspace.get("key"));
-            MongoApp.vent.trigger(MongoApp.events.WKSP_LOAD, workspace);
-        });
-
-        $(document).on('click', '#' + workspace.get("id") + '_delete_button', function() {
-            var confirmDialog = new ConfirmDialog(
-                "Delete VCF File",
-                "Delete " + workspace.get('alias') + "?",
-                "Delete",
-                function() {
-                    MongoApp.vent.trigger(MongoApp.events.WKSP_REMOVE, workspace);
-                }
-            );
-            confirmDialog.show();
-        });
         return this;
     },
 
@@ -77,8 +63,17 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
     toAaDataRow: function(workspace) {
         var id = workspace.get("id");
         var actionHtml;
-        var loadButtonHtml = '<button id="'+id+'_load_button" class="btn" aria-hidden="true">Load</button>';
-        var deleteButtonHtml = '<button id="'+id+'_delete_button" class="btn" aria-hidden="true">Delete</button>';
+
+        var loadButtonHtml =
+            '<div class="btn-group">' +
+            '    <button data-wks-key="' + workspace.get("key") + '" class="btn analyze">Analyze</button>' +
+            '    <button data-wks-key="' + workspace.get("key") + '" class="btn dropdown-toggle show-analyses" data-toggle="dropdown">' +
+            '        <span class="caret"></span>' +
+            '    </button>' +
+            '    <ul class="dropdown-menu"></ul>' +
+            '</div>';
+
+        var deleteButtonHtml = '<button data-wks-key="' + workspace.get("key") + '" class="btn delete">Delete</button>';
         switch(workspace.get("status")) {
             case ReadyStatus.READY:
                 actionHtml = '<div style="white-space:nowrap;">' + loadButtonHtml + deleteButtonHtml + '</div>';

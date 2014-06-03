@@ -220,7 +220,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
 
                 // if the user deletes the current search, then reload the workspace w/ default search
                 if (search.get('id') == MongoApp.search.get('id')) {
-                    MongoApp.vent.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspace);
+                    MongoApp.vent.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspace, new Search());
                 }
             },
             error: function(jqXHR, textStatus) {
@@ -230,33 +230,33 @@ var SearchController = Backbone.Marionette.Controller.extend({
     },
 
     /**
-     * Refreshes the Backbone collection of searches by querying the server.
+     * Queries server for a current listing of Search objects for the given workspace.
      */
-    refreshSearches: function(workspace) {
-
-        console.log("refreshing searches for workspace");
+    getSearches: function(workspaceKey) {
 
         var self = this;
 
-        // clear out workspaces
-        this.searches.reset();
+        var searchList = new SearchList();
 
-        // get workspace information from server
+        // make synchronous REST call to server
         $.ajax({
-            url: "/mongo_svr/ve/filterHistory/search/w/" + workspace.get("key"),
+            url: "/mongo_svr/ve/filterHistory/search/w/" + workspaceKey,
             dataType: "json",
+            async: false,
             success: function(json) {
 
                 var filterHistories = json.filterHistories;
                 for (var i = 0; i < filterHistories.length; i++) {
                     var search = self.filterHistoryToSearch(filterHistories[i]);
-                    self.searches.add(search);
+                    searchList.add(search);
                 }
             },
             error: function(jqXHR, textStatus) {
                 MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
+
+        return searchList;
     },
 
     /**
@@ -264,7 +264,9 @@ var SearchController = Backbone.Marionette.Controller.extend({
      */
     showSearchDialog: function() {
 
-        this.refreshSearches(MongoApp.workspace);
+        // refresh searches
+        this.searches.reset();
+        this.searches.set(this.getSearches(MongoApp.workspace.get("key")).models);
 
         $('#searches_modal').modal();
     },
