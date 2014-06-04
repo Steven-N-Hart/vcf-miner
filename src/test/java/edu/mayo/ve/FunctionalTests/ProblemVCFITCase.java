@@ -4,6 +4,7 @@ import com.mongodb.*;
 import com.mongodb.util.JSON;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.util.Tokens;
+import edu.mayo.ve.CacheMissException;
 import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.message.SampleNumberFilter;
@@ -150,6 +151,27 @@ public class ProblemVCFITCase {
 
         delete(vcf);
     }
+
+
+    @Test
+    public void testCustomCaptureAnno5000() throws IOException, ProcessTerminatedException, CacheMissException {
+        String vcf = "src/test/resources/testData/CustomCapture.anno5000.vcf";
+        String workspace = "wde424d18ecd27a209baddacb97a7dd591ad355d8";
+        //workspace = load(vcf, false);
+        System.out.println(workspace);
+        DB db = MongoConnection.getDB();
+        DBCollection col = db.getCollection(workspace);
+        assertEquals(4856, col.count());
+
+        TypeAheadResource tar = new TypeAheadResource();
+        String snpeff_gene_name_count = tar.getDistinctCount4Field(workspace, "INFO.SNPEFF_GENE_NAME");
+        System.out.println(snpeff_gene_name_count);
+
+        //delete(vcf);
+
+
+    }
+
 
     public String load(String inputVCF, boolean reporting) throws IOException, ProcessTerminatedException {
         System.out.println("Make sure to have MongoDB up and running on localhost (or wherever specified in your sys.properties file) before you try to run this functional test!");

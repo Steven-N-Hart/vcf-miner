@@ -61,6 +61,9 @@ public class VCFParser implements ParserInterface {
     /** @param reporting - if verbose output is desired (much slower and not for production use, use when debugging) */
     private boolean reporting = false;
 
+    private Double initialLinePerformance;
+    private Double averageLinePerformance;
+
     public static void usage(){
             System.out.println("This program will parse a VCF file, obtain the 'schema' for that VCF and populate a MongoDB database with the variants in the VCF.");
             System.out.println("");
@@ -152,6 +155,7 @@ public class VCFParser implements ParserInterface {
                 );
         p.setStarts(Arrays.asList(infile));
         int i;
+        long starttime = System.currentTimeMillis();
         if(reporting) System.out.println("Processing Data....");
         for(i=0; p.hasNext(); i++){
             if(context!=null){ if(context.isTerminated()) throw new ProcessTerminatedException(); }
@@ -176,6 +180,14 @@ public class VCFParser implements ParserInterface {
             if(reporting){
                 System.out.println("i:" + i + "\ts:" + s.length());
             }
+
+            long curtime = System.currentTimeMillis();
+            averageLinePerformance = 1.0*(curtime-starttime)/(i+1);
+            if(i<50){
+                //consider burn in, this is the initial reading(s)...
+                initialLinePerformance = averageLinePerformance;
+            }
+
         }
 
         json = vcf.getJSONMetadata();
@@ -728,9 +740,21 @@ public class VCFParser implements ParserInterface {
         this.indexUtil = indexUtil;
     }
 
+    public Double getInitialLinePerformance() {
+        return initialLinePerformance;
+    }
 
+    public void setInitialLinePerformance(Double initialLinePerformance) {
+        this.initialLinePerformance = initialLinePerformance;
+    }
 
+    public Double getAverageLinePerformance() {
+        return averageLinePerformance;
+    }
 
+    public void setAverageLinePerformance(Double averageLinePerformance) {
+        this.averageLinePerformance = averageLinePerformance;
+    }
 }
 
 
