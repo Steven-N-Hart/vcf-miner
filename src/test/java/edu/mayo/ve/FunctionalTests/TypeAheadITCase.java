@@ -4,6 +4,7 @@ import com.mongodb.*;
 import com.mongodb.util.JSON;
 import edu.mayo.TypeAhead.TypeAheadCollection;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
+import edu.mayo.util.CompareJSON;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.CacheMissException;
@@ -146,7 +147,8 @@ public class TypeAheadITCase {
         //example where you go to the index to get the values
         String result = tar.getTypeAhead4Value(workspaceID,"SNPEFF_GENE_NAME","M",100000);
         String expected = "{ \"INFO.SNPEFF_GENE_NAME\" : [ \"MIB2\" , \"MIR200A\" , \"MRPL20\" , \"MXRA8\"]}";
-        assertEquals(expected,result);
+        assertTrue( CompareJSON.equals(expected,result) );
+        //assertEquals(expected,result);
         //example where you go to the cache, because it it not indexed
         //	"GenotyperControls" : [
         //"Samtools-Pindel",
@@ -155,11 +157,13 @@ public class TypeAheadITCase {
         //],
         result = tar.getTypeAhead4Value(workspaceID,"GenotyperControls","",100000);
         expected = "{ \"INFO.GenotyperControls\" : [ \"Samtools\" , \"Pindel\" , \"Samtools-Pindel\"]}";
-        assertEquals(expected,result);
+        assertTrue( CompareJSON.equals(expected,result) );
+        //assertEquals(expected,result);
         //Checking that prefixes work
         result = tar.getTypeAhead4Value(workspaceID,"GenotyperControls","Sam",100000);
         expected = "{ \"INFO.GenotyperControls\" : [ \"Samtools\" , \"Samtools-Pindel\"]}";
-        assertEquals(expected,result);
+        assertTrue( CompareJSON.equals(expected,result) );
+        //assertEquals(expected,result);
         //example where there are no values in the database to type-ahead
         result = tar.getTypeAhead4Value(workspaceID,"CGT","",100000);
         expected = "{ \"INFO.CGT\" : [ ]}";  //all of the values for this are null, so this is the response
