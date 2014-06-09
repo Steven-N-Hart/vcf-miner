@@ -140,6 +140,8 @@ public class VCFParser implements ParserInterface {
             System.out.println("Testing: " + testing);
             System.out.println("Reporting: " + reporting);
         }
+        //make sure we have type-ahead indexed before wo go-ahead and do the load:
+        typeAhead.index(true);
         VCF2VariantPipe vcf 	= new VCF2VariantPipe(true, false);
         Pipe p = new Pipeline(new CatPipe(),
                              new ReplaceAllPipe("\\{",""),
@@ -156,6 +158,7 @@ public class VCFParser implements ParserInterface {
         p.setStarts(Arrays.asList(infile));
         int i;
         long starttime = System.currentTimeMillis();
+        DBObject jsonmeta = null;
         if(reporting) System.out.println("Processing Data....");
         for(i=0; p.hasNext(); i++){
             if(context!=null){ if(context.isTerminated()) throw new ProcessTerminatedException(); }
@@ -168,6 +171,12 @@ public class VCFParser implements ParserInterface {
                 bo = removeSamples(bo);
             }
 
+            //for type-ahead, we need access to the metadata inside the loop, try to force that here
+            if(jsonmeta == null){
+                //System.out.println(vcf.getJSONMetadata().toString());
+                jsonmeta = (DBObject) JSON.parse(vcf.getJSONMetadata().toString());
+            }
+
             if(reporting){
                 System.out.println("row before removing dots:"); System.out.println(s);  }
             if(testing){
@@ -175,7 +184,7 @@ public class VCFParser implements ParserInterface {
             }else {//production
                 //System.out.println(bo.toString());
                 col.save(removeDots(bo, reporting));
-                addToTypeAhead(bo, workspace);
+                addToTypeAhead(bo, workspace,jsonmeta);
             }
             if(reporting){
                 System.out.println("i:" + i + "\ts:" + s.length());
@@ -211,21 +220,71 @@ public class VCFParser implements ParserInterface {
         return i; //the number of records processed
     }
 
-    private void addToTypeAhead(DBObject vcfLine, String workspace){
-        DBObject info = (DBObject) vcfLine.get("INFO"); //only care about info field for type-ahead
-        if(info != null){
-            for(String key : info.keySet()){
-                String ikey = "INFO." + key;
-                Object o = info.get(key);
-                if(o instanceof String){
-                    typeAhead.put(workspace, ikey, o.toString());
-                }else if(o instanceof Integer){
-                    typeAhead.put(workspace, ikey, String.valueOf((Integer) o));
-                }else if(o instanceof Double){
-                    typeAhead.put(workspace, ikey, String.valueOf((Double) o));
-                }//else we can't really type-ahead something else can we?
+    /**
+     * checks to see if the key is
+     * @param key
+     * @param metadata
+     */
+    private boolean checkMetadataIsNumber(String key, DBObject metadata) {
+        Object o = metadata.get("HEADER.INFO." + key + ".type");
+        if(o == null){
+            return false;
+        }if (o instanceof String) {
+            String s = (String) o;
+            if(s.contains("float") || s.contains("Float") || s.contains("FLOAT") ||
+                    s.contains("Double") || s.contains("double") || s.contains("DOUBLE") ||
+                    s.contains("number") || s.contains("number") || s.contains("NUMBER")){
+                return true;
             }
         }
+        return false;
+    }
+
+    /**
+     *
+     * @param vcfLine
+     * @param workspace
+     * @param metadata  - what the header says about the field (e.g. is it a number, if so, then don't do a type-ahead!)
+     */
+    private void addToTypeAhead(DBObject vcfLine, String workspace, DBObject metadata){
+        DBObject info = (DBObject) vcfLine.get("INFO"); //only care about info field for type-ahead
+        if(info != null){
+            for(String key : info.keySet()) {
+                String ikey = "INFO." + key;
+                if(!checkMetadataIsNumber(key,metadata)) { //check to see if the metadata indicates it is a number.
+                    Object o = info.get(key);
+                    if (o instanceof String) {
+                        typeAhead.put(workspace, ikey, o.toString());
+                    } else if (o instanceof Integer) {
+                        typeAhead.put(workspace, ikey, String.valueOf((Integer) o));
+                    } else if (o instanceof Double) {
+                        typeAhead.put(workspace, ikey, String.valueOf((Double) o));
+                    } else if (o instanceof BasicDBList) { //it is a list of values
+                        addArrToTypeAhead((BasicDBList) o, workspace, ikey);
+                    }//else we can't really type-ahead something else can we?
+                }
+            }
+        }
+    }
+
+    /**
+     *
+     * @param values - a list of strings, doubles or ints.
+     * @param workspace - string, workspace we
+     */
+    private void addArrToTypeAhead(BasicDBList values, String workspace, String ikey){
+        //System.out.println("Adding Array: " + ikey);
+        for(Object o : values){
+            if (o instanceof String) {
+                typeAhead.put(workspace, ikey, o.toString());
+                //System.out.println(ikey + ((String) o));
+            } else if (o instanceof Integer) {
+                typeAhead.put(workspace, ikey, String.valueOf((Integer) o));
+            } else if (o instanceof Double) {
+                typeAhead.put(workspace, ikey, String.valueOf((Double) o));
+            }
+        }
+
     }
 
     private DBObject metadata = null;

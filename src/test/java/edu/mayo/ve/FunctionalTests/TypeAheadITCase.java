@@ -1,10 +1,10 @@
 package edu.mayo.ve.FunctionalTests;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.DBObject;
+import com.mongodb.*;
 import com.mongodb.util.JSON;
 import edu.mayo.TypeAhead.TypeAheadCollection;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.CacheMissException;
 import edu.mayo.ve.VCFParser.VCFParser;
@@ -17,6 +17,7 @@ import javax.ws.rs.PathParam;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -200,6 +201,36 @@ public class TypeAheadITCase {
         //place the index back
         status = index.createFieldIndex(workspaceID, "INFO.SNPEFF_AMINO_ACID_CHANGE");
         System.out.println(status);
+    }
+
+    @Test
+    public void testTypeAheadOnArray() throws IOException, ProcessTerminatedException, CacheMissException {
+        ProblemVCFITCase p = new ProblemVCFITCase();
+        String vcf = "src/test/resources/testData/CustomCapture.anno5000.vcf";
+        String workspace = "w08479e4f019bb4f875b76b4e21153054a258f809";
+        workspace = p.load(vcf, false);
+        System.out.println(workspace);
+        DB db = MongoConnection.getDB();
+        DBCollection col = db.getCollection(workspace);
+        assertEquals(4856, col.count());
+
+        TypeAheadResource tar = new TypeAheadResource();
+        String snpeff_gene_name_count = tar.getDistinctCount4Field(workspace, "INFO.SNPEFF_GENE_NAME");
+        System.out.println(snpeff_gene_name_count);
+        List<String> expectedEff = Arrays.asList("HIGH", "LOW", "MODERATE", "MODIFIER");
+
+        String tajson = tar.getDistinctCount4Field(workspace,"INFO.SNPEFF_Effect_impact");
+        assertTrue(tajson.contains("\"count\" : 4"));
+        String tajson2 = tar.getTypeAhead4Value(workspace, "INFO.SNPEFF_Effect_impact");
+        DBObject dbo = (DBObject) JSON.parse(tajson2);
+        BasicDBList eff = (BasicDBList) dbo.get("INFO.SNPEFF_Effect_impact");
+        System.out.println(tajson2);
+        for(Object o : eff){
+            String s = (String) o;
+            assertTrue(expectedEff.contains(s));
+        }
+
+        p.delete(vcf);
     }
 
 
