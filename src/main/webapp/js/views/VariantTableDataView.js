@@ -97,6 +97,7 @@ var VariantTableDataView = Backbone.Marionette.ItemView.extend({
         this.$('.show').append(showButton);
 
 //        $('#jquery-ui-container').layout().addOpenBtn("#west-opener", "west");
+
         MongoApp.layout.addOpenBtn("#west-opener", "west");
 
         var toolbar = $("#table_toolbar").clone();

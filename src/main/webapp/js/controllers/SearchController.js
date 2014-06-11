@@ -39,12 +39,6 @@ var SearchController = Backbone.Marionette.Controller.extend({
         MongoApp.vent.on(MongoApp.events.SEARCH_IMPORT, function (filterHistoryJsonText) {
             self.importSearch(filterHistoryJsonText);
         });
-
-        var addFilterDialog = new AddFilterDialog();
-        $('#show_add_filter_dialog_button').click(function (e)
-        {
-            addFilterDialog.show();
-        });
     },
 
     showSearchName: function(options) {
@@ -57,15 +51,6 @@ var SearchController = Backbone.Marionette.Controller.extend({
         this.searchDescriptionView = new SearchDescriptionView({model: MongoApp.search});
 
         options.region.show(this.searchDescriptionView);
-    },
-
-    showSearchTable: function (options) {
-
-        var searchTableView = new SearchTableView({
-            collection: this.searches
-        });
-
-        options.region.show(searchTableView);
     },
 
     showSearchSave: function(options) {
@@ -268,6 +253,14 @@ var SearchController = Backbone.Marionette.Controller.extend({
         this.searches.reset();
         this.searches.set(this.getSearches(MongoApp.workspace.get("key")).models);
 
+        var searchTableView = new SearchTableView({
+            collection: this.searches
+        });
+
+        var region = new Backbone.Marionette.Region({
+            el: "#searchTableRegion"
+        });
+        region.show(searchTableView);
         $('#searches_modal').modal();
     },
 

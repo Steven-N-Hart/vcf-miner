@@ -199,7 +199,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
             self.varTableCols.add(new VariantTableColumn({visible:false,  name:'INFO.'+infoFieldName,  displayName:infoFieldName,   description:infoFieldDescription}));
         });
 
-        this.showVariantTable({region: MongoApp.variantDataRegion });
+        this.showVariantTable({region: MongoApp.mainLayout.variantDataRegion });
 
         // update screens
         $('#navbar_tab_table a').text(workspace.get("alias"));

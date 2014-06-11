@@ -8,16 +8,10 @@
 var MongoApp = new Backbone.Marionette.Application();
 
 /**
- * Marionette regions defined in the DOM
+ * Marionette regions
  */
 MongoApp.addRegions({
-    workspaceRegion:     '#workspaceRegion',
-    searchNameRegion:    '#searchNameRegion',
-    searchDescriptionRegion:    '#searchDescriptionRegion',
-    searchTableRegion:   '#searchTableRegion',
-    searchFiltersRegion: '#searchFiltersRegion',
-    searchSaveRegion:    '#searchSaveRegion',
-    variantDataRegion:   '#variantDataRegion'
+    mainRegion: '#mainRegion'
 });
 
 /**
@@ -28,6 +22,12 @@ MongoApp.addInitializer(function () {
     this.events = {
         // system error has occurred
         ERROR: 'error',
+
+        // user authenticating to the system
+        LOGIN: 'login',
+
+        // user successfully authenticated
+        LOGIN_SUCCESS: 'loginSuccess',
 
         // User is choosing a different workspace
         WKSP_LOAD: 'workspaceLoad',
@@ -102,9 +102,9 @@ MongoApp.addInitializer(function () {
 /**
  * Setup the jquery ui layout
  */
-MongoApp.addInitializer(function() {
+initJqueryUI = function() {
 
-    this.layout = $('#jquery-ui-container').layout({
+    MongoApp.layout = $('#jquery-ui-container').layout({
             //	reference only - these options are NOT required because 'true' is the default
             closable:					true	// pane can open & close
         ,	resizable:					true	// when open, pane can be resized
@@ -171,7 +171,25 @@ MongoApp.addInitializer(function() {
         ,	showDebugMessages:			true // log and/or display messages from debugging & testing code
     });
 
-    this.layout.addCloseBtn("#west-closer", "west");
+    MongoApp.layout.addCloseBtn("#west-closer", "west");
+};
+
+/**
+ *
+ */
+MongoApp.addInitializer(function () {
+
+    var self = this;
+
+    this.mainLayout = new MainLayout();
+
+    MongoApp.vent.on(MongoApp.events.LOGIN_SUCCESS, function (user) {
+        // show the getting started screen
+        MongoApp.mainRegion.show(self.mainLayout);
+
+        initJqueryUI();
+    });
+
 });
 
 /**
@@ -179,20 +197,9 @@ MongoApp.addInitializer(function() {
  */
 MongoApp.addInitializer(function () {
     this.workspaceController = new WorkspaceController();
-    this.workspaceController.showWorkspaceTable({region: MongoApp.workspaceRegion });
-
-    var settingsController = new SettingsController();
-    // TODO: fix region
-    settingsController.showSettingsTab({region: MongoApp.TODO });
-
+    this.settingsController = new SettingsController();
     this.searchController = new SearchController();
-    this.searchController.showSearchName({region: MongoApp.searchNameRegion });
-    this.searchController.showSearchDescription({region: MongoApp.searchDescriptionRegion });
-    this.searchController.showSearchTable({region: MongoApp.searchTableRegion });
-    this.searchController.showSearchFilterTable({region: MongoApp.searchFiltersRegion });
-    this.searchController.showSearchSave({region: MongoApp.searchSaveRegion });
-
-    new VariantDataController();
+    this.variantDataController = new VariantDataController();
 
     // Wire Marionette events to function callbacks
     MongoApp.vent.on(MongoApp.events.ERROR, function (errorMessage) {
@@ -242,55 +249,31 @@ MongoApp.addInitializer(function () {
 /**
  *
  */
-MongoApp.addInitializer(function () {
-    //test for MSIE x.x;
-    if (/MSIE (\d+\.\d+);/.test(navigator.userAgent))
-    {
-        $('#getting_started_content').append($('#browser_not_supported_pane'));
-        $('#browser_not_supported_pane').toggle();
+// TODO: fix me
+//MongoApp.addInitializer(function () {
+//    //test for MSIE x.x;
+//    if (/MSIE (\d+\.\d+);/.test(navigator.userAgent))
+//    {
+//        $('#getting_started_content').append($('#browser_not_supported_pane'));
+//        $('#browser_not_supported_pane').toggle();
+//
+//        // end execution here
+//        return;
+//    }
+//    else
+//    {
+//        $('#getting_started_content').append($('#welcome_pane'));
+//        $('#welcome_pane').toggle();
+//    }
+//
+//});
 
-        // end execution here
-        return;
-    }
-    else
-    {
-        $('#getting_started_content').append($('#welcome_pane'));
-        $('#welcome_pane').toggle();
-    }
+/**
+ * Fires after all initializers and after the initializer events
+ */
+MongoApp.on("start", function(options){
 
-    // clicking on brand is redirected to a click on home tab
-    $('.navbar .brand').click(function(e)
-        {
-            $('#home_tab').click();
-        }
-    );
-
-    // handle click event on navbar tabs
-    $('#navbar_tabs a').click(function (e)
-    {
-        switch(e.target.id)
-        {
-            case 'home_tab':
-                $("#getting_started").toggle(true);
-                $("#jquery-ui-container").toggle(false);
-                $("#settings").toggle(false);
-                break;
-            case 'settings_tab':
-                $("#getting_started").toggle(false);
-                $("#jquery-ui-container").toggle(false);
-                $("#settings").toggle(true);
-                break;
-            case 'table_tab':
-                $("#getting_started").toggle(false);
-                $("#jquery-ui-container").toggle(true);
-                $("#settings").toggle(false);
-                break;
-        }
-        // switch active tab
-        var parent = $(this).parent();
-        $(this).parent().siblings('li').removeClass('active');
-        $(this).parent().addClass('active');
-
-        $(this).tab('show');
-    })
+    // show login page
+    this.loginController = new LoginController();
+    this.loginController.showLogin({region: MongoApp.mainRegion });
 });
