@@ -247,28 +247,6 @@ MongoApp.addInitializer(function () {
 });
 
 /**
- *
- */
-// TODO: fix me
-//MongoApp.addInitializer(function () {
-//    //test for MSIE x.x;
-//    if (/MSIE (\d+\.\d+);/.test(navigator.userAgent))
-//    {
-//        $('#getting_started_content').append($('#browser_not_supported_pane'));
-//        $('#browser_not_supported_pane').toggle();
-//
-//        // end execution here
-//        return;
-//    }
-//    else
-//    {
-//        $('#getting_started_content').append($('#welcome_pane'));
-//        $('#welcome_pane').toggle();
-//    }
-//
-//});
-
-/**
  * Fires after all initializers and after the initializer events
  */
 MongoApp.on("start", function(options){

@@ -10,7 +10,7 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
     events: {
         "click .show-analyses": "showAnalysesDropdown",
         "click .analyze": "analyze",
-        "click .delete": "delete"
+        "click .delete": "deleteWorkspace"
     },
 
     showAnalysesDropdown: function(event) {
@@ -56,7 +56,7 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
         MongoApp.vent.trigger(MongoApp.events.WKSP_LOAD, workspace, search);
     },
 
-    delete: function(event) {
+    deleteWorkspace: function(event) {
         var button = $(event.currentTarget);
 
         var workspaceKey = button.data("wks-key");
