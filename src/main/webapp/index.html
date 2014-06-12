@@ -238,11 +238,15 @@
                 <div class="nav-collapse collapse">
                     <div class="pull-left"><a class="brand">VCF-Miner</a></div>
                     <ul id="navbar_tabs" class="nav">
-                        <li class="active"><a id="home_tab">Home</a></li>
-                        <li><a id="settings_tab">Advanced</a></li>
+                        <li class="active"><a id="home_tab"><i class="fa fa-home"></i> Home</a></li>
+                        <li><a id="settings_tab"><i class="fa fa-gears"></i> Advanced</a></li>
 
                         <!-- hidden at the start because no VCF has been loaded yet -->
                         <li id="navbar_tab_table" class="hide"><a id="table_tab">SET_BY_JAVASCRIPT</a></li>
+                    </ul>
+                    <ul class="nav pull-right">
+                        <li><a class="user-info"><i class="fa fa-user"></i> User</a></li>
+                        <li><a class="logout"><i class="fa fa-sign-out"></i> Logout</a></li>
                     </ul>
                 </div>
             </div>
@@ -314,7 +318,7 @@
 
     <!-- the workspace table -->
     <script id="workspace-table-template" type="text/html">
-        <table id="workspace_table" class="table table-striped table-bordered" border="0" cellpadding="0" cellspacing="0">
+        <table class="table table-striped table-bordered" border="0" cellpadding="0" cellspacing="0">
             <thead>
             <tr>
                 <th>VCF File</th>
@@ -597,7 +601,7 @@
     <script src="js/views/SearchSaveView.js"></script>
     <script src="js/views/WorkspaceTableRowView.js"></script>
     <script src="js/views/WorkspaceTableView.js"></script>
-    <script src="js/controllers/LoginController.js"></script>
+    <script src="js/controllers/SecurityController.js"></script>
     <script src="js/controllers/SearchController.js"></script>
     <script src="js/controllers/SettingsController.js"></script>
     <script src="js/controllers/VariantDataController.js"></script>
