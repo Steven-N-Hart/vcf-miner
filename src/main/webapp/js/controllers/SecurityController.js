@@ -1,4 +1,4 @@
-LoginController = Backbone.Marionette.Controller.extend({
+SecurityController = Backbone.Marionette.Controller.extend({
 
     initialize: function () {
 
@@ -7,6 +7,9 @@ LoginController = Backbone.Marionette.Controller.extend({
         // Wire events to functions
         MongoApp.vent.on(MongoApp.events.LOGIN, function (username, password) {
             self.login(username, password);
+        });
+        MongoApp.vent.on(MongoApp.events.LOGOUT, function (userToken) {
+            self.logout(userToken);
         });
     },
 
@@ -72,6 +75,36 @@ LoginController = Backbone.Marionette.Controller.extend({
                 MongoApp.vent.trigger(MongoApp.events.LOGIN_SUCCESS, user);
             },
             error: function(jqXHR ) {
+                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+            }
+        });
+    },
+
+    /**
+     * Logs out the user
+     *
+     * @param userToken
+     */
+    logout: function(userToken) {
+
+        $.ajax({
+            type: "POST",
+            url: "/securityuserapp/api/logout",
+            headers: {usertoken: userToken},
+            data: {},
+            dataType: "json",
+            success: function(json) {
+                switch (json.Status) {
+                    case 'OK':
+                        console.log("logout successful");
+                        MongoApp.vent.trigger(MongoApp.events.LOGOUT_SUCCESS);
+
+                        break;
+                    default:
+                        console.log("logout failed");
+                }
+            },
+            error: function(jqXHR) {
                 MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });

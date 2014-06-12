@@ -13,6 +13,24 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
         "click .delete": "deleteWorkspace"
     },
 
+    ui: {
+        table: "table"
+    },
+
+    itemViewOptions: function() {
+
+        // hack for Marionette not always calling render()
+        if (this.dataTable == null) {
+            this.onRender();
+        }
+
+        // pass reference to DataTables widget to child views
+        return {
+            table: this.ui.table,
+            dataTable: this.dataTable
+        }
+    },
+
     showAnalysesDropdown: function(event) {
 
         var dropdownButton = $(event.currentTarget);
@@ -78,15 +96,17 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
      * Triggered after the view has been rendered.
      */
     onRender: function () {
+
         // initialize the DataTable widget
         var sDom = "<'row't>";
 
-        this.$el.find('table').dataTable( {
-            "sDom": sDom,
-            'aaData': [],
-            "iDisplayLength": 25,
-            "bAutoWidth": false,
-            "bScrollCollapse": true
+        this.dataTable = this.ui.table.dataTable( {
+            sDom: sDom,
+            aaData: [],
+            iDisplayLength: 25,
+            bAutoWidth: false,
+            bScrollCollapse: true,
+            bRetrieve: true
         });
     }
 });

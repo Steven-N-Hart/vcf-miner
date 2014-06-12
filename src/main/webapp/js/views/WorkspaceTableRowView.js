@@ -3,33 +3,6 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
     searches: new SearchList(),
 
     /**
-     * Override to default implementation
-     *
-     * @returns {*}
-     */
-    render: function() {
-
-        var workspace = this.model;
-
-        $('#workspace_table').dataTable().fnAddData(this.toAaDataRow(workspace));
-
-        return this;
-    },
-
-    /**
-     * Run custom code for your view that is fired after your view has been closed and cleaned up.
-     */
-    onClose: function(workspace)
-    {
-        var workspace = this.model;
-
-        // Removes one row from the DataTables widget.
-        var id = workspace.get("id");
-        var nRow =  $('#workspace_table tbody tr[id='+id+']')[0];
-        $('#workspace_table').dataTable().fnDeleteRow( nRow, null, true );
-    },
-
-    /**
      * Called when the view is first created
      *
      * @param options
@@ -38,6 +11,36 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
      */
     initialize: function(options) {
         this.listenTo(this.model, 'change', this.updateRow);
+
+        this.table = options.table;
+
+        // reference to DataTables wiget passed down from parent CollectionView
+        this.dataTable = options.dataTable;
+    },
+
+    /**
+     * Override to default implementation
+     *
+     * @returns {*}
+     */
+    render: function() {
+
+        var workspace = this.model;
+
+        this.dataTable.fnAddData(this.toAaDataRow(workspace));
+    },
+
+    /**
+     * Run custom code for your view that is fired after your view has been closed and cleaned up.
+     */
+    onBeforeClose: function()
+    {
+        var workspace = this.model;
+
+        // Removes one row from the DataTables widget.
+        var id = workspace.get("id");
+        var nRow =  this.table.find('tbody tr[id='+id+']')[0];
+        this.dataTable.fnDeleteRow( nRow, null, true );
     },
 
     /**
@@ -50,9 +53,9 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
 
         // remove element with corresponding ID from DOM
         var id = workspace.get("id");
-        var nRow =  $('#workspace_table tbody tr[id='+id+']')[0];
+        var nRow =  this.table.find('tbody tr[id='+id+']')[0];
 
-        $('#workspace_table').dataTable().fnUpdate( this.toAaDataRow(workspace), nRow );
+        this.dataTable.fnUpdate( this.toAaDataRow(workspace), nRow );
     },
 
     /**

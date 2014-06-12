@@ -26,8 +26,14 @@ MongoApp.addInitializer(function () {
         // user authenticating to the system
         LOGIN: 'login',
 
+        // user logging out of system
+        LOGOUT: 'logout',
+
         // user successfully authenticated
         LOGIN_SUCCESS: 'loginSuccess',
+
+        // user successfully logged out
+        LOGOUT_SUCCESS: 'logoutSuccess',
 
         // User is choosing a different workspace
         WKSP_LOAD: 'workspaceLoad',
@@ -181,15 +187,23 @@ MongoApp.addInitializer(function () {
 
     var self = this;
 
-    this.mainLayout = new MainLayout();
-
     MongoApp.vent.on(MongoApp.events.LOGIN_SUCCESS, function (user) {
+
+        self.user = user;
+
         // show the getting started screen
-        MongoApp.mainRegion.show(self.mainLayout);
+        MongoApp.mainRegion.show(new MainLayout());
 
         initJqueryUI();
     });
 
+    MongoApp.vent.on(MongoApp.events.LOGOUT_SUCCESS, function () {
+
+        self.user = null;
+
+        // show login page
+        self.securityController.showLogin({region: MongoApp.mainRegion });
+    });
 });
 
 /**
@@ -252,6 +266,6 @@ MongoApp.addInitializer(function () {
 MongoApp.on("start", function(options){
 
     // show login page
-    this.loginController = new LoginController();
-    this.loginController.showLogin({region: MongoApp.mainRegion });
+    this.securityController = new SecurityController();
+    this.securityController.showLogin({region: MongoApp.mainRegion });
 });

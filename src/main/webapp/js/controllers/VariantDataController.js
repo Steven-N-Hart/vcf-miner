@@ -33,7 +33,18 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         });
     },
 
-    showVariantTable: function (options) {
+    /**
+     * Sets the Marionette Region where the variant DataTable widget will be rendered.
+     * This action must be deferred until the metadata about the columns is fetched for
+     * a workspace before the DataTable widget can be rendered.
+     *
+     * @param region
+     */
+    setVariantTableRegion: function(region) {
+        this.variantTableRegion = region;
+    },
+
+    renderVariantTable: function () {
 
         // create a new view for variant table
         var variantTableView = new VariantTableDataView(
@@ -45,7 +56,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
 
         new VariantTableColumnView({"model": this.varTableCols});
 
-        options.region.show(variantTableView);
+        this.variantTableRegion.show(variantTableView);
     },
 
     changedSearch: function (search, async) {
@@ -199,10 +210,10 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
             self.varTableCols.add(new VariantTableColumn({visible:false,  name:'INFO.'+infoFieldName,  displayName:infoFieldName,   description:infoFieldDescription}));
         });
 
-        this.showVariantTable({region: MongoApp.mainLayout.variantDataRegion });
+        this.renderVariantTable();
 
         // update screens
-        $('#navbar_tab_table a').text(workspace.get("alias"));
+        $('#navbar_tab_table a').html('<i class="fa fa-file"></i> ' + workspace.get("alias"));
         $('#navbar_tab_table').toggle(true); // set visible if not already
         $('#table_tab').click(); // register click event to switch to that tab
 

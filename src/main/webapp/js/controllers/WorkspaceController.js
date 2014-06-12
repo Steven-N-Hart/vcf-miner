@@ -89,10 +89,10 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
      * @param options
      */
     showWorkspaceTable: function (options) {
+
         var workspaceTableView = new WorkspaceTableView({
             collection: this.workspaces
         });
-
         options.region.show(workspaceTableView);
 
         this.refreshAllWorkspaces();

@@ -35,6 +35,8 @@ var VariantTableDataView = Backbone.Marionette.ItemView.extend({
 
     render: function()
     {
+        this.$el.empty();
+
         // construct a new HTML table and add to DOM
         var table = $('<table>').attr(
             {
@@ -92,6 +94,7 @@ var VariantTableDataView = Backbone.Marionette.ItemView.extend({
      * Triggered after the view has been rendered, has been shown in the DOM via a Marionette.Region, and has been re-rendered.
      */
     onShow: function(){
+
         // dynamically add 'show' button to the <div> with class '.show'
         var showButton = $('<button id="west-opener" title="Show Search" type="button" class="hide btn btn-mini"><i class="fa fa-arrow-right"></i> Show</button>');
         this.$('.show').append(showButton);

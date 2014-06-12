@@ -28,7 +28,9 @@ MainLayout = Backbone.Marionette.Layout.extend({
         // clicking on brand is redirected to a click on home tab
         "click .navbar .brand" : "switchHomeTab",
 
-        "click #show_add_filter_dialog_button" : "showAddFilterDialog"
+        "click #show_add_filter_dialog_button" : "showAddFilterDialog",
+
+        "click .logout" : "logout"
     },
 
     onShow: function() {
@@ -40,6 +42,8 @@ MainLayout = Backbone.Marionette.Layout.extend({
         MongoApp.searchController.showSearchSave({region: this.searchSaveRegion });
 
         MongoApp.settingsController.showSettingsTab({region: this.settingsRegion});
+
+        MongoApp.variantDataController.setVariantTableRegion(this.variantDataRegion);
 
         // display Getting started
         var welcomePane = this.$el.find('#welcome_pane');
@@ -83,6 +87,10 @@ MainLayout = Backbone.Marionette.Layout.extend({
         var listItem = $(e.target).parent();
         listItem.siblings('li').removeClass('active');
         listItem.addClass('active');
+    },
+
+    logout: function() {
+        MongoApp.vent.trigger(MongoApp.events.LOGOUT, MongoApp.user.get("token"));
     }
 
 });
