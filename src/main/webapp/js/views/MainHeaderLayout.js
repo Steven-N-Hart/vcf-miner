@@ -14,6 +14,10 @@ MainHeaderLayout = Backbone.Marionette.Layout.extend({
         "click .logout" : "logout"
     },
 
+    regions: {
+        userRegion: '#mainHeaderUserRegion'
+    },
+
     initialize: function(options) {
 
         this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_META_LOADED, function () {
@@ -24,6 +28,12 @@ MainHeaderLayout = Backbone.Marionette.Layout.extend({
             // simulate clicking on it
             $('#table_tab').click(); // register click event to switch to that tab
         });
+    },
+
+    onShow: function() {
+        this.userRegion.show(new MainHeaderUserLayout({
+            "model": MongoApp.user
+        }));
     },
 
     switchHomeTab: function() {
@@ -57,10 +67,5 @@ MainHeaderLayout = Backbone.Marionette.Layout.extend({
         var listItem = $(e.target).parent();
         listItem.siblings('li').removeClass('active');
         listItem.addClass('active');
-    },
-
-    logout: function() {
-        MongoApp.dispatcher.trigger(MongoApp.events.LOGOUT, MongoApp.user.get("token"));
     }
-
 });

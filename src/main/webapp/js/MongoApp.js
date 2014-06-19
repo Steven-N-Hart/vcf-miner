@@ -121,16 +121,18 @@ MongoApp.addInitializer(function () {
 
     var self = this;
 
+    this.user = new User();
+
     this.listenTo(MongoApp.dispatcher, MongoApp.events.LOGIN_SUCCESS, function (user) {
 
-        self.user = user;
+        self.user.set(user.attributes);
 
         MongoApp.mainRegion.show(new MainLayout());
     });
 
     this.listenTo(MongoApp.dispatcher, MongoApp.events.LOGOUT_SUCCESS, function () {
 
-        self.user = null;
+        self.user = new User();
 
         // show login page
         self.securityController.showLogin({region: MongoApp.mainRegion });

@@ -312,11 +312,37 @@
                         <!-- hidden at the start because no VCF has been loaded yet -->
                         <li id="navbar_tab_table" class="hide"><a id="table_tab">SET_BY_JAVASCRIPT</a></li>
                     </ul>
-                    <ul class="nav pull-right">
-                        <li><a class="user-info"><i class="fa fa-user"></i> User</a></li>
-                        <li><a class="logout"><i class="fa fa-sign-out"></i> Logout</a></li>
-                    </ul>
+
+                    <div id="mainHeaderUserRegion"></div>
                 </div>
+            </div>
+        </div>
+    </script>
+
+    <script id="main-header-user-layout-template" type="text/template">
+        <ul class="nav pull-right">
+            <li><a class="user-info"><i class="fa fa-user"></i> <%=nameFirst%> <%=nameLast%></a></li>
+            <li><a class="logout"><i class="fa fa-sign-out"></i> Logout</a></li>
+        </ul>
+    </script>
+
+    <script id="main-header-user-popover-template" type="text/template">
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span3"><strong>First</strong></div>
+                <div class="span9"><%=nameFirst%></div>
+            </div>
+            <div class="row-fluid">
+                <div class="span3"><strong>Last</strong></div>
+                <div class="span9"><%=nameLast%></div>
+            </div>
+            <div class="row-fluid">
+                <div class="span3"><strong>User</strong></div>
+                <div class="span9"><%=username%></div>
+            </div>
+            <div class="row-fluid">
+                <div class="span3"><strong>E-mail</strong></div>
+                <div class="span9"><a href= "mailto:<%=email%>" ><%=email%></a></div>
             </div>
         </div>
     </script>
@@ -1079,6 +1105,7 @@
     <script src="js/views/InfoFilterTabLayout.js"></script>
     <script src="js/views/CustomFilterTabLayout.js"></script>
     <script src="js/views/MainHeaderLayout.js"></script>
+    <script src="js/views/MainHeaderUserLayout.js"></script>
     <script src="js/views/CreateGroupDialogLayout.js"></script>
     <script src="js/views/SettingsTabLayout.js"></script>
     <script src="js/views/SearchTableRowView.js"></script>
