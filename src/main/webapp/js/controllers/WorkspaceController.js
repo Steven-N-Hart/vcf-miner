@@ -24,10 +24,10 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        MongoApp.vent.on(MongoApp.events.WKSP_REMOVE, function (workspace) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_REMOVE, function (workspace) {
             self.removeWorkspace(workspace);
         });
-        MongoApp.vent.on(MongoApp.events.WKSP_GROUP_CREATE, function (group, workspace) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_GROUP_CREATE, function (group, workspace) {
             self.createSampleGroup(group, workspace);
         });
 
@@ -139,7 +139,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                     }
                 },
                 error: function(jqXHR, textStatus) {
-                    MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+                    MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
                 }
             });
         }
@@ -200,7 +200,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                     }
                 },
                 error: function(jqXHR, textStatus) {
-                    MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+                    MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
                 }
             });
         }
@@ -247,7 +247,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
                 self.refreshAllWorkspaces();
             } else {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, "Error " + xhr.status + " occurred uploading your file.");
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, "Error " + xhr.status + " occurred uploading your file.");
             }
             $('#upload_vcf_progress_modal').modal('hide');
         };
@@ -281,7 +281,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 self.workspaces.remove(workspace);
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     },
@@ -334,7 +334,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
             },
             error: function(jqXHR, textStatus)
             {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     },
@@ -403,7 +403,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     },
@@ -431,11 +431,11 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
                 workspace.get("sampleGroups").add(group);
 
-                MongoApp.vent.trigger(MongoApp.events.WKSP_CHANGE, workspace);
+                MongoApp.dispatcher.trigger(MongoApp.events.WKSP_CHANGE, workspace);
             },
             error: function(jqXHR, textStatus)
             {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     }

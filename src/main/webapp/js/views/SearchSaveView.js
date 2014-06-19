@@ -28,7 +28,7 @@ SearchSaveView = Backbone.Marionette.ItemView.extend({
      * @param e
      */
     saveSearch: function(e) {
-        MongoApp.vent.trigger(MongoApp.events.SEARCH_SAVE, MongoApp.search);
+        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_SAVE, MongoApp.search);
     }
 
 });

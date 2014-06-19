@@ -1,20 +1,17 @@
-/**
- *
- * @type {*}
- */
-var GroupListView = Backbone.View.extend({
+GroupListView = Backbone.View.extend({
+
+    /**
+     * Fired when the user changes the selected group.
+     */
+    EVENT_GROUP_CHANGED: 'event_group_changed',
 
     /**
      * Called when the view is first created
      *
      * @param options
      *      All options passed to the constructor.
-     *
-     * custom option: fnSetWorkspaceCallback
-     *      Function callback that takes a Workspace as a parameter.  This function is called
-     *      when the user changes the workspace.     */
-    initialize: function(options)
-    {
+     */
+    initialize: function(options) {
         // rebind so that options can be access in other functions
         this.options = options;
 
@@ -28,16 +25,13 @@ var GroupListView = Backbone.View.extend({
     /**
      * Delegated events
      */
-    events:
-    {
+    events: {
         "change" : "groupChanged"
     },
 
-    render: function()
-    {
+    render: function() {
         var that = this;
-        _.each(this.model.models, function(group)
-            {
+        _.each(this.model.models, function(group) {
                 that.addOne(group);
             }
         );
@@ -48,8 +42,7 @@ var GroupListView = Backbone.View.extend({
      *
      * @param group
      */
-    addOne: function(group)
-    {
+    addOne: function(group) {
         var option = this.toOption(group);
         this.$el.append(option);
 
@@ -62,14 +55,12 @@ var GroupListView = Backbone.View.extend({
      *
      * @param group
      */
-    removeOne: function(group)
-    {
+    removeOne: function(group) {
         // remove element with corresponding group ID from DOM
         this.$("#" + group.get("id")).remove();
     },
 
-    removeAll: function()
-    {
+    removeAll: function() {
         this.$el.empty();
     },
 
@@ -78,16 +69,13 @@ var GroupListView = Backbone.View.extend({
      *
      * @returns {*}
      */
-    getSelectedGroup: function()
-    {
+    getSelectedGroup: function() {
         // get selected option from select
         var groupOption = this.$('option:selected');
 
         var id = groupOption.attr('id');
 
-        var group = this.model.findWhere({id: id});
-
-        return group;
+        return this.model.findWhere({id: id});
     },
 
     /**
@@ -96,8 +84,7 @@ var GroupListView = Backbone.View.extend({
      * @param group
      * @returns {*|jQuery|HTMLElement}
      */
-    toOption: function(group)
-    {
+    toOption: function(group) {
         var option = $('<option/>');
         option.text(group.get("name"));
         option.attr('id', group.get("id"));
@@ -107,15 +94,11 @@ var GroupListView = Backbone.View.extend({
 
     /**
      * Triggered when the select element is changed to a different option.
-     *
-     * @param event
      */
-    groupChanged: function(event)
-    {
+    groupChanged: function() {
         var group = this.getSelectedGroup();
-        if (typeof group !== 'undefined')
-        {
-            this.options.fnGroupChangeCallback(group);
+        if (typeof group !== 'undefined') {
+            this.trigger(this.EVENT_GROUP_CHANGED, group);
         }
     }
 });

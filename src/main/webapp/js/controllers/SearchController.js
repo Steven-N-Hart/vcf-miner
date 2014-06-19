@@ -18,25 +18,25 @@ var SearchController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_ADD, function (filter, async) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_FILTER_ADD, function (filter, async) {
             self.addFilter(filter, async);
         });
-        MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_REMOVE, function (filter) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_FILTER_REMOVE, function (filter) {
             self.removeFilter(filter);
         });
-        MongoApp.vent.on(MongoApp.events.SEARCH_SAVE, function (search) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_SAVE, function (search) {
             self.saveSearch(search);
         });
-        MongoApp.vent.on(MongoApp.events.SEARCH_DELETE, function (search) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_DELETE, function (search) {
             self.deleteSearch(search);
         });
-        MongoApp.vent.on(MongoApp.events.SEARCH_SHOW_DIALOG, function () {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_SHOW_DIALOG, function () {
             self.showSearchDialog();
         });
-        MongoApp.vent.on(MongoApp.events.SEARCH_EXPORT, function (search) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_EXPORT, function (search) {
             self.exportSearch(search);
         });
-        MongoApp.vent.on(MongoApp.events.SEARCH_IMPORT, function (filterHistoryJsonText) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_IMPORT, function (filterHistoryJsonText) {
             self.importSearch(filterHistoryJsonText);
         });
     },
@@ -72,14 +72,14 @@ var SearchController = Backbone.Marionette.Controller.extend({
         if (filter.get('id') != MongoApp.FILTER_NONE.get('id'))
             MongoApp.search.set("saved", false);
 
-        MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_ADDED, MongoApp.search, async);
+        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_ADDED, MongoApp.search, async);
         this.updateFilterRemovable();
     },
 
     removeFilter: function (filter) {
         MongoApp.search.get("filters").remove(filter);
         MongoApp.search.set("saved", false);
-        MongoApp.vent.trigger(MongoApp.events.SEARCH_FILTER_REMOVED, MongoApp.search);
+        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_REMOVED, MongoApp.search);
         this.updateFilterRemovable();
     },
 
@@ -133,11 +133,11 @@ var SearchController = Backbone.Marionette.Controller.extend({
                 success: function(json)
                 {
                     var savedSearch = self.filterHistoryToSearch(json);
-                    MongoApp.vent.trigger(MongoApp.events.SEARCH_LOAD, savedSearch);
+                    MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_LOAD, savedSearch);
                     console.log("save successful!");
                 },
                 error: function(jqXHR, textStatus) {
-                    MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+                    MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
                 }
             });
         }
@@ -205,11 +205,11 @@ var SearchController = Backbone.Marionette.Controller.extend({
 
                 // if the user deletes the current search, then reload the workspace w/ default search
                 if (search.get('id') == MongoApp.search.get('id')) {
-                    MongoApp.vent.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspace, new Search());
+                    MongoApp.dispatcher.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspace, new Search());
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     },
@@ -237,7 +237,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
 
@@ -271,7 +271,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
     importSearch: function(filterHistoryJsonText) {
         var filterHistory = JSON.parse(filterHistoryJsonText);
         var search = this.filterHistoryToSearch(filterHistory);
-        MongoApp.vent.trigger(MongoApp.events.SEARCH_LOAD, search);
+        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_LOAD, search);
     },
 
     /**

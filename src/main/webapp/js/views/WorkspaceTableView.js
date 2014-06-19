@@ -71,7 +71,7 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
             search = searches.findWhere({id: searchID});
         }
 
-        MongoApp.vent.trigger(MongoApp.events.WKSP_LOAD, workspace, search);
+        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_LOAD, workspace, search);
     },
 
     deleteWorkspace: function(event) {
@@ -86,7 +86,7 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
             "Delete " + workspace.get('alias') + "?",
             "Delete",
             function() {
-                MongoApp.vent.trigger(MongoApp.events.WKSP_REMOVE, workspace);
+                MongoApp.dispatcher.trigger(MongoApp.events.WKSP_REMOVE, workspace);
             }
         );
         confirmDialog.show();

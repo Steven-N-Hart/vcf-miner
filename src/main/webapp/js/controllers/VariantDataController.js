@@ -19,32 +19,21 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_ADDED, function (search, async) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_FILTER_ADDED, function (search, async) {
             self.changedSearch(search, async);
         });
-        MongoApp.vent.on(MongoApp.events.SEARCH_FILTER_REMOVED, function (search, async) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_FILTER_REMOVED, function (search, async) {
             self.changedSearch(search, async);
         });
-        MongoApp.vent.on(MongoApp.events.WKSP_CHANGE, function (workspace) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspace) {
             self.changeWorkspace(workspace);
         });
-        MongoApp.vent.on(MongoApp.events.WKSP_DOWNLOAD, function (workspace, search) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_DOWNLOAD, function (workspace, search) {
             self.download(workspace, search);
         });
     },
 
-    /**
-     * Sets the Marionette Region where the variant DataTable widget will be rendered.
-     * This action must be deferred until the metadata about the columns is fetched for
-     * a workspace before the DataTable widget can be rendered.
-     *
-     * @param region
-     */
-    setVariantTableRegion: function(region) {
-        this.variantTableRegion = region;
-    },
-
-    renderVariantTable: function () {
+    showVariantTable: function (options) {
 
         // create a new view for variant table
         var variantTableView = new VariantTableDataView(
@@ -56,7 +45,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
 
         new VariantTableColumnView({"model": this.varTableCols});
 
-        this.variantTableRegion.show(variantTableView);
+        options.region.show(variantTableView);
     },
 
     changedSearch: function (search, async) {
@@ -76,6 +65,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         // send query request to server
         var query = buildQuery(search.get("filters"), workspace.get("key"));
         this.sendQuery(query, async);
+        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_DATA_LOADED);
     },
 
 
@@ -173,7 +163,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
                 }
             },
             error: function(jqXHR, textStatus) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             },
             complete: function(jqXHR, textStatus) {
                 setTimeout(function(){ pleaseWaitDiv.modal('hide');}, 500);
@@ -210,16 +200,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
             self.varTableCols.add(new VariantTableColumn({visible:false,  name:'INFO.'+infoFieldName,  displayName:infoFieldName,   description:infoFieldDescription}));
         });
 
-        this.renderVariantTable();
-
-        // update screens
-        $('#navbar_tab_table a').html('<i class="fa fa-file"></i> ' + workspace.get("alias"));
-        $('#navbar_tab_table').toggle(true); // set visible if not already
-        $('#table_tab').click(); // register click event to switch to that tab
-
-        // always make sure west pane is open
-        MongoApp.layout.open("west");
-        MongoApp.layout.resizeAll();
+        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_META_LOADED);
     },
 
     /**

@@ -5,10 +5,10 @@ SecurityController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        MongoApp.vent.on(MongoApp.events.LOGIN, function (username, password) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.LOGIN, function (username, password) {
             self.login(username, password);
         });
-        MongoApp.vent.on(MongoApp.events.LOGOUT, function (userToken) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.LOGOUT, function (userToken) {
             self.logout(userToken);
         });
     },
@@ -44,7 +44,7 @@ SecurityController = Backbone.Marionette.Controller.extend({
                 }
             },
             error: function(jqXHR) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     },
@@ -72,10 +72,10 @@ SecurityController = Backbone.Marionette.Controller.extend({
                 // add the authentication token
                 user.set("token", userToken);
 
-                MongoApp.vent.trigger(MongoApp.events.LOGIN_SUCCESS, user);
+                MongoApp.dispatcher.trigger(MongoApp.events.LOGIN_SUCCESS, user);
             },
             error: function(jqXHR ) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     },
@@ -97,7 +97,7 @@ SecurityController = Backbone.Marionette.Controller.extend({
                 switch (json.Status) {
                     case 'OK':
                         console.log("logout successful");
-                        MongoApp.vent.trigger(MongoApp.events.LOGOUT_SUCCESS);
+                        MongoApp.dispatcher.trigger(MongoApp.events.LOGOUT_SUCCESS);
 
                         break;
                     default:
@@ -105,7 +105,7 @@ SecurityController = Backbone.Marionette.Controller.extend({
                 }
             },
             error: function(jqXHR) {
-                MongoApp.vent.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             }
         });
     }

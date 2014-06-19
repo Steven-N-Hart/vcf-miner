@@ -19,6 +19,6 @@ LoginLayout = Backbone.Marionette.Layout.extend({
         var username = $("#login_username_field").val();
         var password = $("#login_password_field").val();
 
-        MongoApp.vent.trigger(MongoApp.events.LOGIN, username, password);
+        MongoApp.dispatcher.trigger(MongoApp.events.LOGIN, username, password);
     }
 });

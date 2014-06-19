@@ -30,7 +30,7 @@ var VariantTableDataView = Backbone.Marionette.ItemView.extend({
     },
 
     download: function() {
-        MongoApp.vent.trigger(MongoApp.events.WKSP_DOWNLOAD, MongoApp.workspace, MongoApp.search);
+        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_DOWNLOAD, MongoApp.workspace, MongoApp.search);
     },
 
     render: function()
@@ -98,10 +98,6 @@ var VariantTableDataView = Backbone.Marionette.ItemView.extend({
         // dynamically add 'show' button to the <div> with class '.show'
         var showButton = $('<button id="west-opener" title="Show Search" type="button" class="hide btn btn-mini"><i class="fa fa-arrow-right"></i> Show</button>');
         this.$('.show').append(showButton);
-
-//        $('#jquery-ui-container').layout().addOpenBtn("#west-opener", "west");
-
-        MongoApp.layout.addOpenBtn("#west-opener", "west");
 
         var toolbar = $("#table_toolbar").clone();
         this.$('.toolbar').append(toolbar);
