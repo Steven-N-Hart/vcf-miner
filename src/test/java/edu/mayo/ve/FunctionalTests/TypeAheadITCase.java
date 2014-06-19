@@ -78,13 +78,15 @@ public class TypeAheadITCase {
 
     }
 
-    private final String GenotyperControlsResult = "[ \"Samtools\" , \"Pindel\" , \"Samtools-Pindel\"]";
+    private final String GenotyperControlsResult = "{ INFO.GenotyperControls = [ \"Samtools\" , \"Pindel\" , \"Samtools-Pindel\"] }";
     @Test
     public void testGetTypeAhead4Value(){
         System.out.println("TestGetTypeAhead4Value");
         String json = tar.getTypeAhead4Value(workspaceID, "GenotyperControls");
+        DBObject expected = (DBObject) JSON.parse(json);
         DBObject result = (DBObject) JSON.parse(json);
-        assertEquals(GenotyperControlsResult,result.get("INFO.GenotyperControls").toString());
+        CompareJSON.equals((BasicDBList) expected.get("INFO.GenotyperControls"),(BasicDBList) result.get("INFO.GenotyperControls") );
+        //assertEquals(GenotyperControlsResult,result.get("INFO.GenotyperControls").toString());
         assertTrue(result.keySet().size() == 1); //one for the specific attribute
     }
 

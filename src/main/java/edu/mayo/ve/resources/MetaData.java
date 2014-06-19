@@ -10,6 +10,7 @@ import edu.mayo.util.MongoConnection;
 import edu.mayo.util.Tokens;
 
 import javax.ws.rs.*;
+import java.util.List;
 
 /**
  *
@@ -181,6 +182,20 @@ public class MetaData {
 
         return "{\"status\":\""+message+"\", \"key\":"+workspaceID+"}";
 
+    }
+
+    /**
+     *
+     * @param workspaceID   - the workspace this metadata is for
+     * @param message       - message (e.g. success, or a stack trace or whatever)
+     * @param readyStatus   - e.g. 'failed'
+     * @param numberLoaded  - number of lines loaded into the workspace
+     * @param numberErrors  - number of lines that errored out
+     * @param errorExamples - examples of lines that failed (up to 10)
+     * @return
+     */
+    public String flag(String workspaceID, String message, int readyStatus, int numberLoaded, int numberErrors, List<String> errorExamples) {
+        return "{\"status\":\""+message+"\", \"key\":"+workspaceID+"}";
     }
     
 }

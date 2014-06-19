@@ -7,7 +7,7 @@
     <groupId>edu.mayo.mongo_svr</groupId>
     <artifactId>mongo_svr</artifactId>
     <packaging>war</packaging>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
 
     <dependencies>
         <!-- MongoDB SUPPORT -->

@@ -6,6 +6,7 @@ import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.CacheMissException;
 import edu.mayo.ve.VCFParser.VCFParser;
+import edu.mayo.ve.index.Index;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.message.SampleNumberFilter;
 import edu.mayo.ve.resources.ExeQuery;
@@ -56,8 +57,21 @@ public class ProblemVCFITCase {
     @Test
     public void testAsif100G() throws IOException, ProcessTerminatedException {
         String vcf = "src/test/resources/testData/Asif1000G.vcf";
+        //check to see if the type-ahead is indexed.
+        DB database = m.getDB("workspace");
+        DBCollection col = database.getCollection(Tokens.TYPEAHEAD_COLLECTION);
+        Index index = new Index();
+        DBObject raw = index.getIndexedFields(col);
+        System.out.println("BEFORE LOAD"); //IN THIS CASE, TYPEAHEAD CAN BE INDEXED OR NOT, BOTH ARE FINE
+        System.out.println(raw.toString());
         load(vcf, false);
+        raw = index.getIndexedFields(col);
+        System.out.println("AFTER LOAD");  //HERE TYPEAHEAD SHOULD BE INDEXED
+        System.out.println(raw.toString());
         delete(vcf);
+        raw = index.getIndexedFields(col);
+        System.out.println("AFTER DELETE"); //HERE TYPEAHEAD SHOULD NOT BE INDEXED
+        System.out.println(raw.toString());
     }
 
     @Test
