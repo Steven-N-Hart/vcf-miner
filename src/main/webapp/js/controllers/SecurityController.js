@@ -41,6 +41,7 @@ SecurityController = Backbone.Marionette.Controller.extend({
                         break;
                     default:
                         console.log("login failed");
+                        MongoApp.dispatcher.trigger(MongoApp.events.LOGIN_FAILED);
                 }
             },
             error: function(jqXHR) {

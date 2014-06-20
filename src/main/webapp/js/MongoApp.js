@@ -35,6 +35,9 @@ MongoApp.addInitializer(function () {
         // user successfully authenticated
         LOGIN_SUCCESS: 'loginSuccess',
 
+        // user failed authentication
+        LOGIN_FAILED: 'loginFailed',
+
         // user successfully logged out
         LOGOUT_SUCCESS: 'logoutSuccess',
 

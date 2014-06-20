@@ -112,6 +112,12 @@
             -moz-border-radius: 4px 0 4px 0;
             border-radius: 4px 0 4px 0;
         }
+
+         .center-block {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+         }
     </style>
 
     <!-- underscorejs templates -->
@@ -132,12 +138,11 @@
                 <br><br><br><br><br><br><br><br><br><br>
             </div>
             <div class="row-fluid">
-                <div class="span3"/>
-                <div class="span6">
-
+                <div class="span4"></div>
+                <div class="span4">
                     <form id="login_form" action="#" onsubmit="return false;" class="form-horizontal">
                         <div class="control-group">
-                            <label class="control-label" for="login_username_field">Username</label>
+                            <label class="control-label text-left" for="login_username_field">Username</label>
                             <div class="controls">
                                 <input id="login_username_field" name="login_username_field" type="text" class="input-medium"/>
                             </div>
@@ -157,9 +162,16 @@
                             </div>
                         </div>
                     </form>
+                    <div id="loginMessageRegion"></div>
                 </div>
-                <div class="span3"/>
+                <div class="span4"></div>
             </div>
+        </div>
+    </script>
+
+    <script id="login-failed-layout-template" type="text/template">
+        <div class="alert alert-error text-center">
+            <strong>Login Failed</strong>
         </div>
     </script>
 
