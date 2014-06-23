@@ -31,27 +31,7 @@ CustomFilterTabLayout = Backbone.Marionette.Layout.extend({
         // register for Marionette events
         this.stopListening();
         this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspace) {
-
-            // remember what the user has selected
-            var selectedFilter = self.getSelectedFilter();
-
-            self.sampleGroups.reset();
-            _.each(workspace.get("sampleGroups").models, function(group) {
-                self.sampleGroups.add(group);
-            });
-
-            self.filters.reset();
-
-            // standard group filters added last
-            self.filters.add(MongoApp.FILTER_IN_GROUP);
-            self.filters.add(MongoApp.FILTER_NOT_IN_GROUP);
-            self.filters.add(MongoApp.FILTER_MIN_ALT_AD);
-
-            // reselect
-            if (selectedFilter != undefined) {
-                var filterName = selectedFilter.get("name");
-                this.$el.find("#custom_field_list option:contains('"+filterName+"')").prop('selected', true);
-            }
+            self.initWorkspace(workspace);
         });
 
         // add custom validation method for the group drowdown to make sure a group
@@ -69,7 +49,34 @@ CustomFilterTabLayout = Backbone.Marionette.Layout.extend({
         }, "A group must be selected.");
     },
 
+    initWorkspace: function(workspace) {
+        var self = this;
+
+        // remember what the user has selected
+        var selectedFilter = this.getSelectedFilter();
+
+        this.sampleGroups.reset();
+        _.each(workspace.get("sampleGroups").models, function(group) {
+            self.sampleGroups.add(group);
+        });
+
+        this.filters.reset();
+
+        // standard group filters added last
+        this.filters.add(MongoApp.FILTER_IN_GROUP);
+        this.filters.add(MongoApp.FILTER_NOT_IN_GROUP);
+        this.filters.add(MongoApp.FILTER_MIN_ALT_AD);
+
+        // reselect
+        if (selectedFilter != undefined) {
+            var filterName = selectedFilter.get("name");
+            this.$el.find("#custom_field_list option:contains('"+filterName+"')").prop('selected', true);
+        }        
+    },
+    
     onShow: function() {
+
+        this.initWorkspace(MongoApp.workspace);
 
         var self = this;
 

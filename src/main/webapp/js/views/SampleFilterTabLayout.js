@@ -16,41 +16,7 @@ SampleFilterTabLayout = Backbone.Marionette.Layout.extend({
         // register for Marionette events
         this.stopListening();
         this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspace) {
-
-            // remember what the user has selected
-            var selectedFilter = self.getSelectedFilter();
-
-            self.filters.reset();
-
-            // translate FORMAT related VCFDataField models into Filter models
-            _.each(workspace.get("dataFields").models, function(vcfDataField) {
-                if (vcfDataField.get("category") == VCFDataCategory.FORMAT)
-                {
-                    self.filters.add(new Filter(
-                        {
-                            name: vcfDataField.get("name"),
-                            description: vcfDataField.get("description"),
-                            operator: FilterOperator.EQ,
-                            value: '0',
-                            displayValue: '0',
-                            category: FilterCategory.FORMAT,
-                            valueFunction: FilterValueFunction.MAX
-                        }
-                    ));
-                }
-            });
-
-            // reselect
-            if (selectedFilter != undefined) {
-                var filterName = selectedFilter.get("name");
-                self.$el.find("#sample_field_list option:contains('"+filterName+"')").prop('selected', true);
-            }
-
-            // check to see whether we have any FORMAT annotation
-            if (self.filters.length > 0)
-                self.$el.find('#no_format_annotation_warning').toggle(false);
-            else
-                self.$el.find('#no_format_annotation_warning').toggle(true);
+            self.initWorkspace(workspace);
         });
 
         // jQuery validate plugin config
@@ -71,8 +37,47 @@ SampleFilterTabLayout = Backbone.Marionette.Layout.extend({
         );
     },
 
+    initWorkspace: function(workspace) {
+        var self = this;
+
+        // remember what the user has selected
+        var selectedFilter = this.getSelectedFilter();
+
+        this.filters.reset();
+
+        // translate FORMAT related VCFDataField models into Filter models
+        _.each(workspace.get("dataFields").models, function(vcfDataField) {
+            if (vcfDataField.get("category") == VCFDataCategory.FORMAT)
+            {
+                self.filters.add(new Filter(
+                    {
+                        name: vcfDataField.get("name"),
+                        description: vcfDataField.get("description"),
+                        operator: FilterOperator.EQ,
+                        value: '0',
+                        displayValue: '0',
+                        category: FilterCategory.FORMAT,
+                        valueFunction: FilterValueFunction.MAX
+                    }
+                ));
+            }
+        });
+
+        // reselect
+        if (selectedFilter != undefined) {
+            var filterName = selectedFilter.get("name");
+            this.$el.find("#sample_field_list option:contains('"+filterName+"')").prop('selected', true);
+        }
+
+        // check to see whether we have any FORMAT annotation
+        if (this.filters.length > 0)
+            this.$el.find('#no_format_annotation_warning').toggle(false);
+        else
+            this.$el.find('#no_format_annotation_warning').toggle(true);        
+    },
+    
     onShow: function() {
-        var filters = this.filters;
+        this.initWorkspace(MongoApp.workspace);
 
         <!-- sub-view that renders available filters in a dropdown choicebox -->
         var ListView = Backbone.View.extend({

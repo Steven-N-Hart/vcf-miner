@@ -368,6 +368,9 @@
     </script>
 
     <script id="data-layout-template" type="text/template">
+
+        <div id="add_filter_modal" data-backdrop="static" class="modal modal-800wide hide fade"></div>
+
         <!-- JQUERY-UI Layout -->
         <!-- NOTE: the following CSS attributes ARE REQUIRED
              Documented at http://stackoverflow.com/questions/5520463/ui-layout-jquery-plugin
@@ -814,6 +817,45 @@
         </form>
     </script>
 
+    <script id="add-filter-dialog-layout-template" type="text/template">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="add_filter_label">Add Filter</h3>
+        </div>
+        <div class="modal-body">
+            <div class="container-fluid">
+                <div class="row-fluid"> <!-- tabs -->
+                    <div class="span12">
+                        <ul class="nav nav-tabs" id="add_filter_tabs">
+                            <li class="active"><a href="#tab_content_custom">Custom</a></li>
+                            <li><a href="#tab_content_info">Info</a></li>
+                            <li><a href="#tab_content_sample">Sample</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row-fluid"> <!-- tab content pane -->
+                    <div class="span12">
+                        <div class="tab-content">
+                            <div class="tab-pane" id="tab_content_sample"> <!-- SAMPLE tab -->
+                                <div id="tab_content_sample_region"></div>
+                            </div>
+                            <div class="tab-pane" id="tab_content_info"> <!-- info tab -->
+                                <div id="tab_content_info_region"></div>
+                            </div>
+                            <div class="tab-pane active" id="tab_content_custom"> <!-- CUSTOM tab -->
+                                <div id="tab_content_custom_region"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" aria-hidden="true" id="add_filter">Add</button>
+            <button class="btn" data-dismiss="modal" aria-hidden="true" id="add_filter_close">Cancel</button>
+        </div>
+    </script>
+
     <script id="create-group-dialog-layout-template" type="text/template">
 
         <form id="create_group_form" action="">
@@ -1087,7 +1129,6 @@
     <script src="js/collections/SampleGroupList.js" type="text/javascript"></script>
     <script src="js/views/GroupListView.js" type="text/javascript"></script>
 
-    <script src="js/AddFilterDialog.js" type="text/javascript"></script>
     <script src="js/ConfirmDialog.js" type="text/javascript"></script>
 
     <script src="js/models/VariantTableColumn.js" type="text/javascript"></script>
@@ -1110,6 +1151,7 @@
     <script src="js/views/HomeLayout.js"></script>
     <script src="js/views/SettingsLayout.js"></script>
     <script src="js/views/DataLayout.js"></script>
+    <script src="js/views/AddFilterDialogLayout.js"></script>
     <script src="js/views/SampleFilterTabLayout.js"></script>
     <script src="js/views/InfoFilterTabLayout.js"></script>
     <script src="js/views/CustomFilterTabLayout.js"></script>
@@ -1281,46 +1323,4 @@
         </div>
     </div>
 </div>
-
-<!-- Modal -->
-<div id="add_filter_modal" data-backdrop="static" class="modal modal-800wide hide fade" tabindex="-1" role="dialog"
-     aria-labelledby="add_filter_label" aria-hidden="true">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="add_filter_label">Add Filter</h3>
-    </div>
-    <div class="modal-body">
-        <div class="container-fluid">
-            <div class="row-fluid"> <!-- tabs -->
-                <div class="span12">
-                    <ul class="nav nav-tabs" id="add_filter_tabs">
-                        <li class="active"><a href="#tab_content_custom">Custom</a></li>
-                        <li><a href="#tab_content_info">Info</a></li>
-                        <li><a href="#tab_content_sample">Sample</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="row-fluid"> <!-- tab content pane -->
-                <div class="span12">
-                    <div class="tab-content">
-                        <div class="tab-pane" id="tab_content_sample"> <!-- SAMPLE tab -->
-                            <div id="tab_content_sample_region"></div>
-                        </div>
-                        <div class="tab-pane" id="tab_content_info"> <!-- info tab -->
-                            <div id="tab_content_info_region"></div>
-                        </div>
-                        <div class="tab-pane active" id="tab_content_custom"> <!-- CUSTOM tab -->
-                            <div id="tab_content_custom_region"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" aria-hidden="true" id="add_filter">Add</button>
-        <button class="btn" data-dismiss="modal" aria-hidden="true" id="add_filter_close">Cancel</button>
-    </div>
-</div>
-
 </html>

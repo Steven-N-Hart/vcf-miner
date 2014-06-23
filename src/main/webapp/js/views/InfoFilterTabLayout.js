@@ -18,23 +18,7 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
         // register for Marionette events
         this.stopListening();
         this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspace) {
-
-            self.workspaceKey = workspace.get("key");
-
-            // pick out the INFO data fields
-            self.infoFields.reset();
-            _.each(workspace.get("dataFields").models, function(vcfDataField) {
-                if (vcfDataField.get("category") == VCFDataCategory.INFO) {
-                    self.infoFields.add(vcfDataField);
-                }
-            });
-
-            // check to see whether we have any INFO annotation
-            if (self.infoFields.length > 0)
-                this.$el.find('#no_info_annotation_warning').toggle(false);
-            else
-                this.$el.find('#no_info_annotation_warning').toggle(true);
-
+            self.initWorkspace(workspace);
         });
 
         // jQuery validate plugin config
@@ -58,7 +42,31 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
         });
     },
 
+    initWorkspace: function(workspace) {
+
+        var self = this;
+
+        this.workspaceKey = workspace.get("key");
+
+        // pick out the INFO data fields
+        this.infoFields.reset();
+        _.each(workspace.get("dataFields").models, function(vcfDataField) {
+            if (vcfDataField.get("category") == VCFDataCategory.INFO) {
+                self.infoFields.add(vcfDataField);
+            }
+        });
+
+        // check to see whether we have any INFO annotation
+        if (this.infoFields.length > 0)
+            this.$el.find('#no_info_annotation_warning').toggle(false);
+        else
+            this.$el.find('#no_info_annotation_warning').toggle(true);
+
+    },
+
     onShow: function() {
+
+        this.initWorkspace(MongoApp.workspace);
 
         var self = this;
 

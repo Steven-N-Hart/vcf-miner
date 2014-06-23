@@ -14,8 +14,6 @@ DataLayout = Backbone.Marionette.Layout.extend({
      * Called when the view is first created
      */
     initialize: function() {
-        this.addFilterDialog = new AddFilterDialog();
-
         var self = this;
         this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_META_LOADED, function () {
             MongoApp.variantDataController.showVariantTable({region: self.variantDataRegion});
@@ -41,7 +39,11 @@ DataLayout = Backbone.Marionette.Layout.extend({
     },
 
     showAddFilterDialog: function() {
-        this.addFilterDialog.show();
+        var region = new Backbone.Marionette.Region({
+            el: this.$el.find("#add_filter_modal")
+        });
+
+        region.show(new AddFilterDialogLayout());
     },
 
     /**
