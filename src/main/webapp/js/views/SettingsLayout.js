@@ -1,15 +1,12 @@
-SettingsTabLayout = Backbone.Marionette.Layout.extend({
-    template: "#settings-tab-layout-template",
+SettingsLayout = Backbone.Marionette.Layout.extend({
 
-    /**
-     * Delegated events
-     */
-    events:
-    {
-//        "click .login" : "login"
+    template: "#settings-layout-template",
+
+    regions: {
     },
 
     onShow: function() {
+
         // jQuery validate plugin config
         this.$el.find('#settings_general_form').validate(
             {

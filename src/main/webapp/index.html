@@ -6,8 +6,8 @@
 	<meta charset="utf-8">
 	<title>VCF-Miner</title>
 
-    <link rel="stylesheet" type="text/css" href="jquery.layout-1.3.0/css/layout-default-latest.css">
-    <link rel="stylesheet" type="text/css" href="jquery.layout-1.3.0/css/complex.css">
+    <link rel="stylesheet" type="text/css" href="jquery.layout-1.3.0-rc30.79/layout-default-latest.css">
+    <!--<link rel="stylesheet" type="text/css" href="jquery.layout-1.3.0/css/complex.css">-->
     <link rel="stylesheet" type="text/css" href="bootstrap-2.3.2/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="DataTables-1.9.4/media/css/DT_bootstrap.css">
     <link rel="stylesheet" href="chosen-0.10.0/chosen.css">
@@ -57,11 +57,12 @@
             margin-left: -300px;
         }
 
+        /* TODO: FIX ME */
         /* override jquery layout */
-        .ui-layout-west{
-            z-index: 50 !important;
-            overflow: auto !important;
-        }
+        /*.ui-layout-west{*/
+            /*z-index: 50 !important;*/
+            /*overflow: auto !important;*/
+        /*}*/
 
         .selectwidth100Percent
         {
@@ -178,136 +179,9 @@
     <script id="main-layout-template" type="text/template">
 
         <div id="mainHeaderRegion"></div>
-
-        <!-- GETTING STARTED -->
-        <div id="welcome_pane" class="hide">
-            <div class="row">
-                <div class="span12">
-                    <div class="row-fluid">
-                        <div class="span12">
-                            <table>
-                                <tr>
-                                    <td>
-                                        <div class="well">
-                                            <h3>Getting started:</h3>
-                                            <table>
-                                                <tr>
-                                                    <td>1.</td>
-                                                    <td>
-                                                        <button title="Import a new VCF File into the system"
-                                                                class="btn btn-primary"
-                                                                onclick="$('#add_workspace_modal').modal();">Import
-                                                        </button>
-                                                        a new VCF File
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2.</td>
-                                                    <td>Analyze an existing VCF File in the list below</td>
-                                                </tr>
-                                                <tr>
-                                                    <td></td>
-                                                    <td><h3></h3></td>
-                                                </tr>
-                                                <tr>
-                                                    <td></td>
-                                                    <!--<td><div class="pull-right" id="workspaces_table_div"></div></td>-->
-                                                    <td>
-                                                        <div class="pull-right" id="workspaceRegion"></div>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                        <div>
-                                            <p>
-                                                <small>The funding was provided by the <a target="_blank"
-                                                                                          href="http://mayoresearch.mayo.edu/center-for-individualized-medicine/">Center
-                                                    for Individualized Medicine</a> at Mayo Clinic.
-                                                </small>
-                                            </p>
-                                            <p>
-                                                <small><a target="_blank" href="license.html">Terms and Conditions of
-                                                    Use</a></small>
-                                            </p>
-                                        </div>
-                                    </td>
-                                    <td class="pull-right">
-                                        <div id=watermark></div>
-                                    </td>
-                                </tr>
-                                <!--<tr>-->
-                                <!--<td>-->
-                                <!--<div id="workspaces_table_div"></div>-->
-                                <!--</td>-->
-                                <!--</tr>-->
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="getting_started">
-            <!-- placeholder-->
-            <div id="getting_started_content" class="hero-unit"></div>
-        </div>
-
-        <div id="settings" class="hide">
-            <div id="settings_region"></div>
-        </div>
-
-        <!-- JQUERY-UI Layout -->
-        <div id="jquery-ui-container"
-             style="zoom: 1; overflow: hidden; width: auto; height: auto; margin: 0px; position: absolute; top: 40px; bottom: 0px; left: 0px; right: 0px; cursor: auto; "
-             class="ui-layout-container hide">
-
-            <!-- WEST -->
-            <div class="ui-layout-west pane pane-west"
-                 style="position: absolute; margin: 0px; left: 0px; right: auto; top: 95px; bottom: 0px; height: 458px; z-index: 0; width: 346px; display: block; visibility: visible; ">
-
-                <div class="sidebar-nav">
-                    <ul class="nav nav-list">
-                        <div class="nav-header">
-                            <div class="row-fluid">
-                                <div class="pull-right">
-                                    <button id="west-closer" title="Hide Analysis" type="button" class="btn btn-mini"><i
-                                            class="fa fa-arrow-left"></i> Hide
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="border-frame">
-                                <div id="searchNameRegion"></div>
-                                <br>
-
-                                <div id="searchDescriptionRegion"></div>
-                                <br>
-
-                                <div class="well">
-                                    <div id="searchFiltersRegion"></div>
-
-                                    <button title="Add Filter to your Analysis" class="btn btn-primary"
-                                            id="show_add_filter_dialog_button">Add Filter
-                                    </button>
-                                </div>
-
-                                <div id="searchSaveRegion"></div>
-                            </div>
-                        </div>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- CENTER -->
-            <div class="pane ui-layout-center ui-layout-pane ui-layout-pane-center">
-
-                <div id="variantDataRegion"
-                     style="padding-left: 35px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;"></div>
-
-            </div>
-        </div>
+        <div id="homeRegion"></div>
+        <div id="settingsRegion"></div>
+        <div id="dataRegion"></div>
 
     </script>
 
@@ -355,6 +229,192 @@
             <div class="row-fluid">
                 <div class="span3"><strong>E-mail</strong></div>
                 <div class="span9"><a href= "mailto:<%=email%>" ><%=email%></a></div>
+            </div>
+        </div>
+    </script>
+
+    <script id="home-layout-template" type="text/template">
+        <div class="hero-unit">
+            <div class="row">
+                <div class="span12">
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <div class="well">
+                                            <h3>Getting started:</h3>
+                                            <table>
+                                                <tr>
+                                                    <td>1.</td>
+                                                    <td>
+                                                        <button title="Import a new VCF File into the system"
+                                                                class="btn btn-primary"
+                                                                onclick="$('#add_workspace_modal').modal();">Import
+                                                        </button>
+                                                        a new VCF File
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2.</td>
+                                                    <td>Analyze an existing VCF File in the list below</td>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td><h3></h3></td>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td>
+                                                        <div class="pull-right" id="workspaceRegion"></div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div>
+                                            <p>
+                                                <small>The funding was provided by the <a target="_blank"
+                                                                                          href="http://mayoresearch.mayo.edu/center-for-individualized-medicine/">Center
+                                                    for Individualized Medicine</a> at Mayo Clinic.
+                                                </small>
+                                            </p>
+                                            <p>
+                                                <small><a target="_blank" href="license.html">Terms and Conditions of
+                                                    Use</a></small>
+                                            </p>
+                                        </div>
+                                    </td>
+                                    <td class="pull-right">
+                                        <div id=watermark></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script id="settings-layout-template" type="text/template">
+        <div class="hero-unit">
+            <div class="well">
+                <h2>General</h2>
+
+                <form id="settings_general_form" class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label" for="max_filtered_variants_field">MAX Displayed
+                            Variants</label>
+
+                        <div class="controls">
+                            <input class="input-mini" name="max_filtered_variants_field"
+                                   id="max_filtered_variants_field" value="1000">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="popover_time_field">Popup Display Time (Seconds)</label>
+
+                        <div class="controls">
+                            <input class="input-mini" name="popover_time_field" id="popover_time_field" value="3">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="max_filter_values_field">Typeahead Limit</label>
+
+                        <div class="controls">
+                            <input class="input-mini" name="max_filter_values_field" id="max_filter_values_field"
+                                   value="25">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="well">
+                <h2>Indexes</h2>
+
+                <div class='row-fluid checkbox'><label><input type='checkbox' id='show_missing_index_warnings'> Show
+                    warnings when adding a Filter on an non-indexed column</label></div>
+                <div class="row-fluid">
+                    <div class="span6" id="indexes_status_div"></div>
+                </div>
+                <div class="well">
+                    <h3>General</h3>
+
+                    <div class="container-fluid pre-scrollable">
+                        <div class="row-fluid">
+                            <div class="pull-left" id="general_indexes_table_div"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="well">
+                    <h3>INFO</h3>
+
+                    <div class="container-fluid pre-scrollable">
+                        <div class="row-fluid">
+                            <div class="pull-left" id="info_indexes_table_div"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="well">
+                    <h3>FORMAT</h3>
+
+                    <div class="container-fluid pre-scrollable">
+                        <div class="row-fluid">
+                            <div class="pull-left" id="format_indexes_table_div"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script id="data-layout-template" type="text/template">
+        <!-- JQUERY-UI Layout -->
+        <!-- NOTE: the following CSS attributes ARE REQUIRED
+             Documented at http://stackoverflow.com/questions/5520463/ui-layout-jquery-plugin
+             width:  100%; height: 100%; overflow: hidden; position:absolute;
+        -->
+        <div id="jquery-ui-container" style="width:  100%; height: 100%; overflow: hidden; position:absolute;">
+
+            <!-- WEST -->
+            <div class="ui-layout-west">
+                <div class="sidebar-nav">
+                    <ul class="nav nav-list">
+                        <div class="nav-header">
+                            <div class="row-fluid">
+                                <div class="pull-right">
+                                    <button id="west-closer" title="Hide Analysis" type="button" class="btn btn-mini"><i
+                                            class="fa fa-arrow-left"></i> Hide
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="border-frame">
+                                <div id="searchNameRegion"></div>
+                                <br>
+
+                                <div id="searchDescriptionRegion"></div>
+                                <br>
+
+                                <div class="well">
+                                    <div id="searchFiltersRegion"></div>
+
+                                    <button title="Add Filter to your Analysis" class="btn btn-primary"
+                                            id="show_add_filter_dialog_button">Add Filter
+                                    </button>
+                                </div>
+
+                                <div id="searchSaveRegion"></div>
+                            </div>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- CENTER -->
+            <div class="ui-layout-center">
+                <div id="variantDataRegion" style="padding-left: 35px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;"></div>
             </div>
         </div>
     </script>
@@ -958,83 +1018,17 @@
         </table>
     </script>
 
+    <script id="variant-table-template" type="text/template">
+        <table id="variant_table" class="table table-striped table-bordered" border="0" cellpadding="0" cellspacing="0">
+        </table>
+    </script>
+
     <script id="config-variant-table-col-template" type="text/template">
         <tr id='<%=id%>_col_row' type='data_row'>
             <td><input data-col-id='<%=id%>' class="input-mini toggle-visibility" type="checkbox" checked="true"/></td>
             <span class="label"><td><%=displayName%></td></span>
             <span class="label"><td><%=description%></td></span>
         </tr>
-    </script>
-
-    <script id="settings-tab-layout-template" type="text/html">
-        <div class="hero-unit">
-            <div class="well">
-                <h2>General</h2>
-
-                <form id="settings_general_form" class="form-horizontal">
-                    <div class="control-group">
-                        <label class="control-label" for="max_filtered_variants_field">MAX Displayed
-                            Variants</label>
-
-                        <div class="controls">
-                            <input class="input-mini" name="max_filtered_variants_field"
-                                   id="max_filtered_variants_field" value="1000">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="popover_time_field">Popup Display Time (Seconds)</label>
-
-                        <div class="controls">
-                            <input class="input-mini" name="popover_time_field" id="popover_time_field" value="3">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="max_filter_values_field">Typeahead Limit</label>
-
-                        <div class="controls">
-                            <input class="input-mini" name="max_filter_values_field" id="max_filter_values_field"
-                                   value="25">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="well">
-                <h2>Indexes</h2>
-
-                <div class='row-fluid checkbox'><label><input type='checkbox' id='show_missing_index_warnings'> Show
-                    warnings when adding a Filter on an non-indexed column</label></div>
-                <div class="row-fluid">
-                    <div class="span6" id="indexes_status_div"></div>
-                </div>
-                <div class="well">
-                    <h3>General</h3>
-
-                    <div class="container-fluid pre-scrollable">
-                        <div class="row-fluid">
-                            <div class="pull-left" id="general_indexes_table_div"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="well">
-                    <h3>INFO</h3>
-
-                    <div class="container-fluid pre-scrollable">
-                        <div class="row-fluid">
-                            <div class="pull-left" id="info_indexes_table_div"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="well">
-                    <h3>FORMAT</h3>
-
-                    <div class="container-fluid pre-scrollable">
-                        <div class="row-fluid">
-                            <div class="pull-left" id="format_indexes_table_div"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </script>
 
     <script id="warning-popover-template" type="text/template">
@@ -1046,7 +1040,7 @@
 
     <script src="jquery-1.10.1/jquery-1.10.1.js"></script>
     <script src="jquery-ui-1.10.3/ui/jquery-ui.js"></script>
-    <script src="jquery.layout-1.3.0/jquery.layout-latest.js"></script>
+    <script src="jquery.layout-1.3.0-rc30.79/jquery.layout-latest.js"></script>
     <script src="jquery-validation-1.11.1/jquery.validate.js"></script>
     <script src="jquery-validation-1.11.1/additional-methods.js"></script>
     <script src="jquery.base64-0.0.2/jquery.base64.js"></script>
@@ -1113,13 +1107,15 @@
     <script src="js/collections/SearchList.js"></script>
     <script src="js/views/LoginLayout.js"></script>
     <script src="js/views/MainLayout.js"></script>
+    <script src="js/views/HomeLayout.js"></script>
+    <script src="js/views/SettingsLayout.js"></script>
+    <script src="js/views/DataLayout.js"></script>
     <script src="js/views/SampleFilterTabLayout.js"></script>
     <script src="js/views/InfoFilterTabLayout.js"></script>
     <script src="js/views/CustomFilterTabLayout.js"></script>
     <script src="js/views/MainHeaderLayout.js"></script>
     <script src="js/views/MainHeaderUserLayout.js"></script>
     <script src="js/views/CreateGroupDialogLayout.js"></script>
-    <script src="js/views/SettingsTabLayout.js"></script>
     <script src="js/views/SearchTableRowView.js"></script>
     <script src="js/views/SearchTableView.js"></script>
     <script src="js/views/SearchFilterRowView.js"></script>
@@ -1147,6 +1143,7 @@
                 <!-- Start Marionette Application -->
                 MongoApp.start();
             }
+
         });
     </script>
 

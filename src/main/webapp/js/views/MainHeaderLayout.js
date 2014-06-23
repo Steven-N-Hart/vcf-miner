@@ -1,5 +1,12 @@
 MainHeaderLayout = Backbone.Marionette.Layout.extend({
 
+    /**
+     * Fired when the user changes the selected tab
+     */
+    EVENT_HOME_TAB_SELECTED:     'home_tab_selected',
+    EVENT_SETTINGS_TAB_SELECTED: 'settings_tab_selected',
+    EVENT_DATA_TAB_SELECTED:     'data_tab_selected',
+
     template: "#main-header-layout-template",
 
     /**
@@ -28,6 +35,8 @@ MainHeaderLayout = Backbone.Marionette.Layout.extend({
             // simulate clicking on it
             $('#table_tab').click(); // register click event to switch to that tab
         });
+
+        this.switchHomeTab();
     },
 
     onShow: function() {
@@ -47,19 +56,22 @@ MainHeaderLayout = Backbone.Marionette.Layout.extend({
         switch(e.target.id)
         {
             case 'home_tab':
-                $("#getting_started").toggle(true);
-                $("#jquery-ui-container").toggle(false);
-                $("#settings").toggle(false);
+                this.trigger(this.EVENT_HOME_TAB_SELECTED);
+//                $("#getting_started").toggle(true);
+//                $("#jquery-ui-container").toggle(false);
+//                $("#settings").toggle(false);
                 break;
             case 'settings_tab':
-                $("#getting_started").toggle(false);
-                $("#jquery-ui-container").toggle(false);
-                $("#settings").toggle(true);
+                this.trigger(this.EVENT_SETTINGS_TAB_SELECTED);
+//                $("#getting_started").toggle(false);
+//                $("#jquery-ui-container").toggle(false);
+//                $("#settings").toggle(true);
                 break;
             case 'table_tab':
-                $("#getting_started").toggle(false);
-                $("#jquery-ui-container").toggle(true);
-                $("#settings").toggle(false);
+                this.trigger(this.EVENT_DATA_TAB_SELECTED);
+//                $("#getting_started").toggle(false);
+//                $("#jquery-ui-container").toggle(true);
+//                $("#settings").toggle(false);
                 break;
         }
 

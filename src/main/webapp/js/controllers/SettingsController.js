@@ -10,12 +10,6 @@ SettingsController = Backbone.Marionette.Controller.extend({
         });
     },
 
-    showSettingsTab: function (options) {
-
-        var settingsTabLayout = new SettingsTabLayout();
-        options.region.show(settingsTabLayout);
-    },
-
     changeWorkspace: function(workspace) {
         MongoApp.indexController.initialize(workspace.get("key"), workspace.get("dataFields"));
         MongoApp.indexController.refreshIndexes();

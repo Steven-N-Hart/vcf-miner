@@ -36,14 +36,12 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
     showVariantTable: function (options) {
 
         // create a new view for variant table
-        var variantTableView = new VariantTableDataView(
-            {
-                "model":        this.varTableRows,
-                "columns":      this.varTableCols
-            }
-        );
+        var variantTableView = new VariantTableDataView({
+            model:        this.varTableRows,
+            columns:      this.varTableCols
+        });
 
-        new VariantTableColumnView({"model": this.varTableCols});
+        new VariantTableColumnView({model: this.varTableCols});
 
         options.region.show(variantTableView);
     },
@@ -88,7 +86,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
 
         console.debug("Sending query to server:" + JSON.stringify(query));
 
-        var req = $.ajax({
+        $.ajax({
             type: "POST",
             url: "/mongo_svr/ve/eq",
             contentType: "application/json",
