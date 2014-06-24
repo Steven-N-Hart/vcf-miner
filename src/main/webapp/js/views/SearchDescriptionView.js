@@ -38,7 +38,7 @@ SearchDescriptionView = Backbone.Marionette.ItemView.extend({
             $('#search_save_desc_field').val(search.get("description"));
 
             if (wysihtml5Initialized == false) {
-                $('#search_save_desc_field').wysihtml5();
+                $('#search_save_desc_field').wysihtml5({stylesheets:[]});
                 wysihtml5Initialized = true;
             }
         };

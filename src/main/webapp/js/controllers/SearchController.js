@@ -162,7 +162,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
 //            });
 
             if (wysihtml5Initialized == false) {
-                $('#search_save_desc_field').wysihtml5();
+                $('#search_save_desc_field').wysihtml5({stylesheets:[]});
                 wysihtml5Initialized = true;
             }
         };
