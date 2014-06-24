@@ -70,8 +70,6 @@ VariantTableDataView = Backbone.Marionette.Layout.extend({
             }
         });
 
-        this.drawTable();
-
         // dynamically add 'show' button to the <div> with class '.show'
         var showButton = $('<button id="west-opener" title="Show Search" type="button" class="hide btn btn-mini"><i class="fa fa-arrow-right"></i> Show</button>');
         this.$('.show').append(showButton);
