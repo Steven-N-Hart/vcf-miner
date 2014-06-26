@@ -54,16 +54,13 @@ public class VCFUploadResource {
     }
 
     //define something incase sysproperties does not exist
-    public static final String UPLOAD_DIR = "/tmp";
+    //public static final String UPLOAD_DIR = "/tmp";
     private static boolean init = false;
 
     public VCFUploadResource() throws IOException {
         if(!init){
             init = true;
             sysprop = new SystemProperties();
-            if(sysprop.get("TEMPDIR") != null){
-                this.fileroot = sysprop.get("TEMPDIR");
-            }
             if(sysprop.get(Tokens.TYPE_AHEAD_OVERUN) != null){
                 maxTypeAheadCache = new Integer(sysprop.get(Tokens.TYPE_AHEAD_OVERUN));  //user may even want to configure this paramater via REST, for now at least it is in a property file
             }
@@ -256,7 +253,7 @@ public class VCFUploadResource {
         private Gson gson = new Gson();
         private Provision provision = new Provision();
         private static SystemProperties sysprop;
-        private String fileroot = "/tmp/";
+        //private String fileroot = "/tmp/";
         private boolean reportingset = false;
         @POST
         @Path("uploadvcf/user/{user}/alias/{alias}/{reporting}")
@@ -286,7 +283,7 @@ public class VCFUploadResource {
             //set the workspace's status to not ready
             MetaData meta = new MetaData();
             meta.flagAsNotReady(wkspID);
-            String uploadedFileLocation = setUploadFileLocation(fileroot, wkspID, compression);
+            String uploadedFileLocation = setUploadFileLocation(this.getFileRoot(), wkspID, compression);
 
             if(reportingset){
                 System.out.println("Attempting to write file upload to the following location: " + uploadedFileLocation);
@@ -476,6 +473,20 @@ public class VCFUploadResource {
     public String writeFileDirectOff() {
         writeDirect = false;
         return "writeFileDirect is turned off!";
+    }
+
+    public String getFileRoot(){
+        try {
+            sysprop = new SystemProperties();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if(sysprop.get("TEMPDIR") != null){
+            return sysprop.get("TEMPDIR");
+        }
+        else {
+            throw new RuntimeException("TEMPDIR not defined in your sys.properties file or sys.properties does not exist");
+        }
     }
 
 
