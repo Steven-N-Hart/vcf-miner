@@ -65,9 +65,6 @@ MongoApp.addInitializer(function () {
         // User is choosing a different search
         SEARCH_LOAD: 'searchLoad',
 
-        // current Search model has been changed
-        SEARCH_CHANGE: 'searchChange',
-
         // signals that a new filter should be added to the search
         SEARCH_FILTER_ADD: 'filterAdd',
 
@@ -192,7 +189,6 @@ MongoApp.addInitializer(function () {
         });
 
         MongoApp.search.set("saved", true);
-        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_CHANGE, MongoApp.search);
     });
 });
 

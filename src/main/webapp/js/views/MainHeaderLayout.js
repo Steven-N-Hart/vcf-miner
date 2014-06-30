@@ -35,14 +35,14 @@ MainHeaderLayout = Backbone.Marionette.Layout.extend({
             // simulate clicking on it
             $('#table_tab').click(); // register click event to switch to that tab
         });
-
-        this.switchHomeTab();
     },
 
     onShow: function() {
         this.userRegion.show(new MainHeaderUserLayout({
             "model": MongoApp.user
         }));
+
+        this.switchHomeTab();
     },
 
     switchHomeTab: function() {
@@ -57,21 +57,12 @@ MainHeaderLayout = Backbone.Marionette.Layout.extend({
         {
             case 'home_tab':
                 this.trigger(this.EVENT_HOME_TAB_SELECTED);
-//                $("#getting_started").toggle(true);
-//                $("#jquery-ui-container").toggle(false);
-//                $("#settings").toggle(false);
                 break;
             case 'settings_tab':
                 this.trigger(this.EVENT_SETTINGS_TAB_SELECTED);
-//                $("#getting_started").toggle(false);
-//                $("#jquery-ui-container").toggle(false);
-//                $("#settings").toggle(true);
                 break;
             case 'table_tab':
                 this.trigger(this.EVENT_DATA_TAB_SELECTED);
-//                $("#getting_started").toggle(false);
-//                $("#jquery-ui-container").toggle(true);
-//                $("#settings").toggle(false);
                 break;
         }
 

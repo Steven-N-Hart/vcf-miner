@@ -38,6 +38,9 @@ MainLayout = Backbone.Marionette.Layout.extend({
             self.settingsRegion.$el.toggle(false);
             self.dataRegion.$el.toggle(true);
         });
+
+        // have the HOME tab shown by default
+        mainHeaderLayout.switchHomeTab();
     }
 
 });
