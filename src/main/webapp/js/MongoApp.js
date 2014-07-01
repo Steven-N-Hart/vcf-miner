@@ -50,9 +50,6 @@ MongoApp.addInitializer(function () {
         // metadata for current workspace has been loaded
         WKSP_META_LOADED: 'workspaceMetaLoaded',
 
-        // data for current workspace has been loaded
-        WKSP_DATA_LOADED: 'workspaceDataLoaded',
-
         // signals that a new sample group should be created
         WKSP_GROUP_CREATE: 'workspaceGroupCreate',
 
@@ -112,6 +109,14 @@ MongoApp.addInitializer(function () {
     this.FILTER_NOT_IN_GROUP = new GroupFilter({name: 'Samples not in Group', operator: FilterOperator.EQ, value: '0', displayValue: '0', category: FilterCategory.NOT_IN_GROUP, description:'Filters variants based on non-matching samples'});
     this.FILTER_MIN_ALT_AD   = new AltAlleleDepthFilter();
 
+
+    this.showPleaseWait = function() {
+        $('#pleaseWaitDialog').modal();
+    };
+
+    this.closePleaseWait = function() {
+        $('#pleaseWaitDialog').modal('hide');
+    }
 });
 
 /**

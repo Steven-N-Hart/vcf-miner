@@ -63,7 +63,6 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         // send query request to server
         var query = buildQuery(search.get("filters"), workspace.get("key"));
         this.sendQuery(query, async);
-        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_DATA_LOADED);
     },
 
 
@@ -81,8 +80,8 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
 
         var self = this;
 
-        var pleaseWaitDiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h3>Running Filters.  Please wait...</h3></div><div class="modal-body"></div></div>');
-        pleaseWaitDiv.modal();
+//        var pleaseWaitDiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h3>Running Filters.  Please wait...</h3></div><div class="modal-body"></div></div>');
+//        pleaseWaitDiv.modal();
 
         console.debug("Sending query to server:" + JSON.stringify(query));
 
@@ -164,7 +163,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
                 MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
             },
             complete: function(jqXHR, textStatus) {
-                setTimeout(function(){ pleaseWaitDiv.modal('hide');}, 500);
+                setTimeout(function(){MongoApp.closePleaseWait();}, 500);
             }
         });
     },

@@ -71,7 +71,14 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
             search = searches.findWhere({id: searchID});
         }
 
-        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_LOAD, workspace, search);
+        MongoApp.showPleaseWait();
+
+        // Trigger event is fired in separate timer so that the analyze() function can complete immediately
+        // This has the desired effect of the dropdown closing and the please wait dialog showing right away
+        setTimeout(function() {
+            MongoApp.dispatcher.trigger(MongoApp.events.WKSP_LOAD, workspace, search);
+        }, 0);
+
     },
 
     deleteWorkspace: function(event) {

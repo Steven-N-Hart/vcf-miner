@@ -67,6 +67,8 @@ var SearchController = Backbone.Marionette.Controller.extend({
     },
 
     addFilter: function (filter, async) {
+        MongoApp.showPleaseWait();
+
         MongoApp.search.get("filters").add(filter);
 
         if (filter.get('id') != MongoApp.FILTER_NONE.get('id'))
@@ -77,6 +79,8 @@ var SearchController = Backbone.Marionette.Controller.extend({
     },
 
     removeFilter: function (filter) {
+        MongoApp.showPleaseWait();
+
         MongoApp.search.get("filters").remove(filter);
         MongoApp.search.set("saved", false);
         MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_REMOVED, MongoApp.search);
