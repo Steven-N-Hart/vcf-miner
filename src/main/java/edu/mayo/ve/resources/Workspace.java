@@ -5,6 +5,9 @@
 package edu.mayo.ve.resources;
 
 import com.mongodb.WriteResult;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +33,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 
 import edu.mayo.util.Tokens;
+import edu.mayo.ve.VCFParser.VCFErrorFileUtils;
+import edu.mayo.util.SystemProperties;
 import org.bson.types.ObjectId;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -114,6 +119,14 @@ public class Workspace {
          //remove typeahead
          TypeAheadCollection type = new TypeAheadCollection();
          type.clear(workspaceID);
+
+         //delete the error log file
+         try {
+             VCFErrorFileUtils.deleteLoadErrorFile(workspaceID);
+         } catch (Exception e){
+             throw new RuntimeException(e);
+         }
+
          //return the status of the deletion to the caller
          BasicDBObject bo = new BasicDBObject();
          bo.append("status", "workspace= " + workspaceID + " deleted");

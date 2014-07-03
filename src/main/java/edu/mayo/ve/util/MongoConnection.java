@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.mongodb.Mongo;
+import edu.mayo.util.SystemProperties;
 
 /**
  *

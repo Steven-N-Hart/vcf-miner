@@ -236,7 +236,7 @@ public class TypeAheadITCase {
             assertTrue(expectedEff.contains(s));
         }
 
-        p.delete(vcf);
+        p.deleteCheck(workspace, 0,48);
     }
 
 

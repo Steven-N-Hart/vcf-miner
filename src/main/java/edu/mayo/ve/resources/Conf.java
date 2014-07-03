@@ -4,7 +4,8 @@
  */
 package edu.mayo.ve.resources;
 
-import edu.mayo.ve.util.SystemProperties;
+import edu.mayo.util.SystemProperties;
+
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;

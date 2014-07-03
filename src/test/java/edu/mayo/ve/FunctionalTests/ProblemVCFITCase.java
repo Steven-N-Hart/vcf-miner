@@ -5,6 +5,8 @@ import com.mongodb.util.JSON;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.CacheMissException;
+import edu.mayo.ve.VCFParser.ErrorStats;
+import edu.mayo.ve.VCFParser.VCFErrorFileUtils;
 import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.index.Index;
 import edu.mayo.ve.message.Querry;
@@ -14,11 +16,13 @@ import edu.mayo.ve.resources.Provision;
 import edu.mayo.ve.resources.TypeAheadResource;
 import edu.mayo.ve.resources.Workspace;
 import edu.mayo.util.MongoConnection;
+import edu.mayo.util.SystemProperties;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,11 +68,11 @@ public class ProblemVCFITCase {
         DBObject raw = index.getIndexedFields(col);
         System.out.println("BEFORE LOAD"); //IN THIS CASE, TYPEAHEAD CAN BE INDEXED OR NOT, BOTH ARE FINE
         System.out.println(raw.toString());
-        load(vcf, false);
+        String workspace = load(vcf, false);
         raw = index.getIndexedFields(col);
         System.out.println("AFTER LOAD");  //HERE TYPEAHEAD SHOULD BE INDEXED
         System.out.println(raw.toString());
-        delete(vcf);
+        deleteCheck(workspace, 0, 0);
         raw = index.getIndexedFields(col);
         System.out.println("AFTER DELETE"); //HERE TYPEAHEAD SHOULD NOT BE INDEXED
         System.out.println(raw.toString());
@@ -77,9 +81,9 @@ public class ProblemVCFITCase {
     @Test
     public void testCaseControlSNPEFFHGVSAnnovar() throws IOException, ProcessTerminatedException {
         String vcf = "src/test/resources/testData/Case.control.snpeff.hgvs.annovar.part.vcf";
-        load(vcf, false);
+        String workspace = load(vcf, false);
         //tests.... (note this problem should create an error if it surfaces again)
-        delete(vcf);
+        deleteCheck(workspace, 0,0);
     }
 
     //this test takes a LONG time to run, so commenting it out, run manually every now and then if you want to ensure functionality is still correct
@@ -93,7 +97,7 @@ public class ProblemVCFITCase {
         //make sure there are ~10k records in the collection
         long count = count(workspace);
         assertEquals(9880,count);
-        delete(vcf);
+        deleteCheck(workspace, 0,0);
     }
 
     @Test
@@ -121,7 +125,7 @@ public class ProblemVCFITCase {
         String result = eq.handleBasicQuerry(q);
         System.out.println(result.substring(0,200));
         assertTrue(result.replaceAll("\\s+","").startsWith("{\"totalResults\":22747"));
-        delete(vcf);
+        deleteCheck(workspace,0,0);
     }
 
     private long count(String workspace){
@@ -149,8 +153,8 @@ public class ProblemVCFITCase {
         System.out.println("Compressed Records Loaded: " + zcount);
         assertEquals(count, zcount);
         assertTrue(count != 0);
-        delete(vcf);
-        delete(zvcf);
+        deleteCheck(workspace,0,0);
+        deleteCheck(zworkspace,0,0);
     }
 
 
@@ -163,7 +167,7 @@ public class ProblemVCFITCase {
         DBCollection col = db.getCollection(workspace);
         assertEquals(197, col.count());
 
-        delete(vcf);
+        deleteCheck(workspace,0,0);
     }
 
 
@@ -189,8 +193,13 @@ public class ProblemVCFITCase {
         return tokens[tokens.length-1];
     }
 
-    public static void delete(String workspaceID)
-    {
+    public static void deleteCheck(String workspaceID, int errors, int warnings) throws IOException {
+        System.out.println("Checking Statistics: ");
+        SystemProperties sysprop = new SystemProperties();
+        String tmp = sysprop.get("TEMPDIR");
+        ErrorStats stats = VCFErrorFileUtils.calculateErrorStatistics(tmp + File.separator + workspaceID + ".errors");
+        assertEquals(errors, stats.getErrors());
+        assertEquals(warnings, stats.getWarnings());
         System.out.println("Deleting Workspace: " + workspaceID);
         Workspace w = new Workspace();
         w.deleteWorkspace(workspaceID);

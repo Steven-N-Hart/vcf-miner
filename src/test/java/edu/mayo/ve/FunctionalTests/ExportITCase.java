@@ -43,16 +43,15 @@ public class ExportITCase {
     @BeforeClass
     public static void init() throws IOException, ProcessTerminatedException {
         it = new ProblemVCFITCase();
-        load(vcf, false);
+        String workspace = load(vcf, false);
         //delete the file that this test creates, just to make sure everything is ok for the test.
         checkAndDelete(exportFile);
     }
 
     @AfterClass
-    public static void cleanup(){
-        delete(workspace);
-        //delete the file that was created in the test (clean up after yourself)
+    public static void cleanup() throws IOException {
         checkAndDelete(exportFile);
+        delete(workspace,0,495);  // wow lots of casting errors in this file!
     }
 
     /**
@@ -112,13 +111,14 @@ public class ExportITCase {
         }
     }
 
-    private static void load(String inputVCF, boolean reporting) throws IOException, ProcessTerminatedException {
+    private static String load(String inputVCF, boolean reporting) throws IOException, ProcessTerminatedException {
         workspace = it.load(vcf,reporting);
         System.out.println("workspace: " + workspace);
+        return workspace;
     }
 
-    private static void delete(String workspaceID){
-        ProblemVCFITCase.delete(workspaceID);
+    private static void delete(String workspaceID, int errors, int warnings) throws IOException {
+        ProblemVCFITCase.deleteCheck(workspaceID, errors, warnings);
     }
 
     private String getAlias(String path){

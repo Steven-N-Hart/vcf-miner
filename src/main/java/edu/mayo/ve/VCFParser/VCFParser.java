@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -28,6 +29,8 @@ import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
 import edu.mayo.pipes.history.HistoryInPipe;
 import edu.mayo.index.Index;
+import edu.mayo.senders.FileSender;
+import edu.mayo.senders.Sender;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.util.SystemProperties;
@@ -100,6 +103,19 @@ public class VCFParser implements ParserInterface {
         //parser.updateMetadata(workspace, "{ \"hosting\" : \"hostA\" , \"clients\" : \"888\" , \"type\" : \"vps\"}");
     }
 
+    /**
+     *
+     * @return  The path to an error file that will show all errors with the load
+     */
+    public String getErrorFile(String workspace){
+        try {
+            SystemProperties sysprops = new SystemProperties();
+            String tmp = sysprops.get("TEMPDIR");
+            return tmp + File.separator + workspace + ".errors";
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
 
     /** legacy interface, keep it in place for testing */
     public int parse(Task context, String infile, String workspace, int typeAheadCacheSize) throws ProcessTerminatedException {
@@ -128,7 +144,7 @@ public class VCFParser implements ParserInterface {
      * @return lines processed.
      */
     public int parse(String infile, String workspace) throws ProcessTerminatedException{
-
+        Sender sender = new FileSender(getErrorFile(workspace));
         if(reporting){ System.out.println("Getting the vcf-miner database from mongo"); }
         DB db = MongoConnection.getDB();
         if(reporting){ System.out.println("Getting the workspace collection from mongo"); }
@@ -142,7 +158,7 @@ public class VCFParser implements ParserInterface {
         }
         //make sure we have type-ahead indexed before wo go-ahead and do the load:
         typeAhead.index(true);
-        VCF2VariantPipe vcf 	= new VCF2VariantPipe(true, false);
+        VCF2VariantPipe vcf = new VCF2VariantPipe(sender, true, false);
         Pipe p = new Pipeline(new CatPipe(),
                              new ReplaceAllPipe("\\{",""),
                              new ReplaceAllPipe("\\}",""),
