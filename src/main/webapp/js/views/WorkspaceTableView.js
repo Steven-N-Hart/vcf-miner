@@ -10,7 +10,8 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
     events: {
         "click .show-analyses": "showAnalysesDropdown",
         "click .analyze": "analyze",
-        "click .delete": "deleteWorkspace"
+        "click .delete": "deleteWorkspace",
+        "click .errors": "showErrorsDialog"
     },
 
     ui: {
@@ -115,5 +116,18 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
             bScrollCollapse: true,
             bRetrieve: true
         });
+    },
+
+    showErrorsDialog: function(event) {
+        var button = $(event.currentTarget);
+
+        var workspaceKey = button.data("wks-key");
+        var workspaces = this.collection;
+        var workspace = workspaces.findWhere({key: workspaceKey});
+
+        var region = new Backbone.Marionette.Region({el: this.$el.find("#errors_modal")});
+        region.show(new ShowErrorsDialogLayout({
+            model: workspace
+        }));
     }
 });

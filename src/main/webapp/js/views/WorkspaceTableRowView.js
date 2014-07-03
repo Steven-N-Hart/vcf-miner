@@ -77,6 +77,8 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
             '</div>';
 
         var deleteButtonHtml = '<button data-wks-key="' + workspace.get("key") + '" class="btn delete">Delete</button>';
+        var errorsButtonHtml = '<button data-wks-key="' + workspace.get("key") + '" class="btn errors">Errors</button>';
+
         switch(workspace.get("status")) {
             case ReadyStatus.READY:
                 actionHtml = '<div style="white-space:nowrap;">' + loadButtonHtml + deleteButtonHtml + '</div>';
@@ -86,6 +88,11 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
                 break;
             default:
                 actionHtml = '';
+        }
+
+        // TODO: wire in logic for showing the errors button
+        if (true) {
+            actionHtml += errorsButtonHtml;
         }
 
         var alias = workspace.get("alias");
