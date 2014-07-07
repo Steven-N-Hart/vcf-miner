@@ -62,12 +62,16 @@ public class LoadWorker implements WorkerLogic {
             HashMap<String,String> context = (HashMap) t.getCommandContext();
             String workspace = context.get(Tokens.KEY);
             String loadfile = context.get(Tokens.VCF_LOAD_FILE);
+            MetaData meta = new MetaData();
             try {
                 long startTime = System.currentTimeMillis();
 
                 if(report) System.out.println("Setting up the mongo connection");
                 setMongo();
                 if(report) System.out.println("I am working on loading this file: " + loadfile);
+
+                //change the status from queued to loading:
+                meta.flagAsNotReady(workspace);
 
                 if(report) System.out.println("Setting up the parser...");
                 TypeAheadInterface thead = new TypeAheadCollection();
@@ -86,13 +90,16 @@ public class LoadWorker implements WorkerLogic {
                 //calculate and log the processing time
                 long endTime   = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
+                icontext.put("TimeElapsed", (int) totalTime);
                 //change to logger!
                 System.out.println("__LOADTIME__ Loading to workspace: " + workspace + " LOADFILE: " + loadfile + " total time (millis): " + totalTime);
+
+                //update the system's metadata with loading statistics
+                meta.updateLoadStatistics(workspace,icontext);
 
             }catch(Throwable e){   //this thread is working in the background... so we need to make sure that it outputs an error if one came up
                 //if(logStackTrace){ e.printStackTrace(); }
                 e.printStackTrace();
-                MetaData meta = new MetaData();
                 meta.flagAsFailed(workspace,"The Load Failed with Exception: " + e.getMessage());
             }
             //delete the load file

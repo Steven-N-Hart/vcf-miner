@@ -7,9 +7,15 @@ package edu.mayo.ve.resources;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import edu.mayo.util.MongoConnection;
+import edu.mayo.util.SystemProperties;
 import edu.mayo.util.Tokens;
+import edu.mayo.ve.VCFParser.ErrorStats;
+import edu.mayo.ve.VCFParser.VCFErrorFileUtils;
 
 import javax.ws.rs.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -53,6 +59,72 @@ public class MetaData {
         BasicDBObject bo = (BasicDBObject) JSON.parse("{ "+key+" :\"" + id + "\" }"); //JSON2BasicDBObject
         DBCursor dbc = coll.find(bo);
         return dbc.next();
+    }
+
+
+    public void updateLoadStatistics(String workspace, HashMap<String, Integer> context) throws IOException {
+        DB db = MongoConnection.getDB();
+        DBCollection col = db.getCollection(Tokens.METADATA_COLLECTION);
+
+        //get the current object in the workspace:
+        DBObject meta = queryMeta(Tokens.KEY, workspace);
+
+        BasicDBObject query = new BasicDBObject().append(Tokens.KEY, workspace);
+//        BasicDBObject update = new BasicDBObject();
+//
+        DBObject stats = constructStatsObject(workspace, castContext(context));
+        //place the stats object in the previous workspace metadata object
+        meta.put("STATISTICS", stats);
+        col.update(query,meta);
+//
+//        BasicDBObject bdbo = new BasicDBObject().append(Tokens.READY_TOKEN, readyStatus);
+//        bdbo.append("status",message);
+//        update.append("$set", bdbo);
+//        coll.update(query, update);
+
+//        System.out.println("workspace");
+//        System.out.println(workspaceID);
+//        System.out.println(coll.find(query).next().toString());
+
+    }
+
+    private HashMap<String,Long> castContext(HashMap<String, Integer> context){
+        HashMap<String,Long> newContext = new HashMap<String,Long>();
+        for(String key: context.keySet()){
+            try {
+                //System.out.println("key: " + key);
+                //System.out.println("value: " + context.get(key));
+                newContext.put(key, (long) context.get(key));
+            }catch (Exception e){
+                //don't care if we can't cast this thing... it is probably something like:
+                // {$oid=53bb055c4206583ff3ec6f4b}
+            }
+        }
+        return newContext;
+    }
+
+    /**
+     * constructs a DBObject with statistics for the file that was loaded and statistics for the errors/warnings found in the file.
+     * NOTE: This method can only be called once a VCF file is uploaded into the TEMPDIR (e.g. /tmp) with the error file next to it in
+     * the same directory
+     * @param workspace
+     */
+    public DBObject constructStatsObject(String workspace, HashMap<String,Long> context) throws IOException {
+        String errorFile = VCFErrorFileUtils.getLoadErrorFilePath(workspace);
+        ErrorStats estats = VCFErrorFileUtils.calculateErrorStatistics(errorFile);
+        DBObject stats = new BasicDBObject();
+        stats.put("ERRORS", (long) estats.getErrors());
+        stats.put("WARNINGS", (long) estats.getWarnings());
+        File f = new File(errorFile.replaceAll("\\.errors$",""));
+        long filesize = 0;
+        if(f.exists()){
+            filesize = f.length();
+        }
+        stats.put("VCF_FILE_SIZE", filesize);
+        for(String key : context.keySet()){
+            stats.put(key, context.get(key));
+        }
+        return stats;
     }
 
 
@@ -102,6 +174,22 @@ public class MetaData {
     @Produces("application/json")
     public String flagAsReady(@PathParam("workspaceid") String workspaceID){
         return flag(workspaceID, "workspace is ready", 1);
+    }
+
+
+    /**
+     * If a workspace is flaged as ready, the ready token will have a value of 1 to indicate it is ready
+     * do something like:
+     * db.meta.update({"key": "wa49233e327247200efecf0c0968f8bc23aa3eb96"},{$set:{"ready":1}})
+     *
+     * for a given workspace, change the ready flag to ready (used by VCFParser and other loaders to tell when a workspace is indexed)
+     * @param workspaceID
+     */
+    @POST
+    @Path("/flagAsQueued/w/{workspaceid}")
+    @Produces("application/json")
+    public String flagAsQueued(@PathParam("workspaceid") String workspaceID){
+        return flag(workspaceID, "workspace is queued for loading", 2);
     }
 
 

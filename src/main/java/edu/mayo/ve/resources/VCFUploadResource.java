@@ -237,7 +237,7 @@ public class VCFUploadResource {
         //set the workspace's status to not ready
         if(reportingset){System.out.println("Setting the workspace status to not ready: ");}
         MetaData meta = new MetaData();
-        meta.flagAsNotReady(workspace);
+        meta.flagAsQueued(workspace);
 
         if(turnOffLoading==false){
             wp.addTask(t);           //this will add the UUID to the task
@@ -282,7 +282,7 @@ public class VCFUploadResource {
             String wkspID =(String) workspaceMeta.get(Tokens.KEY);
             //set the workspace's status to not ready
             MetaData meta = new MetaData();
-            meta.flagAsNotReady(wkspID);
+            meta.flagAsQueued(wkspID);
             String uploadedFileLocation = setUploadFileLocation(this.getFileRoot(), wkspID, compression);
 
             if(reportingset){

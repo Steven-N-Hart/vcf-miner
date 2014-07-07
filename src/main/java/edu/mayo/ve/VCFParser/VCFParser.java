@@ -64,8 +64,8 @@ public class VCFParser implements ParserInterface {
     /** @param reporting - if verbose output is desired (much slower and not for production use, use when debugging) */
     private boolean reporting = false;
 
-    private Double initialLinePerformance;
-    private Double averageLinePerformance;
+    private Double initialLinePerformance = 0.0;
+    private Double averageLinePerformance = 0.0;
 
     public static void usage(){
             System.out.println("This program will parse a VCF file, obtain the 'schema' for that VCF and populate a MongoDB database with the variants in the VCF.");
@@ -157,7 +157,7 @@ public class VCFParser implements ParserInterface {
             System.out.println("Reporting: " + reporting);
         }
         //make sure we have type-ahead indexed before wo go-ahead and do the load:
-        typeAhead.index(true);
+        typeAhead.index(reporting);
         VCF2VariantPipe vcf = new VCF2VariantPipe(sender, true, false);
         Pipe p = new Pipeline(new CatPipe(),
                              new ReplaceAllPipe("\\{",""),
