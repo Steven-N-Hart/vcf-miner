@@ -125,6 +125,8 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
                 return "Available";
             case ReadyStatus.FAILED:
                 return "Failed";
+            case ReadyStatus.QUEUED:
+                return "Queued";
             default:
                 return "NA";
         }
