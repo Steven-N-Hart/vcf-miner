@@ -65,7 +65,7 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
      */
     toAaDataRow: function(workspace) {
         var id = workspace.get("id");
-        var actionHtml;
+        var actionHtml = '<div style="white-space:nowrap;">';
 
         var loadButtonHtml =
             '<div class="btn-group">' +
@@ -77,23 +77,24 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
             '</div>';
 
         var deleteButtonHtml = '<button data-wks-key="' + workspace.get("key") + '" class="btn delete">Delete</button>';
-        var errorsButtonHtml = '<button data-wks-key="' + workspace.get("key") + '" class="btn errors">Errors</button>';
 
         switch(workspace.get("status")) {
             case ReadyStatus.READY:
-                actionHtml = '<div style="white-space:nowrap;">' + loadButtonHtml + deleteButtonHtml + '</div>';
+                actionHtml += loadButtonHtml + deleteButtonHtml;
                 break;
             case ReadyStatus.FAILED:
-                actionHtml = deleteButtonHtml;
+                actionHtml += deleteButtonHtml;
                 break;
-            default:
-                actionHtml = '';
         }
 
-        // TODO: wire in logic for showing the errors button
-        if (true) {
-            actionHtml += errorsButtonHtml;
+        // show error button only if there are errors or warnings
+        var errorAndWarningCount = workspace.get("statsErrors") + workspace.get("statsWarnings");
+        if (errorAndWarningCount > 0) {
+            actionHtml += '<button data-wks-key="' + workspace.get("key") + '" class="btn error errors">Errors ('+errorAndWarningCount+')</button>';
         }
+
+        // close nowrap div
+        actionHtml += '</div>';
 
         var alias = workspace.get("alias");
         var aliasHtml = "<div class='ellipsis' title='"+alias+"'>"+alias+"</div>";

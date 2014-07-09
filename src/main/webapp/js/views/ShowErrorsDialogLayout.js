@@ -32,16 +32,31 @@ ShowErrorsDialogLayout = Backbone.Marionette.Layout.extend({
 
         var numLines = this.ui.numLinesField.val();
 
-        // TODO: perform AJAX HTTP GET to server to get content
-        var content = 'Preview of the first ' + numLines + ' lines from ' + this.model.get("alias");
+        var key = this.model.get("key");
 
-        this.ui.previewTextArea.text(content);
+        var self = this;
+        $.ajax({
+            url: "/mongo_svr/error/download/w/"+key+"/n/"+numLines,
+            dataType: "text",
+            success: function(lines) {
+                // TODO: perform AJAX HTTP GET to server to get content
+//                var content = 'Preview of the first ' + numLines + ' lines from ' + this.model.get("alias");
+                self.ui.previewTextArea.text(lines);
+            },
+            error: function(jqXHR) {
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+            }
+        });
     },
 
     /**
      * Download entire error log to filesystem.
      */
     download: function() {
-        // TODO: perform AJAX HTTP call to get entire file
+        var errorAndWarningCount = this.model.get("statsErrors") + this.model.get("statsWarnings");
+
+        var url="/mongo_svr/error/download/w/"+this.model.get("key")+"/n/"+errorAndWarningCount;
+
+        window.open(url,'_blank');
     }
 });

@@ -153,6 +153,11 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         ws.set("status", workspaceJSON.ready);
         ws.set("date", getDateString(workspaceJSON.timestamp));
 
+        if (workspaceJSON.STATISTICS != undefined) {
+            ws.set("statsErrors", parseInt(workspaceJSON.STATISTICS.ERRORS));
+            ws.set("statsWarnings", parseInt(workspaceJSON.STATISTICS.WARNINGS));
+        }
+
         // load extra information about workspace
         this.loadMetadata(ws);
         this.loadSampleGroups(ws);

@@ -19,7 +19,9 @@ var Workspace = Backbone.Model.extend({
             id:     guid(),
             dataFields: new VCFDataFieldList(),
             sampleNames: new Array(),
-            sampleGroups: new SampleGroupList()
+            sampleGroups: new SampleGroupList(),
+            statsErrors: 0,
+            statsWarnings: 0
         };
     }
 });
