@@ -156,6 +156,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         if (workspaceJSON.STATISTICS != undefined) {
             ws.set("statsErrors", parseInt(workspaceJSON.STATISTICS.ERRORS));
             ws.set("statsWarnings", parseInt(workspaceJSON.STATISTICS.WARNINGS));
+            ws.set("statsNumVariants", parseInt(workspaceJSON.STATISTICS.data_line_count));
         }
 
         // load extra information about workspace

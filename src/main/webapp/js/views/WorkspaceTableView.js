@@ -114,7 +114,8 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
             iDisplayLength: 25,
             bAutoWidth: false,
             bScrollCollapse: true,
-            bRetrieve: true
+            bRetrieve: true,
+            aaSorting: [[ 2, "desc" ]] // order on the date column descending
         });
     },
 

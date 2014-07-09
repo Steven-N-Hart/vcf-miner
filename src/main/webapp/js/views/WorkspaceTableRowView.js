@@ -104,7 +104,8 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
             "0": aliasHtml,
             "1": this.getDisplayStatus(workspace),
             "2": workspace.get("date"),
-            "3": actionHtml
+            "3": workspace.get("statsNumVariants"),
+            "4": actionHtml
         };
 
         return aaDataRow;

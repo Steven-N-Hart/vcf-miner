@@ -21,7 +21,8 @@ var Workspace = Backbone.Model.extend({
             sampleNames: new Array(),
             sampleGroups: new SampleGroupList(),
             statsErrors: 0,
-            statsWarnings: 0
+            statsWarnings: 0,
+            statsNumVariants: 0
         };
     }
 });
