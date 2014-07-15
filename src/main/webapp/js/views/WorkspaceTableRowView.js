@@ -65,7 +65,7 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
      */
     toAaDataRow: function(workspace) {
         var id = workspace.get("id");
-        var actionHtml = '<div style="white-space:nowrap;">';
+        var actionHtml = '<div style="white-space:normal;">';
 
         var loadButtonHtml =
             '<div class="btn-group">' +
@@ -103,7 +103,7 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
             "DT_RowId": workspace.get("id"),
             "0": aliasHtml,
             "1": this.getDisplayStatus(workspace),
-            "2": workspace.get("date"),
+            "2": "<div style='white-space:normal;'>"+workspace.get("date")+"</div>",
             "3": workspace.get("statsNumVariants"),
             "4": actionHtml
         };
