@@ -25,7 +25,7 @@
         <module name="mongo_svr" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="1.6">
+    <bytecodeTargetLevel>
       <module name="mongo_svr" target="1.6" />
     </bytecodeTargetLevel>
   </component>
