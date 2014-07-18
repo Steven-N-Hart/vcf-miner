@@ -22,9 +22,15 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="mongo_svr" />
         <module name="mongo_view" />
+        <module name="securityuserapp" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="mongo_svr" target="1.6" />
+      <module name="securityuserapp" target="1.6" />
+    </bytecodeTargetLevel>
   </component>
 </project>
 
