@@ -1,12 +1,5 @@
-User = Backbone.Model.extend({
-    defaults: function() {
-
-        return {
-            username: 'username',
-            nameFirst: 'nameFirst',
-            nameLast:  'nameLast',
-            email: 'email'
-        };
-
-    }
-});
+/**
+ * Derived from server-side edu.mayo.securityuserapp.dbobjects.User
+ * @type {*}
+ */
+User = Backbone.Model.extend({});
