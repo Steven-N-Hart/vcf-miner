@@ -246,6 +246,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
         // setup HTTP request header key/value pairs
         xhr.setRequestHeader('file-compression', uploadFile.name);
+        xhr.setRequestHeader('usertoken', MongoApp.user.get("token"));
 
         xhr.onload = function(oEvent) {
             if (xhr.status == 200) {
