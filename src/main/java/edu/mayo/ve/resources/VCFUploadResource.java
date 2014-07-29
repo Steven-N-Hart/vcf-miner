@@ -18,7 +18,10 @@ import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.pipes.Factories.InputStreamBufferedReaderFactory;
 import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.pipes.iterators.Compressor;
+import edu.mayo.securityuserapp.client.PermissionMgmtClient;
+import edu.mayo.securityuserapp.client.ResourceMgmtClient;
 import edu.mayo.util.Tokens;
+import edu.mayo.ve.SecurityUserAppHelper;
 import edu.mayo.ve.VCFLoaderPool;
 import edu.mayo.ve.VCFParser.LoadWorker;
 import edu.mayo.util.SystemProperties;
@@ -43,19 +46,21 @@ public class VCFUploadResource {
     private static int maxTypeAheadCache = 1000;
     private static boolean turnOffLoading = false;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         VCFUploadResource uploadResource = new VCFUploadResource();
         LoadWorker logic = new LoadWorker(new VCFParser(), maxTypeAheadCache);//do we want to let them pass this value?
         WorkerPool wp = new WorkerPool(logic, 1);
         VCFLoaderPool.setWp(wp);
         WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
         InputStream is = new FileInputStream("src/test/resources/testData/httpExample.vcf");
-        uploadResource.uploadFileNoReport("steve", "foo","", is);  //an example if there is no compression
+        uploadResource.uploadFileNoReport("steve", "foo","","userToken???", is);  //an example if there is no compression
     }
 
     //define something incase sysproperties does not exist
     //public static final String UPLOAD_DIR = "/tmp";
     private static boolean init = false;
+
+    private SecurityUserAppHelper securityHelper;
 
     public VCFUploadResource() throws IOException {
         if(!init){
@@ -64,14 +69,16 @@ public class VCFUploadResource {
             if(sysprop.get(Tokens.TYPE_AHEAD_OVERUN) != null){
                 maxTypeAheadCache = new Integer(sysprop.get(Tokens.TYPE_AHEAD_OVERUN));  //user may even want to configure this paramater via REST, for now at least it is in a property file
             }
+
+            securityHelper = new SecurityUserAppHelper(sysprop);
         }
     }
 
-        @GET
-        @Produces(MediaType.TEXT_PLAIN)
-        public String get() {
-            return "Welcome to the REST Server! \nREST endpoints are ready and File Upload Resource Ready";
-        }
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String get() {
+        return "Welcome to the REST Server! \nREST endpoints are ready and File Upload Resource Ready";
+    }
 
     /**
      * service path
@@ -104,13 +111,14 @@ public class VCFUploadResource {
             @PathParam("user") String user,
             @PathParam("alias") String alias,
             @HeaderParam("file-compression") String compression,
+            @HeaderParam("usertoken") String userToken,
             @FormDataParam("file") InputStream uploadedInputStream
-    ) throws IOException {
+    ) throws Exception {
         if(reportingset == true){
             VCFLoaderPool.reset(maxTypeAheadCache);
             reportingset = false;
         }
-        return uploadFile(user,alias,"FALSE",compression,uploadedInputStream);
+        return uploadFile(user,alias,"FALSE",compression,userToken,uploadedInputStream);
     }
 
     /**
@@ -263,8 +271,9 @@ public class VCFUploadResource {
                 @PathParam("alias") String alias,
                 @PathParam("reporting") String reporting,
                 @HeaderParam("file-compression") String compression,
+                @HeaderParam("usertoken") String userToken,
                 @FormDataParam("file") InputStream uploadedInputStream
-           ) throws IOException {
+           ) throws Exception {
 
             if(reporting.equalsIgnoreCase("TRUE")){
                 if(reportingset == false){
@@ -280,6 +289,9 @@ public class VCFUploadResource {
             String json = provision.provision(user, alias);
             HashMap workspaceMeta = gson.fromJson(json, java.util.HashMap.class);
             String wkspID =(String) workspaceMeta.get(Tokens.KEY);
+
+            securityHelper.registerWorkspace(userToken, wkspID);
+
             //set the workspace's status to not ready
             MetaData meta = new MetaData();
             meta.flagAsQueued(wkspID);
@@ -489,5 +501,12 @@ public class VCFUploadResource {
         }
     }
 
+    private ResourceMgmtClient getResourceMgmtClient() {
+        return null;
+    }
+
+    private PermissionMgmtClient getPermissionsMgmtClient() {
+        return null;
+    }
 
 }
