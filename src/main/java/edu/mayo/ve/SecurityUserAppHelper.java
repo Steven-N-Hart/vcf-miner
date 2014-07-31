@@ -94,6 +94,9 @@ public class SecurityUserAppHelper {
         soloGroupAccess.userOrGroupId = soloGroup.id;
         soloGroupAccess.isUser = false;
         soloGroupAccess.actions = new String[0];
+        soloGroupAccess.isReadAuthority = true;
+        soloGroupAccess.isWriteAuthority = true;
+        soloGroupAccess.isExecuteAuthority = true;
         permissionMgmtClient.setPermissions(userToken, soloGroupAccess);
     }
 
