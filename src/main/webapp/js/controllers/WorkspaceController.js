@@ -10,6 +10,12 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     workspaces: new WorkspaceList(),
 
     /**
+     * Keys of workspaces allowed in {@link WorkspaceController.workspaces}
+     * NULL indicates that all workspaces are allowed.
+     */
+    filterKeys: null,
+
+    /**
      * Array of strings that represent user names.
      */
     users: new Array(),
@@ -99,6 +105,34 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     },
 
     /**
+     * Show workspace group dropdown
+     *
+     * @param options
+     */
+    showWorkspaceGroupDropdown: function (options) {
+
+        var workspaceGroupLayout = new WorkspaceDropdownView({
+            collection: MongoApp.userGroups
+        });
+        options.region.show(workspaceGroupLayout);
+
+        var self = this;
+        this.listenTo(workspaceGroupLayout, workspaceGroupLayout.EVENT_ALL_GROUPS, function (userGroups) {
+            self.filterKeys = null;
+            self.refreshAllWorkspaces();
+        });
+        this.listenTo(workspaceGroupLayout, workspaceGroupLayout.EVENT_ONE_GROUP, function (userGroup) {
+            var userToken = MongoApp.user.get("token");
+            try {
+                self.filterKeys = MongoApp.securityController.getAuthorizedWorkspaceKeys(userToken, userGroup);
+                self.refreshAllWorkspaces();
+            } catch (e) {
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, e.responseText);
+            }
+        });
+    },
+
+    /**
      * Refreshes the Backbone collection of workspaces by querying the server.
      */
     refreshAllWorkspaces: function() {
@@ -125,17 +159,20 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
                             var workspaceJSON = json[attr];
 
-                            var ws = new Workspace();
+                            // check filtered keys
+                            if ((self.filterKeys == null) || _.contains(self.filterKeys, workspaceJSON.key)) {
+                                var ws = new Workspace();
 
-                            self.initWorkspace(user, workspaceJSON, ws);
+                                self.initWorkspace(user, workspaceJSON, ws);
 
-                            self.workspaces.add(ws);
+                                self.workspaces.add(ws);
 
-                            // auto-update if the workspace is 'not ready' or 'queued'
-                            if (((ws.get("status") == ReadyStatus.NOT_READY) || (ws.get("status") == ReadyStatus.QUEUED))
-                                && ($.inArray(ws.get("key"), self.notReadyKeys) == -1)) {
-                                console.log("Adding auto-updates for key "  + ws.get("key"));
-                                self.notReadyKeys.push(ws.get("key"));
+                                // auto-update if the workspace is 'not ready' or 'queued'
+                                if (((ws.get("status") == ReadyStatus.NOT_READY) || (ws.get("status") == ReadyStatus.QUEUED))
+                                    && ($.inArray(ws.get("key"), self.notReadyKeys) == -1)) {
+                                    console.log("Adding auto-updates for key "  + ws.get("key"));
+                                    self.notReadyKeys.push(ws.get("key"));
+                                }
                             }
                         }
                     }
