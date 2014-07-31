@@ -127,10 +127,12 @@ MongoApp.addInitializer(function () {
     var self = this;
 
     this.user = new User();
+    this.userGroups = new UserGroupList();
 
-    this.listenTo(MongoApp.dispatcher, MongoApp.events.LOGIN_SUCCESS, function (user) {
+    this.listenTo(MongoApp.dispatcher, MongoApp.events.LOGIN_SUCCESS, function (user, userGroups) {
 
         self.user.set(user.attributes);
+        self.userGroups.add(userGroups.models);
 
         MongoApp.mainRegion.show(new MainLayout());
     });
@@ -138,6 +140,7 @@ MongoApp.addInitializer(function () {
     this.listenTo(MongoApp.dispatcher, MongoApp.events.LOGOUT_SUCCESS, function () {
 
         self.user = new User();
+        self.userGroups.reset();
 
         // show login page
         self.securityController.showLogin({region: MongoApp.mainRegion });
