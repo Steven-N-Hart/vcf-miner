@@ -69,9 +69,9 @@ public class VCFUploadResource {
             if(sysprop.get(Tokens.TYPE_AHEAD_OVERUN) != null){
                 maxTypeAheadCache = new Integer(sysprop.get(Tokens.TYPE_AHEAD_OVERUN));  //user may even want to configure this paramater via REST, for now at least it is in a property file
             }
-
-            securityHelper = new SecurityUserAppHelper(sysprop);
         }
+
+        securityHelper = new SecurityUserAppHelper(sysprop);
     }
 
     @GET
