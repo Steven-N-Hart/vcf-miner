@@ -41,6 +41,9 @@ MongoApp.addInitializer(function () {
         // user successfully logged out
         LOGOUT_SUCCESS: 'logoutSuccess',
 
+        // current user model has been changed
+        USER_CHANGED: 'userChanged',
+
         // User is choosing a different workspace
         WKSP_LOAD: 'workspaceLoad',
 
@@ -133,6 +136,7 @@ MongoApp.addInitializer(function () {
 
         self.user.set(user.attributes);
         self.userGroups.add(userGroups.models);
+        MongoApp.dispatcher.trigger(MongoApp.events.USER_CHANGED, self.user);
 
         MongoApp.mainRegion.show(new MainLayout());
     });
