@@ -19,7 +19,7 @@ SecurityController = Backbone.Marionette.Controller.extend({
     },
 
     /**
-     * Authenticates the user
+     * Authenticates the user and initializes stuff in the UserSecurityApp upon successful authentication.
      *
      * @param username
      * @param password
@@ -35,8 +35,20 @@ SecurityController = Backbone.Marionette.Controller.extend({
             dataType: "json",
             success: function(authResponse) {
                 if (authResponse.isAuthenticated) {
-                    console.log("login successful");
-                    self.initUser(authResponse.userToken, username);
+
+                    try {
+                        var user = self.initUser(authResponse.userToken, username);
+                        var userGroups = self.getGroupsForLoggedInUser(authResponse.userToken);
+
+                        // delegate further action by firing a LOGIN_SUCCESS event.
+                        console.log("login successful");
+                        MongoApp.dispatcher.trigger(MongoApp.events.LOGIN_SUCCESS, user, userGroups);
+
+                    } catch (e) {
+                        console.log("user initialization failed");
+                        MongoApp.dispatcher.trigger(MongoApp.events.ERROR, e.responseText);
+                    }
+
                 } else {
                     console.log("login failed");
                     MongoApp.dispatcher.trigger(MongoApp.events.LOGIN_FAILED);
@@ -48,6 +60,17 @@ SecurityController = Backbone.Marionette.Controller.extend({
         });
     },
 
+    /**
+     * Initializes the user in the UserSecurityApp backend web application.
+     *
+     * @param userToken
+     * @param username
+     *
+     * @return
+     *      An initialized {@link User} backbone model.
+     *
+     * @throws AJAXRequestException
+     */
     initUser: function(userToken, username) {
 
         var user = this.getUser(userToken, username);
@@ -67,8 +90,7 @@ SecurityController = Backbone.Marionette.Controller.extend({
             }
         }
 
-        // delegate further action by firing a LOGIN_SUCCESS event.
-        MongoApp.dispatcher.trigger(MongoApp.events.LOGIN_SUCCESS, user);
+        return user;
     },
 
     /**
@@ -88,8 +110,9 @@ SecurityController = Backbone.Marionette.Controller.extend({
      *
      * NOTE: This function is synchronous.
      *
-     * @param username
      * @param userToken
+     * @param username
+     * @throws AJAXRequestException
      */
     getUser: function(userToken, username) {
 
@@ -106,8 +129,8 @@ SecurityController = Backbone.Marionette.Controller.extend({
                 // init Backbone model
                 user = new User(json);
             },
-            error: function(jqXHR ) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+            error: function(jqXHR, textStatus, errorThrown) {
+                throw new AJAXRequestException(jqXHR, textStatus, errorThrown);
             }
         });
 
@@ -140,9 +163,15 @@ SecurityController = Backbone.Marionette.Controller.extend({
     },
 
     /**
-     * Fetches the groups for the user that is currently signed into the system.
+     * Gets a {@link UserGroupList} backbone collection for the user that is currently signed into the system.
      *
      * NOTE: this call is synchronous
+     *
+     * @param userToken
+     *
+     * @returns TODO
+     *
+     * @throws AJAXRequestException
      */
     getGroupsForLoggedInUser: function(userToken) {
 
@@ -164,8 +193,8 @@ SecurityController = Backbone.Marionette.Controller.extend({
                 }
 
             },
-            error: function(jqXHR) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+            error: function(jqXHR, textStatus, errorThrown) {
+                throw new AJAXRequestException(jqXHR, textStatus, errorThrown);
             }
         });
 
@@ -177,7 +206,9 @@ SecurityController = Backbone.Marionette.Controller.extend({
      *
      * NOTE: this call is synchronous
      *
-     * @returns A new UserGroup backbone model on success.  NULL on failure.
+     * @returns A new UserGroup backbone model on success.
+     *
+     * @throws AJAXRequestException
      */
     createGroup: function(userToken, groupName) {
 
@@ -193,10 +224,9 @@ SecurityController = Backbone.Marionette.Controller.extend({
             success: function(groupJSON) {
                 console.debug("Created new group " + groupName);
                 group = new UserGroup(groupJSON);
-
             },
-            error: function(jqXHR) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+            error: function(jqXHR, textStatus, errorThrown) {
+                throw new AJAXRequestException(jqXHR, textStatus, errorThrown);
             }
         });
 
@@ -204,9 +234,11 @@ SecurityController = Backbone.Marionette.Controller.extend({
     },
 
     /**
-     * Creates a new group on the server.
+     * Adds the given user to the group.
      *
      * NOTE: this call is synchronous
+     *
+     * @throws AJAXRequestException
      */
     addUserToGroup: function(userToken, groupName, userName) {
 
@@ -220,10 +252,43 @@ SecurityController = Backbone.Marionette.Controller.extend({
             success: function() {
                 console.debug("Added user " + userName + " to " + groupName);
             },
-            error: function(jqXHR) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+            error: function(jqXHR, textStatus, errorThrown) {
+                throw new AJAXRequestException(jqXHR, textStatus, errorThrown);
             }
         });
-    }
+    },
 
+    /**
+     * Gets workspace keys authorized to the specified group.
+     *
+     * @param userGroup
+     *
+     * @return
+     *      An {@link Array} of strings, each string representing a workspace key.
+     *
+     * @throws AJAXRequestException
+     */
+    getAuthorizedWorkspaceKeys: function(userToken, userGroup) {
+
+        var workspaceKeys = new Array();
+
+        $.ajax({
+            type: "POST",
+            url: "/securityuserapp/api/resources/forgroup",
+            headers: {usertoken: userToken},
+            data: {groupname: userGroup.get("groupName")},
+            dataType: "json",
+            async: false,
+            success: function(permissions) {
+                for (var i = 0; i < permissions.length; i++) {
+                    workspaceKeys.push(permissions[i].key);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                throw new AJAXRequestException(jqXHR, textStatus, errorThrown);
+            }
+        });
+
+        return workspaceKeys;
+    }
 });
