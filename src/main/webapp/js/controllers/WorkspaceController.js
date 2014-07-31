@@ -16,11 +16,6 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     filterKeys: null,
 
     /**
-     * Array of strings that represent user names.
-     */
-    users: new Array(),
-
-    /**
      * Array of workspace keys that should be updated automatically
      */
     notReadyKeys: new Array(),
@@ -36,10 +31,6 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_GROUP_CREATE, function (group, workspace) {
             self.createSampleGroup(group, workspace);
         });
-
-        // TODO: users hardcoded
-        this.users.push('steve');
-        this.users.push('dan');
 
         // automatic polling to update "not ready" workspaces
         var TIMER_INTERVAL = 10000; // 10 seconds
@@ -130,6 +121,10 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 MongoApp.dispatcher.trigger(MongoApp.events.ERROR, e.responseText);
             }
         });
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.USER_CHANGED, function () {
+            self.filterKeys = null;
+        });
+
     },
 
     /**
@@ -144,51 +139,47 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         // clear out workspaces
         this.workspaces.reset();
 
-        // perform REST call per-user
-        for (var i = 0; i < this.users.length; i++) {
-            var user = this.users[i];
-            // get workspace information from server
-            $.ajax({
-                url: "/mongo_svr/ve/q/owner/list_workspaces/" + user,
-                dataType: "json",
-                success: function(json) {
+        // get workspace information from server
+        $.ajax({
+            url: "/mongo_svr/ve/q/owner/list_workspaces/" + MongoApp.user.get("username"),
+            headers: {usertoken: MongoApp.user.get("token")},
+            dataType: "json",
+            success: function(json) {
 
-                    // each workspace object has an increment num as the attr name
-                    for (var attr in json) {
-                        if (json.hasOwnProperty(attr)) {
+                // each workspace object has an increment num as the attr name
+                for (var attr in json) {
+                    if (json.hasOwnProperty(attr)) {
 
-                            var workspaceJSON = json[attr];
+                        var workspaceJSON = json[attr];
 
-                            // check filtered keys
-                            if ((self.filterKeys == null) || _.contains(self.filterKeys, workspaceJSON.key)) {
-                                var ws = new Workspace();
+                        // check filtered keys
+                        if ((self.filterKeys == null) || _.contains(self.filterKeys, workspaceJSON.key)) {
+                            var ws = new Workspace();
 
-                                self.initWorkspace(user, workspaceJSON, ws);
+                            self.initWorkspace(workspaceJSON, ws);
 
-                                self.workspaces.add(ws);
+                            self.workspaces.add(ws);
 
-                                // auto-update if the workspace is 'not ready' or 'queued'
-                                if (((ws.get("status") == ReadyStatus.NOT_READY) || (ws.get("status") == ReadyStatus.QUEUED))
-                                    && ($.inArray(ws.get("key"), self.notReadyKeys) == -1)) {
-                                    console.log("Adding auto-updates for key "  + ws.get("key"));
-                                    self.notReadyKeys.push(ws.get("key"));
-                                }
+                            // auto-update if the workspace is 'not ready' or 'queued'
+                            if (((ws.get("status") == ReadyStatus.NOT_READY) || (ws.get("status") == ReadyStatus.QUEUED))
+                                && ($.inArray(ws.get("key"), self.notReadyKeys) == -1)) {
+                                console.log("Adding auto-updates for key "  + ws.get("key"));
+                                self.notReadyKeys.push(ws.get("key"));
                             }
                         }
                     }
-                },
-                error: function(jqXHR, textStatus) {
-                    MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
                 }
-            });
-        }
+            },
+            error: function(jqXHR, textStatus) {
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+            }
+        });
     },
 
-    initWorkspace: function(user, workspaceJSON, ws) {
+    initWorkspace: function(workspaceJSON, ws) {
         // each workspace object has an increment num as the attr name
         ws.set("key",   workspaceJSON.key);
         ws.set("alias", workspaceJSON.alias);
-        ws.set("user",  user);
         ws.set("status", workspaceJSON.ready);
         ws.set("date", getDateString(workspaceJSON.timestamp));
 
@@ -211,44 +202,41 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
             return;
         }
 
-        // perform REST call per-user
-        for (var i = 0; i < this.users.length; i++) {
-            var user = this.users[i];
-            // get workspace information from server
-            $.ajax({
-                url: "/mongo_svr/ve/q/owner/list_workspaces/" + user,
-                dataType: "json",
-                success: function(json) {
+        // get workspace information from server
+        $.ajax({
+            url: "/mongo_svr/ve/q/owner/list_workspaces/" + MongoApp.user.get("username"),
+            dataType: "json",
+            headers: {usertoken: MongoApp.user.get("token")},
+            success: function(json) {
 
-                    // each workspace object has an increment num as the attr name
-                    for (var attr in json) {
-                        if (json.hasOwnProperty(attr)) {
-                            var workspaceJSON = json[attr];
-                            var key = workspaceJSON.key;
+                // each workspace object has an increment num as the attr name
+                for (var attr in json) {
+                    if (json.hasOwnProperty(attr)) {
+                        var workspaceJSON = json[attr];
+                        var key = workspaceJSON.key;
 
-                            if($.inArray(key, self.notReadyKeys) != -1) {
-                                console.log("updating status for key " + key);
-                                var ws = self.workspaces.findWhere({key: key});
-                                self.initWorkspace(user, workspaceJSON, ws);
+                        if($.inArray(key, self.notReadyKeys) != -1) {
+                            console.log("updating status for key " + key);
+                            var ws = self.workspaces.findWhere({key: key});
+                            self.initWorkspace(workspaceJSON, ws);
 
-                                if ((ws.get("status") == ReadyStatus.READY) ||
-                                    (ws.get("status") == ReadyStatus.FAILED)) {
-                                    // delete key
-                                    var index = self.notReadyKeys.indexOf(key);
-                                    if (index > -1) {
-                                        self.notReadyKeys.splice(index, 1);
-                                    }
-                                    console.log("Removing auto-updates for key "  + key);
+                            if ((ws.get("status") == ReadyStatus.READY) ||
+                                (ws.get("status") == ReadyStatus.FAILED)) {
+                                // delete key
+                                var index = self.notReadyKeys.indexOf(key);
+                                if (index > -1) {
+                                    self.notReadyKeys.splice(index, 1);
                                 }
+                                console.log("Removing auto-updates for key "  + key);
                             }
                         }
                     }
-                },
-                error: function(jqXHR, textStatus) {
-                    MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
                 }
-            });
-        }
+            },
+            error: function(jqXHR, textStatus) {
+                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
+            }
+        });
     },
 
     /**
@@ -258,9 +246,6 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         $("#progress").css('width','0%');
-
-        // TODO: hardcoded user
-        var user = 'steve';
 
         var uploadFile = $( '#vcf_file_upload' )[0].files[0]
 
@@ -279,7 +264,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
         xhr.upload.addEventListener("progress", updateProgress, false);
 
-        xhr.open('POST', "/mongo_svr/uploadvcf/user/" + user + "/alias/" + name, true);
+        xhr.open('POST', "/mongo_svr/uploadvcf/user/" + MongoApp.user.get("username") + "/alias/" + name, true);
 
         // setup HTTP request header key/value pairs
         xhr.setRequestHeader('file-compression', uploadFile.name);
