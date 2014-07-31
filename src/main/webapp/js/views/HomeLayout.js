@@ -3,6 +3,7 @@ HomeLayout = Backbone.Marionette.Layout.extend({
     template: "#home-layout-template",
 
     regions: {
+        workspaceGroupRegion:  '#workspaceGroupRegion',
         workspaceRegion:  '#workspaceRegion'
     },
 
@@ -15,7 +16,7 @@ HomeLayout = Backbone.Marionette.Layout.extend({
     onShow: function() {
 
         MongoApp.workspaceController.showWorkspaceTable({region: this.workspaceRegion });
+        MongoApp.workspaceController.showWorkspaceGroupDropdown({region: this.workspaceGroupRegion });
 
     }
-
 });
