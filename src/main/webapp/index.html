@@ -231,12 +231,7 @@
                             <div class="row-fluid">
                                 <div class="well">
                                     <div class="pull-left">
-                                        <p>Showing <select>
-                                            <option value='?'>ALL VCF files</option>
-                                            <option value='?'>My Imported VCF files</option>
-                                            <option value='?'>Dr. Doe's Lab</option>
-                                            <option value='?'>Informatics Specialists</option>
-                                        </select></p>
+                                        <div id="workspaceGroupRegion"></div>
                                     </div>
 
                                     <!-- the CSS style "row" conflicts between Bootstrap and DataTables adding a "-20px" left margin -->
@@ -263,6 +258,21 @@
                 </tr>
             </table>
         </div>
+    </script>
+
+    <script id="workspace-group-dropdown-template" type="text/template">
+        <p>Showing <select>
+            <option value='ALL_GROUPS'>All VCF Files</option> <!-- Special Group that represents a union of all groups -->
+            <% _.each(items, function(item){ %>
+                <option value='<%=item.id%>'>
+                    <% if(item.groupName.substring(item.groupName.length - 11) == ".solo.group"){ %>
+                    My Imported VCF files
+                    <% } else { %>
+                    <%=item.groupName%>
+                    <% } %>
+                </option>
+            <% }); %>
+        </select></p>
     </script>
 
     <script id="settings-layout-template" type="text/template">
@@ -1146,6 +1156,7 @@
     <script src="js/customized-bootstrap-dropdown-checkbox.js" type="text/javascript"></script>
 
     <!-- Marionette Application -->
+    <script src="js/AJAXRequestException.js"></script>
     <script src="js/models/User.js"></script>
     <script src="js/models/UserGroup.js"></script>
     <script src="js/models/Search.js"></script>
@@ -1154,6 +1165,8 @@
     <script src="js/views/LoginLayout.js"></script>
     <script src="js/views/MainLayout.js"></script>
     <script src="js/views/HomeLayout.js"></script>
+    <script src="js/views/WorkspaceDropdownItemView.js"></script>
+    <script src="js/views/WorkspaceDropdownView.js"></script>
     <script src="js/views/SettingsLayout.js"></script>
     <script src="js/views/DataLayout.js"></script>
     <script src="js/views/AddFilterDialogLayout.js"></script>
