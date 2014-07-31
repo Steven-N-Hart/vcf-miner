@@ -9,6 +9,9 @@ import edu.mayo.securityuserapp.db.objects.Permission;
 import edu.mayo.securityuserapp.db.objects.Resource;
 import edu.mayo.util.SystemProperties;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Centralizes logic for interfacing with the SecurityUserApp web application.
  */
@@ -98,6 +101,27 @@ public class SecurityUserAppHelper {
         soloGroupAccess.isWriteAuthority = true;
         soloGroupAccess.isExecuteAuthority = true;
         permissionMgmtClient.setPermissions(userToken, soloGroupAccess);
+    }
+
+    /**
+     * Gets a collection of keys that represent workspace resources the specified user is
+     * authorized to have access to.
+     *
+     * @param userToken
+     *      The token that identifies an authenticated user.
+     * @return
+     *      A {@link Set} containing zero or more workspace keys.
+     * @throws Exception
+     */
+    public Set<String> getAuthorizedWorkspaces(String userToken) throws Exception {
+
+        HashSet<String> workspaceKeys = new HashSet<String>();
+
+        for (Resource r: resourceMgmtClient.getAllResourcesForUser(userToken)) {
+            workspaceKeys.add(r.key);
+        }
+
+        return workspaceKeys;
     }
 
     /**
