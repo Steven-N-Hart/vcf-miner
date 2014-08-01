@@ -92,53 +92,62 @@
             -moz-border-radius: 4px 0 4px 0;
             border-radius: 4px 0 4px 0;
         }
+
     </style>
 
     <!-- underscorejs templates -->
 
     <script id="login-layout-template" type="text/template">
-        <!-- Navigation bar -->
-        <div class="navbar navbar-inverse navbar-static-top">
-            <div class="navbar-inner">
-                <div class="nav-collapse collapse">
-                    <div class="pull-left"><a class="brand">VCF-Miner</a></div>
-                </div>
-            </div>
-        </div>
 
-        <div class="container-fluid">
+        <div class="container-fluid hero-unit">
             <div class="row-fluid">
-                <!-- push the form down from the top -->
-                <br><br><br><br><br><br><br><br><br><br>
-            </div>
-            <div class="row-fluid">
-                <div class="span4"></div>
-                <div class="span4">
-                    <form id="login_form" action="#" onsubmit="return false;" class="form-horizontal">
-                        <div class="control-group">
-                            <label class="control-label text-left" for="login_username_field">Username</label>
-                            <div class="controls">
-                                <input id="login_username_field" name="login_username_field" type="text" class="input-medium"/>
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label" for="login_password_field">Password</label>
-                            <div class="controls">
-                                <input id="login_password_field" name="login_password_field" type="password" class="input-medium"/>
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <div class="controls">
-                                <!--<label class="checkbox">-->
-                                    <!--<input type="checkbox"> Remember me-->
-                                <!--</label>-->
-                                <button class="btn btn-primary login">Login</button>
-                            </div>
-                        </div>
-                    </form>
-                    <div id="loginMessageRegion"></div>
+                <!-- column 1 has logo and branding-->
+                <div class="span6">
+                    <div class="text-center">
+                        <h1>VCF-Miner</h1>
+                        <br>
+                        <img src="img/vcf-miner.png"/>
+                    </div>
                 </div>
-                <div class="span4"></div>
+
+                <!-- column 2 has login stuff -->
+                <!-- TODO: HACKed the height to be hardcoded because 100% was not working as it should -->
+                <div class="span6" style="min-height:600px;display:table;table-layout:fixed;">
+                    <div style="display:table-cell;vertical-align:middle;">
+                            <form id="login_form" action="#" onsubmit="return false;" class="form-horizontal">
+
+
+                                <div class="control-group">
+                                    <label class="control-label text-left" for="login_username_field">Username</label>
+                                    <div class="controls">
+                                        <input id="login_username_field" name="login_username_field" type="text" class="input-medium"/>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="login_password_field">Password</label>
+                                    <div class="controls">
+                                        <input id="login_password_field" name="login_password_field" type="password" class="input-medium"/>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="controls">
+                                        <!--<label class="checkbox">-->
+                                        <!--<input type="checkbox"> Remember me-->
+                                        <!--</label>-->
+                                        <button class="btn btn-primary login">Login</button>
+                                    </div>
+                                </div>
+
+                            </form>
+                            <div id="loginMessageRegion"></div>
+                            <p>
+                                <small>The funding was provided by the <a target="_blank" href="http://mayoresearch.mayo.edu/center-for-individualized-medicine/">Center for Individualized Medicine</a> at Mayo Clinic.</small>
+                            </p>
+                            <p>
+                                <small><a target="_blank" href="license.html">Terms and Conditions of Use</a></small>
+                            </p>
+                    </div>
+                </div>
             </div>
         </div>
     </script>
@@ -253,7 +262,6 @@
                                 </p>
                             </div>
                         </div>
-                        <img src="img/vcf-miner.png"/>
                     </td>
                 </tr>
             </table>
@@ -1165,7 +1173,6 @@
     <script src="js/views/LoginLayout.js"></script>
     <script src="js/views/MainLayout.js"></script>
     <script src="js/views/HomeLayout.js"></script>
-    <script src="js/views/WorkspaceDropdownItemView.js"></script>
     <script src="js/views/WorkspaceDropdownView.js"></script>
     <script src="js/views/SettingsLayout.js"></script>
     <script src="js/views/DataLayout.js"></script>
