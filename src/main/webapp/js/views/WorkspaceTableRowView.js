@@ -90,7 +90,7 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
         // show error button only if there are errors or warnings
         var errorAndWarningCount = workspace.get("statsErrors") + workspace.get("statsWarnings");
         if (errorAndWarningCount > 0) {
-            actionHtml += '<button data-wks-key="' + workspace.get("key") + '" class="btn error errors">Errors ('+errorAndWarningCount+')</button>';
+            actionHtml += '<button data-wks-key="' + workspace.get("key") + '" class="btn error errors">Warnings ('+errorAndWarningCount+')</button>';
         }
 
         // close nowrap div
