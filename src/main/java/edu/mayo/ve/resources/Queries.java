@@ -11,19 +11,14 @@ import com.google.gson.JsonParser;
 
 import javax.ws.rs.*;
 
-import com.mongodb.WriteResult;
+import com.mongodb.*;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.Path;
 
-import com.mongodb.Mongo;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.DBCursor;
 import com.mongodb.util.JSON;
 import edu.mayo.util.SystemProperties;
 import edu.mayo.util.Tokens;
@@ -63,12 +58,20 @@ public class Queries {
 
          final Set<String> authKeys = securityHelper.getAuthorizedWorkspaces(userToken);
 
+         // build IN clause using authorized keys
+         BasicDBList inList = new BasicDBList();
+         for(String key : authKeys){
+             inList.add(key);
+         }
+         BasicDBObject inClause = new BasicDBObject();
+         inClause.put("$in", inList);
+
          bottomCleaner.dropWorkspacesWOMetadata(); //deal with a strange bug where some workspaces exist even after they are deleted... if this is too slow, consider spawning up a workerpool to do it in the background
          //System.out.println("getWorkspaceJSON: " + userID);
          DB db = MongoConnection.getDB();
          DBCollection coll = db.getCollection(Tokens.METADATA_COLLECTION);
          BasicDBObject query = new BasicDBObject();
-         query.append(Tokens.OWNER, userID);
+         query.put("key", inClause);
          DBCursor workspaces = coll.find(query);
          BasicDBObject docList = new BasicDBObject();
          int counter = 0;         
