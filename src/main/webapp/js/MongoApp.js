@@ -145,6 +145,7 @@ MongoApp.addInitializer(function () {
 
         self.user = new User();
         self.userGroups.reset();
+        self.workspaceController.reset();
 
         // show login page
         self.securityController.showLogin({region: MongoApp.mainRegion });

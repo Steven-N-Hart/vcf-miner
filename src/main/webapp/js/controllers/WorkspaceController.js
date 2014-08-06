@@ -81,6 +81,15 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     },
 
     /**
+     * Resets the state of this controller.
+     */
+    reset: function() {
+        this.workspaces.reset();
+        this.notReadyKeys = new Array();
+        this.filterKeys = null;
+    },
+
+    /**
      * Show workspaces table and populate with latest workspace data.
      *
      * @param options
