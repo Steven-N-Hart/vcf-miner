@@ -9,6 +9,7 @@ import edu.mayo.securityuserapp.db.objects.Permission;
 import edu.mayo.securityuserapp.db.objects.Resource;
 import edu.mayo.util.SystemProperties;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -72,14 +73,17 @@ public class SecurityUserAppHelper {
      *     <li>Creates a new resource based on the specified workspace key</li>
      *     <li>Authorizes the "SOLO" group to have access to this newly created resource</li>
      * </ul>
-     *
+     * @param username
+     *      The username of the user.
      * @param userToken
      *      The token that identifies an authenticated user.
      * @param workspaceKey
      *      The unique key of the workspace resource to be registered.
+     * @param workspaceName
+     *      The name given to the workspace by the user.
      * @throws Exception
      */
-    public void registerWorkspace(String userToken, String workspaceKey) throws Exception {
+    public void registerWorkspace(String username, String userToken, String workspaceKey, String workspaceName) throws Exception {
 
         // get the SOLO group for the current user (should exist already)
         final Group soloGroup = getSoloGroup(userToken);
@@ -88,7 +92,7 @@ public class SecurityUserAppHelper {
         Resource requestedResource = new Resource();
         requestedResource.type = RESOURCE_TYPE_WORKSPACE;
         requestedResource.key = workspaceKey;
-        requestedResource.description = "none";
+        requestedResource.description = String.format("user=%s,name=%s,date=%tc", username, workspaceName, new Date());
         final Resource wksResource = resourceMgmtClient.addResource(userToken, requestedResource);
 
         // authorize SOLO group to have access to the new resource by default

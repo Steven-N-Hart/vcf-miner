@@ -290,7 +290,7 @@ public class VCFUploadResource {
             HashMap workspaceMeta = gson.fromJson(json, java.util.HashMap.class);
             String wkspID =(String) workspaceMeta.get(Tokens.KEY);
 
-            securityHelper.registerWorkspace(userToken, wkspID);
+            securityHelper.registerWorkspace(user, userToken, wkspID, alias);
 
             //set the workspace's status to not ready
             MetaData meta = new MetaData();
