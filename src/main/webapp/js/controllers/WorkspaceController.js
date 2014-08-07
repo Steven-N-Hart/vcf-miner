@@ -111,17 +111,23 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
      */
     showWorkspaceGroupDropdown: function (options) {
 
-        var workspaceGroupLayout = new WorkspaceDropdownView({
+        this.workspaceGroupLayout = new WorkspaceDropdownView({
             collection: MongoApp.userGroups
         });
-        options.region.show(workspaceGroupLayout);
+        options.region.show(this.workspaceGroupLayout);
 
         var self = this;
-        this.listenTo(workspaceGroupLayout, workspaceGroupLayout.EVENT_ALL_GROUPS, function (userGroups) {
+        this.listenTo(self.workspaceGroupLayout, self.workspaceGroupLayout.EVENT_ALL_GROUPS, function (userGroups) {
+
+            self.workspaceGroupLayout.disableDropdown();
+
             self.filterKeys = null;
             self.refreshAllWorkspaces();
         });
-        this.listenTo(workspaceGroupLayout, workspaceGroupLayout.EVENT_ONE_GROUP, function (userGroup) {
+        this.listenTo(self.workspaceGroupLayout, self.workspaceGroupLayout.EVENT_ONE_GROUP, function (userGroup) {
+
+            self.workspaceGroupLayout.disableDropdown();
+
             var userToken = MongoApp.user.get("token");
             try {
                 self.filterKeys = MongoApp.securityController.getAuthorizedWorkspaceKeys(userToken, userGroup);
@@ -130,10 +136,6 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 MongoApp.dispatcher.trigger(MongoApp.events.ERROR, e.responseText);
             }
         });
-        this.listenTo(MongoApp.dispatcher, MongoApp.events.USER_CHANGED, function () {
-            self.filterKeys = null;
-        });
-
     },
 
     /**
@@ -178,6 +180,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                         }
                     }
                 }
+                self.workspaceGroupLayout.enableDropdown();
             },
             error: function(jqXHR, textStatus) {
                 MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);

@@ -269,7 +269,7 @@
     </script>
 
     <script id="workspace-group-dropdown-template" type="text/template">
-        <p>Showing <select>
+        <p>Showing <select disabled="true">
             <option value='ALL_GROUPS'>All VCF Files</option> <!-- Special Group that represents a union of all groups -->
             <% _.each(items, function(item){ %>
                 <option value='<%=item.id%>'>
@@ -280,7 +280,8 @@
                     <% } %>
                 </option>
             <% }); %>
-        </select></p>
+        </select> <img src="img/loading.gif" width="30"/> <span>Loading</span>
+        </p>
     </script>
 
     <script id="settings-layout-template" type="text/template">

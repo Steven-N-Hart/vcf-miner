@@ -26,5 +26,17 @@ WorkspaceDropdownView = Backbone.Marionette.ItemView.extend({
             var userGroup = this.collection.findWhere({id: parseInt(selectedValue)});
             this.trigger(this.EVENT_ONE_GROUP, userGroup);
         }
+    },
+
+    disableDropdown: function() {
+        this.$el.find('select').prop('disabled', true);
+        this.$el.find('img').toggle(true);
+        this.$el.find('span').toggle(true);
+    },
+
+    enableDropdown: function() {
+        this.$el.find('select').prop('disabled', false);
+        this.$el.find('img').toggle(false);
+        this.$el.find('span').toggle(false);
     }
 });
