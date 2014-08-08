@@ -158,6 +158,12 @@
         </div>
     </script>
 
+    <script id="session-expired-layout-template" type="text/template">
+        <div class="alert alert-info text-center">
+            <strong>Your session has expired.  Please login again.</strong>
+        </div>
+    </script>
+
     <script id="main-layout-template" type="text/template">
 
         <div id="mainHeaderRegion"></div>
@@ -1218,6 +1224,9 @@
 
 </head>
 <body>
+
+    <!-- Marionette Region for communicating warnings/errors to user-->
+    <div id="mainMessageRegion"></div>
 
     <!-- Marionette Region for entire single page app -->
     <div id="mainRegion"></div>

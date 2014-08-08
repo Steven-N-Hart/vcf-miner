@@ -133,7 +133,9 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 self.filterKeys = MongoApp.securityController.getAuthorizedWorkspaceKeys(userToken, userGroup);
                 self.refreshAllWorkspaces();
             } catch (e) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, e.responseText);
+                if (e instanceof AJAXRequestException) {
+                    jqueryAJAXErrorHandler(e.jqXHR, e.textStatus, e.errorThrown);
+                }
             }
         });
     },

@@ -11,6 +11,7 @@ var MongoApp = new Backbone.Marionette.Application();
  * Marionette regions
  */
 MongoApp.addRegions({
+    mainMessageRegion: '#mainMessageRegion',
     mainRegion: '#mainRegion'
 });
 
@@ -43,9 +44,6 @@ MongoApp.addInitializer(function () {
 
         // user's session has expired
         SESSION_EXPIRED: 'sessionExpired',
-
-        // current user model has been changed
-        USER_CHANGED: 'userChanged',
 
         // User is choosing a different workspace
         WKSP_LOAD: 'workspaceLoad',
@@ -137,11 +135,24 @@ MongoApp.addInitializer(function () {
 
     this.listenTo(MongoApp.dispatcher, MongoApp.events.LOGIN_SUCCESS, function (user, userGroups) {
 
+        // clear out message region
+        self.mainMessageRegion.reset();
+
         self.user.set(user.attributes);
         self.userGroups.add(userGroups.models);
-        MongoApp.dispatcher.trigger(MongoApp.events.USER_CHANGED, self.user);
 
         MongoApp.mainRegion.show(new MainLayout());
+    });
+
+    this.listenTo(MongoApp.dispatcher, MongoApp.events.SESSION_EXPIRED, function () {
+
+        var expireAlert = Backbone.Marionette.Layout.extend({
+            template: "#session-expired-layout-template"
+        });
+        self.mainMessageRegion.show(new expireAlert());
+
+        // user was logged out by the usersecurityapp
+        MongoApp.dispatcher.trigger(MongoApp.events.LOGOUT_SUCCESS);
     });
 
     this.listenTo(MongoApp.dispatcher, MongoApp.events.LOGOUT_SUCCESS, function () {
