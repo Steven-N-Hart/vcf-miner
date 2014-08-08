@@ -405,9 +405,7 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
             success: function(json) {
                 values = json["INFO."+fieldID];
             },
-            error: function(jqXHR) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            }
+            error: jqueryAJAXErrorHandler
         });
 
         return values;

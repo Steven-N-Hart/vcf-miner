@@ -43,9 +43,7 @@ ShowErrorsDialogLayout = Backbone.Marionette.Layout.extend({
 //                var content = 'Preview of the first ' + numLines + ' lines from ' + this.model.get("alias");
                 self.ui.previewTextArea.text(lines);
             },
-            error: function(jqXHR) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            }
+            error: jqueryAJAXErrorHandler
         });
     },
 

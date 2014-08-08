@@ -164,3 +164,46 @@ function buildQuery(filterList, workspaceKey) {
 
     return query;
 }
+
+/**
+ * Handler for failed AJAX calls.  This handler is responsible for translating the error
+ * into the proper marionette events.
+ *
+ * @param xmlHttpRequest
+ *  The {@link XMLHttpRequest} AJAX call that failed.
+ *
+ */
+function genericAJAXErrorHandler(xmlHttpRequest) {
+
+    if (xmlHttpRequest.status == 401) {
+
+        // HTTP response status 401 "Unauthorized" indicates an expired user token
+        MongoApp.dispatcher.trigger(MongoApp.events.SESSION_EXPIRED);
+
+    } else {
+
+        MongoApp.dispatcher.trigger(MongoApp.events.ERROR, xmlHttpRequest.responseText);
+
+    }
+}
+
+/**
+ * Handler for failed AJAX calls.
+ *
+ * @param jqXHR
+ *      jQuery XMLHttpRequest object that is a superset of the browser's native XMLHTTPRequest object.
+ * @param textStatus
+ *      A string describing the type of error that occurred
+ * @param errorThrown
+ *      An optional exception object.  Possible values for the second argument (besides null) are "timeout", "error",
+ *      "abort", and "parsererror". When an HTTP error occurs, errorThrown receives the textual portion of the HTTP
+ *      status, such as "Not Found" or "Internal Server Error."
+ *
+ * @constructor
+ */
+function jqueryAJAXErrorHandler(jqXHR, textStatus, errorThrown) {
+
+    console.debug("AJAX error: status=" + jqXHR.status + " textStatus=" + textStatus + " errorThrown=" + errorThrown);
+
+    genericAJAXErrorHandler(jqXHR);
+}

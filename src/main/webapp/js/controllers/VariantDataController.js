@@ -159,9 +159,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
                     setTimeout(function(){ numMatchesLabel.popover('hide'); }, MongoApp.settings.popupDuration * 1000);
                 }
             },
-            error: function(jqXHR, textStatus) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            },
+            error: jqueryAJAXErrorHandler,
             complete: function(jqXHR, textStatus) {
                 setTimeout(function(){MongoApp.closePleaseWait();}, 500);
             }

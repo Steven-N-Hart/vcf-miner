@@ -140,9 +140,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
                     MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_LOAD, savedSearch);
                     console.log("save successful!");
                 },
-                error: function(jqXHR, textStatus) {
-                    MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-                }
+                error: jqueryAJAXErrorHandler
             });
         }
 
@@ -212,9 +210,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
                     MongoApp.dispatcher.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspace, new Search());
                 }
             },
-            error: function(jqXHR, textStatus) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            }
+            error: jqueryAJAXErrorHandler
         });
     },
 
@@ -240,9 +236,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
                     searchList.add(search);
                 }
             },
-            error: function(jqXHR, textStatus) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            }
+            error: jqueryAJAXErrorHandler
         });
 
         return searchList;

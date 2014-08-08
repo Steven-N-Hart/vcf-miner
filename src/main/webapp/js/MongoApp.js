@@ -41,6 +41,9 @@ MongoApp.addInitializer(function () {
         // user successfully logged out
         LOGOUT_SUCCESS: 'logoutSuccess',
 
+        // user's session has expired
+        SESSION_EXPIRED: 'sessionExpired',
+
         // current user model has been changed
         USER_CHANGED: 'userChanged',
 

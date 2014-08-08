@@ -182,9 +182,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 }
                 self.workspaceGroupLayout.enableDropdown();
             },
-            error: function(jqXHR, textStatus) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            }
+            error: jqueryAJAXErrorHandler
         });
     },
 
@@ -245,9 +243,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                     }
                 }
             },
-            error: function(jqXHR, textStatus) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            }
+            error: jqueryAJAXErrorHandler
         });
     },
 
@@ -290,7 +286,8 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
                 self.refreshAllWorkspaces();
             } else {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, "Error " + xhr.status + " occurred uploading your file.");
+                console.log("Error " + xhr.status + " occurred uploading file");
+                genericAJAXErrorHandler(xhr);
             }
             $('#upload_vcf_progress_modal').modal('hide');
         };
@@ -323,9 +320,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
             success: function(json) {
                 self.workspaces.remove(workspace);
             },
-            error: function(jqXHR, textStatus) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            }
+            error: jqueryAJAXErrorHandler
         });
     },
 
@@ -375,10 +370,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 allSamples.sort(SortByName);
                 workspace.set("sampleNames", allSamples);
             },
-            error: function(jqXHR, textStatus)
-            {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            }
+            error: jqueryAJAXErrorHandler
         });
     },
 
@@ -445,9 +437,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                     workspace.get("sampleGroups").add(group);
                 }
             },
-            error: function(jqXHR, textStatus) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            }
+            error: jqueryAJAXErrorHandler
         });
     },
 
@@ -476,10 +466,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
                 MongoApp.dispatcher.trigger(MongoApp.events.WKSP_CHANGE, workspace);
             },
-            error: function(jqXHR, textStatus)
-            {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            }
+            error: jqueryAJAXErrorHandler
         });
     }
 });

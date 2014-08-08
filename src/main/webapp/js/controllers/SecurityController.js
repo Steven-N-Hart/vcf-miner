@@ -44,9 +44,11 @@ SecurityController = Backbone.Marionette.Controller.extend({
                         console.log("login successful");
                         MongoApp.dispatcher.trigger(MongoApp.events.LOGIN_SUCCESS, user, userGroups);
 
-                    } catch (e) {
-                        console.log("user initialization failed");
-                        MongoApp.dispatcher.trigger(MongoApp.events.ERROR, e.responseText);
+                    } catch (exception) {
+                        if (exception instanceof AJAXRequestException) {
+                            console.log("user initialization failed");
+                            jqueryAJAXErrorHandler(exception.jqXHR, exception.textStatus, exception.errorThrown);
+                        }
                     }
 
                 } else {
@@ -54,9 +56,7 @@ SecurityController = Backbone.Marionette.Controller.extend({
                     MongoApp.dispatcher.trigger(MongoApp.events.LOGIN_FAILED);
                 }
             },
-            error: function(jqXHR) {
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            }
+            error: jqueryAJAXErrorHandler
         });
     },
 
@@ -155,10 +155,7 @@ SecurityController = Backbone.Marionette.Controller.extend({
                 console.log("logout successful");
                 MongoApp.dispatcher.trigger(MongoApp.events.LOGOUT_SUCCESS);
             },
-            error: function(jqXHR) {
-                console.log("logout failed");
-                MongoApp.dispatcher.trigger(MongoApp.events.ERROR, jqXHR.responseText);
-            }
+            error: jqueryAJAXErrorHandler
         });
     },
 
