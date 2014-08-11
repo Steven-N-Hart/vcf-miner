@@ -8,30 +8,18 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import javax.ws.rs.*;
-
 import com.mongodb.*;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.ws.rs.Path;
-
-import com.mongodb.util.JSON;
+import edu.mayo.securityuserapp.client.SessionExpiredClientException;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.util.SystemProperties;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.SecurityUserAppHelper;
 import edu.mayo.ve.util.BottomCleaner;
-import edu.mayo.util.MongoConnection;
-import java.net.UnknownHostException;
-import java.util.Iterator;
-import java.util.Set;
 
-import org.bson.types.ObjectId;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.util.Set;
 
 
 /**
@@ -56,7 +44,14 @@ public class Queries {
      @Produces("application/json")
      public String getWorkspaceJSON(@PathParam("user_id") String userID, @HeaderParam("usertoken") String userToken) throws Exception {
 
-         final Set<String> authKeys = securityHelper.getAuthorizedWorkspaces(userToken);
+         Set<String> authKeys;
+         try {
+            authKeys = securityHelper.getAuthorizedWorkspaces(userToken);
+         } catch (SessionExpiredClientException sece) {
+             // translate expired session to UNAUTHORIZED - 401
+             throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+         }
+
 
          // build IN clause using authorized keys
          BasicDBList inList = new BasicDBList();

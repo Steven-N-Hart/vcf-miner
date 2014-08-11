@@ -20,6 +20,7 @@ import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.pipes.iterators.Compressor;
 import edu.mayo.securityuserapp.client.PermissionMgmtClient;
 import edu.mayo.securityuserapp.client.ResourceMgmtClient;
+import edu.mayo.securityuserapp.client.SessionExpiredClientException;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.SecurityUserAppHelper;
 import edu.mayo.ve.VCFLoaderPool;
@@ -290,7 +291,12 @@ public class VCFUploadResource {
             HashMap workspaceMeta = gson.fromJson(json, java.util.HashMap.class);
             String wkspID =(String) workspaceMeta.get(Tokens.KEY);
 
-            securityHelper.registerWorkspace(user, userToken, wkspID, alias);
+            try {
+                securityHelper.registerWorkspace(user, userToken, wkspID, alias);
+            } catch (SessionExpiredClientException sece) {
+                // translate expired session to UNAUTHORIZED - 401
+                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+            }
 
             //set the workspace's status to not ready
             MetaData meta = new MetaData();
