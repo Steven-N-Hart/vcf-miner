@@ -1,5 +1,11 @@
 package edu.mayo.ve;
 
+import edu.mayo.securityuserapp.api.impl.GroupMgmt;
+import edu.mayo.securityuserapp.api.impl.PermissionMgmt;
+import edu.mayo.securityuserapp.api.impl.ResourceMgmt;
+import edu.mayo.securityuserapp.api.interfaces.GroupMgmtInterface;
+import edu.mayo.securityuserapp.api.interfaces.PermissionMgmtInterface;
+import edu.mayo.securityuserapp.api.interfaces.ResourceMgmtInterface;
 import edu.mayo.securityuserapp.client.ClientFactory;
 import edu.mayo.securityuserapp.client.GroupMgmtClient;
 import edu.mayo.securityuserapp.client.PermissionMgmtClient;
@@ -33,9 +39,9 @@ public class SecurityUserAppHelper {
     private static final String RESOURCE_TYPE_WORKSPACE = "WKS";
 
     // client APIs to interface with the SecurityUserApp RESTful services
-    private ResourceMgmtClient resourceMgmtClient;
-    private PermissionMgmtClient permissionMgmtClient;
-    private GroupMgmtClient groupMgmtClient;
+    private ResourceMgmtInterface resourceMgmtClient;
+    private PermissionMgmtInterface permissionMgmtClient;
+    private GroupMgmtInterface groupMgmtClient;
 
     /**
      * Constructor
@@ -46,10 +52,7 @@ public class SecurityUserAppHelper {
      *      The port number of the SecurityUserApp web application.
      */
     public SecurityUserAppHelper(String hostname, int port) {
-        ClientFactory factory = new ClientFactory(hostname, port);
-        resourceMgmtClient = factory.buildResourceMgmtClient();
-        permissionMgmtClient = factory.buildPermissionMgmtClient();
-        groupMgmtClient = factory.buildGroupMgmtClient();
+        this(new ClientFactory(hostname, port));
     }
 
     /**
@@ -64,6 +67,18 @@ public class SecurityUserAppHelper {
      */
     public SecurityUserAppHelper(SystemProperties sysprops) {
         this(getStringProperty(sysprops, SYS_PRP_SECURITY_APP_HOSTNAME), getIntegerProperty(sysprops, SYS_PRP_SECURITY_APP_PORT));
+    }
+
+    /**
+     * Constructor
+     *
+     * @param factory
+     *      Factory that builds client APIs for talking to the security server.
+     */
+    public SecurityUserAppHelper(ClientFactory factory) {
+        resourceMgmtClient   = factory.buildResourceMgmtClient();
+        permissionMgmtClient = factory.buildPermissionMgmtClient();
+        groupMgmtClient      = factory.buildGroupMgmtClient();
     }
 
     /**
