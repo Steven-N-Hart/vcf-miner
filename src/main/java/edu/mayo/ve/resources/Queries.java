@@ -33,8 +33,22 @@ public class Queries {
 
     private SecurityUserAppHelper securityHelper;
 
+    /**
+     * Default constructor called by Jersey
+     *
+     * @throws IOException
+     */
     public Queries() throws IOException {
-        securityHelper = new SecurityUserAppHelper(new SystemProperties());
+        this(new SecurityUserAppHelper(new SystemProperties()));
+    }
+
+    /**
+     * Constructor used by functional tests.
+     *
+     * @param helper
+     */
+    public Queries(SecurityUserAppHelper helper) {
+        this.securityHelper = helper;
     }
 
      Mongo m = MongoConnection.getMongo();
