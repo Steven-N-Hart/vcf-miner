@@ -142,6 +142,69 @@ public class FailedLoadITCase {
     }
 
 
+
+    @Test
+    public void testLoadNoSamples() throws InterruptedException {
+        String owner = "steve";
+        String alias = "alias";
+        String workspace = "w9c3fb5f300ab5073128749de49b1ff52d4819099";
+
+        //provision the workspace
+        Provision prov = new Provision();
+        String json = prov.provision(owner, alias);
+
+        //get out the id for the newly minted workspace...
+        System.out.println(json);
+        HashMap response = (HashMap) JSON.parse(json);
+        workspace = (String) response.get(Tokens.KEY);
+
+        MetaData meta = new MetaData();
+        //make sure this workspace is flaged as ready...
+        meta.flagAsReady(workspace);
+        String readyStatus = meta.isReady(workspace);
+        assertTrue(readyStatus.contains(" \"ready\" : 1"));
+
+        //create a vcfparser that will fail on this malformed input.
+        VCFParser parser = new VCFParser();
+
+        //inject the VCF parser into a new LoadWorker
+        LoadWorker worker = new LoadWorker(parser, 100000);
+        worker.setDeleteAfterLoad(false); //don't delete the file we are 'loading' it will screw up other tests
+        worker.setLogStackTrace(false);   //don't show the stacktrace on this failure to the screen, we don't want it to confuse people
+
+        //create a pool with loader workers
+        WorkerPool wp = new WorkerPool(worker, 1);
+
+        //create a task for the workers to do...
+        Task<HashMap,HashMap> t = new Task<HashMap,HashMap>();
+        HashMap hm = new HashMap();
+        hm.put(Tokens.VCF_LOAD_FILE,"src/test/resources/testData/clinvar1500_20140430.vcf");
+        hm.put(Tokens.KEY,workspace);
+        hm.put(Tokens.OWNER,owner);
+        hm.put(Tokens.DATA_LINE_COUNT, new Integer(1500));
+        t.setCommandContext(hm);
+
+        //start processing
+        try {
+            //the parser will throw an InvalidPipeInputException (Invalid VCF data) we want to ensure that this gets logged to MongoDB as a fail
+            worker.compute(t);
+        } catch (ProcessTerminatedException e) {
+            fail();
+            //should never get here, the worker will
+            //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        //verify that the failure status was updated...
+        readyStatus = meta.isReady(workspace);
+        System.out.println(readyStatus);
+        assertTrue(readyStatus.contains(" \"ready\" : 0"));
+
+        //
+        wp.shutdown(1);
+
+    }
+
+
     /**
      * This tests if we load some junk file into the system that it transitions to 'fail' rather than 'ready'
      */

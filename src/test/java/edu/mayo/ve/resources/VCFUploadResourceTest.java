@@ -2,6 +2,7 @@ package edu.mayo.ve.resources;
 
 import com.tinkerpop.pipes.util.Pipeline;
 import edu.mayo.concurrency.workerQueue.WorkerPool;
+import edu.mayo.pipes.PrintPipe;
 import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.VCFLoaderPool;
@@ -46,12 +47,13 @@ public class VCFUploadResourceTest {
         String tmpout = "/tmp/uploadedAnnotated.functional.vcf.gz";
         up.writeFile(is,tmpout);
         int count = 0;
-        Pipeline p = new Pipeline(new CatPipe());
+        Pipeline p = new Pipeline(new CatPipe(), new PrintPipe());
         p.setStarts(Arrays.asList(tmpout));
         while(p.hasNext()){p.next(); count++;}
         assertEquals(1793, count);
         File f = new File(tmpout);
         f.delete();
+        wp.shutdown(1);
     }
 
 //    @Test

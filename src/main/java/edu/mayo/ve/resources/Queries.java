@@ -19,6 +19,8 @@ import edu.mayo.ve.util.BottomCleaner;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 
@@ -125,6 +127,57 @@ public class Queries {
          //System.err.println(docList.toString());
          return ret.toString() + "\n";
      }
+
+
+    /**
+     * gets a list of all workspaces provisioned in the system.
+     * @return
+     */
+    public String getAllWorkspaces(){
+        DB db = MongoConnection.getDB();
+        DBCollection col = db.getCollection(Tokens.METADATA_COLLECTION);
+        DBObject q = new BasicDBObject();
+        DBCursor cursor = col.find(q, q);
+        while(cursor.hasNext()){
+            DBObject result = cursor.next();
+            System.out.println(result.toString());
+        }
+
+        return null;
+    }
+
+    public String queryWithMultipleKeys(List<String> workspaces){
+        DB db = MongoConnection.getDB();
+        DBCollection col = db.getCollection(Tokens.METADATA_COLLECTION);
+        DBObject q = new BasicDBObject();
+        BasicDBList in = new BasicDBList();
+        for(String w : workspaces){
+            in.add(w);
+        }
+        BasicDBObject k = new BasicDBObject();
+        k.put("$in",in);
+        q.put("key",k);
+        System.out.println(q.toString());
+        DBCursor cursor = col.find(q);
+        BasicDBList returnList = new BasicDBList();
+        while(cursor.hasNext()){
+            DBObject result = cursor.next();
+            String rkey = (String) result.get(Tokens.KEY);
+            //if(workspaces.contains(rkey)) {
+                System.out.println(result.toString());
+                System.out.println(rkey);
+                returnList.add(result);
+            //}
+        }
+        BasicDBObject ret = new BasicDBObject();
+        ret.put("results", returnList);
+        return ret.toString();
+    }
+
+    public static void main(String[] args) throws Exception {
+        Queries q = new Queries();
+        q.queryWithMultipleKeys(Arrays.asList("w800e120f1638dacbca9ceb35e6d6eb0760f346c5", "w342d78ad8e6452ad8e7d35b678fce9296b8e20c8", "w0e04ce27161986cde5bf7705b697a28ac5099243"));
+    }
      
      
 }
