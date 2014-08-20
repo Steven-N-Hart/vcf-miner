@@ -41,7 +41,7 @@ MainHeaderLayout = Backbone.Marionette.Layout.extend({
 
     onShow: function() {
         this.userRegion.show(new MainHeaderUserLayout({
-            "model": MongoApp.user
+            "model": MongoApp.securityController.user
         }));
 
         this.switchHomeTab();

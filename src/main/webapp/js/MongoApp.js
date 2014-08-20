@@ -130,20 +130,10 @@ MongoApp.addInitializer(function () {
 
     var self = this;
 
-    this.user = new User();
-    this.userGroups = new UserGroupList();
-
-    this.listenTo(MongoApp.dispatcher, MongoApp.events.LOGIN_SUCCESS, function (user, userGroups) {
-
-        // store user model to local browser storage
-        localStorage.setItem('cached-user-model', JSON.stringify(user));
-        localStorage.setItem('cached-user-groups-collection', JSON.stringify(userGroups));
+    this.listenTo(MongoApp.dispatcher, MongoApp.events.LOGIN_SUCCESS, function () {
 
         // clear out message region
         self.mainMessageRegion.reset();
-
-        self.user.set(user.attributes);
-        self.userGroups.add(userGroups.models);
 
         MongoApp.mainRegion.show(new MainLayout());
     });
@@ -161,12 +151,7 @@ MongoApp.addInitializer(function () {
 
     this.listenTo(MongoApp.dispatcher, MongoApp.events.LOGOUT_SUCCESS, function () {
 
-        // delete user model from local browser storage
-        localStorage.removeItem('cached-user-model');
-        localStorage.removeItem('cached-user-groups-collection');
-
-        self.user = new User();
-        self.userGroups.reset();
+        self.securityController.reset();
         self.workspaceController.reset();
 
         // show login page
@@ -234,31 +219,21 @@ MongoApp.on("start", function(options){
 
     this.securityController = new SecurityController();
 
-    // attempt to load user model from local browser storage
-    var userJsonString   = localStorage.getItem('cached-user-model');
-    var groupsJsonString = localStorage.getItem('cached-user-groups-collection');
-    if ((userJsonString != undefined) && (groupsJsonString != undefined)) {
-        var user = new User(JSON.parse(userJsonString));
-        var userGroups = new UserGroupList(JSON.parse(groupsJsonString));
-        var userToken = user.get("token");
+    switch (this.securityController.getSessionStatus()) {
 
-        try {
-            // check if user's session still valid with arbitrary AJAX call
-            // AJAX call will throw an exception if session is not valid
-            this.securityController.getGroupsForLoggedInUser(userToken);
-
-            // AJAX call was successful, session is still valid
+        case SessionStatus.VALID:
             // fire event that user has been logged in
-            MongoApp.dispatcher.trigger(MongoApp.events.LOGIN_SUCCESS, user, userGroups);
+            MongoApp.dispatcher.trigger(MongoApp.events.LOGIN_SUCCESS);
+            break;
 
-        } catch (e) {
+        case SessionStatus.INVALID:
+            // show login page
+            this.securityController.showLogin({region: MongoApp.mainRegion });
+            break;
 
+        case SessionStatus.EXPIRED:
             // fire event that user's session has been expired
             MongoApp.dispatcher.trigger(MongoApp.events.SESSION_EXPIRED);
-        }
-
-    } else {
-        // show login page
-        this.securityController.showLogin({region: MongoApp.mainRegion });
+            break;
     }
 });

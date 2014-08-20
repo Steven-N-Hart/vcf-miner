@@ -112,7 +112,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     showWorkspaceGroupDropdown: function (options) {
 
         this.workspaceGroupLayout = new WorkspaceDropdownView({
-            collection: MongoApp.userGroups
+            collection: MongoApp.securityController.userGroups
         });
         options.region.show(this.workspaceGroupLayout);
 
@@ -128,7 +128,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
             self.workspaceGroupLayout.disableDropdown();
 
-            var userToken = MongoApp.user.get("token");
+            var userToken = MongoApp.securityController.user.get("token");
             try {
                 self.filterKeys = MongoApp.securityController.getAuthorizedWorkspaceKeys(userToken, userGroup);
                 self.refreshAllWorkspaces();
@@ -154,8 +154,8 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
         // get workspace information from server
         $.ajax({
-            url: "/mongo_svr/ve/q/owner/list_workspaces/" + MongoApp.user.get("username"),
-            headers: {usertoken: MongoApp.user.get("token")},
+            url: "/mongo_svr/ve/q/owner/list_workspaces/" + MongoApp.securityController.user.get("username"),
+            headers: {usertoken: MongoApp.securityController.user.get("token")},
             dataType: "json",
             success: function(json) {
 
@@ -216,9 +216,9 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
         // get workspace information from server
         $.ajax({
-            url: "/mongo_svr/ve/q/owner/list_workspaces/" + MongoApp.user.get("username"),
+            url: "/mongo_svr/ve/q/owner/list_workspaces/" + MongoApp.securityController.user.get("username"),
             dataType: "json",
-            headers: {usertoken: MongoApp.user.get("token")},
+            headers: {usertoken: MongoApp.securityController.user.get("token")},
             success: function(json) {
 
                 // each workspace object has an increment num as the attr name
@@ -274,11 +274,11 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
         xhr.upload.addEventListener("progress", updateProgress, false);
 
-        xhr.open('POST', "/mongo_svr/uploadvcf/user/" + MongoApp.user.get("username") + "/alias/" + name, true);
+        xhr.open('POST', "/mongo_svr/uploadvcf/user/" + MongoApp.securityController.user.get("username") + "/alias/" + name, true);
 
         // setup HTTP request header key/value pairs
         xhr.setRequestHeader('file-compression', uploadFile.name);
-        xhr.setRequestHeader('usertoken', MongoApp.user.get("token"));
+        xhr.setRequestHeader('usertoken', MongoApp.securityController.user.get("token"));
 
         xhr.onload = function(oEvent) {
             if (xhr.status == 200) {

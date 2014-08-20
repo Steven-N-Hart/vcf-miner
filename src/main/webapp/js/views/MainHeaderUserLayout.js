@@ -30,6 +30,6 @@ MainHeaderUserLayout = Backbone.Marionette.Layout.extend({
     },
 
     logout: function() {
-        MongoApp.dispatcher.trigger(MongoApp.events.LOGOUT, MongoApp.user.get("token"));
+        MongoApp.dispatcher.trigger(MongoApp.events.LOGOUT, MongoApp.securityController.user.get("token"));
     }
 });
