@@ -29,6 +29,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.2.2" level="project" />
+    <orderEntry type="library" name="Maven: edu.mayo:securityuserapp:0.0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.9.5" level="project" />
     <orderEntry type="library" name="Maven: edu.mayo:mayo-commons-mongodb:2.0.8" level="project" />
     <orderEntry type="library" name="Maven: edu.mayo:pipes:3.0.0" level="project" />
     <orderEntry type="library" name="Maven: edu.mayo:mayo-commons-mq:1.0.4" level="project" />
@@ -117,6 +119,7 @@
     <orderEntry type="library" name="Maven: net.sf.opencsv:opencsv:2.0" level="project" />
     <orderEntry type="library" name="Maven: edu.mayo.commons:mayo-commons-directory:2.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.mindrot:jbcrypt:0.3m" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.9.5" level="project" />
   </component>
 </module>
 

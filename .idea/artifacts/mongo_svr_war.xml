@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
   <artifact type="war" name="mongo_svr:war">
     <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="mongo_svr-1.3.0.war">
+    <root id="archive" name="mongo_svr-1.2.2.war">
       <element id="artifact" artifact-name="mongo_svr:war exploded" />
     </root>
   </artifact>
