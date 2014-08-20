@@ -1,15 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/FunctionalTestUtil.java" line="29" mnemonic="6" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="be9f73b3-8806-4b29-b922-d6eef1649cf2" name="Default" comment="version 1.1.0 release... fixed some regressions&#10;">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/VCFUploadResourceITCase.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/resources/testData/VCFUploadResourceITCase.vcf" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__edu_mayo_mayo_commons_exec_0_0_8_SNAPSHOT.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__edu_mayo_mayo_commons_exec_0_0_8_SNAPSHOT.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java" afterPath="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mongo_svr.iml" afterPath="$PROJECT_DIR$/mongo_svr.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/mongo_svr_war.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/mongo_svr_war.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/mongo_svr_war_exploded.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/mongo_svr_war_exploded.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="mongo_svr.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1399561998249" ignored="false" />
+    <ignored path=".idea/libraries/Maven__org_mockito_mockito_all_1_9_5.xml" />
+    <ignored path=".idea/libraries/Maven__org_tukaani_xz_1_0.xml" />
+    <ignored path=".idea/libraries/Maven__edu_mayo_securityuserapp_0_0_1_SNAPSHOT.xml" />
+    <ignored path=".idea/libraries/Maven__edu_mayo_webapp_commons_1_0_0.xml" />
+    <ignored path=".idea/libraries/Maven__commons_lang_commons_lang_2_4.xml" />
+    <ignored path=".idea/libraries/Maven__org_mindrot_jbcrypt_0_3m.xml" />
+    <ignored path=".idea/libraries/Maven__org_hamcrest_hamcrest_core_1_3.xml" />
+    <ignored path=".idea/libraries/Maven__net_sf_opencsv_opencsv_2_0.xml" />
+    <ignored path=".idea/libraries/Maven__edu_mayo_mayo_commons_mq_1_0_4.xml" />
+    <ignored path=".idea/libraries/Maven__edu_mayo_commons_mayo_commons_directory_2_0_0_SNAPSHOT.xml" />
+    <ignored path=".idea/libraries/Maven__com_rabbitmq_amqp_client_3_3_3.xml" />
+    <ignored path=".idea/libraries/Maven__edu_mayo_pipes_3_0_0.xml" />
+    <ignored path=".idea/libraries/Maven__com_google_code_gson_gson_2_2_4.xml" />
+    <ignored path=".idea/libraries/Maven__edu_mayo_mayo_commons_concurrency_1_0_0.xml" />
+    <ignored path=".idea/libraries/Maven__edu_mayo_mayo_commons_mongodb_2_0_8.xml" />
+    <ignored path=".idea/libraries/Maven__junit_junit_4_11.xml" />
+    <ignored path=".idea/" />
+    <file path="/Dummy.txt" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1408049091987" ignored="false" />
     <file path="/DownloadFile.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1386880214925" ignored="false" />
     <file path="/Provision.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1398721282631" ignored="false" />
     <file path="/Tokens.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1398526858432" ignored="false" />
@@ -22,7 +46,7 @@
     <file path="$PROJECT_DIR$/../pipes/src/test/java/edu/mayo/pipes/bioinformatics/VCF2VariantPipeTest.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1390426096285" ignored="false" />
     <file path="/VCF2VariantPipeTest.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1399481288404" ignored="false" />
     <file path="/VCFLoadWorker.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395254225094" ignored="false" />
-    <file path="/VCFUploadResource.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1396894634031" ignored="false" />
+    <file path="/VCFUploadResource.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1408034193842" ignored="false" />
     <file path="/VCFLoaderPool.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395674990573" ignored="false" />
     <file path="$PROJECT_DIR$/../mongo_view/trunk/web/js/mongo_view.js" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1382624333928" ignored="false" />
     <file path="/VCFParserTest.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1396012601690" ignored="false" />
@@ -120,7 +144,7 @@
     <file path="$PROJECT_DIR$/../pipes/src/main/java/edu/mayo/pipes/JSON/InjectIntoJsonPipe.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1385396789022" ignored="false" />
     <file path="$PROJECT_DIR$/../pipes/src/main/java/edu/mayo/pipes/JSON/SimpleDrillPipe.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1385396789022" ignored="false" />
     <file path="$PROJECT_DIR$/../pipes/src/main/java/edu/mayo/pipes/history/FindAndReplaceHPipe.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1385396789022" ignored="false" />
-    <file path="/Queries.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395166833265" ignored="false" />
+    <file path="/Queries.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1408026271329" ignored="false" />
     <file path="/Compressor.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1386801332001" ignored="false" />
     <file path="/VCFUploadResourceTest.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395258727685" ignored="false" />
     <file path="/InputStreamBufferedReaderFactory.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1386861191578" ignored="false" />
@@ -166,7 +190,7 @@
     <file path="/MongoDBCacheTestITCase.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1387398950677" ignored="false" />
     <file path="$PROJECT_DIR$/../mayo-commons-cache/src/main/java/edu/mayo/cache/backends/Hazelcast/HazelcastCache.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1387469838991" ignored="false" />
     <file path="/HazelcastCache.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1387246600515" ignored="false" />
-    <file path="/pom.xml" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1399561951902" ignored="false" />
+    <file path="/pom.xml" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1407956847748" ignored="false" />
     <file path="$PROJECT_DIR$/../mayo-commons-cache/src/test/java/edu/mayo/cache/backends/Hazelcast/HazelcastCacheTest.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1387470004262" ignored="false" />
     <file path="/HazelcastCacheTest.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1387200358331" ignored="false" />
     <file path="/Fasta2Tabix.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1391554119398" ignored="false" />
@@ -193,7 +217,7 @@
     <file path="/IndexITCase.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1395160303804" ignored="false" />
     <file path="/VCFParserITCase.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1398098932860" ignored="false" />
     <file path="/SampleNumberFilter.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1393431678585" ignored="false" />
-    <file path="/QuerryITCase.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1399320304845" ignored="false" />
+    <file path="/QuerryITCase.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1408026032051" ignored="false" />
     <file path="/InfoStringFilter.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1389208703102" ignored="false" />
     <file path="$PROJECT_DIR$/../bior_catalog/src/main/java/edu/mayo/bior/publishers/HGMD/HGMDPublisher.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1389756583608" ignored="false" />
     <file path="$PROJECT_DIR$/../bior_catalog/pom.xml" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1393270065638" ignored="false" />
@@ -416,6 +440,14 @@
     <file path="$PROJECT_DIR$/../../micro/src/main/scripts/micro_matrix2tree" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1399053828069" ignored="false" />
     <file path="/micro_matrix2tree" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1399053820596" ignored="false" />
     <file path="/Rresults.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1399558027061" ignored="false" />
+    <file path="/SecurityUserAppHelperTest.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1407965194765" ignored="false" />
+    <file path="/SecurityUserAppHelper.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1407959440629" ignored="false" />
+    <file path="$PROJECT_DIR$/../mayo-commons-security/src/main/java/edu/mayo/securityuserapp/client/ClientFactory.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1407959695590" ignored="false" />
+    <file path="/ClientFactory.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1407959666158" ignored="false" />
+    <file path="/QuerriesITCase.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1408035562964" ignored="false" />
+    <file path="/FunctionalTestUtil.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1408029690273" ignored="false" />
+    <file path="/QuerriesITCase.vcf" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1408032439164" ignored="false" />
+    <file path="/VCFUploadResourceITCase.java" changelist="be9f73b3-8806-4b29-b922-d6eef1649cf2" time="1408047790128" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -423,6 +455,11 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/mongo_svr$SecurityUserAppHelperTest.coverage" NAME="SecurityUserAppHelperTest Coverage Results" MODIFIED="1407964964267" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>edu.mayo.ve.*</FILTER>
+    </SUITE>
+  </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
   </component>
@@ -430,42 +467,6 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
-    <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
-      <breakpoint>
-        <option name="NOTIFY_CAUGHT" value="true" />
-        <option name="NOTIFY_UNCAUGHT" value="true" />
-        <option name="ENABLED" value="false" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="REMOVE_AFTER_HIT" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="SUSPEND" value="true" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="true" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint>
-        <option name="NOTIFY_CAUGHT" value="true" />
-        <option name="NOTIFY_UNCAUGHT" value="true" />
-        <option name="ENABLED" value="false" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="REMOVE_AFTER_HIT" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="SUSPEND" value="true" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="true" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-    </breakpoint_any>
     <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint url="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/QuerryTest.java" line="226" class="edu.mayo.ve.QuerryTest" package="edu.mayo.ve">
         <option name="ENABLED" value="true" />
@@ -812,7 +813,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/TypeAheadITCase.java" line="260" class="edu.mayo.ve.FunctionalTests.TypeAheadITCase" package="edu.mayo.ve.FunctionalTests">
+      <breakpoint url="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/TypeAheadITCase.java" line="260" class="TypeAheadITCase.java" package="">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -962,7 +963,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java" line="129" class="edu.mayo.ve.FunctionalTests.QuerryITCase" package="edu.mayo.ve.FunctionalTests">
+      <breakpoint url="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java" line="119" class="edu.mayo.ve.FunctionalTests.QuerryITCase" package="edu.mayo.ve.FunctionalTests">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -977,7 +978,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java" line="175" class="edu.mayo.ve.FunctionalTests.QuerryITCase" package="edu.mayo.ve.FunctionalTests">
+      <breakpoint url="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java" line="165" class="edu.mayo.ve.FunctionalTests.QuerryITCase" package="edu.mayo.ve.FunctionalTests">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -1022,7 +1023,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java" line="79" class="edu.mayo.ve.FunctionalTests.QuerryITCase" package="edu.mayo.ve.FunctionalTests">
+      <breakpoint url="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java" line="71" class="edu.mayo.ve.FunctionalTests.QuerryITCase" package="edu.mayo.ve.FunctionalTests">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -1052,8 +1053,59 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java" line="285" class="edu.mayo.ve.resources.VCFUploadResource" package="edu.mayo.ve.resources">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
     </line_breakpoints>
     <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
+    <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </breakpoint_any>
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -1062,53 +1114,7 @@
     <favorites_list name="mongo_svr" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="Querry.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/Querry.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="44" column="0" selection-start="1909" selection-end="1909" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="QuerryITCase.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="80" column="49" selection-start="3185" selection-end="3185" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ProblemVCFITCase.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/ProblemVCFITCase.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="91" column="68" selection-start="3348" selection-end="3348" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ExeQuery.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/ExeQuery.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="29" column="58" selection-start="735" selection-end="735" vertical-scroll-proportion="0.26923078">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Rresults.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/Rresults.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="42" column="49" selection-start="1009" selection-end="1009" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -1118,22 +1124,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFParser.java" />
-        <option value="$PROJECT_DIR$/src/main/resources/sys.properties" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Provision.java" />
-        <option value="$PROJECT_DIR$/../../mayo-commons-mongodb/src/main/java/edu/mayo/util/MongoConnection.java" />
-        <option value="$PROJECT_DIR$/src/test/resources/testData/zygosityTest.vcf" />
-        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/QuerryTest.java" />
-        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java" />
-        <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/History.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/SampleGroup.java" />
         <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/VCFParser/VCFParserITCase.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/Querry.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/Rresults.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/ExeQuery.java" />
         <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/ProblemVCFITCase.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/SecurityUserAppHelper.java" />
+        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/SecurityUserAppHelperTest.java" />
+        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Queries.java" />
+        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/FunctionalTestUtil.java" />
+        <option value="$PROJECT_DIR$/src/test/resources/testData/QuerriesITCase.vcf" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java" />
+        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerriesITCase.java" />
+        <option value="$PROJECT_DIR$/src/test/resources/testData/VCFUploadResourceITCase.vcf" />
+        <option value="$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/VCFUploadResourceITCase.java" />
       </list>
     </option>
   </component>
@@ -1223,6 +1229,8 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -1231,10 +1239,208 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="testData" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ve" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ve" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="FunctionalTests" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mayo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ve" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mayo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ve" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mongo_svr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mayo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -1270,21 +1476,16 @@
       <recent name="$PROJECT_DIR$/src/main" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.ProblemVCFITCase.testAll_SamplesQuerry">
-    <configuration default="false" name="QuerryITCase.testSampleFormatQueries" type="JUnit" factoryName="JUnit" temporary="true">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
-        <pattern>
-          <option name="PATTERN" value="edu.mayo.ve.FunctionalTests.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
+  <component name="RunManager" selected="JUnit.VCFUploadResourceITCase.uploadFile">
+    <configuration default="false" name="All in mongo_svr" type="JUnit" factoryName="JUnit" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="mongo_svr" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="edu.mayo.ve.FunctionalTests" />
-      <option name="MAIN_CLASS_NAME" value="edu.mayo.ve.FunctionalTests.QuerryITCase" />
-      <option name="METHOD_NAME" value="testSampleFormatQueries" />
-      <option name="TEST_OBJECT" value="method" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="package" />
       <option name="VM_PARAMETERS" value="-ea" />
       <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -1295,28 +1496,52 @@
       </option>
       <envs />
       <patterns />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
-      </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Debug" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <configuration default="false" name="VCFParserITCase" type="JUnit" factoryName="JUnit" temporary="true">
+    <configuration default="false" name="SecurityUserAppHelperTest" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
-          <option name="PATTERN" value="edu.mayo.ve.VCFParser.*" />
+          <option name="PATTERN" value="edu.mayo.ve.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
       <module name="mongo_svr" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="edu.mayo.ve.VCFParser" />
-      <option name="MAIN_CLASS_NAME" value="edu.mayo.ve.VCFParser.VCFParserITCase" />
+      <option name="PACKAGE_NAME" value="edu.mayo.ve" />
+      <option name="MAIN_CLASS_NAME" value="edu.mayo.ve.SecurityUserAppHelperTest" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <RunnerSettings RunnerId="Cover" />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Cover" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="QuerriesITCase" type="JUnit" factoryName="JUnit" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="edu.mayo.ve.FunctionalTests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <module name="mongo_svr" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="edu.mayo.ve.FunctionalTests" />
+      <option name="MAIN_CLASS_NAME" value="edu.mayo.ve.FunctionalTests.QuerriesITCase" />
       <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" value="-ea" />
@@ -1333,19 +1558,19 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <configuration default="false" name="VCFParserITCase.testParseAndLoad" type="JUnit" factoryName="JUnit" temporary="true">
+    <configuration default="false" name="QuerriesITCase.getWorkspaceJSON" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
-          <option name="PATTERN" value="edu.mayo.ve.VCFParser.*" />
+          <option name="PATTERN" value="edu.mayo.ve.FunctionalTests.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
       <module name="mongo_svr" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="edu.mayo.ve.VCFParser" />
-      <option name="MAIN_CLASS_NAME" value="edu.mayo.ve.VCFParser.VCFParserITCase" />
-      <option name="METHOD_NAME" value="testParseAndLoad" />
+      <option name="PACKAGE_NAME" value="edu.mayo.ve.FunctionalTests" />
+      <option name="MAIN_CLASS_NAME" value="edu.mayo.ve.FunctionalTests.QuerriesITCase" />
+      <option name="METHOD_NAME" value="getWorkspaceJSON" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="-ea" />
       <option name="PARAMETERS" />
@@ -1361,7 +1586,7 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <configuration default="false" name="QuerryITCase" type="JUnit" factoryName="JUnit" temporary="true">
+    <configuration default="false" name="VCFUploadResourceITCase.uploadFile" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
           <option name="PATTERN" value="edu.mayo.ve.FunctionalTests.*" />
@@ -1372,36 +1597,8 @@
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PACKAGE_NAME" value="edu.mayo.ve.FunctionalTests" />
-      <option name="MAIN_CLASS_NAME" value="edu.mayo.ve.FunctionalTests.QuerryITCase" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <envs />
-      <patterns />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
-    <configuration default="false" name="ProblemVCFITCase.testAll_SamplesQuerry" type="JUnit" factoryName="JUnit" temporary="true">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
-        <pattern>
-          <option name="PATTERN" value="edu.mayo.ve.FunctionalTests.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <module name="mongo_svr" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="edu.mayo.ve.FunctionalTests" />
-      <option name="MAIN_CLASS_NAME" value="edu.mayo.ve.FunctionalTests.ProblemVCFITCase" />
-      <option name="METHOD_NAME" value="testAll_SamplesQuerry" />
+      <option name="MAIN_CLASS_NAME" value="edu.mayo.ve.FunctionalTests.VCFUploadResourceITCase" />
+      <option name="METHOD_NAME" value="uploadFile" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="-ea" />
       <option name="PARAMETERS" />
@@ -1631,19 +1828,19 @@
     </configuration>
     <list size="6">
       <item index="0" class="java.lang.String" itemvalue="Tomcat Server.Default" />
-      <item index="1" class="java.lang.String" itemvalue="JUnit.QuerryITCase.testSampleFormatQueries" />
-      <item index="2" class="java.lang.String" itemvalue="JUnit.VCFParserITCase" />
-      <item index="3" class="java.lang.String" itemvalue="JUnit.VCFParserITCase.testParseAndLoad" />
-      <item index="4" class="java.lang.String" itemvalue="JUnit.QuerryITCase" />
-      <item index="5" class="java.lang.String" itemvalue="JUnit.ProblemVCFITCase.testAll_SamplesQuerry" />
+      <item index="1" class="java.lang.String" itemvalue="JUnit.All in mongo_svr" />
+      <item index="2" class="java.lang.String" itemvalue="JUnit.SecurityUserAppHelperTest" />
+      <item index="3" class="java.lang.String" itemvalue="JUnit.QuerriesITCase" />
+      <item index="4" class="java.lang.String" itemvalue="JUnit.QuerriesITCase.getWorkspaceJSON" />
+      <item index="5" class="java.lang.String" itemvalue="JUnit.VCFUploadResourceITCase.uploadFile" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="JUnit.ProblemVCFITCase.testAll_SamplesQuerry" />
-        <item index="1" class="java.lang.String" itemvalue="JUnit.QuerryITCase.testSampleFormatQueries" />
-        <item index="2" class="java.lang.String" itemvalue="JUnit.QuerryITCase" />
-        <item index="3" class="java.lang.String" itemvalue="JUnit.VCFParserITCase" />
-        <item index="4" class="java.lang.String" itemvalue="JUnit.VCFParserITCase.testParseAndLoad" />
+        <item index="0" class="java.lang.String" itemvalue="JUnit.VCFUploadResourceITCase.uploadFile" />
+        <item index="1" class="java.lang.String" itemvalue="JUnit.QuerriesITCase" />
+        <item index="2" class="java.lang.String" itemvalue="JUnit.QuerriesITCase.getWorkspaceJSON" />
+        <item index="3" class="java.lang.String" itemvalue="JUnit.SecurityUserAppHelperTest" />
+        <item index="4" class="java.lang.String" itemvalue="JUnit.All in mongo_svr" />
       </list>
     </recent_temporary>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
@@ -1964,7 +2161,15 @@
       <created>1399322470101</created>
       <updated>1399322470101</updated>
     </task>
-    <option name="localTasksCounter" value="66" />
+    <task id="LOCAL-00066" summary="security app tests">
+      <created>1407965374103</created>
+      <updated>1407965374103</updated>
+    </task>
+    <task id="LOCAL-00067" summary="Tests for Queries">
+      <created>1408049098106</created>
+      <updated>1408049098106</updated>
+    </task>
+    <option name="localTasksCounter" value="68" />
     <servers />
   </component>
   <component name="TodoView" selected-index="0">
@@ -1991,12 +2196,12 @@
     <frame x="0" y="22" width="1440" height="874" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32689834" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.47354499" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34941176" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34880635" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.249694" sideWeight="0.28712872" order="2" side_tool="true" content_ui="tabs" />
@@ -2004,18 +2209,19 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.111692846" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.249694" sideWeight="0.28712872" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34635416" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34615386" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.13892289" sideWeight="0.6581986" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2038489" sideWeight="0.5814978" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20373027" sideWeight="0.5992063" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30837005" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2446198" sideWeight="0.5964706" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40315107" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32424676" sideWeight="0.6511936" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40079364" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32998565" sideWeight="0.67374" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32522124" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39058822" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3899204" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -2061,7 +2267,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="version 1.1.0 release... fixed some regressions&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="Tests for Queries" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -2089,6 +2295,8 @@
     <MESSAGE value="adding additional field for api" />
     <MESSAGE value="version 1.1.0 release&#10;" />
     <MESSAGE value="version 1.1.0 release... fixed some regressions&#10;" />
+    <MESSAGE value="security app tests" />
+    <MESSAGE value="Tests for Queries" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2102,92 +2310,109 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$MAVEN_REPOSITORY$/com/tinkerpop/pipes/2.0.0/pipes-2.0.0.jar!/com/tinkerpop/pipes/util/Pipeline.class">
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/SecurityUserAppHelperTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="19" selection-start="1238" selection-end="1238" vertical-scroll-proportion="-7.6" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFParser/VCFParser.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="115" column="0" selection-start="5206" selection-end="5206" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.5/junit-4.5.jar!/org/junit/internal/runners/model/ReflectiveCallable.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="40" selection-start="388" selection-end="388" vertical-scroll-proportion="-6.0" />
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.5/junit-4.5.jar!/org/junit/runners/model/FrameworkMethod.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="28" selection-start="423" selection-end="423" vertical-scroll-proportion="-7.08" />
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.5/junit-4.5.jar!/org/junit/internal/runners/statements/RunBefores.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="16" selection-start="616" selection-end="616" vertical-scroll-proportion="-7.2" />
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/2.10.1/mongo-java-driver-2.10.1.jar!/com/mongodb/util/JSONSerializers.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="52" selection-start="373" selection-end="373" vertical-scroll-proportion="0.3144654" />
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/2.10.1/mongo-java-driver-2.10.1.jar!/com/mongodb/util/JSON.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="35" selection-start="244" selection-end="244" vertical-scroll-proportion="0.25157234" />
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/2.10.1/mongo-java-driver-2.10.1.jar!/com/mongodb/BasicDBObject.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="28" selection-start="774" selection-end="774" vertical-scroll-proportion="0.63" />
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/2.10.1/mongo-java-driver-2.10.1.jar!/com/mongodb/util/ClassMapBasedObjectSerializer.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="4" selection-start="323" selection-end="323" vertical-scroll-proportion="0.24" />
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/2.10.1/mongo-java-driver-2.10.1.jar!/com/mongodb/util/AbstractObjectSerializer.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="4" selection-start="237" selection-end="237" vertical-scroll-proportion="0.18" />
+        <state line="22" column="36" selection-start="839" selection-end="839" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/Querry.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="44" column="0" selection-start="1909" selection-end="1909" vertical-scroll-proportion="0.0">
+        <state line="16" column="13" selection-start="293" selection-end="293" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerryITCase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="80" column="49" selection-start="3185" selection-end="3185" vertical-scroll-proportion="0.0">
-          <folding />
+        <state line="88" column="0" selection-start="3049" selection-end="3405" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#4116#4136#0" expanded="false" />
+            <element signature="e#5049#5067#0" expanded="false" />
+            <element signature="e#5883#5903#0" expanded="false" />
+            <element signature="e#6785#6793#0" expanded="false" />
+            <element signature="e#7032#7045#0" expanded="false" />
+            <element signature="e#9971#9979#0" expanded="false" />
+            <element signature="e#10266#10279#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/com/google/code/gson/gson/1.7.1/gson-1.7.1.jar!/com/google/gson/Gson.class">
+    <entry file="file://$PROJECT_DIR$/src/test/resources/testData/example.vcf">
+      <provider editor-type-id="com.intellij.persistence.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state line="35" column="28" selection-start="2506" selection-end="2506" vertical-scroll-proportion="0.35147393" />
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/message/Rresults.java">
+    <entry file="file://$PROJECT_DIR$/src/test/resources/testData/SoftSearch4Dan.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="49" selection-start="1009" selection-end="1009" vertical-scroll-proportion="0.0">
-          <folding />
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/resources/testData/SoftSearch_for_Dan.vcf">
+      <provider editor-type-id="com.intellij.persistence.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="20" selection-start="520" selection-end="626" vertical-scroll-proportion="-3.8888888" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/FunctionalTestUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="6" selection-start="500" selection-end="500" vertical-scroll-proportion="0.6976744">
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/ProblemVCFITCase.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/Queries.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="91" column="68" selection-start="3348" selection-end="3348" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="40" column="0" selection-start="876" selection-end="970" vertical-scroll-proportion="0.4628331" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/ExeQuery.java">
+    <entry file="jar://$MAVEN_REPOSITORY$/edu/mayo/securityuserapp/0.0.1-SNAPSHOT/securityuserapp-0.0.1-SNAPSHOT.jar!/edu/mayo/securityuserapp/api/interfaces/ResourceMgmtInterface.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="58" selection-start="735" selection-end="735" vertical-scroll-proportion="0.26923078">
+        <state line="15" column="51" selection-start="789" selection-end="789" vertical-scroll-proportion="0.29957205" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/resources/testData/QuerriesITCase.vcf">
+      <provider editor-type-id="com.intellij.persistence.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="17" selection-start="0" selection-end="611" vertical-scroll-proportion="-3.8888888" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/QuerriesITCase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="37" column="20" selection-start="1355" selection-end="1434" vertical-scroll-proportion="0.6473829" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/SecurityUserAppHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="161" column="0" selection-start="6251" selection-end="6251" vertical-scroll-proportion="0.17768595" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/resources/testData/VCFUploadResourceITCase.vcf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="197" selection-start="611" selection-end="611" vertical-scroll-proportion="0.14726508" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/mayo/ve/FunctionalTests/VCFUploadResourceITCase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="59" column="0" selection-start="2118" selection-end="2118" vertical-scroll-proportion="0.77272725" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/VCFLoaderPool.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="33" column="26" selection-start="1166" selection-end="1166" vertical-scroll-proportion="0.45454547" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/mayo/ve/resources/VCFUploadResource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="285" column="45" selection-start="10552" selection-end="10552" vertical-scroll-proportion="0.08571429">
           <folding />
         </state>
       </provider>
