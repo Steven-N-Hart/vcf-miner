@@ -1,10 +1,18 @@
 package edu.mayo.ve.FunctionalTests;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
 import edu.mayo.concurrency.workerQueue.WorkerPool;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.SecurityUserAppHelper;
 import edu.mayo.ve.VCFLoaderPool;
 import edu.mayo.ve.VCFParser.LoadWorker;
 import edu.mayo.ve.VCFParser.VCFParser;
+import edu.mayo.ve.resources.ExeQuery;
 import edu.mayo.ve.resources.VCFUploadResource;
 import edu.mayo.ve.resources.WorkerPoolManager;
 import edu.mayo.ve.util.Tokens;
@@ -13,11 +21,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Random;
 
+import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -65,8 +75,26 @@ public class VCFUploadResourceITCase {
 
         String reporting = "FALSE";
         String compression = vcf.getName();
-        uploadResource.uploadFile(DUMMY_USER_ID, DUMMY_ALIAS, reporting, compression, DUMMY_USER_TOKEN, inStream);
+        Response r = uploadResource.uploadFile(DUMMY_USER_ID, DUMMY_ALIAS, reporting, compression, DUMMY_USER_TOKEN, inStream);
 
         verify(mockHelper).registerWorkspace(eq(DUMMY_USER_ID), eq(DUMMY_USER_TOKEN), anyString(), eq(DUMMY_ALIAS));
+
+        //get the workspace id from the raw response and check there is one variant in there
+        String json = r.getEntity().toString().replaceAll("File uploaded and workspace constructed :","");
+        JsonElement jelement = new JsonParser().parse(json);
+        JsonObject jobject = jelement.getAsJsonObject();
+        String key = jobject.getAsJsonPrimitive("key").getAsString();
+        assertEquals(1, count(key));
+
+        System.out.println(key);
+
+    }
+
+    private long count(String workspace){
+        ExeQuery q = new ExeQuery();
+        DB db = MongoConnection.getDB();
+        DBCollection col = db.getCollection(workspace);
+        long count = q.countResults(col, new BasicDBObject());
+        return count;
     }
 }
