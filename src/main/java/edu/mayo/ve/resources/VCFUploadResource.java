@@ -44,35 +44,36 @@ public class VCFUploadResource {
     // safari:  ------WebKitFormBoundaryfvB1PcYD46yOUCmU
     // firefox: -----------------------------9849436581144108930470211272
     private static Pattern dashHeaderRegex = Pattern.compile("[-]+\\w+\\s*");
-    private static int maxTypeAheadCache = 1000;
+    private int maxTypeAheadCache = 1000;
     private static boolean turnOffLoading = false;
-
-    public static void main(String[] args) throws Exception {
-        VCFUploadResource uploadResource = new VCFUploadResource();
-        LoadWorker logic = new LoadWorker(new VCFParser(), maxTypeAheadCache);//do we want to let them pass this value?
-        WorkerPool wp = new WorkerPool(logic, 1);
-        VCFLoaderPool.setWp(wp);
-        WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
-        InputStream is = new FileInputStream("src/test/resources/testData/httpExample.vcf");
-        uploadResource.uploadFileNoReport("steve", "foo","","userToken???", is);  //an example if there is no compression
-    }
 
     //define something incase sysproperties does not exist
     //public static final String UPLOAD_DIR = "/tmp";
-    private static boolean init = false;
 
     private SecurityUserAppHelper securityHelper;
 
+    /**
+     * Default constructor called by Jersey
+     *
+     * @throws IOException
+     */
     public VCFUploadResource() throws IOException {
-        if(!init){
-            init = true;
-            sysprop = new SystemProperties();
-            if(sysprop.get(Tokens.TYPE_AHEAD_OVERUN) != null){
-                maxTypeAheadCache = new Integer(sysprop.get(Tokens.TYPE_AHEAD_OVERUN));  //user may even want to configure this paramater via REST, for now at least it is in a property file
-            }
-        }
+        this(new SecurityUserAppHelper(new SystemProperties()));
+    }
 
-        securityHelper = new SecurityUserAppHelper(sysprop);
+    /**
+     * Constructor
+     *
+     * @param helper
+     */
+    public VCFUploadResource(SecurityUserAppHelper helper) throws IOException {
+
+        this.securityHelper = helper;
+
+        SystemProperties sysprop = new SystemProperties();
+        if(sysprop.get(Tokens.TYPE_AHEAD_OVERUN) != null){
+            maxTypeAheadCache = new Integer(sysprop.get(Tokens.TYPE_AHEAD_OVERUN));  //user may even want to configure this paramater via REST, for now at least it is in a property file
+        }
     }
 
     @GET
@@ -261,7 +262,6 @@ public class VCFUploadResource {
 
         private Gson gson = new Gson();
         private Provision provision = new Provision();
-        private static SystemProperties sysprop;
         //private String fileroot = "/tmp/";
         private boolean reportingset = false;
         @POST
@@ -494,6 +494,7 @@ public class VCFUploadResource {
     }
 
     public String getFileRoot(){
+        SystemProperties sysprop;
         try {
             sysprop = new SystemProperties();
         } catch (IOException e) {
