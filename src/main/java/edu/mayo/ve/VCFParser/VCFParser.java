@@ -360,7 +360,8 @@ public class VCFParser implements ParserInterface {
         //now flag the workspace as ready so the UI knows
         if(reporting) System.out.println("Flagging the workspace as ready");
 
-        metaData.flagAsReady(workspace);
+        //requested change by patrick
+        //metaData.flagAsReady(workspace);
         return true;
     }
 

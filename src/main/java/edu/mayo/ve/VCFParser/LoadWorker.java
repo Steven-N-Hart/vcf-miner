@@ -96,6 +96,7 @@ public class LoadWorker implements WorkerLogic {
 
                 //update the system's metadata with loading statistics
                 meta.updateLoadStatistics(workspace,icontext);
+                meta.flagAsReady(workspace);
 
             }catch(Throwable e){   //this thread is working in the background... so we need to make sure that it outputs an error if one came up
                 //if(logStackTrace){ e.printStackTrace(); }
