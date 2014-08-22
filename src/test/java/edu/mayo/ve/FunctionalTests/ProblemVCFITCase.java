@@ -183,6 +183,17 @@ public class ProblemVCFITCase {
     }
 
 
+    //@Test
+    public void testExcessiveWarningsNotPresent() throws IOException, ProcessTerminatedException {
+        //certain versions of pipes had excessive warnings when custom logic failed on a VCF, this tests that the version of pipes is correct
+        String vcf = "src/test/resources/testData/failCustomLogic.vcf";
+        String workspace = load(vcf, false);
+        System.out.println(workspace);
+        //not completing test because it turned out to be redundant to the pipes test.
+
+    }
+
+
     public String load(String inputVCF, boolean reporting) throws IOException, ProcessTerminatedException {
         System.out.println("Make sure to have MongoDB up and running on localhost (or wherever specified in your sys.properties file) before you try to run this functional test!");
         System.out.println("ProblemVCFITCase.Provision a new workspace...");
