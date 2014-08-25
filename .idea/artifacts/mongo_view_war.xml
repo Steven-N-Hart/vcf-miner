@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="mongo_view:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="vcf-miner.war">
-      <element id="artifact" artifact-name="mongo_view:war exploded" />
-    </root>
-  </artifact>
-</component>
