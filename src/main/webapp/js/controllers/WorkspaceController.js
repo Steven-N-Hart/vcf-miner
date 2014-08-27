@@ -316,14 +316,44 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         console.debug("Deleting working with name=" + workspace.get("alias") + " and key=" + workspaceKey);
 
         var self = this;
-        $.ajax({
-            type: "DELETE",
-            url: "/mongo_svr/ve/delete_workspace/" + workspaceKey,
-            success: function(json) {
-                self.workspaces.remove(workspace);
-            },
-            error: jqueryAJAXErrorHandler
-        });
+
+        try {
+            // STEP #1: Delete the workspace in mongodb
+            $.ajax({
+                type: "DELETE",
+                url: "/mongo_svr/ve/delete_workspace/" + workspaceKey,
+                async: false,
+                success: function() {
+                    console.log("Deleted workspace from mongodb with key: " + workspaceKey);
+                    self.workspaces.remove(workspace);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    throw new AJAXRequestException(jqXHR, textStatus, errorThrown);
+                }
+            });
+
+            // STEP #2: Delete corresponding resource in securityuserapp
+            $.ajax({
+                type: "POST",
+                url: "/securityuserapp/api/resources/delete/" + workspaceKey,
+                headers: {usertoken: MongoApp.securityController.user.get("token")},
+                data: {},
+                dataType: "json",
+                async: false,
+                success: function() {
+                    console.log("Deleted resource from securityuserapp with key: " + workspaceKey);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    throw new AJAXRequestException(jqXHR, textStatus, errorThrown);
+                }
+            });
+        } catch (exception) {
+            if (exception instanceof AJAXRequestException) {
+                jqueryAJAXErrorHandler(exception.jqXHR, exception.textStatus, exception.errorThrown);
+            } else {
+                throw exception;
+            }
+        }
     },
 
     /**
