@@ -46,12 +46,12 @@ VariantTableDataView = Backbone.Marionette.Layout.extend({
 
         var sDom =
             "<'row'<'pull-left'<'show'>><'pull-right'<'toolbar'>>>" +
-                "R<'row'<'pull-left'l><'pull-right'i>>" +
+                "<'row'<'pull-left'l><'pull-right'i>>" +
                 "<'row't>" +
                 "<'row'<'pull-left'p>>";
 
         this.dataTable = this.ui.table.dataTable( {
-            "sDom": sDom,
+            "dom": sDom,
             "aoColumns": aoColumns,
             'aaData':    [],
             "bDestroy":  true,
@@ -70,6 +70,8 @@ VariantTableDataView = Backbone.Marionette.Layout.extend({
             }
         });
 
+        this.dataTableReorder = new $.fn.dataTable.ColReorder( this.dataTable );
+
         // dynamically add 'show' button to the <div> with class '.show'
         var showButton = $('<button id="west-opener" title="Show Search" type="button" class="hide btn btn-mini"><i class="fa fa-arrow-right"></i> Show</button>');
         this.$('.show').append(showButton);
@@ -85,13 +87,20 @@ VariantTableDataView = Backbone.Marionette.Layout.extend({
 
         var self = this;
 
+        // get the latest ordering of the columns as they may have been changed
+        // array index : current column indexes left-to-right (0, 1, 2, 3, etc...)
+        // array value : original column indexes before any re-ordering
+        var order = this.dataTableReorder.fnOrder();
+
         var rows = new Array();
         _.each(this.model.models, function(variantTableRow) {
             var aaDataRow = new Array();
-            var values = variantTableRow.get("values");
-            for (var i = 0; i < values.length; i++) {
-                aaDataRow.push(self.getDisplayValue(variantTableRow, i));
+
+            for (var currentIdx = 0; currentIdx < order.length; currentIdx++) {
+                var originalIdx = order[currentIdx];
+                aaDataRow.push(self.getDisplayValue(variantTableRow, originalIdx));
             }
+
             rows.push(aaDataRow);
         });
 
