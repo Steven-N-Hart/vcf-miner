@@ -125,13 +125,14 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
                         else if (name.substring(0, 6) === 'FORMAT') {
                             // FORMAT column
                             var formatFieldName = col.get("name").substring(7);
-                            var variantFormat = variant['FORMAT'];
-                            if(variantFormat[formatFieldName] !== undefined) {
-                                rowValues.push(variantFormat[formatFieldName]);
+                            var rowValue = "";
+                            if (variant.hasOwnProperty('FORMAT')) {
+                                var variantFormat = variant['FORMAT'];
+                                if(variantFormat.hasOwnProperty(formatFieldName) && (variantFormat[formatFieldName] !== undefined)) {
+                                    rowValue = variantFormat[formatFieldName];
+                                }
                             }
-                            else {
-                                rowValues.push("");
-                            }
+                            rowValues.push(rowValue);
                         }
                         else {
                             rowValues.push(variant[name]);
