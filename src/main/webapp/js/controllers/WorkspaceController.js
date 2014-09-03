@@ -171,6 +171,10 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
                             self.initWorkspace(workspaceJSON, ws);
 
+                            console.log("workspace:");
+                            console.log("\tname:\t"+ws.get("alias"));
+                            console.log("\tkey :\t"+ws.get("key"));
+
                             self.workspaces.add(ws);
 
                             // auto-update if the workspace is 'not ready' or 'queued'
@@ -457,8 +461,6 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
             dataType: "json",
             success: function(json) {
                 var groupArray = json.sampleGroups;
-                console.debug(json);
-                console.debug("Number of groups: " + groupArray.length);
                 for (var i = 0; i < groupArray.length; i++) {
                     // translate to SampleGroup model
                     var group = new SampleGroup();
