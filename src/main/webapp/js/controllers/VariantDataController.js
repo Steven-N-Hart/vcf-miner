@@ -36,14 +36,14 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
     showVariantTable: function (options) {
 
         // create a new view for variant table
-        var variantTableView = new VariantTableDataView({
+        this.variantTableView = new VariantTableDataView({
             model:        this.varTableRows,
             columns:      this.varTableCols
         });
 
         new VariantTableColumnView({model: this.varTableCols});
 
-        options.region.show(variantTableView);
+        options.region.show(this.variantTableView);
     },
 
     changedSearch: function (search, async) {
@@ -208,11 +208,17 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
 
         var returnFields = new Array();
         var displayFields = new Array();
-        _.each(this.varTableCols.getVisibleColumns().models, function(visibleCol)
-        {
-            returnFields.push(visibleCol.get("name"));
-            displayFields.push(visibleCol.get("displayName"));
-        });
+        var order = this.variantTableView.getColumnOrderHash();
+        for (var currentIdx = 0; currentIdx < order.length; currentIdx++) {
+            var originalIdx = order[currentIdx];
+
+            var col = this.varTableCols.models[originalIdx];
+            if ( col.get("visible") ) {
+                returnFields.push(col.get("name"));
+                displayFields.push(col.get("displayName"));
+            }
+        }
+
         query.returnFields = returnFields;
         query.displayFields = displayFields;
 

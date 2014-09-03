@@ -87,10 +87,7 @@ VariantTableDataView = Backbone.Marionette.Layout.extend({
 
         var self = this;
 
-        // get the latest ordering of the columns as they may have been changed
-        // array index : current column indexes left-to-right (0, 1, 2, 3, etc...)
-        // array value : original column indexes before any re-ordering
-        var order = this.dataTableReorder.fnOrder();
+        var order = this.getColumnOrderHash();
 
         var rows = new Array();
         _.each(this.model.models, function(variantTableRow) {
@@ -107,6 +104,19 @@ VariantTableDataView = Backbone.Marionette.Layout.extend({
         this.dataTable.fnAddData(rows, false);
 
         this.dataTable.fnDraw();
+    },
+
+    /**
+     * Get the latest ordering of the columns as they may have been changed.
+     *
+     * @return A hash where:
+     * <ul>
+     * <li>array index : current column indexes left-to-right (0, 1, 2, 3, etc...)</li>
+     * <li>array value : original column indexes before any re-ordering</li>
+     * </ul>
+     */
+    getColumnOrderHash: function() {
+        return this.dataTableReorder.fnOrder();
     },
 
 //    /**
