@@ -84,7 +84,7 @@
         <dependency>
             <groupId>edu.mayo</groupId>
             <artifactId>securityuserapp</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -95,12 +95,17 @@
 
     </dependencies>
 
+    <scm>
+        <connection>scm:svn:https://bsisvn/main/projects/m/mongo_svr/trunk</connection>
+        <developerConnection>scm:svn:https://bsisvn/main/projects/m/mongo_svr/trunk</developerConnection>
+        <url>https://bsisvn/main/projects/m/mongo_svr/trunk</url>
+    </scm>
 
     <!-- Distribution through Nexus -->
     <distributionManagement>
         <repository>
             <id>mayo-nexus-bsi</id>
-            <name> Mayo Internal BSI Nexus releases</name>
+            <name>Mayo Internal BSI Nexus releases</name>
             <url>http://nexus.mayo.edu/content/repositories/hsr_bsi/</url>
         </repository>
 
