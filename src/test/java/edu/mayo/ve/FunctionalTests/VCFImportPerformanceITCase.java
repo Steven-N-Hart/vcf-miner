@@ -23,14 +23,14 @@ public class VCFImportPerformanceITCase {
     private static String vcf = "src/test/resources/testData/CustomCapture.anno5000.vcf";
     private static String workspace = "wde424d18ecd27a209baddacb97a7dd591ad355d8";
 
-    @AfterClass
-    public static void tearDown()
-    {
-        //delete the workspace - after the test is done
-        System.out.println("Deleting Workspace: " + workspace);
-        Workspace w = new Workspace();
-        w.deleteWorkspace(workspace);
-    }
+//    @AfterClass
+//    public static void tearDown()
+//    {
+//        //delete the workspace - after the test is done
+//        System.out.println("Deleting Workspace: " + workspace);
+//        Workspace w = new Workspace();
+//        w.deleteWorkspace(workspace);
+//    }
 
 
 //    @Test
