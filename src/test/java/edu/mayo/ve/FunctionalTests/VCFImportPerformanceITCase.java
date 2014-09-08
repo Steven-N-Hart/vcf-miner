@@ -33,35 +33,36 @@ public class VCFImportPerformanceITCase {
     }
 
 
-    public void loadPerformanceTest() throws IOException, ProcessTerminatedException {
-        //provision the workspace (not a performance concern typically)
-        System.out.println("Make sure to have MongoDB up and running on localhost (or wherever specified in your sys.properties file) before you try to run this functional test!");
-        System.out.println("ProblemVCFITCase.Provision a new workspace...");
-        Provision prov = new Provision();
-        String alias = "alias";
-        String user = "steve";
-        String json = prov.provision(user,alias);
-        DBObject w = (DBObject) JSON.parse(json);
-        workspace = (String) w.get(Tokens.KEY);
-        System.out.println("Workspace provisioned with key: " + workspace);
-
-        System.out.println("ProblemVCF.Loading data into a new workspace...");
-        long starttime = System.currentTimeMillis();
-        VCFParser parser = new VCFParser();
-        parser.parse(vcf, workspace);  //put true in the second to last param for verbose load reporting
-        long endtime = System.currentTimeMillis();
-        System.out.println("total time elapsed on import: " + (endtime - starttime));
-        //check that the average line performance is within some delta of the initial line performance
-        //i.e. it does not slow down over time.
-        Double elapsedDeltaMesured = Math.abs(parser.getAverageLinePerformance() - parser.getInitialLinePerformance());
-        Double delta = 100.0; //observed 81.81822899505767 with the initial being a lot slower!
-        System.out.println("average elapsed time per line: " + parser.getAverageLinePerformance());
-        System.out.println("initial elapsed time per line: " + parser.getInitialLinePerformance());
-        System.out.println("delta observed: " + elapsedDeltaMesured);
-
-        assertTrue(endtime - starttime < 90000);   //observed 88645
-        assertTrue(elapsedDeltaMesured < delta);
-    }
+//    @Test
+//    public void loadPerformanceTest() throws IOException, ProcessTerminatedException {
+//        //provision the workspace (not a performance concern typically)
+//        System.out.println("Make sure to have MongoDB up and running on localhost (or wherever specified in your sys.properties file) before you try to run this functional test!");
+//        System.out.println("ProblemVCFITCase.Provision a new workspace...");
+//        Provision prov = new Provision();
+//        String alias = "alias";
+//        String user = "steve";
+//        String json = prov.provision(user,alias);
+//        DBObject w = (DBObject) JSON.parse(json);
+//        workspace = (String) w.get(Tokens.KEY);
+//        System.out.println("Workspace provisioned with key: " + workspace);
+//
+//        System.out.println("ProblemVCF.Loading data into a new workspace...");
+//        long starttime = System.currentTimeMillis();
+//        VCFParser parser = new VCFParser();
+//        parser.parse(vcf, workspace);  //put true in the second to last param for verbose load reporting
+//        long endtime = System.currentTimeMillis();
+//        System.out.println("total time elapsed on import: " + (endtime - starttime));
+//        //check that the average line performance is within some delta of the initial line performance
+//        //i.e. it does not slow down over time.
+//        Double elapsedDeltaMesured = Math.abs(parser.getAverageLinePerformance() - parser.getInitialLinePerformance());
+//        Double delta = 100.0; //observed 81.81822899505767 with the initial being a lot slower!
+//        System.out.println("average elapsed time per line: " + parser.getAverageLinePerformance());
+//        System.out.println("initial elapsed time per line: " + parser.getInitialLinePerformance());
+//        System.out.println("delta observed: " + elapsedDeltaMesured);
+//
+//        assertTrue(endtime - starttime < 90000);   //observed 88645
+//        assertTrue(elapsedDeltaMesured < delta);
+//    }
 
 
 
