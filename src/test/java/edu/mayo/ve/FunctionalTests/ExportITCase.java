@@ -51,7 +51,7 @@ public class ExportITCase {
     @AfterClass
     public static void cleanup() throws IOException {
         checkAndDelete(exportFile);
-        delete(workspace,0,495);  // wow lots of casting errors in this file!
+        delete(workspace,0,0);  // wow lots of casting errors in this file!
     }
 
     /**
