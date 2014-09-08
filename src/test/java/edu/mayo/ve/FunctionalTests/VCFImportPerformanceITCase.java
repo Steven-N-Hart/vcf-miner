@@ -32,7 +32,7 @@ public class VCFImportPerformanceITCase {
         w.deleteWorkspace(workspace);
     }
 
-    @Test
+
     public void loadPerformanceTest() throws IOException, ProcessTerminatedException {
         //provision the workspace (not a performance concern typically)
         System.out.println("Make sure to have MongoDB up and running on localhost (or wherever specified in your sys.properties file) before you try to run this functional test!");

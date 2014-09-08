@@ -34,7 +34,7 @@ public class VCFUploadResourceTest {
      * this tests that the raw upload function copies the data from a test file correctly
      * @throws Exception
      */
-    @Test
+
     public void testUploadCompressedFile() throws Exception {
         VCFUploadResource up = new VCFUploadResource();
         String compressedFile = "src/test/resources/testData/Annotated.functional.vcf.gz";
