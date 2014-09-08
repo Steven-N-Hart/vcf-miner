@@ -7,11 +7,32 @@
     <groupId>edu.mayo.mongo_svr</groupId>
     <artifactId>mongo_view</artifactId>
     <packaging>war</packaging>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
 
 
     <build>
         <finalName>vcf-miner</finalName>
     </build>
+
+    <scm>
+        <connection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mongo_view/trunk</connection>
+        <developerConnection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mongo_view/trunk</developerConnection>
+        <url>https://bsisvn.mayo.edu/main/projects/m/mongo_view/trunk</url>
+    </scm>
+
+    <!-- Distribution through Nexus -->
+    <distributionManagement>
+        <repository>
+            <id>mayo-nexus-bsi</id>
+            <name>Mayo Internal BSI Nexus releases</name>
+            <url>http://nexus.mayo.edu/content/repositories/hsr_bsi/</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>mayo-nexus-bsi</id>
+            <name>Mayo Internal BSI Nexus snapshots</name>
+            <url>http://nexus.mayo.edu/content/repositories/hsr_bsi-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
