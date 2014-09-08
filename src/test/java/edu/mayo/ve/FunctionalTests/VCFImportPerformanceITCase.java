@@ -33,6 +33,10 @@ public class VCFImportPerformanceITCase {
 //    }
 
 
+    @Test
+    public void placeholder() {
+
+    }
 //    @Test
 //    public void loadPerformanceTest() throws IOException, ProcessTerminatedException {
 //        //provision the workspace (not a performance concern typically)
