@@ -51,7 +51,6 @@ public class VCFImportPerformanceITCase {
         parser.parse(vcf, workspace);  //put true in the second to last param for verbose load reporting
         long endtime = System.currentTimeMillis();
         System.out.println("total time elapsed on import: " + (endtime - starttime));
-        assertTrue(endtime - starttime < 90000);   //observed 88645
         //check that the average line performance is within some delta of the initial line performance
         //i.e. it does not slow down over time.
         Double elapsedDeltaMesured = Math.abs(parser.getAverageLinePerformance() - parser.getInitialLinePerformance());
@@ -59,6 +58,8 @@ public class VCFImportPerformanceITCase {
         System.out.println("average elapsed time per line: " + parser.getAverageLinePerformance());
         System.out.println("initial elapsed time per line: " + parser.getInitialLinePerformance());
         System.out.println("delta observed: " + elapsedDeltaMesured);
+
+        assertTrue(endtime - starttime < 90000);   //observed 88645
         assertTrue(elapsedDeltaMesured < delta);
     }
 
