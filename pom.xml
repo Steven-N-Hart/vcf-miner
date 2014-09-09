@@ -5,7 +5,7 @@
     <groupId>edu.mayo.mongo_svr</groupId>
     <artifactId>mongo_svr</artifactId>
     <packaging>war</packaging>
-    <version>2.0.0</version>
+    <version>2.0.1-SNAPSHOT</version>
 
     <dependencies>
         <!-- MongoDB SUPPORT -->
@@ -94,9 +94,9 @@
     </dependencies>
 
     <scm>
-        <connection>scm:svn:https://bsisvn/main/projects/m/mongo_svr/tags/mongo_svr-2.0.0</connection>
-        <developerConnection>scm:svn:https://bsisvn/main/projects/m/mongo_svr/tags/mongo_svr-2.0.0</developerConnection>
-        <url>https://bsisvn/main/projects/m/mongo_svr/tags/mongo_svr-2.0.0</url>
+        <connection>scm:svn:https://bsisvn/main/projects/m/mongo_svr</connection>
+        <developerConnection>scm:svn:https://bsisvn/main/projects/m/mongo_svr</developerConnection>
+        <url>https://bsisvn/main/projects/m/mongo_svr</url>
     </scm>
 
     <!-- Distribution through Nexus -->
