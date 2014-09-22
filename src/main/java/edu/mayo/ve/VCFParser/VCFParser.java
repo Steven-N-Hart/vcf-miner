@@ -648,12 +648,13 @@ public class VCFParser implements ParserInterface {
         BasicDBObject replace = (BasicDBObject) JSON.parse(jsonUpdate);
         //we need to remove any dot keys before we save the metadata to mongo.
         DBObject replaceWODots = removeDots(replace, reporting);
+
+        // carry forward ALL existing keys/value pairs (owner, key, _id, alias, ready, status)
+        replaceWODots.putAll(result);
+
         //now add the new keys
-        replaceWODots.put(Tokens.OWNER, owner);
-        replaceWODots.put("key", workspace);
-        replaceWODots.put("_id", id);
         replaceWODots.put("timestamp", getISONow()); //The last time the workspace was touched.
-        replaceWODots.put(Tokens.WORKSPACE_ALIAS, alias);
+
         if(reporting) System.out.println(replaceWODots.toString());
         col.save(replaceWODots);
     }
