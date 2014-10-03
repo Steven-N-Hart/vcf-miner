@@ -110,6 +110,8 @@ SecurityController = Backbone.Marionette.Controller.extend({
             success: function(authResponse) {
                 if (authResponse.isAuthenticated) {
 
+                    console.log("usertoken: " + authResponse.userToken);
+
                     try {
                         var user = self.initUser(authResponse.userToken, username);
                         var userGroups = self.getGroupsForLoggedInUser(authResponse.userToken);
