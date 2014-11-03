@@ -81,7 +81,7 @@ public class DownloadFile {
         return q;
     }
 
-    private StreamingOutput failedInputMessage(final String json){
+    public StreamingOutput failedInputMessage(final String json){
         return new StreamingOutput() {
             public void write(OutputStream output) throws IOException, WebApplicationException {
                 try {

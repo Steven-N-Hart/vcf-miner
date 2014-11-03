@@ -183,7 +183,7 @@ public class ProblemVCFITCase {
     }
 
 
-    //@Test
+    @Test
     public void testExcessiveWarningsNotPresent() throws IOException, ProcessTerminatedException {
         //certain versions of pipes had excessive warnings when custom logic failed on a VCF, this tests that the version of pipes is correct
         String vcf = "src/test/resources/testData/failCustomLogic.vcf";
