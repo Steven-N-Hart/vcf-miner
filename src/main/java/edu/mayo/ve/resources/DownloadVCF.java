@@ -93,6 +93,11 @@ public class DownloadVCF {
                 DBObject dbfield = (DBObject) section.get(field);
                 //output.write(dbfield.toString().getBytes());
                 //output.write("\n".getBytes());
+                String number = dbfield.get("number").toString();
+                //for these fields we actually change the data, and provide a custom calculation for the fields they are interested in.  So they need to be changed to Number=1
+                if(key.equalsIgnoreCase("INFO") && (field.equalsIgnoreCase("AC") ||  field.equalsIgnoreCase("AN") || field.equalsIgnoreCase("AF")) ){
+                    number = "1";
+                }
                 String line = "##" + key + "=<ID=" + field +
                         ",Number=" + dbfield.get("number").toString() +
                         ",Type=" + dbfield.get("type").toString() +
@@ -139,6 +144,7 @@ public class DownloadVCF {
         DBCursor documents = col.find(query);
         for( i = 0; documents.hasNext(); i++){
             DBObject next = documents.next();
+            next = recalculateAlleleStats(next, q.getSelectedSamples());
             //#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT
             output.write(next.get("CHROM").toString().getBytes());
             output.write("\t".getBytes());
@@ -163,6 +169,56 @@ public class DownloadVCF {
             //System.out.println(next);
         }
     }
+
+    /**
+     * when the user only selects a subset of variants, the values for AC, AN, and AF all need to be recalculated. This modifies the variant row in place as json so it can be
+     * formatted properly later...
+     * @param variant
+     * @return
+     */
+    public DBObject recalculateAlleleStats(DBObject variant, List<String> selectedSamples){
+        DBObject info = (DBObject) variant.get("INFO");
+        if(selectedSamples != null){
+            if(selectedSamples.size() > 0){
+                int ac = calculateAC(variant);
+                int an = calculateAN(variant);
+                //"CALCULATIONS.AF = CALCULATIONS.AC / CALCULATIONS.AN;"
+                double af = (1.0*ac) / (1.0*an);
+                System.out.println(variant.toString());
+                info.put("AC",ac);
+                info.put("AN", an);
+                info.put("AF", af);
+            }
+        }
+        variant.put("INFO", info);
+        return variant;
+    }
+
+    //"CALCULATIONS.AC = hetrocount + 2*homocount;"
+    public int calculateAC(DBObject variant){
+        int ac =0;
+        BasicDBObject format = (BasicDBObject) variant.get("FORMAT");
+        BasicDBList bhomozygousList = (BasicDBList) format.get("HomozygousList");
+        BasicDBList bheterozygousList = (BasicDBList) format.get("HeterozygousList");
+        if(bheterozygousList == null || bhomozygousList == null) return -1;
+        ac = bheterozygousList.size() + 2* bhomozygousList.size();
+        return ac;
+    }
+
+    //"CALCULATIONS.AN = 2*hetrocount + 2*homocount + 2*wildcount;"
+    public int calculateAN(DBObject variant){
+        int an =0;
+        BasicDBObject format = (BasicDBObject) variant.get("FORMAT");
+        BasicDBList bhomozygousList = (BasicDBList) format.get("HomozygousList");
+        BasicDBList bheterozygousList = (BasicDBList) format.get("HeterozygousList");
+        BasicDBList bwildtypeList = (BasicDBList) format.get("WildtypeList");
+        if(bheterozygousList == null || bhomozygousList == null || bwildtypeList == null) return -1;
+        an = bheterozygousList.size() + 2* bhomozygousList.size() + 2*bwildtypeList.size();
+        return an;
+    }
+
+
+
 
     public String formatInfo(DBObject info, DBObject schema){
         StringBuilder sb = new StringBuilder();

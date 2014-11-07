@@ -25,6 +25,8 @@ public class QuerryDownload extends Querry {
     ArrayList<String> returnFields = new ArrayList<String>();
     /** display fields has the same order as returnFields, but instead of being what the database calls the field, it is what the header should be (so it can match what was in the display and not confuse users)*/
     ArrayList<String> displayFields = new ArrayList<String>();
+    /** if the user wants to slice an output file by variants, they will use this optional array */
+    ArrayList<String> selectedSamples = new ArrayList<String>();
 
     /** displays in the header the filters applied to get the result set (optional)
      * e.g.
@@ -103,5 +105,11 @@ public class QuerryDownload extends Querry {
         this.displayFiltersApplied = displayFiltersApplied;
     }
 
+    public ArrayList<String> getSelectedSamples() {
+        return selectedSamples;
+    }
 
+    public void setSelectedSamples(ArrayList<String> selectedSamples) {
+        this.selectedSamples = selectedSamples;
+    }
 }
