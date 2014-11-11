@@ -4,6 +4,7 @@ import com.mongodb.BasicDBObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -22,11 +23,11 @@ import java.util.Set;
 public class QuerryDownload extends Querry {
 
     /** a special field for those cases where we want to download a tab delimited file and we only need certain fields - this is the representation in the database */
-    ArrayList<String> returnFields = new ArrayList<String>();
+    List<String> returnFields = new ArrayList<String>();
     /** display fields has the same order as returnFields, but instead of being what the database calls the field, it is what the header should be (so it can match what was in the display and not confuse users)*/
-    ArrayList<String> displayFields = new ArrayList<String>();
+    List<String> displayFields = new ArrayList<String>();
     /** if the user wants to slice an output file by variants, they will use this optional array */
-    ArrayList<String> selectedSamples = new ArrayList<String>();
+    List<String> selectedSamples = new ArrayList<String>();
 
     /** displays in the header the filters applied to get the result set (optional)
      * e.g.
@@ -81,23 +82,23 @@ public class QuerryDownload extends Querry {
         return b;
     }
 
-    public ArrayList<String> getReturnFields() {
+    public List<String> getReturnFields() {
         return returnFields;
     }
 
-    public void setReturnFields(ArrayList<String> returnFields) {
+    public void setReturnFields(List<String> returnFields) {
         this.returnFields = returnFields;
     }
 
-    public ArrayList<String> getDisplayFields() {
+    public List<String> getDisplayFields() {
         return displayFields;
     }
 
-    public void setDisplayFields(ArrayList<String> displayFields) {
+    public void setDisplayFields(List<String> displayFields) {
         this.displayFields = displayFields;
     }
 
-    public ArrayList<DisplayedFilterVariants> getDisplayFiltersApplied() {
+    public List<DisplayedFilterVariants> getDisplayFiltersApplied() {
         return displayFiltersApplied;
     }
 
@@ -105,11 +106,11 @@ public class QuerryDownload extends Querry {
         this.displayFiltersApplied = displayFiltersApplied;
     }
 
-    public ArrayList<String> getSelectedSamples() {
+    public List<String> getSelectedSamples() {
         return selectedSamples;
     }
 
-    public void setSelectedSamples(ArrayList<String> selectedSamples) {
+    public void setSelectedSamples(List<String> selectedSamples) {
         this.selectedSamples = selectedSamples;
     }
 }
