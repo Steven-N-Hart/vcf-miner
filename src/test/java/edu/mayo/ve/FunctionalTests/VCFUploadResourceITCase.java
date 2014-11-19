@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.SecurityUserAppHelper;
@@ -84,9 +85,45 @@ public class VCFUploadResourceITCase {
         JsonElement jelement = new JsonParser().parse(json);
         JsonObject jobject = jelement.getAsJsonObject();
         String key = jobject.getAsJsonPrimitive("key").getAsString();
+
+        // since the VCF import itself runs in a separate thread and the uploadFile()
+        // returns before the import completes, it's necessary to check the status
+        // until the import completes before doing any JUNIT assert statements
+        waitForImportStatus(key, "workspace is ready");
+
         assertEquals(1, count(key));
 
         System.out.println(key);
+
+    }
+
+    /**
+     * Continuously polls the status of the given workspace.  If the status matches
+     * the specified "expected" status, then the method will return.
+     *
+     * @param workspaceKey
+     *      The key for the workspace to poll.
+     * @param expectedStatus
+     *      The "expected" status to check for.  The method will return when the workspace status
+     *      matches this status value.
+     * @throws InterruptedException
+     *      Can potentially be thrown during the 1 second sleep between polls.
+     */
+    private void waitForImportStatus(String workspaceKey, String expectedStatus) throws InterruptedException {
+
+        DB db = MongoConnection.getDB();
+
+        DBCollection coll = db.getCollection(edu.mayo.util.Tokens.METADATA_COLLECTION);
+        DBObject query = new BasicDBObject().append(edu.mayo.util.Tokens.KEY, workspaceKey);
+
+        while (true) {
+            DBObject dbo = coll.findOne(query);
+            String status = (String) dbo.get("status");
+            if (status.equals(expectedStatus)) {
+                return;
+            }
+            Thread.sleep(1000);
+        }
 
     }
 
