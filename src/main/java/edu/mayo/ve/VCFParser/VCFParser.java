@@ -543,7 +543,7 @@ public class VCFParser implements ParserInterface {
         //auto-index all SNPEFF columns
         indexSNPEFF(col, json, reporting);
         //index format
-        indexFormat(vcf.getFormatKeys().keySet(), col, reporting);
+        indexFormat(vcf.getFormatKeys(), col, reporting);
     }
 
     /**
