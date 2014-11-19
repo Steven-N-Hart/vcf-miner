@@ -71,7 +71,7 @@ public class QuerriesITCase {
         assertEquals(1,                    JsonPath.compile("0.HEADER.INFO.INFO1.number").read(json));
         assertEquals("String",             JsonPath.compile("0.HEADER.INFO.INFO1.type").read(json));
         assertEquals("String info field",  JsonPath.compile("0.HEADER.INFO.INFO1.Description").read(json));
-        assertEquals(1,                    JsonPath.compile("0.HEADER.INFO.INFO2.number").read(json));
+        assertEquals(0,                    JsonPath.compile("0.HEADER.INFO.INFO2.number").read(json));
         assertEquals("Flag",               JsonPath.compile("0.HEADER.INFO.INFO2.type").read(json));
         assertEquals("Flag info field",    JsonPath.compile("0.HEADER.INFO.INFO2.Description").read(json));
         assertEquals(1,                    JsonPath.compile("0.HEADER.INFO.INFO3.number").read(json));

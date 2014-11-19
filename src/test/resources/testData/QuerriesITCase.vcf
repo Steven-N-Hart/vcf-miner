@@ -1,6 +1,6 @@
 ##fileformat=VCFv4.1
 ##INFO=<ID=INFO1,Number=1,Type=String,Description="String info field">
-##INFO=<ID=INFO2,Number=1,Type=Flag,Description="Flag info field">
+##INFO=<ID=INFO2,Number=0,Type=Flag,Description="Flag info field">
 ##INFO=<ID=INFO3,Number=1,Type=Integer,Description="Integer info field">
 ##INFO=<ID=INFO4,Number=1,Type=Float,Description="Float info field">
 ##FORMAT=<ID=FORMAT1,Number=1,Type=Integer,Description="Integer format field">
