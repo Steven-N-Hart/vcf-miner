@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import javax.ws.rs.WebApplicationException;
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -68,6 +69,8 @@ public class QuerriesITCase {
         assertEquals(workspaceKey,         JsonPath.compile("0.key").read(json));
         assertEquals(DUMMY_ALIAS,          JsonPath.compile("0.alias").read(json));
         assertEquals(DUMMY_USER_ID,        JsonPath.compile("0.owner").read(json));
+
+        // ##INFOs
         assertEquals(1,                    JsonPath.compile("0.HEADER.INFO.INFO1.number").read(json));
         assertEquals("String",             JsonPath.compile("0.HEADER.INFO.INFO1.type").read(json));
         assertEquals("String info field",  JsonPath.compile("0.HEADER.INFO.INFO1.Description").read(json));
@@ -80,9 +83,29 @@ public class QuerriesITCase {
         assertEquals(1,                    JsonPath.compile("0.HEADER.INFO.INFO4.number").read(json));
         assertEquals("Float",              JsonPath.compile("0.HEADER.INFO.INFO4.type").read(json));
         assertEquals("Float info field",   JsonPath.compile("0.HEADER.INFO.INFO4.Description").read(json));
+
+        // ## FORMATs
         assertEquals(1,                    JsonPath.compile("0.HEADER.FORMAT.FORMAT1.number").read(json));
         assertEquals("Integer",            JsonPath.compile("0.HEADER.FORMAT.FORMAT1.type").read(json));
         assertEquals("Integer format field", JsonPath.compile("0.HEADER.FORMAT.FORMAT1.Description").read(json));
+
+        // ##METAs
+        assertEquals(1,                    JsonPath.compile("0.HEADER.META.META1.number").read(json));
+        assertEquals("Float",              JsonPath.compile("0.HEADER.META.META1.type").read(json));
+        assertEquals("A float field",      JsonPath.compile("0.HEADER.META.META1.Description").read(json));
+        assertEquals(Arrays.asList(21.0, 30.3, 42.7),     JsonPath.compile("0.HEADER.META.META1.Values").read(json));
+        assertEquals(1,                    JsonPath.compile("0.HEADER.META.META2.number").read(json));
+        assertEquals("String",             JsonPath.compile("0.HEADER.META.META2.type").read(json));
+        assertEquals("A string field",     JsonPath.compile("0.HEADER.META.META2.Description").read(json));
+        assertEquals(Arrays.asList("PASS", "FAIL"),     JsonPath.compile("0.HEADER.META.META2.Values").read(json));
+        assertEquals(0,                    JsonPath.compile("0.HEADER.META.META3.number").read(json));
+        assertEquals("Flag",               JsonPath.compile("0.HEADER.META.META3.type").read(json));
+        assertEquals("A flag field",       JsonPath.compile("0.HEADER.META.META3.Description").read(json));
+        assertEquals(Arrays.asList(),      JsonPath.compile("0.HEADER.META.META3.Values").read(json));
+        assertEquals(1,                    JsonPath.compile("0.HEADER.META.META4.number").read(json));
+        assertEquals("Integer",            JsonPath.compile("0.HEADER.META.META4.type").read(json));
+        assertEquals("An integer field",   JsonPath.compile("0.HEADER.META.META4.Description").read(json));
+        assertEquals(Arrays.asList(51, 78, 109),     JsonPath.compile("0.HEADER.META.META4.Values").read(json));
 
         JsonPath.compile("0.SAMPLES.SAMPLE1").read(json);
 
