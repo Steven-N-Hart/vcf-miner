@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  *
  */
-@Path("/ve")
+@Path("/ve/subset")
 public class Subset {
 
     private SecurityUserAppHelper securityHelper;
@@ -72,7 +72,7 @@ public class Subset {
      * @throws Exception
      */
     @POST
-    @Path("subset/workspace/{workspace}/user/{user}/alias/{alias}")
+    @Path("workspace/{workspace}/user/{user}/alias/{alias}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response subset(
             SubsetInfo subsetInfo,
