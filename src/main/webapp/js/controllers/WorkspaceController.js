@@ -10,10 +10,9 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     workspaces: new WorkspaceList(),
 
     /**
-     * Keys of workspaces allowed in {@link WorkspaceController.workspaces}
-     * NULL indicates that all workspaces are allowed.
+     * Currently selected group.  NULL if All groups are selected.
      */
-    filterKeys: null,
+    selectedUserGroup: null,
 
     /**
      * Array of workspace keys that should be updated automatically
@@ -49,8 +48,11 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                     }
                 },
                 submitHandler: function(form) {
+
+                    // hide add dialog
+                    $('#add_workspace_modal').modal('hide');
+
                     self.addWorkspace();
-                    $('#add_workspace_modal').modal('hide')
                 },
                 highlight: function(element) {
                     $(element).parent().addClass('control-group error');
@@ -86,7 +88,6 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     reset: function() {
         this.workspaces.reset();
         this.notReadyKeys = new Array();
-        this.filterKeys = null;
     },
 
     /**
@@ -99,64 +100,69 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         var workspaceTableView = new WorkspaceTableView({
             collection: this.workspaces
         });
-        options.region.show(workspaceTableView);
+        options.regionTable.show(workspaceTableView);
 
-        this.refreshAllWorkspaces();
-    },
-
-    /**
-     * Show workspace group dropdown
-     *
-     * @param options
-     */
-    showWorkspaceGroupDropdown: function (options) {
 
         this.workspaceGroupLayout = new WorkspaceDropdownView({
             collection: MongoApp.securityController.userGroups
         });
-        options.region.show(this.workspaceGroupLayout);
+        options.regionGroup.show(this.workspaceGroupLayout);
 
         var self = this;
         this.listenTo(self.workspaceGroupLayout, self.workspaceGroupLayout.EVENT_ALL_GROUPS, function (userGroups) {
 
-            self.workspaceGroupLayout.disableDropdown();
+            self.selectedUserGroup = null; // NULL indicates all user groups
 
-            self.filterKeys = null;
+            // do not allow the user to change the workspace while refresh is happening
+            self.workspaceGroupLayout.disableDropdown();
             self.refreshAllWorkspaces();
+            self.workspaceGroupLayout.enableDropdown();
         });
         this.listenTo(self.workspaceGroupLayout, self.workspaceGroupLayout.EVENT_ONE_GROUP, function (userGroup) {
 
-            self.workspaceGroupLayout.disableDropdown();
+            self.selectedUserGroup = userGroup;
 
-            var userToken = MongoApp.securityController.user.get("token");
-            try {
-                self.filterKeys = MongoApp.securityController.getAuthorizedWorkspaceKeys(userToken, userGroup);
+            // do not allow the user to change the workspace while refresh is happening
+            self.workspaceGroupLayout.disableDropdown();
                 self.refreshAllWorkspaces();
-            } catch (e) {
-                if (e instanceof AJAXRequestException) {
-                    jqueryAJAXErrorHandler(e.jqXHR, e.textStatus, e.errorThrown);
-                }
-            }
+            self.workspaceGroupLayout.enableDropdown();
         });
+
+        // initial fetch of data
+        this.workspaceGroupLayout.disableDropdown();
+        this.refreshAllWorkspaces();
+        this.workspaceGroupLayout.enableDropdown();
     },
 
     /**
      * Refreshes the Backbone collection of workspaces by querying the server.
+     *
+     * NOTE: This function is synchronous.
      */
     refreshAllWorkspaces: function() {
 
         console.log("refreshing all workspaces");
 
-        var self = this;
-
         // clear out workspaces
         this.workspaces.reset();
+
+        var userToken = MongoApp.securityController.user.get("token");
+
+        // Keys of workspaces allowed in {@link WorkspaceController.workspaces}
+        // NULL indicates that all workspaces are allowed.
+        var filterKeys = null;
+        if (this.selectedUserGroup != null) {
+            filterKeys = MongoApp.securityController.getAuthorizedWorkspaceKeys(userToken, this.selectedUserGroup);
+        }
+
+        var self = this;
 
         // get workspace information from server
         $.ajax({
             url: "/mongo_svr/ve/q/owner/list_workspaces/" + MongoApp.securityController.user.get("username"),
-            headers: {usertoken: MongoApp.securityController.user.get("token")},
+            headers: {usertoken: userToken},
             dataType: "json",
+            async: false,
             success: function(json) {
 
                 // each workspace object has an increment num as the attr name
@@ -166,7 +172,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                         var workspaceJSON = json[attr];
 
                         // check filtered keys
-                        if ((self.filterKeys == null) || _.contains(self.filterKeys, workspaceJSON.key)) {
+                        if ((filterKeys == null) || _.contains(filterKeys, workspaceJSON.key)) {
                             var ws = new Workspace();
 
                             self.initWorkspace(workspaceJSON, ws);
@@ -186,7 +192,6 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                         }
                     }
                 }
-                self.workspaceGroupLayout.enableDropdown();
             },
             error: jqueryAJAXErrorHandler
         });
@@ -259,8 +264,6 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     addWorkspace: function() {
         var self = this;
 
-        $("#progress").css('width','0%');
-
         var uploadFile = $( '#vcf_file_upload' )[0].files[0]
 
         var name = $("#vcf_name_field").val();
@@ -290,23 +293,25 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
                 $("#progress").css('width','100%');
 
+                // refresh the workspaces
+                // this will include the newly imported workspace
                 self.refreshAllWorkspaces();
+
+                $('#upload_vcf_progress_modal').modal('hide');
+
             } else {
                 console.log("Error " + xhr.status + " occurred uploading file");
                 genericAJAXErrorHandler(xhr);
             }
-            $('#upload_vcf_progress_modal').modal('hide');
         };
 
         var formData = new FormData;
         formData.append('file', uploadFile);
+
+        $("#progress").css('width','0%');
+        $('#upload_vcf_progress_modal').modal('show');
+
         xhr.send(formData);
-
-        // hide
-        $('#add_workspace_modal').modal('hide');
-
-        // display
-        $('#upload_vcf_progress_modal').modal();
     },
 
     /**

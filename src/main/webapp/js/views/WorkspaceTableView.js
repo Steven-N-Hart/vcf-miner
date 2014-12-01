@@ -111,7 +111,7 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
         this.dataTable = this.ui.table.dataTable( {
             sDom: sDom,
             aaData: [],
-            iDisplayLength: 25,
+            iDisplayLength: 9999999, // show all in the same table w/o paging
             bAutoWidth: false,
             bScrollCollapse: true,
             bRetrieve: true,

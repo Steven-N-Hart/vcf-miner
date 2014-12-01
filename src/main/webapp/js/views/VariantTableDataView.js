@@ -101,7 +101,9 @@ VariantTableDataView = Backbone.Marionette.Layout.extend({
             rows.push(aaDataRow);
         });
 
+        if (rows.length > 0) {
         this.dataTable.fnAddData(rows, false);
+        }
 
         this.dataTable.fnDraw();
     },
