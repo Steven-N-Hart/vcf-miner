@@ -26,6 +26,7 @@ import edu.mayo.parsers.ParserInterface;
 import edu.mayo.pipes.MergePipe;
 import edu.mayo.pipes.PrintPipe;
 import edu.mayo.pipes.UNIX.CatPipe;
+import edu.mayo.pipes.bioinformatics.SampleDefinition;
 import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
 import edu.mayo.pipes.history.HistoryInPipe;
 import edu.mayo.index.Index;
@@ -301,6 +302,22 @@ public class VCFParser implements ParserInterface {
             }
         }
 
+    }
+
+    /**
+     * Adds the {@link SampleDefinition} values of type string to the typeahead backend.
+     * @param def
+     *      The {@link SampleDefinition} to be used.
+     * @param workspace
+     *      The workspace key.
+     */
+    public void addToTypeAhead(SampleDefinition def, String workspace) {
+        for (String stringMetaKey: def.getStringKeys()) {
+            final String ikey = "META." + stringMetaKey;
+            for (String value: def.getStringValues(stringMetaKey)) {
+                typeAhead.put(workspace, ikey, value);
+            }
+        }
     }
 
     private DBObject metadata = null;

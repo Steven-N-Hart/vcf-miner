@@ -12,6 +12,7 @@ import edu.mayo.TypeAhead.TypeAheadInterface;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.pipes.PrintPipe;
 import edu.mayo.pipes.UNIX.CatPipe;
+import edu.mayo.pipes.bioinformatics.SampleDefinition;
 import edu.mayo.util.CompareJSON;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.resources.*;
@@ -318,6 +319,38 @@ public class VCFParserITCase {
 
     }
 
+    @Test
+    public void addToTypeAhead() {
 
+        final String workspaceID = provision("alias");
+
+        VCFParser parser = new VCFParser();
+
+        SampleDefinition def = new SampleDefinition("SAMPLE1");
+        def.addString("KEY1", "value1");
+        def.addString("KEY1", "value2");
+        def.addString("KEY1", "value3");
+        def.addString("KEY1", "foo");
+        def.addString("KEY1", "bar");
+
+        parser.addToTypeAhead(def, workspaceID);
+
+        TypeAheadResource resrc = new TypeAheadResource();
+
+        assertEquals(
+                "{ \"META.KEY1\" : [ \"value1\" , \"value2\" , \"value3\"]}",
+                resrc.getTypeAhead4Value(workspaceID, "META.KEY1", "val", 100)
+        );
+
+        assertEquals(
+                "{ \"META.KEY1\" : [ \"foo\"]}",
+                resrc.getTypeAhead4Value(workspaceID, "META.KEY1", "f", 100)
+        );
+
+        assertEquals(
+                "{ \"META.KEY1\" : [ \"bar\"]}",
+                resrc.getTypeAhead4Value(workspaceID, "META.KEY1", "b", 100)
+        );
+    }
 
 }
