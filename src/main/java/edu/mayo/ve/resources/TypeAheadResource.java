@@ -129,9 +129,6 @@ public class TypeAheadResource {
             @PathParam("prefix") String prefix,
             @PathParam("maxValues") Integer maxValues
     ){
-        if(!field.startsWith("INFO")){
-            field = "INFO." + field;
-        }
         TypeAheadCollection ta = new TypeAheadCollection();
         List<String> results = ta.getTypeAhead4Value(workspaceID,field,prefix,maxValues);
         return formatAsJSON(workspaceID,field, results).toString();

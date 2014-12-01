@@ -82,7 +82,7 @@ public class TypeAheadITCase {
     @Test
     public void testGetTypeAhead4Value(){
         System.out.println("TestGetTypeAhead4Value");
-        String json = tar.getTypeAhead4Value(workspaceID, "GenotyperControls");
+        String json = tar.getTypeAhead4Value(workspaceID, "INFO.GenotyperControls");
         DBObject expected = (DBObject) JSON.parse(json);
         DBObject result = (DBObject) JSON.parse(json);
         CompareJSON.equals((BasicDBList) expected.get("INFO.GenotyperControls"),(BasicDBList) result.get("INFO.GenotyperControls") );
@@ -147,7 +147,7 @@ public class TypeAheadITCase {
     public void testGetTypeAhead4Value4Params(){
         //test iterations where you hit the cache or the index!
         //example where you go to the index to get the values
-        String result = tar.getTypeAhead4Value(workspaceID,"SNPEFF_GENE_NAME","M",100000);
+        String result = tar.getTypeAhead4Value(workspaceID,"INFO.SNPEFF_GENE_NAME","M",100000);
         String expected = "{ \"INFO.SNPEFF_GENE_NAME\" : [ \"MIB2\" , \"MIR200A\" , \"MRPL20\" , \"MXRA8\"]}";
         assertTrue( CompareJSON.equals(expected,result) );
         //assertEquals(expected,result);
@@ -157,17 +157,17 @@ public class TypeAheadITCase {
         //        "Pindel",
         //        "Samtools"
         //],
-        result = tar.getTypeAhead4Value(workspaceID,"GenotyperControls","",100000);
+        result = tar.getTypeAhead4Value(workspaceID,"INFO.GenotyperControls","",100000);
         expected = "{ \"INFO.GenotyperControls\" : [ \"Samtools\" , \"Pindel\" , \"Samtools-Pindel\"]}";
         assertTrue( CompareJSON.equals(expected,result) );
         //assertEquals(expected,result);
         //Checking that prefixes work
-        result = tar.getTypeAhead4Value(workspaceID,"GenotyperControls","Sam",100000);
+        result = tar.getTypeAhead4Value(workspaceID,"INFO.GenotyperControls","Sam",100000);
         expected = "{ \"INFO.GenotyperControls\" : [ \"Samtools\" , \"Samtools-Pindel\"]}";
         assertTrue( CompareJSON.equals(expected,result) );
         //assertEquals(expected,result);
         //example where there are no values in the database to type-ahead
-        result = tar.getTypeAhead4Value(workspaceID,"CGT","",100000);
+        result = tar.getTypeAhead4Value(workspaceID,"INFO.CGT","",100000);
         expected = "{ \"INFO.CGT\" : [ ]}";  //all of the values for this are null, so this is the response
         assertEquals(expected,result);
 
