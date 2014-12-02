@@ -102,17 +102,9 @@ SampleSelectionLayout = Backbone.Marionette.Layout.extend({
         var headerRow = this.getHeader();
         var data = this.getData();
 
-//        var dataSet = [
-//            ['Trident','Internet Explorer 4.0','Win 95+','4','X'],
-//            ['Trident','Internet Explorer 5.0','Win 95+','5','C'],
-//            ['Trident','Internet Explorer 5.5','Win 95+','5.5','A']
-//            ];
-
         var sDom =
-            "<'row'<'pull-left'<'show'>><'pull-right'<'toolbar'>>>" +
-            "<'row'<'pull-left'l><'pull-right'i>>" +
             "<'row't>" +
-            "<'row'<'pull-left'p>>";
+            "<'row'<'pull-left'p><'pull-right'i>>";
 
         // How to add a checkbox column:
         //   http://editor.datatables.net/examples/api/checkbox.html
@@ -130,7 +122,7 @@ SampleSelectionLayout = Backbone.Marionette.Layout.extend({
             "iDisplayLength": 25,
             "aLengthMenu": [[10, 25, 50, 100, 500, 1000, -1],[10, 25, 50, 100, 500, 1000, 'All']],
             "bAutoWidth": false,
-            "bScrollCollapse": true,
+            "bScrollCollapse": true
 //            "fnHeaderCallback": function( nHead, aData, iStart, iEnd, aiDisplay ) {
 //                // set tooltip 'title' attribute for all TH elements that correspond to visible columns
 //                var colIdx = 0;
