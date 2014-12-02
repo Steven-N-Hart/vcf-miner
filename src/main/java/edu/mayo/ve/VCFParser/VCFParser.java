@@ -4,6 +4,7 @@
  */
 package edu.mayo.ve.VCFParser;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mongodb.*;
@@ -28,6 +29,7 @@ import edu.mayo.pipes.PrintPipe;
 import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.pipes.bioinformatics.SampleDefinition;
 import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
+import edu.mayo.pipes.bioinformatics.VCFHeaderParser;
 import edu.mayo.pipes.history.HistoryInPipe;
 import edu.mayo.index.Index;
 import edu.mayo.senders.FileSender;
@@ -36,10 +38,13 @@ import edu.mayo.util.Tokens;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.util.SystemProperties;
 import java.io.IOException;
+import edu.mayo.pipes.bioinformatics.SampleDefinition;
 
 //import edu.mayo.cli.CommandPlugin; TO DO! get this to work :(
 import edu.mayo.pipes.ReplaceAllPipe;
 import edu.mayo.util.MongoConnection;
+import edu.mayo.ve.resources.SampleMeta;
+
 import java.util.Date;
 
 
@@ -202,6 +207,12 @@ public class VCFParser implements ParserInterface {
                 //System.out.println(bo.toString());
                 col.save(removeDots(bo, reporting));
                 addToTypeAhead(bo, workspace,jsonmeta);
+                try {
+                    addPoundSamples(vcf.getSampleDefinitions(), workspace);
+                }catch (IOException e){
+                    //this exception happens when the configuration file, sys.properties is not set up correctly.
+                    throw new ProcessTerminatedException();
+                }
             }
             if(reporting){
                 System.out.println("i:" + i + "\ts:" + s.length());
@@ -282,6 +293,31 @@ public class VCFParser implements ParserInterface {
                 }
             }
         }
+    }
+
+    /**
+     * ##SAMPLE LINES need to be added to their own collection so that later code can query it.
+     *    DBObject metadata
+     */
+    public void addPoundSamples(Iterator<SampleDefinition> iter, String workspace) throws IOException {
+        SampleMeta sm = new SampleMeta();
+        SystemProperties sysprop = new SystemProperties();
+        String poundsamplecol = sysprop.get(SampleMeta.sample_meta_collection);
+        DB db = MongoConnection.getDB();
+        DBCollection col = db.getCollection(poundsamplecol);
+
+        Gson gson = new Gson();
+        //First, get a curser to the ##SAMPLE objects.
+        while(iter.hasNext()){
+            SampleDefinition sdef = (SampleDefinition) iter.next();
+            String json = gson.toJson(sdef);
+            BasicDBObject bo = (BasicDBObject) JSON.parse(json);
+            bo.append(SampleMeta.sample_meta_key, workspace);
+            System.out.println(json);
+            col.save(bo);
+        }
+
+        sm.indexSampleDocuments();
     }
 
     /**

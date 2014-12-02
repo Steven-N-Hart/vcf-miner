@@ -6,12 +6,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
+import com.tinkerpop.pipes.Pipe;
 import com.tinkerpop.pipes.util.Pipeline;
 import edu.mayo.TypeAhead.TypeAheadCollection;
 import edu.mayo.TypeAhead.TypeAheadInterface;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
+import edu.mayo.pipes.MergePipe;
 import edu.mayo.pipes.PrintPipe;
+import edu.mayo.pipes.ReplaceAllPipe;
 import edu.mayo.pipes.UNIX.CatPipe;
+import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
+import edu.mayo.pipes.history.HistoryInPipe;
 import edu.mayo.pipes.bioinformatics.SampleDefinition;
 import edu.mayo.util.CompareJSON;
 import edu.mayo.util.Tokens;
@@ -317,6 +322,67 @@ public class VCFParserITCase {
         Workspace wksp = new Workspace();
         wksp.deleteWorkspace(workspaceID);
 
+    }
+
+
+    @Test
+    public void testAddPoundSamples() throws IOException {
+        DBObject samps;
+        SampleMeta smeta = new SampleMeta();
+        String workspace = "wHASH";
+
+        //clean up the workspace before the test in case the tests crashed mid run last time...
+        smeta.deleteSamples4Workspace(workspace);
+        //validate that we did indeed clean up after ourselves ...
+        samps = smeta.getAllSampleDocuments4WorkspaceImpl(workspace);
+        BasicDBList results = ((BasicDBList)samps.get("results"));
+        assertEquals(0, results.size());
+
+
+        //first populate the ##SAMPLES so that they can be iterated over
+        String f = "src/test/resources/testData/vcf-format-4_3.vcf";
+        VCF2VariantPipe vcf = new VCF2VariantPipe(true, false);
+        Pipe p = new Pipeline(new CatPipe(),
+                new ReplaceAllPipe("\\{",""),
+                new ReplaceAllPipe("\\}",""),
+                new HistoryInPipe(),
+                vcf,
+                new MergePipe("\t"),
+                new ReplaceAllPipe("^.*\t\\{", "{"),
+                new ReplaceAllPipe("\"_id\":","\"_ident\":"),
+                new ReplaceAllPipe("Infinity","2147483648")
+        );
+        p.setStarts(Arrays.asList(f));
+        String vjson = (String) p.next(); //
+        //System.out.println(vjson);        //the first variant from VCF as json
+
+        //now for the test
+        VCFParser parser = new VCFParser();
+        parser.addPoundSamples(vcf.getSampleDefinitions(),workspace);
+
+        //we need to query mongo and make sure the objects are there
+        samps = smeta.getAllSampleDocuments4WorkspaceImpl(workspace);
+        results = ((BasicDBList)samps.get("results"));
+        //check that the number of results equals the number of ##SAMPLE lines in the original VCF
+        assertEquals(3, results.size());
+        //check that the contents of the results is correct for at least one ##SAMPLE line
+        BasicDBObject result1 = (BasicDBObject) results.get(0);
+        //{"name":"NA00003","integerVals":{"Field4":[109]},"floatVals":{"Field1":[42.7]},"stringVals":{"Field2":["FAIL"],"Field5":["s5","s22"]},"characterVals":{},"booleanVals":{"Field3":false}}
+        assertEquals("NA00003", result1.getString("name"));
+        assertEquals(109, ((BasicDBList)((BasicDBObject)result1.get("integerVals")).get("Field4")).get(0));
+        assertEquals(42.7, ((BasicDBList)((BasicDBObject)result1.get("floatVals")).get("Field1")).get(0));
+        assertEquals("FAIL", ((BasicDBList)((BasicDBObject)result1.get("stringVals")).get("Field2")).get(0));
+        assertEquals("s5", ((BasicDBList)((BasicDBObject)result1.get("stringVals")).get("Field5")).get(0));
+        assertEquals("s22", ((BasicDBList)((BasicDBObject)result1.get("stringVals")).get("Field5")).get(1));
+        assertEquals(false, (((BasicDBObject)result1.get("booleanVals")).get("Field3")));
+        assertEquals(0, ((BasicDBObject)result1.get("characterVals")).keySet().size());
+
+        //clean up after ourselves
+        smeta.deleteSamples4Workspace(workspace);
+        //validate that we did indeed clean up after ourselves ...
+        samps = smeta.getAllSampleDocuments4WorkspaceImpl(workspace);
+        results = ((BasicDBList)samps.get("results"));
+        assertEquals(0, results.size());
     }
 
     @Test
