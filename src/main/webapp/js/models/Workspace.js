@@ -21,6 +21,7 @@ var Workspace = Backbone.Model.extend({
             dataFields: new VCFDataFieldList(),
             sampleNames: new Array(),
             sampleGroups: new SampleGroupList(),
+            sampleMetaFields: new SampleMetadataFieldList(),
             statsErrors: 0,
             statsWarnings: 0,
             statsNumVariants: 0

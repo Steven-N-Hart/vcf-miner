@@ -48,15 +48,7 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
         var userToken = "aaa:bbb";
 
         // Create empty lists - one for the metadata fields, and one for the full list of SampleFilter objects
-        var metadataFieldList = new SampleMetadataFieldList();
         var sampleFilterList  = new SampleFilterList();
-
-        // TODO: We will pass in the metadataFieldList to the subset tab as this will be fetched when the workspaces are fetched:
-        metadataFieldList.push(new SampleMetadataField({id:"Field 1 - Numeric",            type: SampleMetadataFieldType.FLOAT,   desc: "Numeric field"}));
-        metadataFieldList.push(new SampleMetadataField({id:"Field 2 - String (<= cutoff)", type: SampleMetadataFieldType.STRING,  desc: "String field - under cutoff for dropdown-combobox"}));
-        metadataFieldList.push(new SampleMetadataField({id:"Field 3 - Boolean",            type: SampleMetadataFieldType.BOOLEAN, desc: "Boolean field"}));
-        metadataFieldList.push(new SampleMetadataField({id:"Disease - String (> cutoff)",  type: SampleMetadataFieldType.STRING,  desc: "String field - over cutoff for dropdown-combobox"}));
-
 
         // TODO: We will also pass in the list of Samples to the subset tab which will fetched when the workspaces are fetched:
         var sample1 = new Sample({
@@ -102,7 +94,7 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
         var options = {
             workspaceKey:       workspaceKey,
             userToken:          userToken,
-            metadataFieldList:  metadataFieldList,
+            metadataFieldList:  MongoApp.workspace.get("sampleMetaFields"),
             sampleFilterList:   sampleFilterList,
             sampleList:         sampleList,
             sampleSubsetList:   sampleSubsetList
@@ -162,5 +154,4 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
     onClose: function() {
         this.$el.parents('.modal').modal('hide');
     }
-
 });

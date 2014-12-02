@@ -397,6 +397,10 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                     workspace.get("dataFields").add(generalDataFields.models);
                     workspace.get("dataFields").add(infoDataFields.models);
                     workspace.get("dataFields").add(formatDataFields.models);
+
+                    var sampleMetaFields = self.toSampleMetadataFields(json.HEADER.META);
+                    workspace.get("sampleMetaFields").reset();
+                    workspace.get("sampleMetaFields").add(sampleMetaFields.models);
                 }
 
                 var allSamples = new Array();
@@ -416,9 +420,12 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     },
 
     /**
+     * Parses JSON and builds a collection {@link VCFDataField} models.
      *
      * @param infoOrFormat
+     *      JSON that contains INFO or FORMAT information.
      * @param category
+     *
      * @returns {VCFDataFieldList}
      */
     toDataFields: function(infoOrFormat, category) {
@@ -450,6 +457,45 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         }
 
         return dataFields;
+    },
+
+    /**
+     * Parses JSON and builds a collection {@link SampleMetadataField} models.
+     *
+     * @param metaJSON
+     *      JSON that contains ##META information.
+     *
+     * @returns {SampleMetadataFieldList}
+     */
+    toSampleMetadataFields: function(metaJSON) {
+
+        var fields = new SampleMetadataFieldList();
+
+        var fieldNames = getSortedAttrNames(metaJSON);
+        for (var i = 0; i < fieldNames.length; i++) {
+            var fieldName = fieldNames[i];
+            if (metaJSON.hasOwnProperty(fieldName)) {
+                var type;
+                switch(metaJSON[fieldName].type) {
+                    case 'Flag':
+                        type = SampleMetadataFieldType.FLAG;
+                        break;
+                    case 'Integer':
+                        type = SampleMetadataFieldType.INTEGER;
+                        break;
+                    case 'Float':
+                        type = SampleMetadataFieldType.FLOAT;
+                        break;
+                    default:
+                        type = SampleMetadataFieldType.STRING;
+                        break;
+                }
+                var description = metaJSON[fieldName].Description;
+                fields.add(new VCFDataField({id:fieldName, type:type, desc:description}));
+            }
+        }
+
+        return fields;
     },
 
     /**
