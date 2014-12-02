@@ -75,7 +75,7 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
 
         // Number field
         // TODO: Change this to match numeric fields
-        '.numberValue': {
+        '#numberValue': {
             observe: 'values',
             onGet: function(value, options) {
 
