@@ -182,49 +182,55 @@ public class VCFParser implements ParserInterface {
         long starttime = System.currentTimeMillis();
         DBObject jsonmeta = null;
         if(reporting) System.out.println("Processing Data....");
-        for(i=0; p.hasNext(); i++){
-            if(context!=null){ if(context.isTerminated()) throw new ProcessTerminatedException(); }
-            if(reporting) System.out.println(col.count());
-            String s = (String) p.next();
-            //System.out.println(s);
-            BasicDBObject bo = (BasicDBObject) JSON.parse(s);
+        try {
+            for(i=0; p.hasNext(); i++){
+                if(context!=null){ if(context.isTerminated()) throw new ProcessTerminatedException(); }
+                if(reporting) System.out.println(col.count());
+                String s = (String) p.next();
+                //System.out.println(s);
+                BasicDBObject bo = (BasicDBObject) JSON.parse(s);
 
-            if(saveSamples == false){
-                bo = removeSamples(bo);
-            }
-
-            //for type-ahead, we need access to the metadata inside the loop, try to force that here
-            if(jsonmeta == null){
-                //System.out.println(vcf.getJSONMetadata().toString());
-                jsonmeta = (DBObject) JSON.parse(vcf.getJSONMetadata().toString());
-            }
-
-            if(reporting){
-                System.out.println("row before removing dots:"); System.out.println(s);  }
-            if(testing){
-                testingCollection.put(new Integer(i), s);
-            }else {//production
-                //System.out.println(bo.toString());
-                col.save(removeDots(bo, reporting));
-                addToTypeAhead(bo, workspace,jsonmeta);
-                try {
-                    addPoundSamples(vcf.getSampleDefinitions(), workspace);
-                }catch (IOException e){
-                    //this exception happens when the configuration file, sys.properties is not set up correctly.
-                    throw new ProcessTerminatedException();
+                if(saveSamples == false){
+                    bo = removeSamples(bo);
                 }
-            }
-            if(reporting){
-                System.out.println("i:" + i + "\ts:" + s.length());
-            }
 
-            long curtime = System.currentTimeMillis();
-            averageLinePerformance = 1.0*(curtime-starttime)/(i+1);
-            if(i<50){
-                //consider burn in, this is the initial reading(s)...
-                initialLinePerformance = averageLinePerformance;
-            }
+                //for type-ahead, we need access to the metadata inside the loop, try to force that here
+                if(jsonmeta == null){
+                    //System.out.println(vcf.getJSONMetadata().toString());
+                    jsonmeta = (DBObject) JSON.parse(vcf.getJSONMetadata().toString());
+                }
 
+                if(reporting){
+                    System.out.println("row before removing dots:"); System.out.println(s);  }
+                if(testing){
+                    testingCollection.put(new Integer(i), s);
+                }else {//production
+                    //System.out.println(bo.toString());
+                    col.save(removeDots(bo, reporting));
+                    addToTypeAhead(bo, workspace,jsonmeta);
+                }
+                if(reporting){
+                    System.out.println("i:" + i + "\ts:" + s.length());
+                }
+
+                long curtime = System.currentTimeMillis();
+                averageLinePerformance = 1.0*(curtime-starttime)/(i+1);
+                if(i<50){
+                    //consider burn in, this is the initial reading(s)...
+                    initialLinePerformance = averageLinePerformance;
+                }
+
+            }
+        } finally {
+            // close the FileSender so that all messages are flushed to disk
+            sender.close();
+        }
+
+        try {
+            addPoundSamples(vcf.getSampleDefinitions(), workspace);
+        }catch (IOException e){
+            //this exception happens when the configuration file, sys.properties is not set up correctly.
+            throw new ProcessTerminatedException();
         }
 
         json = vcf.getJSONMetadata();
