@@ -35,11 +35,6 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
      */
     initialize: function() {
 
-        // will cause the modal to initialize itself every time it is shown
-//        $('#add_filter_modal').on('hidden', function(){
-//            $(this).data('modal', null);
-//        });
-
         this.sampleFilterTabLayout = new SampleFilterTabLayout();
         this.infoFilterTabLayout = new InfoFilterTabLayout();
         this.customFilterTabLayout = new CustomFilterTabLayout();
@@ -50,54 +45,13 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
         // Create empty lists - one for the metadata fields, and one for the full list of SampleFilter objects
         var sampleFilterList  = new SampleFilterList();
 
-        // TODO: We will also pass in the list of Samples to the subset tab which will fetched when the workspaces are fetched:
-        var sample1 = new Sample({
-            name:"NA00001",
-            sampleMetadataFieldKeyValuePairs: {
-                "Field 1 - Numeric":            [30.1],
-                "Field 2 - String (<= cutoff)": ["A","B"],
-                "Field 3 - Boolean":            [true],
-                "Disease - String (> cutoff)":  ["Cystic Fibrosis","Down Syndrome"]
-            }
-        });
-        var sample2 = new Sample({
-            name:"NA00002",
-            sampleMetadataFieldKeyValuePairs: {
-                "Field 1 - Numeric":            [2.3, 11.1],
-                "Field 2 - String (<= cutoff)": ["C","D"],
-                "Field 3 - Boolean":            [false],
-                "Disease - String (> cutoff)":  ["Hemophilia","Color blindness"]
-            }
-        });
-        var sample3 = new Sample({
-            name:"NA00003",
-            sampleMetadataFieldKeyValuePairs: {
-                "Field 1 - Numeric":            [19.6, 21.3],
-                "Field 2 - String (<= cutoff)": [],
-                "Field 3 - Boolean":            [true],
-                "Disease - String (> cutoff)":  ["Canavan disease"]
-            }
-        });
-
-        // Add all the samples to the sampleList
-        var sampleList = new SampleList();
-        sampleList.add(sample1);
-        sampleList.add(sample2);
-        sampleList.add(sample3);
-
-        // Initially, make the sampleFilteredList contain the same samples as sampleList
-        var sampleSubsetList = new SampleList();
-        sampleSubsetList.add(sample1);
-        sampleSubsetList.add(sample2);
-        sampleSubsetList.add(sample3);
-
         var options = {
             workspaceKey:       workspaceKey,
             userToken:          userToken,
             metadataFieldList:  MongoApp.workspace.get("sampleMetaFields"),
             sampleFilterList:   sampleFilterList,
-            sampleList:         sampleList,
-            sampleSubsetList:   sampleSubsetList
+            sampleList:         MongoApp.workspace.get("samples"),
+            sampleSubsetList:   MongoApp.workspace.get("samples").clone() // Initially, make the sampleFilteredList contain the same samples as sampleList
         };
 
         // instantiate a new controller

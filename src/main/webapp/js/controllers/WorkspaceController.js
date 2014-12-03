@@ -213,6 +213,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         // load extra information about workspace
         this.loadMetadata(ws);
         this.loadSampleGroups(ws);
+        this.loadSamples(ws);
     },
 
     updateNotReadyWorkspaces: function()
@@ -414,6 +415,52 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 // sort alphabetically
                 allSamples.sort(SortByName);
                 workspace.set("sampleNames", allSamples);
+            },
+            error: jqueryAJAXErrorHandler
+        });
+    },
+
+    /**
+     * Loads ##SAMPLE information
+     *
+     * @param workspace
+     */
+    loadSamples: function(workspace) {
+
+        $.ajax({
+            url: "/mongo_svr/SampleMeta/" + workspace.get("key"),
+            dataType: "json",
+            success: function(json)
+            {
+                console.log(JSON.stringify(json));
+
+                var sampleArray = json.results;
+                for (var i = 0; i < sampleArray.length; i++) {
+                    var serverSideSample = sampleArray[i];
+                    // translate to Sample model
+                    var sample = new Sample();
+                    sample.set("name", serverSideSample.name);
+
+                    var keyValPairs = new Object();
+                    for (var key in serverSideSample.integerVals) {
+                        keyValPairs[key] = serverSideSample.integerVals[key];
+                    }
+                    for (var key in serverSideSample.floatVals) {
+                        keyValPairs[key] = serverSideSample.floatVals[key];
+                    }
+                    for (var key in serverSideSample.stringVals) {
+                        keyValPairs[key] = serverSideSample.stringVals[key];
+                    }
+                    for (var key in serverSideSample.booleanVals) {
+                        var boolArray = new Array();
+                        boolArray.push(serverSideSample.booleanVals[key]);
+                        keyValPairs[key] = boolArray;
+                    }
+                    sample.set("sampleMetadataFieldKeyValuePairs", keyValPairs);
+
+                    workspace.get("samples").add(sample);
+                }
+
             },
             error: jqueryAJAXErrorHandler
         });
