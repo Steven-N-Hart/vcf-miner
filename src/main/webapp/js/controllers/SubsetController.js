@@ -56,8 +56,7 @@ var SubsetController = Backbone.Marionette.Controller.extend({
             metadataFields: this.metadataFieldList,
             filters: this.sampleFilterList,
             sampleSubsetList: this.sampleSubsetList,
-            countFunction: this.getStringValuesCount,
-            valuesFunction: this.getStringValues,
+            samplesAllList:     this.samplesAllList,
             typeAheadFunction: this.getTypeAheadValues,
             sampleSelectionLayout: this.sampleSelectionLayout
         });
@@ -101,6 +100,7 @@ var SubsetController = Backbone.Marionette.Controller.extend({
         this.recalculateLastFilter();
     },
 
+    /**  Remove the current filter row when the 'X' button is clicked */
     removeFilter: function (sampleFilter) {
         this.sampleFilterList.remove(sampleFilter);
 
@@ -118,9 +118,6 @@ var SubsetController = Backbone.Marionette.Controller.extend({
      * are saved to the filtered samples collection {@link SubsetController#filteredSamples}.
      */
     applyFilters: function () {
-
-        // TODO: implement - end result is the filtered samples are stored to this.sampleSubsetList
-
         // Remove all the samples from the sampleSubsetList
         while (this.sampleSubsetList.length > 0) {
             this.sampleSubsetList.pop();
@@ -134,7 +131,8 @@ var SubsetController = Backbone.Marionette.Controller.extend({
                 var filter = this.sampleFilterList.models[j];
                 // If the filter is not valid (the user hasn't selected the field), then skip it and check the next filter
                 // Else, if the filter did not pass, then we will not add the sample
-                if ( filter.attributes.values != null  &&  ! this.isPassesFilter(sample, filter) ) {
+                var filterVal = filter.get("values");
+                if ( filterVal != null  &&  ! this.isPassesFilter(sample, filter) ) {
                     isPassesAllFilters = false;
                     break;
                 }
@@ -155,10 +153,10 @@ var SubsetController = Backbone.Marionette.Controller.extend({
      *  OUT: Boolean (true if the sample passes the filter, else false) */
     isPassesFilter: function (sample, filter) {
         // The filter can have multiple values if it is a string
-        var filterValues = filter.attributes.values;
-        var filterType = filter.attributes.metadataField.attributes.type;
-        var fieldId = filter.attributes.metadataField.id;
-        var filterOp = filter.attributes.operator;
+        var filterValues = filter.get("values");
+        var filterOp     = filter.get("operator");
+        var filterType   = filter.get("metadataField").get("type");
+        var fieldId      = filter.get("metadataField").get("id");
 
         // For the sample, we need to find the Key-Value-Pair that matches filter id
         // sampleValues will be an array
@@ -213,37 +211,53 @@ var SubsetController = Backbone.Marionette.Controller.extend({
      *  PRE: The filter should be checked to ensure it is a STRING  field
      *  IN:  Sample, SampleFilter
      *  OUT: Boolean (true if the sample passes the filter, else false)    */
-    isPassesStringFilter: function (operator, sampleValue, filterValues) {
+    isPassesStringFilter: function (operator, sampleValues, filterValues) {
         // The only options for string comparisons currently are '=' and '!='
-        // HOWEVER, there can be multiple string values
+        // HOWEVER, there can be multiple string values for both filterValues and sampleValues
 
-        // If the operator is "=", then OR the values together,
-        // But if the operator is "!=", then AND the values together
-        var isPassedFilter = false;
+        // If the operator is "=", then OR the values together
+        // (the sample values list must contain at least ONE of the filter values)
         if (operator == SampleFilterOperator.EQ) {
-            for (var filterVal in filterValues) {
-                if (sampleValue == filterVal) {
-                    isPassedFilter = true;
+            for (var i=0; i < filterValues.length; i++) {
+                var filterVal = filterValues[i];
+                for( var j=0; j < sampleValues.length; j++ ) {
+                    var sampleVal = sampleValues[j];
+                    if (sampleVal == filterVal) {
+                        return true;
+                    }
                 }
             }
+            // The sample values did not contain any of the filter values, so return false
+            return false;
+        // But if the operator is "!=", then AND the values together
+        // (the sample values must NOT contain ANY of the filter values)
         } else if (operator == SampleFilterOperator.NEQ) {
-            isPassedFilter = true;
-            for (var filterVal in filterValues) {
-                if (sampleValue == filterVal) {
-                    isPassedFilter = false;
+            for (var i=0; i < filterValues.length; i++) {
+                var filterVal = filterValues[i];
+                for( var j=0; j < sampleValues.length; j++ ) {
+                    var sampleVal = sampleValues[j];
+                    if (sampleVal == filterVal) {
+                        return false;
+                    }
                 }
             }
+            // The sample values did not contain any of the filter values, so return true;
+            return true;
         }
-        return isPassedFilter;
+
+        // Operator not recognized, so return false
+        console.log("ERROR: String operator not recognized: " + operator);
+        return false;
     },
 
 
-    /** Given a sample, find the value within that sample for the given key (a string) */
+    /** Given a sample, find the value within that sample for the given key (a string).
+        This will be an array */
     getSampleValueFromKey: function (sample, keyStr) {
-        for (var key in sample.attributes.sampleMetadataFieldKeyValuePairs) {
+        for( var key in sample.get("sampleMetadataFieldKeyValuePairs") ) {
             var k = key;
             if (key == keyStr) {
-                var val = sample.attributes.sampleMetadataFieldKeyValuePairs[key]
+                var val = sample.get("sampleMetadataFieldKeyValuePairs")[key];
                 return val;
             }
         }
@@ -264,7 +278,7 @@ var SubsetController = Backbone.Marionette.Controller.extend({
         if (this.sampleFilterList.models.length > 0) {
             this.sampleFilterList.models[this.sampleFilterList.models.length - 1].set("isLast", true)
         }
-    },
+    }
 
     //=========================================================================================================
 
@@ -347,72 +361,5 @@ var SubsetController = Backbone.Marionette.Controller.extend({
 //
 //        return sampleNamesArray;
 //    },
-
-    /**
-     * For the given {@link SampleMetadataField} of type {@link SampleMetadataFieldType#string},
-     * get a count of the TOTAL number of possible string values.
-     *
-     * @param metadataField The ##META to get possible values for.
-     *
-     * @returns An integer that represents the count.
-     */
-    getStringValuesCount: function (metadataField) {
-
-        // TODO: hardcoded stubs - Make this a REST call back to the server
-        if (metadataField.id == "Field 2 - String (<= cutoff)")
-            return 5;
-        else
-            return 30;
-    },
-
-    /**
-     * For the given {@link SampleMetadataField} of type {@link SampleMetadataFieldType#string},
-     * get the possible string values.
-     *
-     * @param metadataField The ##META to get possible values for.
-     *
-     * @returns A {@link Array} of strings that represent the possible values.
-     */
-    getStringValues: function (metadataField) {
-
-        var values = new Array();
-
-        // TODO: hardcoded stubs - make this a REST call back to the server
-        //       5 values for one id, 30 for all other string metadata
-        values.push("A");
-        values.push("B");
-        values.push("C");
-        values.push("D");
-        values.push("E");
-        if (metadataField.id != "Field 2 - String (<= cutoff)") {
-            for (var i = 6; i <= 30; i++) {
-                values.push("Value" + i);
-            }
-        }
-        return values;
-
-    },
-
-    /**
-     * For the given {@link SampleMetadataField} of type {@link SampleMetadataFieldType#string},
-     * get the possible string values based on the given text string already typed by the user.
-     *
-     * @param metadataField The ##META to get possible values for.
-     * @param text The text value typed by the user.
-     *
-     * @returns A {@link Array} of strings that represent the possible values.
-     */
-    getTypeAheadValues: function (metadataField, text) {
-
-        var valuesFiltered = new Array();
-
-        // TODO: hardcoded stubs - make this a REST call back to the server
-        var valuesFull = getStringValues(metadataField);
-        for (var i = 0; i < valuesFull.length; i++) {
-            if (valuesFull[i].indexOf(text) != -1)
-                valuesFiltered.push(valuesFull[i]);
-        }
-        return valuesFiltered;
-    }
 
 });

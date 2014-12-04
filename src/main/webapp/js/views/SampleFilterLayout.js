@@ -29,8 +29,7 @@ SampleFilterLayout = Backbone.Marionette.Layout.extend({
         this.filterTableView = new SampleFilterTableView({
             collection:        options.sampleFilters,
             metadataFields:    options.metadataFields,
-            countFunction:     options.countFunction,
-            valuesFunction:    options.valuesFunction,
+            samplesAllList:    options.samplesAllList,
             typeAheadFunction: options.typeAheadFunction
         });
     },

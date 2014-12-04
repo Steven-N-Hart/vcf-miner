@@ -33,7 +33,7 @@
       <ul class="dropdown-checkbox-menu"></ul>\
     </div>'
 
-    var templateOption = '<li><div class="layout"><input type="checkbox"/><label></label></div></li>'
+    var templateOption = '<li><div class="layout"><input type="checkbox" style="clear: both; float: left;"/><label style="float: left; margin-left: 10px;"></label></div></li>'
 //    var templateOption = '<li><div class="layout"><label class="checkbox"><input type="checkbox"/></label></div></li>'
     var templateNoResult = '<li><div class="layout"><label>No results.</label></div></li>'
 

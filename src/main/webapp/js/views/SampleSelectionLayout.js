@@ -34,12 +34,6 @@ SampleSelectionLayout = Backbone.Marionette.Layout.extend({
     initialize: function(options) {
 
         this.sampleList = options.samples;
-
-        //this.sampleSelectionTableView = new SampleSelectionTableView({
-        //    collection:        options.samples
-        //});
-
-
     },
 
 
@@ -49,16 +43,14 @@ SampleSelectionLayout = Backbone.Marionette.Layout.extend({
         // loop through the first sample and pull out the header names
         if( this.options.samples.models.length > 0 ) {
             // Add "Sample Name" as first cell in header
-            //headerRow.push( { "sTitle":  "Sample Name" } );
             headerRow.push( { "title":  "Sample Name" } );
 
             // Loop through all field names and add those
             var sample1 = this.options.samples.models[0];
-            var keyValPairs = sample1.attributes.sampleMetadataFieldKeyValuePairs;
+            var keyValPairs = sample1.get("sampleMetadataFieldKeyValuePairs");
             for(var key in keyValPairs) {
                 var val = keyValPairs[key];
-                //headerRow.push( { "sTitle":  key } );
-                headerRow.push( { "title":  key } );
+                 headerRow.push( { "title":  key } );
             }
         }
         return headerRow;
@@ -82,19 +74,24 @@ SampleSelectionLayout = Backbone.Marionette.Layout.extend({
     */
     getData: function() {
         // Loop through all samples, to add the data
-        var data = new Array();
+        var allData = new Array();
         for(var  i=0; i < this.options.samples.models.length; i++ ) {
+            var sample = this.options.samples.models[i];
+            var keyValPairs = sample.get("sampleMetadataFieldKeyValuePairs");
+
+            // First column is the sample name
             var dataRow = new Array();
-            var sample = this.options.samples.models[i].attributes;
-            dataRow.push(sample.name);
-            // For all fields (each field is a key/value pair), add the value (the key should be in the header already)
-            for( var key in sample.sampleMetadataFieldKeyValuePairs) {
-                var valuesStr = this.getValuesAsCommaSeparatedString(sample.sampleMetadataFieldKeyValuePairs[key]);
+            dataRow.push(sample.get("name"));
+
+            // For all fields (each field is a key/value pair), add the values as another column (the key should be in the header already)
+            for( var key in keyValPairs) {
+                var values = keyValPairs[key];
+                var valuesStr = this.getValuesAsCommaSeparatedString(values);
                 dataRow.push( valuesStr );
             }
-            data.push(dataRow);
+            allData.push(dataRow);
         }
-        return data;
+        return allData;
     },
 
 
@@ -103,8 +100,10 @@ SampleSelectionLayout = Backbone.Marionette.Layout.extend({
         var data = this.getData();
 
         var sDom =
+            "<'row'<'pull-left'<'show'>><'pull-right'<'toolbar'>>>" +
+            "<'row'<'pull-left'l><'pull-right'i>>" +
             "<'row't>" +
-            "<'row'<'pull-left'p><'pull-right'i>>";
+            "<'row'<'pull-left'p>>";
 
         // How to add a checkbox column:
         //   http://editor.datatables.net/examples/api/checkbox.html
@@ -116,27 +115,15 @@ SampleSelectionLayout = Backbone.Marionette.Layout.extend({
             "dom":       sDom,
             "columns":   headerRow,
             "data":      data,
-            //"aoColumns": headerRow,
-            //'aaData':    data,
             "bDestroy":  true,
             "iDisplayLength": 25,
             "aLengthMenu": [[10, 25, 50, 100, 500, 1000, -1],[10, 25, 50, 100, 500, 1000, 'All']],
             "bAutoWidth": false,
             "bScrollCollapse": true
-//            "fnHeaderCallback": function( nHead, aData, iStart, iEnd, aiDisplay ) {
-//                // set tooltip 'title' attribute for all TH elements that correspond to visible columns
-//                var colIdx = 0;
-//                _.each(self.options.columns.getVisibleColumns().models, function(col) {
-//                    $('th:eq('+ colIdx +')', nHead).attr('title', col.get("description"));
-//                    colIdx++;
-//                });
-//            }
         });
     },
 
     onShow: function() {
-        //this.samplesTableRegion.show(this.sampleSelectionTableView);
-        //$('#samplesTable').dataTable();
         this.showDataTable();
     },
 

@@ -7,15 +7,27 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
     template: '#sample-filter-row-template',
 
     events: {
+        // Listen for changes to the field name combobox
         "change #fieldDropdown" : "fieldChanged",
-        "click .removeFilter"   : "removeFilter"
+
+        // Listen for clicks on the 'X' button
+        "click .removeFilter"   : "removeFilter",
+
+        // Look for all clicks on checkboxes within the row (for the checkbox combobox)
+        "change input[type='checkbox']" : "changeCheckboxComboboxValue"
     },
 
     // stickit 2-way binding setup
     bindings: {
 
-        // field dropdown
+        //=================================================================================
+        // Field dropdown
+        //=================================================================================
+
+        //-------------------------------------------------------------------------
+        // field dropdown  (the first combobox on the left of a filter row for the field name)
         // the <option> element value correspond to the SampleMetadataField's "id" attribute
+        //-------------------------------------------------------------------------
         '#fieldDropdown': {
             observe: 'metadataField',
             onGet: function(value, options) {
@@ -35,45 +47,72 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
             }
         },
 
+        //=================================================================================
+        // Comparator drop-down
+        //=================================================================================
+
         // Bind the number comparator to the "operator" field in the SampleFilter model
         '#numberComparatorDropdown': 'operator',
 
         // Bind the string comparator to the "operator" field in the SampleFilter model
         '#stringComparatorDropdown': 'operator',
 
+        // NOTE: boolean comparator should default to "=", and should not need to change
+
+
+
+        //=================================================================================
+        // Values for string, number, boolean
+        //=================================================================================
+
         // Bind the string values text field to the "values" field in the SampleFilter model
-        '#stringValue': 'values',
+        // NOTE: Since we are using multi-select checkboxes and type-aheads, this will not be a simple mapping - so have added specialized ones below
+        //'#stringValue': 'values',
 
         // Bind the number value text field to the "values" field in the SampleFilter model
-        // NOTE: This will treat the number as a STRING
+        // NOTE: This will treat the number as a STRING - so instead, add getter/setter to allow us to convert to numberic type
         //'#numberValue': 'values',
 
         // Bind the boolean value radio button to the "values" field in the SampleFilter model
-        // NOTE: This will treat the number as a STRING
+        // NOTE: This will treat the number as a STRING - so instead, add getter/setter to allow us to convert to boolean type
         //'#boolean_group': 'values',
 
         //----------------------------------------------------------------------------------------------
-        // Boolean:  (turn the string value into boolean)
+        // Boolean selection:  (turn the string value into boolean)
         //----------------------------------------------------------------------------------------------
+
         // radio button group
-        '.boolean_group': {
+        '#boolean_group': {
             observe: 'values',
+
             onGet: function(value, options) {
-                // If the value is either not defined or is "true", then return true
-                return (! value  ||  "true" == value.toLowerCase());
+                // If not defined, then return TRUE
+                if( ! value )
+                    return true;
+                // If not a boolean type, then compare to "true" string
+                if( typeof value != "boolean" ) {
+                    return "true" == value.toLowerCase();
+                }
+                return value;
             },
+
             onSet: function(value, options) {
-                return  (value.toLowerCase() == "true");
+                // If not defined, then return TRUE
+                if( ! value )
+                    return true;
+                // If not a boolean type, then compare to "true" string
+                if( typeof value != "boolean" ) {
+                    return "true" == value.toLowerCase();
+                }
+                return value;
             }
+
         },
 
 
         //----------------------------------------------------------------------------------------------
-        // Numeric:  (turn the string from the text field into a numeric)
+        // Numeric value field:  (turn the string from the text field into a numeric)
         //----------------------------------------------------------------------------------------------
-        // TODO: Add comparator....   ("numberComparatorDropdown")
-
-        // Number field
         // TODO: Change this to match numeric fields
         '#numberValue': {
             observe: 'values',
@@ -90,21 +129,37 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
             onSet: function(value, options) {
                 return value;
             }
-        },
+        }
         //----------------------------------------------------------------------------------------------
-        // String:
+        // String - checkbox multi-select for sample names
         //----------------------------------------------------------------------------------------------
-        // String comparator dropdown
         // TODO:  Need to add and fix this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        '.stringComparatorDropdown': {
-
-        },
-
-        // String checkbox group for the sample names
-        // TODO:  Need to add and fix this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        '.sample_metadata_dropdown_checkbox': {
+        /*
+        '#sample_metadata_dropdown_checkbox': {
+        //'.sample_metadata_dropdown_checkbox': {
+        //'.dropdown': {
             // TODO: May need to be changed to reflect multiple values
-            observe: 'value',
+            observe: 'values',
+            onGet: function(values, options) {
+                if( values == null ) {
+                    return new Array();
+                }
+                return values.toString();
+            },
+            onSet: function(values, options) {
+                return values;
+            }
+        },
+        */
+
+        //----------------------------------------------------------------------------------------------
+        // String - type-ahead multi-select for sample names
+        //----------------------------------------------------------------------------------------------
+        // TODO:  Need to add and fix this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        /*
+        '.sample_metadata_typeahead': {
+            // TODO: May need to be changed to reflect multiple values
+            observe: 'values',
             onGet: function(values, options) {
                 if( values == null ) {
                     return new Array();
@@ -115,6 +170,7 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
                 return values;
             }
         }
+        */
     },
 
     /**
@@ -129,9 +185,9 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
         // Should get:
         //    metadataFieldList  (SampleMetadataList)
         //    sampleNameArray (array of strings containing sample names)
+        //    samplesAllList (list of ALL Sample objects)
         this.options = options;
 
-//        this.listenTo(this.model, 'change', this.render);
         this.listenTo(this.model, 'change:isLast', this.updateAddFilterVisibility);
     },
 
@@ -152,6 +208,39 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
         this.$el.find('.sample_filter_region').toggle(false);
 
         this.stickit();
+
+        // Change the names of the radio button group so that it is unique for this row
+        this.changeBooleanRadioButtonGroupNames();
+    },
+
+
+    /** When adding a filter, make sure to change the boolean radio button group name so they are unique.
+     *  Otherwise if there are 3 boolean filters each with a true/false radio button pair, only one radio button could be selected out of the six.
+     */
+    changeBooleanRadioButtonGroupNames : function() {
+        // Get the radio buttons in the radio button group under the current row
+        var radioButtons = this.$el.find("#boolean_group");
+
+        // There should be two elements found, so change the name of each by appending the index
+        // Increment the index to make the boolean radio button group unique
+        var idx = this.getUniqueId();
+        for( var i=0; i < radioButtons.length; i++) {
+            var newName = radioButtons[i].name + "_" + idx;
+            radioButtons[i].name = newName;
+        }
+    },
+
+    /** Get a unique id.  This will increment the id every time this function is called.
+     *  See: http://stackoverflow.com/questions/1535631/static-variables-in-javascript
+     * @returns {number}
+     */
+    getUniqueId : function() {
+        // Check to see if the counter was initialized, and if not, initialize it to 0
+        // The variable is associated with the function which appears to be static across all instances
+        if( typeof this.getUniqueId.counter == 'undefined' ) {
+            this.getUniqueId.counter = 0;
+        }
+        return ++this.getUniqueId.counter;
     },
 
     /**
@@ -163,7 +252,7 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
     fieldChanged: function(event) {
         var dropdown = $(event.target);
 
-        // determine what model was selected
+        // determine what SampleMetadataField model was selected
         var fieldID = dropdown.val();
         var metadataField = this.options.metadataFields.findWhere({id: fieldID});
 
@@ -213,8 +302,9 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
     //---------------------------------------------------------------------------------------------------------
     showStringFilter: function(metadataField) {
 
-        var count = this.options.countFunction(metadataField);
-        if ( count <= this.DROPDOWN_LIMIT ) {
+        var fieldValues = this.getFieldValues(metadataField);
+
+        if ( fieldValues.length <= this.DROPDOWN_LIMIT ) {
 
             //------------------------------------------------------------------------------
             // Dropdown combobox
@@ -222,9 +312,8 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
             // setup the dropdown checkbox
             var dropdownData = new Array();
             // Loop through the data and add one line for each String in the string array
-            var valuesArr = this.options.valuesFunction(metadataField);
-            for (var i=0; i < valuesArr.length; i++) {
-                dropdownData.push({id: i + 1, label: valuesArr[i]});
+            for (var i=0; i < fieldValues.length; i++) {
+                dropdownData.push({id: i + 1, label: fieldValues[i]});
             }
 
             var dropdownCheckbox = this.$el.find("#sample_metadata_dropdown_checkbox");
@@ -261,6 +350,25 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
         }
     },
 
+    /** Listen for a change to a checkbox within the checkbox-combobox items */
+    changeCheckboxComboboxValue : function(event) {
+        // Get the checkbox component that was clicked/changed
+        var checkboxElement = $(event.target);
+        // Get the ancestor component that has the id of the div containing the checkbox-combobox
+        var dropdownCheckboxDiv = checkboxElement.parents("#sample_metadata_dropdown_checkbox");
+
+        // Get the list of all selected checkbox items
+        var selectedItems = dropdownCheckboxDiv.dropdownCheckbox("checked");
+        var filterObj = this.model;
+
+        // Set the filter's values to the selectedItems
+        var values = new Array();
+        for(var i=0; i < selectedItems.length; i++) {
+            var val = selectedItems[i].label;
+            values.push(val);
+        }
+        filterObj.set("values", values);
+    },
     removeFilter: function(event) {
         // fire event that this model should be removed
         MongoApp.vent.trigger("removeFilter", this.model);
@@ -275,5 +383,42 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
         } else {
             addFilterButton.toggle(false);
         }
+    },
+
+    /** Given a metadataField, find all values from all samples that match that field Id.
+     *  This will be used for the string-filter checkbox-combobox */
+    getFieldValues: function (metadataField) {
+        var values = new Array();
+        // Loop through the samples:
+        //   Get the key-value pairs, and if the metadataField id matches the key, add all the values for that key to the list
+        for(var i=0; i < this.options.samplesAllList.length; i++) {
+            var fieldKeyValPairs = this.options.samplesAllList.models[i].get("sampleMetadataFieldKeyValuePairs");
+            var valuesForField = fieldKeyValPairs[metadataField.id];
+            values = values.concat(valuesForField);
+        }
+        values.sort();
+        return values;
+    },
+
+    /**
+     * For the given {@link SampleMetadataField} of type {@link SampleMetadataFieldType#string},
+     * get the possible string values based on the given text string already typed by the user.
+     *
+     * @param metadataField The ##META to get possible values for.
+     * @param text The text value typed by the user.
+     *
+     * @returns A {@link Array} of strings that represent the possible values.
+     *
+     * This will be used for the string-filter type-ahead fields
+     */
+    getFieldValuesForTypeAhead: function (metadataField, text) {
+        var valuesFiltered = new Array();
+        // TODO: hardcoded stubs - make this a REST call back to the server
+        var valuesFull = this.getFieldValues(metadataField);
+        for (var i = 0; i < valuesFull.length; i++) {
+            if (valuesFull[i].indexOf(text) != -1)
+                valuesFiltered.push(valuesFull[i]);
+        }
+        return valuesFiltered;
     }
 });

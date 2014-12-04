@@ -26,8 +26,7 @@ SampleFilterTableView = Backbone.Marionette.CompositeView.extend({
             {
                 model: item,
                 metadataFields:    this.options.metadataFields,
-                countFunction:     this.options.countFunction,
-                valuesFunction:    this.options.valuesFunction,
+                samplesAllList:    this.options.samplesAllList,
                 typeAheadFunction: this.options.typeAheadFunction
             }, itemViewOptions );
 
