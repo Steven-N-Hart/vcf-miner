@@ -396,7 +396,13 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
             var valuesForField = fieldKeyValPairs[metadataField.id];
             values = values.concat(valuesForField);
         }
+
+        // Keep only the unique values
+        values = _.uniq(values);
+
+        // Sort the values
         values.sort();
+
         return values;
     },
 
