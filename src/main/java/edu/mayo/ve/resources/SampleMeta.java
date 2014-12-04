@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mongodb.*;
 import edu.mayo.util.MongoConnection;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.index.*;
 import edu.mayo.ve.index.Index;
 import edu.mayo.ve.util.SystemProperties;
@@ -42,6 +43,7 @@ public class SampleMeta {
         String samplemetacol = sysprop.get(sample_meta_collection);
         DBCollection col = db.getCollection(samplemetacol);
         BasicDBObject query = new BasicDBObject();
+        query.put(Tokens.KEY,workspace);
         DBCursor cursor = col.find(query);
         while(cursor.hasNext()){
             DBObject o = cursor.next();
