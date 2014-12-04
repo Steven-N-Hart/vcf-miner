@@ -522,21 +522,20 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         for (var i = 0; i < fieldNames.length; i++) {
             var fieldName = fieldNames[i];
             if (metaJSON.hasOwnProperty(fieldName)) {
-                var type;
-                switch(metaJSON[fieldName].type) {
-                    case 'Flag':
-                        type = SampleMetadataFieldType.FLAG;
-                        break;
-                    case 'Integer':
-                        type = SampleMetadataFieldType.INTEGER;
-                        break;
-                    case 'Float':
-                        type = SampleMetadataFieldType.FLOAT;
-                        break;
-                    default:
-                        type = SampleMetadataFieldType.STRING;
-                        break;
-                }
+                var type = null;
+
+                if (metaJSON[fieldName].type == "Integer")
+                    type = SampleMetadataFieldType.INTEGER;
+
+                if (metaJSON[fieldName].type == "Float")
+                    type = SampleMetadataFieldType.FLOAT;
+
+                if (metaJSON[fieldName].type == "Flag")
+                    type = SampleMetadataFieldType.BOOLEAN;
+
+                if (metaJSON[fieldName].type == "String")
+                    type = SampleMetadataFieldType.STRING;
+
                 var description = metaJSON[fieldName].Description;
                 fields.add(new VCFDataField({id:fieldName, type:type, desc:description}));
             }
