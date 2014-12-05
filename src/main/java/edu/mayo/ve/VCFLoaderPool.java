@@ -11,6 +11,8 @@ import edu.mayo.util.Tokens;
 import edu.mayo.ve.VCFParser.LoadWorker;
 import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.resources.WorkerPoolManager;
+import edu.mayo.ve.util.SystemProperties;
+import org.apache.log4j.Logger;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -18,14 +20,26 @@ import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import javax.servlet.http.HttpSessionBindingEvent;
+import java.io.IOException;
 
 public class VCFLoaderPool implements ServletContextListener,
         HttpSessionListener, HttpSessionAttributeListener {
+
+    private static final Logger log = Logger.getLogger(VCFLoaderPool.class);
 
     private static WorkerPool wp = null;
     private static int maxCache = 50000;
     // Public constructor is required by servlet spec
     public VCFLoaderPool() {
+    }
+
+
+    public static final String NUM_WORKERS = "num_workers";
+    private static int numberworkers = 1;
+    public static int initNumberWorkers() throws IOException {
+        SystemProperties sysprop = new SystemProperties();
+        String v = sysprop.get(NUM_WORKERS);
+        return Integer.parseInt(v);
     }
 
     // -------------------------------------------------------
@@ -38,8 +52,14 @@ public class VCFLoaderPool implements ServletContextListener,
       */
         //initialize the worker pool if this is the first load
         if(wp == null){
+            try {
+                numberworkers = initNumberWorkers();
+                log.debug("Number of Threads in the Workder Pool: " + numberworkers);
+            }catch (IOException e){
+                throw new RuntimeException(e.getMessage(),e);    //todo: probably a better way to handle this exception!
+            }
             LoadWorker logic = new LoadWorker(new VCFParser(), maxCache);//do we want to let them pass this value?
-            wp = new WorkerPool(logic, 1);
+            wp = new WorkerPool(logic, numberworkers);
             WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
         }
     }
@@ -100,15 +120,17 @@ public class VCFLoaderPool implements ServletContextListener,
     public static void setReportingTrueAndResetPool(int typeAheadCacheSize){
         LoadWorker logic = new LoadWorker(new VCFParser(), typeAheadCacheSize, true);
         logic.setLogStackTrace(true);
-        wp = new WorkerPool(logic, 1);
+        wp = new WorkerPool(logic, numberworkers);
         WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
         return;
     }
 
     public static void reset(int typeAheadCacheSize){
         LoadWorker logic = new LoadWorker(new VCFParser(), typeAheadCacheSize);//do we want to let them pass this value?
-        wp = new WorkerPool(logic, 1);
+        wp = new WorkerPool(logic, numberworkers);
         WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
         return;
     }
+
+
 }
