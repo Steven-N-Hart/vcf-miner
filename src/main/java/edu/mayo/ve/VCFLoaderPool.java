@@ -54,7 +54,7 @@ public class VCFLoaderPool implements ServletContextListener,
         if(wp == null){
             try {
                 numberworkers = initNumberWorkers();
-                log.debug("Number of Threads in the Workder Pool: " + numberworkers);
+                log.info("Number of Threads in the Workder Pool: " + numberworkers);
             }catch (IOException e){
                 throw new RuntimeException(e.getMessage(),e);    //todo: probably a better way to handle this exception!
             }
