@@ -208,6 +208,16 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
             ws.set("statsErrors", parseInt(workspaceJSON.STATISTICS.ERRORS));
             ws.set("statsWarnings", parseInt(workspaceJSON.STATISTICS.WARNINGS));
             ws.set("statsNumVariants", parseInt(workspaceJSON.STATISTICS.data_line_count));
+        } else {
+            var variant_count_total = parseInt(workspaceJSON.variant_count_total);
+            if (!isNaN(variant_count_total)) {
+                ws.set("statsTotalVariants", variant_count_total);
+            }
+
+            var variant_count_current = parseInt(workspaceJSON.variant_count_current);
+            if (!isNaN(variant_count_current)) {
+                ws.set("statsNumVariants", variant_count_current);
+            }
         }
 
         // load extra information about workspace

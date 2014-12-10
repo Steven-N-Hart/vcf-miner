@@ -65,36 +65,6 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
      */
     toAaDataRow: function(workspace) {
         var id = workspace.get("id");
-        var actionHtml = '<div style="white-space:normal;">';
-
-        var loadButtonHtml =
-            '<div class="btn-group">' +
-            '    <button data-wks-key="' + workspace.get("key") + '" class="btn analyze">Analyze</button>' +
-            '    <button data-wks-key="' + workspace.get("key") + '" class="btn dropdown-toggle show-analyses" data-toggle="dropdown">' +
-            '        <span class="caret"></span>' +
-            '    </button>' +
-            '    <ul class="dropdown-menu"></ul>' +
-            '</div>';
-
-        var deleteButtonHtml = '<button data-wks-key="' + workspace.get("key") + '" class="btn delete">Delete</button>';
-
-        switch(workspace.get("status")) {
-            case ReadyStatus.READY:
-                actionHtml += loadButtonHtml + deleteButtonHtml;
-                break;
-            case ReadyStatus.FAILED:
-                actionHtml += deleteButtonHtml;
-                break;
-        }
-
-        // show error button only if there are errors or warnings
-        var errorAndWarningCount = workspace.get("statsErrors") + workspace.get("statsWarnings");
-        if (errorAndWarningCount > 0) {
-            actionHtml += '<button data-wks-key="' + workspace.get("key") + '" class="btn error errors">Warnings ('+errorAndWarningCount+')</button>';
-        }
-
-        // close nowrap div
-        actionHtml += '</div>';
 
         var alias = workspace.get("alias");
         var aliasHtml = "<div class='ellipsis' title='"+alias+"'>"+alias+"</div>";
@@ -104,11 +74,64 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
             "0": aliasHtml,
             "1": this.getDisplayStatus(workspace),
             "2": "<div style='white-space:normal;'>"+workspace.get("date")+"</div>",
-            "3": workspace.get("statsNumVariants"),
-            "4": actionHtml
+            "3": this.getVariantsCell(workspace),
+            "4": this.getActionCell(workspace)
         };
 
         return aaDataRow;
+    },
+
+    getVariantsCell: function(workspace) {
+
+        if (workspace.get("statsNumVariants") < workspace.get("statsTotalVariants")) {
+            return workspace.get("statsNumVariants") + ' of ' + workspace.get("statsTotalVariants");
+        } else {
+            return workspace.get("statsNumVariants");
+        }
+    },
+
+    getActionCell: function(workspace) {
+
+        if (workspace.get("statsNumVariants") < workspace.get("statsTotalVariants")) {
+            var percentComplete = (workspace.get("statsNumVariants") / workspace.get("statsTotalVariants")) * 100;
+            return '<div class="progress progress-striped active" style="width:200px">' +
+                '   <div class="bar" style="width: '+percentComplete+'%;"></div>' +
+                '</div>';
+
+        } else {
+            var actionHtml = '<div style="white-space:normal;">';
+
+            var loadButtonHtml =
+                '<div class="btn-group">' +
+                    '    <button data-wks-key="' + workspace.get("key") + '" class="btn analyze">Analyze</button>' +
+                    '    <button data-wks-key="' + workspace.get("key") + '" class="btn dropdown-toggle show-analyses" data-toggle="dropdown">' +
+                    '        <span class="caret"></span>' +
+                    '    </button>' +
+                    '    <ul class="dropdown-menu"></ul>' +
+                    '</div>';
+
+            var deleteButtonHtml = '<button data-wks-key="' + workspace.get("key") + '" class="btn delete">Delete</button>';
+
+            switch(workspace.get("status")) {
+                case ReadyStatus.READY:
+                    actionHtml += loadButtonHtml + deleteButtonHtml;
+                    break;
+                case ReadyStatus.FAILED:
+                    actionHtml += deleteButtonHtml;
+                    break;
+            }
+
+            // show error button only if there are errors or warnings
+            var errorAndWarningCount = workspace.get("statsErrors") + workspace.get("statsWarnings");
+            if (errorAndWarningCount > 0) {
+                actionHtml += '<button data-wks-key="' + workspace.get("key") + '" class="btn error errors">Warnings ('+errorAndWarningCount+')</button>';
+            }
+
+            // close nowrap div
+            actionHtml += '</div>';
+
+            return actionHtml;
+        }
     },
 
     /**
