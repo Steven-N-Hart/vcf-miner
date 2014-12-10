@@ -11,6 +11,8 @@ import com.mongodb.*;
 import com.mongodb.util.JSON;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.LineNumberReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -32,6 +34,7 @@ import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
 import edu.mayo.pipes.bioinformatics.VCFHeaderParser;
 import edu.mayo.pipes.history.HistoryInPipe;
 import edu.mayo.index.Index;
+import edu.mayo.pipes.iterators.Compressor;
 import edu.mayo.senders.FileSender;
 import edu.mayo.senders.Sender;
 import edu.mayo.util.Tokens;
@@ -181,10 +184,28 @@ public class VCFParser implements ParserInterface {
         int i;
         long starttime = System.currentTimeMillis();
         DBObject jsonmeta = null;
+        boolean storedVariantCount = false;
         if(reporting) System.out.println("Processing Data....");
         try {
             for(i=0; p.hasNext(); i++){
                 if(context!=null){ if(context.isTerminated()) throw new ProcessTerminatedException(); }
+
+                if (!storedVariantCount) {
+                    try {
+
+                        storeVariantCount(new File(infile), vcf.getHeaderLineCount(), workspace);
+
+                    } catch (IOException ioe) {
+                        throw new RuntimeException(ioe);
+                    }
+                    storedVariantCount = true;
+                }
+
+                // if the line # is equally divisble by 256 (power of 2)
+                if (fastModulus(i, 256) == 0) {
+                    storeCurrentVariantCount(i, workspace);
+                }
+
                 if(reporting) System.out.println(col.count());
                 String s = (String) p.next();
                 //System.out.println(s);
@@ -221,6 +242,10 @@ public class VCFParser implements ParserInterface {
                 }
 
             }
+
+            // final time, update current count
+            storeCurrentVariantCount(i, workspace);
+
         } finally {
             // close the FileSender so that all messages are flushed to disk
             sender.close();
@@ -252,6 +277,80 @@ public class VCFParser implements ParserInterface {
         }
         if(reporting){ System.out.println("done!");}
         return i; //the number of records processed
+    }
+
+    /**
+     * Stores the TOTAL variant count in the 'meta' collection
+     * @param vcf
+     * @param headerLineCount
+     * @param workspaceID
+     * @throws IOException
+     */
+    private void storeVariantCount(File vcf, int headerLineCount, String workspaceID) throws IOException {
+
+        long timestamp = System.currentTimeMillis();
+        int variantCount = getLineCount(vcf) - headerLineCount;
+        long delta = System.currentTimeMillis() - timestamp;
+        int totalLines = variantCount + headerLineCount;
+        System.out.println("Took " + delta + "ms to get line count for file " + vcf.getAbsolutePath());
+
+        // store to mongo meta collection
+        BasicDBObject query = new BasicDBObject().append(Tokens.KEY, workspaceID);
+        BasicDBObject update = new BasicDBObject();
+        update.append("$set", new BasicDBObject().append("variant_count_total", variantCount));
+        MongoConnection.getDB().getCollection(Tokens.METADATA_COLLECTION).update(query, update);
+    }
+
+    /**
+     * Stores the CURRENT variant count in the 'meta' collection.
+     * @param currentLineNum
+     * @param workspaceID
+     */
+    private void storeCurrentVariantCount(int currentLineNum, String workspaceID){
+        // store to mongo meta collection
+        BasicDBObject query = new BasicDBObject().append(Tokens.KEY, workspaceID);
+        BasicDBObject update = new BasicDBObject();
+        update.append("$set", new BasicDBObject().append("variant_count_current", currentLineNum));
+        MongoConnection.getDB().getCollection(Tokens.METADATA_COLLECTION).update(query, update);
+    }
+
+    /**
+     * Faster implementation to the Java language modulus "%" operator, which internally uses
+     * slow division calculations.  NOTE: this only works if the divisor is a power of 2 (e.g. 2, 4, 8, 16, etc...)
+     *
+     * @param dividend
+     * @param divisor
+     * @return
+     */
+    private int fastModulus(int dividend, int divisor) {
+        return dividend & (divisor - 1);
+    }
+
+    /**
+     * Gets the total line count for the given file.
+     * @param f
+     *      The file to be inspected.
+     * @return
+     *      The line count for the given file.
+     * @throws IOException
+     */
+    private int getLineCount(File f) throws IOException {
+
+        // use compressor to figure out how to handle .zip, .gz, .bz2, etc...
+        File fakeOutFile = File.createTempFile("fake", "fake");
+        Compressor compressor = new Compressor(f, fakeOutFile);
+
+        LineNumberReader reader = null;
+        try {
+
+            reader = new LineNumberReader(compressor.getReader());
+            reader.skip(Long.MAX_VALUE);
+            return reader.getLineNumber();
+
+        } finally {
+            reader.close();
+            fakeOutFile.delete();
+        }
     }
 
     /**
