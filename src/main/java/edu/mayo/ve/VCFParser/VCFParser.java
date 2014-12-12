@@ -354,23 +354,32 @@ public class VCFParser implements ParserInterface {
     }
 
     /**
-     * checks to see if the key is
-     * @param key
+     * Checks whether the given INFO field has a metadata type of String or Character.
+     *
+     * @param infoField
+     *      The INFO field to be checked.
      * @param metadata
+     *      VCF metadata.
      */
-    private boolean checkMetadataIsNumber(String key, DBObject metadata) {
-        Object o = metadata.get("HEADER.INFO." + key + ".type");
-        if(o == null){
-            return false;
-        }if (o instanceof String) {
-            String s = (String) o;
-            if(s.contains("float") || s.contains("Float") || s.contains("FLOAT") ||
-                    s.contains("Double") || s.contains("double") || s.contains("DOUBLE") ||
-                    s.contains("number") || s.contains("number") || s.contains("NUMBER")){
+    private boolean isStringOrCharacter(String infoField, DBObject metadata) {
+        Map headerMap = (Map) metadata.get("HEADER");
+        Map infoMap = (Map) headerMap.get("INFO");
+
+        if (infoMap.containsKey(infoField)) {
+            Map fieldMetadata = (Map) infoMap.get(infoField);
+
+            String type = (String) fieldMetadata.get("type");
+            if(type.equals("String") || type.equals("Character")) {
                 return true;
+            } else {
+                return false;
             }
+
+        } else {
+            // no matching ##INFO metadata for this field
+            // it's possible the ##INFO is missing completely or not well-formed
+            return false;
         }
-        return false;
     }
 
     /**
@@ -384,17 +393,15 @@ public class VCFParser implements ParserInterface {
         if(info != null){
             for(String key : info.keySet()) {
                 String ikey = "INFO." + key;
-                if(!checkMetadataIsNumber(key,metadata)) { //check to see if the metadata indicates it is a number.
+                if(isStringOrCharacter(key,metadata)) { //check to see if its a String or Character
                     Object o = info.get(key);
-                    if (o instanceof String) {
-                        typeAhead.put(workspace, ikey, o.toString());
-                    } else if (o instanceof Integer) {
-                        typeAhead.put(workspace, ikey, String.valueOf((Integer) o));
-                    } else if (o instanceof Double) {
-                        typeAhead.put(workspace, ikey, String.valueOf((Double) o));
-                    } else if (o instanceof BasicDBList) { //it is a list of values
+                    if (o instanceof BasicDBList) {
+                        //it is a list of String or Character
                         addArrToTypeAhead((BasicDBList) o, workspace, ikey);
-                    }//else we can't really type-ahead something else can we?
+                    } else {
+                        // it is a single String or Character value
+                        typeAhead.put(workspace, ikey, String.valueOf(o));
+                    }
                 }
             }
         }
