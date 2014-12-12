@@ -6,7 +6,9 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
         sampleRegion: "#tab_content_sample_region",
         infoRegion: "#tab_content_info_region",
         customRegion: "#tab_content_custom_region",
-        subsetRegion: "#tab_content_subset_region"
+
+        // TODO: DISABLED SUBSET
+//        subsetRegion: "#tab_content_subset_region"
     },
 
     events: {
@@ -45,17 +47,18 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
         // Create empty lists - one for the metadata fields, and one for the full list of SampleFilter objects
         var sampleFilterList  = new SampleFilterList();
 
-        var options = {
-            workspaceKey:       workspaceKey,
-            userToken:          userToken,
-            metadataFieldList:  MongoApp.workspace.get("sampleMetaFields"),
-            sampleFilterList:   sampleFilterList,
-            sampleList:         MongoApp.workspace.get("samples"),
-            sampleSubsetList:   MongoApp.workspace.get("samples").clone() // Initially, make the sampleFilteredList contain the same samples as sampleList
-        };
-
-        // instantiate a new controller
-        this.subsetController = new SubsetController(options);
+        // TODO: DISABLED SUBSET
+//        var options = {
+//            workspaceKey:       workspaceKey,
+//            userToken:          userToken,
+//            metadataFieldList:  MongoApp.workspace.get("sampleMetaFields"),
+//            sampleFilterList:   sampleFilterList,
+//            sampleList:         MongoApp.workspace.get("samples"),
+//            sampleSubsetList:   MongoApp.workspace.get("samples").clone() // Initially, make the sampleFilteredList contain the same samples as sampleList
+//        };
+//
+//        // instantiate a new controller
+//        this.subsetController = new SubsetController(options);
     },
 
     onShow: function() {
@@ -64,7 +67,8 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
         this.infoRegion.show(this.infoFilterTabLayout);
         this.customRegion.show(this.customFilterTabLayout);
 
-        this.subsetController.showSubsetTab({region: this.subsetRegion });
+        // TODO: DISABLED SUBSET
+//        this.subsetController.showSubsetTab({region: this.subsetRegion });
 
         // show modal dialog
         this.$el.parents('.modal').modal();
@@ -90,6 +94,7 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
                     filter = this.infoFilterTabLayout.getFilter();
                 break;
             case "tab_content_custom":
+                if (this.customFilterTabLayout.validate())
                 if (this.customFilterTabLayout.validate())
                     filter = this.customFilterTabLayout.getFilter();
                 break;
