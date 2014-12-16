@@ -82,21 +82,31 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
     },
 
     getVariantsCell: function(workspace) {
-
-        if (workspace.get("statsNumVariants") < workspace.get("statsTotalVariants")) {
-            return workspace.get("statsNumVariants") + ' of ' + workspace.get("statsTotalVariants");
-        } else {
-            return workspace.get("statsNumVariants");
+        switch(workspace.get("status")) {
+            case ReadyStatus.NOT_READY:
+            case ReadyStatus.READY:
+                return workspace.get("statsNumVariants");
+            default:
+                return "";
         }
     },
 
     getActionCell: function(workspace) {
 
-        if (workspace.get("statsNumVariants") < workspace.get("statsTotalVariants")) {
-            var percentComplete = (workspace.get("statsNumVariants") / workspace.get("statsTotalVariants")) * 100;
-            return '<div class="progress progress-striped active" style="width:200px">' +
+        if (workspace.get("status") == ReadyStatus.NOT_READY) {
+            var percentComplete;
+            if (workspace.get("statsTotalVariants") == 0) {
+                percentComplete = 0;
+            } else {
+                percentComplete = Math.ceil((workspace.get("statsNumVariants") / workspace.get("statsTotalVariants")) * 100);
+            }
+            var html =
+                '<p>' + percentComplete + '% (' + workspace.get("statsNumVariants") + ' of ' + workspace.get("statsTotalVariants") + ')</p>' +
+                '<div class="progress progress-info" style="style="width:200px;">' +
                 '   <div class="bar" style="width: '+percentComplete+'%;"></div>' +
                 '</div>';
+
+            return html;
 
         } else {
             var actionHtml = '<div style="white-space:normal;">';
