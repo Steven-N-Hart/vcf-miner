@@ -137,7 +137,9 @@ var SearchController = Backbone.Marionette.Controller.extend({
                 success: function(json)
                 {
                     var savedSearch = self.filterHistoryToSearch(json);
-                    MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_LOAD, savedSearch);
+                    MongoApp.search.set("id", savedSearch.get("id"));
+                    MongoApp.search.set("timestamp", savedSearch.get("timestamp"));
+                    MongoApp.search.set("saved", true);
                     console.log("save successful!");
                 },
                 error: jqueryAJAXErrorHandler
