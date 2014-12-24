@@ -105,6 +105,10 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
      */
     onRender: function () {
 
+        // setup automatic type detection for sorting using MomentJS
+        // this allows DataTables to properly sort the date columns
+        $.fn.dataTable.moment( 'MM/DD/YYYY hh:mm A' );
+
         // initialize the DataTable widget
         var sDom = "<'row't>";
 
