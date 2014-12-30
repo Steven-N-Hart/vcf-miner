@@ -11,10 +11,10 @@ import edu.mayo.util.MongoConnection;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.util.SystemProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.UnknownHostException;
+import java.io.*;
 import java.util.HashMap;
 
 /**
@@ -26,6 +26,8 @@ import java.util.HashMap;
  * The Parser passed to the constructor (e.g. VCFParser) determines the type of file that is loaded by the LoadWorker.
  */
 public class LoadWorker implements WorkerLogic {
+
+    private static final Logger logger = LoggerFactory.getLogger(LoadWorker.class);
 
     ParserInterface parser = null;
     private boolean deleteAfterLoad = true;
@@ -99,8 +101,26 @@ public class LoadWorker implements WorkerLogic {
                 meta.flagAsReady(workspace);
 
             }catch(Throwable e){   //this thread is working in the background... so we need to make sure that it outputs an error if one came up
-                //if(logStackTrace){ e.printStackTrace(); }
-                e.printStackTrace();
+                // dump to server log via STDERR
+                logger.error(e.getMessage(), e);
+
+                // write stacktrace to the workspace errors log so the user can view it
+                StringWriter stackTraceWriter = new StringWriter();
+                e.printStackTrace(new PrintWriter(stackTraceWriter));
+                String mesg = String.format(
+                        "Internal System Error\n" +
+                        "\n" +
+                        "Validate your VCF file using vcf-validate (see http://vcftools.sourceforge.net).\n" +
+                        "If your VCF file passes validation, please send the diagnostic information below to the development team:\n" +
+                        "\n%s"
+                        ,stackTraceWriter.toString());
+                try {
+                    writeToErrorFile(workspace, mesg);
+                    meta.updateLoadStatistics(workspace, (HashMap) t.getCommandContext());
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+
                 meta.flagAsFailed(workspace,"The Load Failed with Exception: " + e.getMessage());
             }
             //delete the load file
@@ -116,6 +136,26 @@ public class LoadWorker implements WorkerLogic {
         public boolean isTerminated(){
             return false;
         }
+
+    /**
+     * Writes the given mesg to the workspace errors file.
+     * @param workspace
+     *      The workspace key.
+     * @param mesg
+     *      The error message to write to the file.
+     * @throws IOException
+     */
+    private void writeToErrorFile(String workspace, String mesg) throws IOException {
+        String errorFile = VCFErrorFileUtils.getLoadErrorFilePath(workspace);
+
+        PrintWriter pWtr = new PrintWriter(new FileWriter(errorFile));
+
+        try {
+            pWtr.println("ERROR: " + mesg);
+        } finally {
+            pWtr.close();
+        }
+    }
 
     public static boolean isLoadSamples() {
         return loadSamples;
