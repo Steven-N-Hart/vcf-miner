@@ -166,7 +166,7 @@ public class VCFParser implements ParserInterface {
             System.out.println("Reporting: " + reporting);
         }
         //make sure we have type-ahead indexed before wo go-ahead and do the load:
-        typeAhead.index(reporting);
+        typeAhead.index(workspace, reporting);
         VCF2VariantPipe vcf = new VCF2VariantPipe(sender, true, false);
         Pipe p = new Pipeline(new CatPipe(),
                              new ReplaceAllPipe("\\{",""),
@@ -219,6 +219,7 @@ public class VCFParser implements ParserInterface {
                 if(jsonmeta == null){
                     //System.out.println(vcf.getJSONMetadata().toString());
                     jsonmeta = (DBObject) JSON.parse(vcf.getJSONMetadata().toString());
+                    jsonmeta = removeDots(jsonmeta, reporting);
                 }
 
                 if(reporting){
@@ -273,7 +274,7 @@ public class VCFParser implements ParserInterface {
             if(reporting){System.out.println("indexing...");}
             index(workspace, vcf, reporting);
             if(reporting){System.out.println("saving type-ahead results to the database");}
-            typeAhead.index(reporting);
+            typeAhead.index(workspace, reporting);
         }
         if(reporting){ System.out.println("done!");}
         return i; //the number of records processed

@@ -1,6 +1,9 @@
 package edu.mayo.ve.FunctionalTests;
 
-import com.mongodb.*;
+import com.mongodb.BasicDBList;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import edu.mayo.TypeAhead.TypeAheadCollection;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
@@ -9,21 +12,21 @@ import edu.mayo.util.MongoConnection;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.CacheMissException;
 import edu.mayo.ve.VCFParser.VCFParser;
+import edu.mayo.ve.resources.Index;
 import edu.mayo.ve.resources.Provision;
-import edu.mayo.ve.resources.*;
+import edu.mayo.ve.resources.TypeAheadResource;
 import edu.mayo.ve.resources.Workspace;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-import javax.ws.rs.PathParam;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created with IntelliJ IDEA.
@@ -74,7 +77,7 @@ public class TypeAheadITCase {
         Workspace w = new Workspace();
         w.deleteWorkspace(workspaceID);
         TypeAheadCollection tac = new TypeAheadCollection();
-        tac.clear();
+        tac.clear(workspaceID);
 
     }
 
@@ -213,8 +216,7 @@ public class TypeAheadITCase {
     public void testTypeAheadOnArray() throws IOException, ProcessTerminatedException, CacheMissException {
         ProblemVCFITCase p = new ProblemVCFITCase();
         String vcf = "src/test/resources/testData/CustomCapture.anno5000.vcf";
-        String workspace = "w08479e4f019bb4f875b76b4e21153054a258f809";
-        workspace = p.load(vcf, false);
+        String workspace = p.load(vcf, false);
         System.out.println(workspace);
         DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspace);

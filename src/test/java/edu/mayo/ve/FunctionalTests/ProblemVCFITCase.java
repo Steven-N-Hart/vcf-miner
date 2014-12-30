@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
@@ -61,13 +63,24 @@ public class ProblemVCFITCase {
         String vcf = "src/test/resources/testData/Asif1000G.vcf";
         //check to see if the type-ahead is indexed.
         DB database = m.getDB("workspace");
-        DBCollection col = database.getCollection(Tokens.TYPEAHEAD_COLLECTION);
-        Index index = new Index();
-        DBObject raw = index.getIndexedFields(col);
-        System.out.println("BEFORE LOAD"); //IN THIS CASE, TYPEAHEAD CAN BE INDEXED OR NOT, BOTH ARE FINE
-        System.out.println(raw.toString());
+
         String workspace = load(vcf, false);
-        raw = index.getIndexedFields(col);
+
+        String typeaheadCollectionName = null;
+        for (String collectionName: database.getCollectionNames()) {
+            if (collectionName.contains(workspace) && collectionName.contains("typeahead")) {
+                typeaheadCollectionName = collectionName;
+                break;
+            }
+        }
+        assertNotNull(String.format("Could not find typeahead collection for workspace key %s", workspace), typeaheadCollectionName);
+
+        // find type-ahead collection
+        DBCollection col = database.getCollection(typeaheadCollectionName);
+        Index index = new Index();
+
+
+        DBObject raw = index.getIndexedFields(col);
         System.out.println("AFTER LOAD");  //HERE TYPEAHEAD SHOULD BE INDEXED
         System.out.println(raw.toString());
         deleteCheck(workspace, 0, 0);
