@@ -3,8 +3,12 @@ package edu.mayo.ve.VCFParser;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
+import com.tinkerpop.pipes.Pipe;
 import edu.mayo.TypeAhead.TypeAheadCollection;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
+import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
+import edu.mayo.senders.FileSender;
+import edu.mayo.senders.Sender;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -95,6 +99,36 @@ public class VCFParserTest {
             fail();
         } catch (Exception e) {//InvalidPipeInputException
             //e.printStackTrace();  //On success should get here
+        }
+    }
+
+    @Test
+    public void testInfinityDoubleisSameAsConfig(){
+        //tests that +/- INFINITY and other parameters are gotten from the sys.properties file and not from java
+        String infile = "src/test/resources/testData/1KG.chr22.anno.first1500.vcf";
+        String workspace = "foowork";
+        VCFParser parser = new VCFParser();
+        Sender sender = new FileSender(parser.getErrorFile(workspace));
+        VCF2VariantPipe vcf = new VCF2VariantPipe(sender, true, false);
+        Pipe p = parser.getPipeline(vcf, infile);
+        while(p.hasNext()){
+            String json = (String) p.next();
+            if(json.contains("16053863")) {
+                System.out.println(json);
+                //TODO: drill into the resulting json to ensure we have: "CUSTOM":{"max":{"AD":1.0E-307},"min":{"AD":1.0E308
+                DBObject result = (DBObject) JSON.parse(json);
+                Double maxAD =  (Double) ( (((DBObject)((DBObject)result.get("CUSTOM")).get("max")).get("AD")) );
+                Double minAD =  (Double) ( (((DBObject)((DBObject)result.get("CUSTOM")).get("min")).get("AD")) );
+                assertEquals(1.0E-307, maxAD,0.01 );
+                assertEquals(1.0E308, minAD,0.01 );
+                //NOTE: if this test does not pass, you need to put the following in your sys.properties: (no forward slashes of course)
+                //#Values for INFINITY, 1/INFINITY, NotANumber ect that work in both the javascript importer AND java.
+                //Double_MAX_VALUE = 1.0e308
+                //Double_MIN_VALUE = 1.0e-307
+                //Double_NEGATIVE_INFINITY = -1.0e307
+                //NaN_KEY = NaN
+                break;
+            }
         }
     }
 

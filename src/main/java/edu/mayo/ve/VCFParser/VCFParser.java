@@ -146,6 +146,28 @@ public class VCFParser implements ParserInterface {
     }
 
     /**
+     * This method makes it easier to test the logic in the VCF file by enabling testing methods
+     * to directly get the parsing pipeline.
+     * @return
+     */
+    public Pipe getPipeline(VCF2VariantPipe vcf, String infile){
+        Pipe p = new Pipeline(new CatPipe(),
+                new ReplaceAllPipe("\\{",""),
+                new ReplaceAllPipe("\\}",""),
+                new HistoryInPipe(),
+                vcf,
+                new MergePipe("\t"),
+                new ReplaceAllPipe("^.*\t\\{", "{"),
+                new ReplaceAllPipe("\"_id\":","\"_ident\":"),
+                new ReplaceAllPipe("Infinity","2147483648"),
+                //new PrintPipe(),
+                new IdentityPipe()
+        );
+        p.setStarts(Arrays.asList(infile));
+        return p;
+    }
+
+    /**
      * This is the simple direct interface that just works when we need a simple parser.
      * parse the infile, which is a raw vcf and put it into the mongo workspace
      * @param infile     - the raw complete (cononical) path to the file we want to parse as a string.
@@ -168,19 +190,8 @@ public class VCFParser implements ParserInterface {
         //make sure we have type-ahead indexed before wo go-ahead and do the load:
         typeAhead.index(workspace, reporting);
         VCF2VariantPipe vcf = new VCF2VariantPipe(sender, true, false);
-        Pipe p = new Pipeline(new CatPipe(),
-                             new ReplaceAllPipe("\\{",""),
-                             new ReplaceAllPipe("\\}",""),
-                             new HistoryInPipe(),
-                             vcf,
-                             new MergePipe("\t"),
-                             new ReplaceAllPipe("^.*\t\\{", "{"),
-                             new ReplaceAllPipe("\"_id\":","\"_ident\":"),
-                             new ReplaceAllPipe("Infinity","2147483648"),
-                             //new PrintPipe(),
-                             new IdentityPipe()
-                );
-        p.setStarts(Arrays.asList(infile));
+        Pipe p = getPipeline(vcf, infile);
+
         int i;
         long starttime = System.currentTimeMillis();
         DBObject jsonmeta = null;
