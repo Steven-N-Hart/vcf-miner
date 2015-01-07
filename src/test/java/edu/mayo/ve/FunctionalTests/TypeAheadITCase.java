@@ -59,7 +59,7 @@ public class TypeAheadITCase {
 
         System.out.println("TypeAheadITCase.Loading data into a new workspace...");
         VCFParser parser = new VCFParser();
-        parser.parse(null, inputVCF, workspaceID, overflowThreshold, false, false, true);  //put true in the third to last param for verbose load reporting
+        parser.parse(null, inputVCF, workspaceID, overflowThreshold, false, false);  //put true in the third to last param for verbose load reporting
 
     }
 
