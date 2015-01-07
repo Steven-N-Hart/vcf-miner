@@ -9,46 +9,38 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
+import com.tinkerpop.pipes.Pipe;
+import com.tinkerpop.pipes.transform.IdentityPipe;
+import com.tinkerpop.pipes.util.Pipeline;
+import edu.mayo.TypeAhead.TypeAheadCollection;
+import edu.mayo.TypeAhead.TypeAheadInterface;
+import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
+import edu.mayo.concurrency.workerQueue.Task;
+import edu.mayo.index.Index;
+import edu.mayo.parsers.ParserInterface;
+import edu.mayo.pipes.MergePipe;
+import edu.mayo.pipes.ReplaceAllPipe;
+import edu.mayo.pipes.UNIX.CatPipe;
+import edu.mayo.pipes.bioinformatics.SampleDefinition;
+import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
+import edu.mayo.pipes.history.HistoryInPipe;
+import edu.mayo.pipes.iterators.Compressor;
+import edu.mayo.senders.FileSender;
+import edu.mayo.senders.Sender;
+import edu.mayo.util.MongoConnection;
+import edu.mayo.util.SystemProperties;
+import edu.mayo.util.Tokens;
+import edu.mayo.ve.resources.MetaData;
+import edu.mayo.ve.resources.SampleMeta;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.IOException;
 import java.io.LineNumberReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import com.tinkerpop.pipes.Pipe;
-import com.tinkerpop.pipes.transform.IdentityPipe;
-import com.tinkerpop.pipes.util.Pipeline;
-
-import edu.mayo.TypeAhead.TypeAheadCollection;
-import edu.mayo.TypeAhead.TypeAheadInterface;
-import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
-import edu.mayo.concurrency.workerQueue.Task;
-import edu.mayo.parsers.ParserInterface;
-import edu.mayo.pipes.MergePipe;
-import edu.mayo.pipes.PrintPipe;
-import edu.mayo.pipes.UNIX.CatPipe;
-import edu.mayo.pipes.bioinformatics.SampleDefinition;
-import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
-import edu.mayo.pipes.bioinformatics.VCFHeaderParser;
-import edu.mayo.pipes.history.HistoryInPipe;
-import edu.mayo.index.Index;
-import edu.mayo.pipes.iterators.Compressor;
-import edu.mayo.senders.FileSender;
-import edu.mayo.senders.Sender;
-import edu.mayo.util.Tokens;
-import edu.mayo.ve.resources.MetaData;
-import edu.mayo.util.SystemProperties;
-import java.io.IOException;
-import edu.mayo.pipes.bioinformatics.SampleDefinition;
-
 //import edu.mayo.cli.CommandPlugin; TO DO! get this to work :(
-import edu.mayo.pipes.ReplaceAllPipe;
-import edu.mayo.util.MongoConnection;
-import edu.mayo.ve.resources.SampleMeta;
-
-import java.util.Date;
 
 
 /**
@@ -63,7 +55,6 @@ public class VCFParser implements ParserInterface {
     /** testingCollection contains all of the objects placed into the workspace from parsing the VCF */
     HashMap<Integer,String> testingCollection = new HashMap<Integer,String>();
     JsonObject json = null;
-    private boolean saveSamples = false;
     /** @param context                 - the execution context (so we can kill the process if needed)  -- can be null */
     private Task context = null;
     /** @param typeAhead               - the implementation for where value sets will be stored for providing type-ahead functionality. */
@@ -104,7 +95,7 @@ public class VCFParser implements ParserInterface {
         System.out.println("#mongo_server: " + sysprops.get("mongo_server") );
         System.out.println("#mongo port: " + new Integer(sysprops.get("mongo_port")));
         parser.setReporting(true);
-        int datalines = parser.parse(null, infile, workspace, 50000, false, true, true);
+        int datalines = parser.parse(null, infile, workspace, 50000, false, true);
         parser.checkAndUpdateLoadStatus(workspace, datalines, true);
         parser.m.close();
         //note the following will only work if you have a document in mongo like:
@@ -128,18 +119,17 @@ public class VCFParser implements ParserInterface {
 
     /** legacy interface, keep it in place for testing */
     public int parse(Task context, String infile, String workspace, int typeAheadCacheSize) throws ProcessTerminatedException {
-        return parse(context, infile, workspace, typeAheadCacheSize, false, false, true);
+        return parse(context, infile, workspace, typeAheadCacheSize, false, false);
     }
 
     /** legacy interface, keep it in place for testing */
     public int parse(Task context, String infile, String workspace, int typeAheadCacheSize, boolean testing) throws ProcessTerminatedException{
-        return parse(context, infile, workspace, typeAheadCacheSize, testing, false, true);
+        return parse(context, infile, workspace, typeAheadCacheSize, testing, false);
     }
 
     /** legacy interface, keep it in place for testing */
-    public int parse(Task context, String infile, String workspace, int typeAheadCacheSize, boolean testing, boolean reporting, boolean saveSamples) throws ProcessTerminatedException {
+    public int parse(Task context, String infile, String workspace, int typeAheadCacheSize, boolean testing, boolean reporting) throws ProcessTerminatedException {
         typeAhead = new TypeAheadCollection();
-        this.saveSamples = saveSamples;
         this.reporting = reporting;
         this.testing = testing;
         return parse(infile, workspace);
@@ -221,10 +211,6 @@ public class VCFParser implements ParserInterface {
                 String s = (String) p.next();
                 //System.out.println(s);
                 BasicDBObject bo = (BasicDBObject) JSON.parse(s);
-
-                if(saveSamples == false){
-                    bo = removeSamples(bo);
-                }
 
                 //for type-ahead, we need access to the metadata inside the loop, try to force that here
                 if(jsonmeta == null){
@@ -486,11 +472,6 @@ public class VCFParser implements ParserInterface {
      */
     public DBObject getMetadata(){
         return metadata;
-    }
-
-    public BasicDBObject removeSamples(BasicDBObject o){
-        o.removeField("samples");
-        return o;
     }
 
     public int parse(Task task, String inputVCFFile, String workspace, TypeAheadInterface typeAhead, boolean testing) throws ProcessTerminatedException {
@@ -931,14 +912,6 @@ public class VCFParser implements ParserInterface {
 
     public void setM(Mongo m) {
         this.m = m;
-    }
-
-    public boolean isSaveSamples() {
-        return saveSamples;
-    }
-
-    public void setSaveSamples(boolean saveSamples) {
-        this.saveSamples = saveSamples;
     }
 
     public int getCacheSize() {
