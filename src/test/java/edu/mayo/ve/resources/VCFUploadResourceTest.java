@@ -13,7 +13,6 @@ import org.junit.Test;
 import java.io.*;
 import java.util.Arrays;
 
-import static com.mongodb.util.MyAsserts.assertEquals;
 
 /**
  * Created with IntelliJ IDEA.

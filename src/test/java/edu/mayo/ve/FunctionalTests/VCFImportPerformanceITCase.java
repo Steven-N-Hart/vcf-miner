@@ -13,8 +13,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.mongodb.util.MyAsserts.assertTrue;
-
 /**
  * Created by m102417 on 6/4/14.
  */

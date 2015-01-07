@@ -10,6 +10,7 @@ import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.message.SampleNumberFilter;
 import edu.mayo.ve.resources.Provision;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -21,8 +22,9 @@ import java.util.ArrayList;
  *
  *
  *
- *
+ *  --- this code has never gone into production, it was a 'prototype' to see how we could recalculate AC/AD/AF 'in the database'
  */
+@Ignore
 public class MapReduceITCase {
 
     Mongo m = MongoConnection.getMongo();
