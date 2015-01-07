@@ -29,7 +29,7 @@ public class VCFParserTest {
         String result = "{ \"CHROM\" : \"chr1\" , \"POS\" : \"61871\" , \"ID\" : \".\" , \"REF\" : \"C\" , \"ALT\" : \"CT\" , \"QUAL\" : \".\" , \"FILTER\" : \"PASS\" , \"INFO\" : { \"AC\" : [ 1] , \"AF\" : [ 0.5] , \"AN\" : 2 , \"Controls_AC\" : \"1\" , \"Controls_AF\" : \"0.500\" , \"Controls_AN\" : \"2\" , \"FS\" : 0 , \"GenotyperControls\" : \"Pindel\" , \"Group\" : \"Controls\" , \"HRun\" : 9 , \"SNPEFF_EFFECT\" : \"INTERGENIC\" , \"SNPEFF_FUNCTIONAL_CLASS\" : \"NONE\" , \"SNPEFF_IMPACT\" : \"MODIFIER\"} , \"_ident\" : \".\" , \"_type\" : \"variant\" , \"_landmark\" : \"1\" , \"_refAllele\" : \"C\" , \"_altAlleles\" : [ \"CT\"] , \"_minBP\" : 61871 , \"_maxBP\" : 61871 , \"FORMAT\" : { \"max\" : { \"AD\" : 3} , \"min\" : { \"AD\" : 3} , \"GenotypePostitiveCount\" : 1 , \"GenotypePositiveList\" : [ \"s_Mayo_TN_CC_757\"]}}";
         BasicDBObject bo = (BasicDBObject) JSON.parse(input);
         VCFParser parser = new VCFParser();
-        assertEquals(result, parser.removeSamples(bo).toString());
+        assertEquals(result, bo.toString());
     }
 
     @Test
@@ -92,7 +92,6 @@ public class VCFParserTest {
         VCFParser parser = new VCFParser();
         parser.setTypeAhead(new TypeAheadCollection());
         parser.setReporting(reporting);
-        parser.setSaveSamples(false);
         parser.setTesting(true); //don't try to place it in mongo
         try {
             parser.parse(junkfile,"wSOMERANDOMWORKSPACE");

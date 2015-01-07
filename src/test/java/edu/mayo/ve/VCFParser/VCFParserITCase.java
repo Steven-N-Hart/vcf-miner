@@ -84,7 +84,6 @@ public class VCFParserITCase {
         String collection = "thisshouldnot";
         VCFParser parser = new VCFParser();
         parser.setTestingCollection(results);
-        parser.setSaveSamples(false);
         parser.setTesting(true);   //typeahead won't work if this is true!
         parser.setReporting(false);
         parser.parse(VCF, workspace);
@@ -154,7 +153,7 @@ public class VCFParserITCase {
         System.out.println("Running: edu.mayo.ve.VCFParser.VCFParserITCase.testHang");
         String collection = "thisshouldnot";
         VCFParser parser = new VCFParser();
-        parser.parse(null, "src/test/resources/testData/dbSNP4Variants.vcf",workspace,1000,true, reporting, true);
+        parser.parse(null, "src/test/resources/testData/dbSNP4Variants.vcf",workspace,1000,true, reporting);
         HashMap<Integer, String> col = parser.getTestingCollection();
         int i =0;
         for(String s : dbSNP4){
@@ -172,7 +171,7 @@ public class VCFParserITCase {
         System.out.println("Running: edu.mayo.ve.VCFParser.VCFParserITCase.testSoftSearch");
         String softSearchVCF = "src/test/resources/testData/SoftSearch_for_Dan.vcf";
         VCFParser parser = new VCFParser();
-        parser.parse(null, softSearchVCF,workspace,1000000,true, reporting, true);
+        parser.parse(null, softSearchVCF,workspace,1000000,true, reporting);
         HashMap<Integer, String> col = parser.getTestingCollection();
 //        for(String s : col.values()){
 //            System.out.println(s);
@@ -236,7 +235,6 @@ public class VCFParserITCase {
         System.out.println("VCFParserITCase.Loading data into a new workspace...");
         VCFParser parser = new VCFParser();
         //false,false at the end of this call are correct for loading to MongoDB
-        parser.setSaveSamples(true);
         TypeAheadInterface thead = new TypeAheadCollection();
         parser.setReporting(reporting);
         parser.setTypeAhead(thead);
@@ -328,7 +326,7 @@ public class VCFParserITCase {
         String alias = "CaseControls";
         String workspaceID = provision(alias);
         VCFParser parser = new VCFParser();
-        parser.parse(null, VCF, workspaceID, overflowThreshold, false, reporting, true);
+        parser.parse(null, VCF, workspaceID, overflowThreshold, false, reporting);
 
         //delete the workspace
         System.out.println("Deleting Workspace: " + workspaceID);
