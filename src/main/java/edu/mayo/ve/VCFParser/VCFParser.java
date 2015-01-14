@@ -170,8 +170,6 @@ public class VCFParser implements ParserInterface {
         DB db = MongoConnection.getDB();
         if(reporting){ System.out.println("Getting the workspace collection from mongo"); }
         DBCollection col = db.getCollection(workspace);
-        //bulk insert API for MongoDB:
-        BulkWriteOperation bulk = col.initializeUnorderedBulkOperation(); //other_option: col.initializeOrderedBulkOperation();
         if(reporting){
             System.out.println("Setting up Pipeline,\n input file: " + infile);
             System.out.println("Workspace: " + workspace);
@@ -190,7 +188,6 @@ public class VCFParser implements ParserInterface {
         boolean storedVariantCount = false;
         if(reporting) System.out.println("Processing Data....");
         try {
-            boolean recordsRemain = false;
             for(i=0; p.hasNext(); i++){
                 if(context!=null){ if(context.isTerminated()) throw new ProcessTerminatedException(); }
 
@@ -228,18 +225,7 @@ public class VCFParser implements ParserInterface {
                     testingCollection.put(new Integer(i), s);
                 }else {//production
                     //System.out.println(bo.toString());
-                    //old- non bulk call: col.save(removeDots(bo, reporting));
-                    //bulk call:
-                    bulk.insert(removeDots(bo, reporting));
-                    recordsRemain = true;
-                    //mongodb supports up to 1000 records in an bulk insert:
-                    if(i%1000==0){
-                        if(recordsRemain) {//should always be true, but calling bulk.execute if it is not results in a crash
-                            bulk.execute();
-                            bulk = col.initializeUnorderedBulkOperation();
-                            recordsRemain = false;
-                        }
-                    }
+                    col.save(removeDots(bo, reporting));
                     addToTypeAhead(bo, workspace,jsonmeta);
                 }
                 if(reporting){
@@ -254,9 +240,7 @@ public class VCFParser implements ParserInterface {
                 }
 
             }
-            if(recordsRemain) {
-                bulk.execute();
-            }
+
             // final time, update current count
             storeCurrentVariantCount(i, workspace);
 
