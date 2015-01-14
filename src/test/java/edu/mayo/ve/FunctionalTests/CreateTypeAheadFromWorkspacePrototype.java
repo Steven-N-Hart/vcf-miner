@@ -51,17 +51,36 @@ public class CreateTypeAheadFromWorkspacePrototype {
         DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspace);
 
+        String map =
+        "function () {" +
+            "for (var name in this.INFO) {" +
 
-        String map = "function() { " +
-                "var next = this;" +
-                "for(var p in next.INFO){" +
-                    "var stats = {\"key\":p,\"value\":next.INFO[p],\"count\":1 }" +
-                    "emit(\"INFO_\" + p, [stats]);" +
-                "}";
+                "var value = this.INFO[name];" +
 
-        String reduce = "function(key,value) { " +
-                "return value;" +
-                "} ";
+                "if (typeof value == 'string' || value instanceof String) {" +
+
+                    "var key = name + '|' + value;" +
+                    "emit(key, 1);" +
+                "}" +
+            "}" +
+         "}";
+
+        String reduce =
+        "function (key, counts) {" +
+            "return Array.sum(counts);" +
+        "}";
+
+
+//        String map = "function() { " +
+//                "var next = this;" +
+//                "for(var p in next.INFO){" +
+//                    "var stats = {\"key\":p,\"value\":next.INFO[p],\"count\":1 }" +
+//                    "emit(\"INFO_\" + p, [stats]);" +
+//                "}";
+//
+//        String reduce = "function(key,value) { " +
+//                "return value;" +
+//                "} ";
 
 
         String finalize = "";
