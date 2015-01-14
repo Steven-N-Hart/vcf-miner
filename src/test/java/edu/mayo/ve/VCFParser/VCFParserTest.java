@@ -9,6 +9,7 @@ import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
 import edu.mayo.senders.FileSender;
 import edu.mayo.senders.Sender;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -23,7 +24,7 @@ import static org.junit.Assert.fail;
  */
 public class VCFParserTest {
 
-    @Test
+    @Ignore("depricated") @Test
     public void testRemoveSamples(){
         String input =  "{ \"CHROM\" : \"chr1\" , \"POS\" : \"61871\" , \"ID\" : \".\" , \"REF\" : \"C\" , \"ALT\" : \"CT\" , \"QUAL\" : \".\" , \"FILTER\" : \"PASS\" , \"INFO\" : { \"AC\" : [ 1] , \"AF\" : [  0.5], \"AN\" : 2 , \"Controls_AC\" : \"1\" , \"Controls_AF\" : \"0.500\" , \"Controls_AN\" : \"2\" , \"FS\" : 0 , \"GenotyperControls\" : \"Pindel\" , \"Group\" : \"Controls\" , \"HRun\" : 9 , \"SNPEFF_EFFECT\" : \"INTERGENIC\", \"SNPEFF_FUNCTIONAL_CLASS\" : \"NONE\", \"SNPEFF_IMPACT\" : \"MODIFIER\" }, \"_ident\" : \".\", \"_type\" : \"variant\", \"_landmark\" : \"1\", \"_refAllele\" : \"C\", \"_altAlleles\" : [  \"CT\" ], \"_minBP\" : 61871, \"_maxBP\" : 61871, \"samples\" : [ \t{ \t\"GT\" : \"0/1\", \t\"AD\" : 3, \t\"GenotypePositive\" : 1, \t\"sampleID\" : \"s_Mayo_TN_CC_757\" }], \"FORMAT\" : { \"max\" : { \"AD\" : 3 }, \"min\" : { \"AD\" : 3 }, \"GenotypePostitiveCount\" : 1, \"GenotypePositiveList\" : [  \"s_Mayo_TN_CC_757\" ] } }";
         String result = "{ \"CHROM\" : \"chr1\" , \"POS\" : \"61871\" , \"ID\" : \".\" , \"REF\" : \"C\" , \"ALT\" : \"CT\" , \"QUAL\" : \".\" , \"FILTER\" : \"PASS\" , \"INFO\" : { \"AC\" : [ 1] , \"AF\" : [ 0.5] , \"AN\" : 2 , \"Controls_AC\" : \"1\" , \"Controls_AF\" : \"0.500\" , \"Controls_AN\" : \"2\" , \"FS\" : 0 , \"GenotyperControls\" : \"Pindel\" , \"Group\" : \"Controls\" , \"HRun\" : 9 , \"SNPEFF_EFFECT\" : \"INTERGENIC\" , \"SNPEFF_FUNCTIONAL_CLASS\" : \"NONE\" , \"SNPEFF_IMPACT\" : \"MODIFIER\"} , \"_ident\" : \".\" , \"_type\" : \"variant\" , \"_landmark\" : \"1\" , \"_refAllele\" : \"C\" , \"_altAlleles\" : [ \"CT\"] , \"_minBP\" : 61871 , \"_maxBP\" : 61871 , \"FORMAT\" : { \"max\" : { \"AD\" : 3} , \"min\" : { \"AD\" : 3} , \"GenotypePostitiveCount\" : 1 , \"GenotypePositiveList\" : [ \"s_Mayo_TN_CC_757\"]}}";

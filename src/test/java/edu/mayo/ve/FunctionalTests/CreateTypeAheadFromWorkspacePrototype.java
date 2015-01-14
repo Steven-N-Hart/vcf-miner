@@ -1,8 +1,15 @@
 package edu.mayo.ve.FunctionalTests;
 
 import com.mongodb.*;
+import com.mongodb.util.JSON;
 import edu.mayo.util.MongoConnection;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * Created by m102417 on 12/19/14.
@@ -12,10 +19,31 @@ public class CreateTypeAheadFromWorkspacePrototype {
 
     Mongo m = MongoConnection.getMongo();
 
+    private String database = "workspace";
     String alias = "alias";
     String user = "user";
-    String workspace = "w530390f64fccc455973f2381f6dfe376d5267e2e";
+    String workspace = "wHASHRANDOM";
     String outWorkspace = "mr";
+
+
+    //@Before
+    @Test
+    public void load() throws IOException {
+        DB db = m.getDB(database);
+        DBCollection col = db.getCollection(workspace);
+        col.drop();//clean up before we insert
+        BufferedReader br = new BufferedReader(new FileReader("src/test/resources/testData/variants.json"));
+        String line;
+        while((line = br.readLine()) != null){
+            String tmp = line.replaceAll("ObjectId\\(.*\\)","\"value\"");//remove the _id, it is not valid json
+            System.out.println(tmp);
+            DBObject o = (DBObject) JSON.parse(tmp);
+            o.removeField("_id");//remove the _id, it is not valid json
+            System.out.println(o.toString());
+            col.insert(o);
+        }
+        System.out.println("Number of Records: " + col.count());
+    }
 
 
     @Test
