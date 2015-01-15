@@ -218,7 +218,7 @@ public class LoadWorker implements WorkerLogic {
     /**
      * Creates a new Mongo collection for the typeahead data as a post-processing step.
      *
-     * @param variantCollection
+     * @param variantCollection The collection of variant data.
      */
     private void createTypeAheadCollection(DBCollection variantCollection) {
 
