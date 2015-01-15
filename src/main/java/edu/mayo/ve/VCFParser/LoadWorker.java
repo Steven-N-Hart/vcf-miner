@@ -1,8 +1,6 @@
 package edu.mayo.ve.VCFParser;
 
 import com.mongodb.*;
-import edu.mayo.TypeAhead.TypeAheadCollection;
-import edu.mayo.TypeAhead.TypeAheadInterface;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerLogic;
@@ -75,12 +73,6 @@ public class LoadWorker implements WorkerLogic {
                 //change the status from queued to loading:
                 meta.flagAsNotReady(workspace);
 
-                if(report) System.out.println("Setting up the parser...");
-                TypeAheadInterface thead = new TypeAheadCollection();
-                parser.setTypeAhead(thead);
-                parser.setTesting(false);
-                parser.setReporting(report);
-
                 if(report) System.out.println("Parsing the file...");
                 parser.parse(loadfile,workspace); //make the third to last one false in production!   make the second to last one false in production!
                 if(report) System.out.println("File loading done");
@@ -88,6 +80,10 @@ public class LoadWorker implements WorkerLogic {
                 if(report) System.out.println("Checking to see if the file upload worked or failed.");
                 HashMap<String,Integer> icontext = (HashMap) t.getCommandContext(); //need to cast this to an integer
                 parser.checkAndUpdateLoadStatus(workspace, icontext.get(Tokens.DATA_LINE_COUNT), false);
+
+                if(report) System.out.println("Running map-reduce to produce TypeAhead collection...");
+                createTypeAheadCollection(MongoConnection.getDB().getCollection(workspace));
+                if(report) System.out.println("TypeAhead collection done.");
 
                 //calculate and log the processing time
                 long endTime   = System.currentTimeMillis();
@@ -217,5 +213,82 @@ public class LoadWorker implements WorkerLogic {
 
     public void setReport(boolean report) {
         this.report = report;
+    }
+
+    /**
+     * Creates a new Mongo collection for the typeahead data as a post-processing step.
+     *
+     * @param variantCollection
+     */
+    private void createTypeAheadCollection(DBCollection variantCollection) {
+
+        // The MAP produces unique keys that will be counted in the REDUCE function.
+        //
+        // The format of the key is:
+        //
+        //      <INFO field name>|<INFO field value>
+        //
+        // Example:
+        //
+        //      SNPEFF_GENE_NAME|AGRN
+        //
+        // The emit() passes a value of "1" to signify 1 instance was found of this key
+        //
+        String map =
+                "function () {" +
+                        "for (var name in this.INFO) {" +
+
+                            "var value = this.INFO[name];" +
+
+                            "if ((typeof value == 'string' || value instanceof String) && (value != '.')) {" +
+
+                                "var key = name + '|' + value;" +
+                                "emit(key, 1);" +
+                            "}" +
+                        "}" +
+                "}";
+
+        // The REDUCE simply sums the instances together into a single total (e.g. count).
+        String reduce =
+                "function (key, counts) {" +
+                        "return Array.sum(counts);" +
+                "}";
+
+        // The FINALIZE parses the key into separate field and value attributes.
+        String finalize =
+                "function (key, reducedCount) {" +
+
+                        "var nameValueArray = key.split('|');" +
+
+                        "var typeahead = new Object();" +
+                        "typeahead.field = 'INFO.' + nameValueArray[0];" +
+                        "typeahead.value = nameValueArray[1];" +
+                        "typeahead.count = reducedCount;" +
+
+                        "return typeahead;" +
+                "}";
+
+        final String typeaheadCollectionName = variantCollection.getName()+".typeahead";
+
+        MapReduceCommand cmd = new MapReduceCommand(variantCollection, map, reduce, typeaheadCollectionName, MapReduceCommand.OutputType.REPLACE, null);
+        cmd.setFinalize(finalize);
+
+        variantCollection.mapReduce(cmd);
+
+        // transform the typeahead schema
+        DBCollection typeaheadCol = MongoConnection.getDB().getCollection(typeaheadCollectionName);
+        final DBObject grabEverythingQuery = new BasicDBObject();
+
+        // STEP 1 - rename "value" to "temp"
+        final DBObject renameToTemp = new BasicDBObject("$rename", new BasicDBObject("value", "temp"));
+        typeaheadCol.update(grabEverythingQuery, renameToTemp, false, true);
+
+        // STEP 2 - move "temp" attributes up a level
+        final DBObject moveUp = new BasicDBObject("$rename", new BasicDBObject("temp.field", "field").append("temp.value", "value").append("temp.count", "count"));
+        typeaheadCol.update(grabEverythingQuery, moveUp, false, true);
+
+        // STEP 3 - delete "temp"
+        final DBObject delete = new BasicDBObject("$unset", new BasicDBObject("temp", ""));
+        typeaheadCol.update(grabEverythingQuery, delete, false, true);
     }
 }
