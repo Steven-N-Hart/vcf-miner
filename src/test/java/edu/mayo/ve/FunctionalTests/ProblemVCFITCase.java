@@ -219,7 +219,7 @@ public class ProblemVCFITCase {
 
         System.out.println("ProblemVCF.Loading data into a new workspace...");
         VCFParser parser = new VCFParser();
-        parser.parse(null, inputVCF, workspaceID, overflowThreshold, false, reporting);  //put true in the second to last param for verbose load reporting
+        parser.parse(null, inputVCF, workspaceID, false, reporting);  //put true in the second to last param for verbose load reporting
         parser.setTypeAhead(null);//remove the type-ahead, because it could be consuming too much ram...
         return workspaceID;
     }

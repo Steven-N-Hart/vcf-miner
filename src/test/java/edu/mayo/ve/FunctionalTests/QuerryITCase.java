@@ -64,7 +64,7 @@ public class QuerryITCase {
 
         System.out.println("QuerryITCase.Loading data into a new workspace...");
         VCFParser parser = new VCFParser();
-        parser.parse(null, vcf, workspace, overflowThreshold, reporting, false);  //put true in the second to last param for verbose load reporting
+        parser.parse(null, vcf, workspace, reporting, false);  //put true in the second to last param for verbose load reporting
         return workspace;
     }
 

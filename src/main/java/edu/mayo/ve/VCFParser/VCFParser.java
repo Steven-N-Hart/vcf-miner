@@ -12,7 +12,6 @@ import com.mongodb.util.JSON;
 import com.tinkerpop.pipes.Pipe;
 import com.tinkerpop.pipes.transform.IdentityPipe;
 import com.tinkerpop.pipes.util.Pipeline;
-import edu.mayo.TypeAhead.TypeAheadCollection;
 import edu.mayo.TypeAhead.TypeAheadInterface;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
@@ -57,8 +56,6 @@ public class VCFParser implements ParserInterface {
     JsonObject json = null;
     /** @param context                 - the execution context (so we can kill the process if needed)  -- can be null */
     private Task context = null;
-    /** @param typeAhead               - the implementation for where value sets will be stored for providing type-ahead functionality. */
-    private TypeAheadInterface typeAhead = new TypeAheadCollection();
     /**  @param testing    -- populate in-memoryt testingCollection instead of Mongo.  */
     private boolean testing = false;
     /** @param reporting - if verbose output is desired (much slower and not for production use, use when debugging) */
@@ -95,7 +92,7 @@ public class VCFParser implements ParserInterface {
         System.out.println("#mongo_server: " + sysprops.get("mongo_server") );
         System.out.println("#mongo port: " + new Integer(sysprops.get("mongo_port")));
         parser.setReporting(true);
-        int datalines = parser.parse(null, infile, workspace, 50000, false, true);
+        int datalines = parser.parse(null, infile, workspace, false, true);
         parser.checkAndUpdateLoadStatus(workspace, datalines, true);
         parser.m.close();
         //note the following will only work if you have a document in mongo like:
@@ -118,18 +115,12 @@ public class VCFParser implements ParserInterface {
     }
 
     /** legacy interface, keep it in place for testing */
-    public int parse(Task context, String infile, String workspace, int typeAheadCacheSize) throws ProcessTerminatedException {
-        return parse(context, infile, workspace, typeAheadCacheSize, false, false);
+    public int parse(Task context, String infile, String workspace) throws ProcessTerminatedException {
+        return parse(context, infile, workspace, false, false);
     }
 
     /** legacy interface, keep it in place for testing */
-    public int parse(Task context, String infile, String workspace, int typeAheadCacheSize, boolean testing) throws ProcessTerminatedException{
-        return parse(context, infile, workspace, typeAheadCacheSize, testing, false);
-    }
-
-    /** legacy interface, keep it in place for testing */
-    public int parse(Task context, String infile, String workspace, int typeAheadCacheSize, boolean testing, boolean reporting) throws ProcessTerminatedException {
-        typeAhead = new TypeAheadCollection();
+    public int parse(Task context, String infile, String workspace, boolean testing, boolean reporting) throws ProcessTerminatedException {
         this.reporting = reporting;
         this.testing = testing;
         return parse(infile, workspace);
@@ -173,12 +164,9 @@ public class VCFParser implements ParserInterface {
         if(reporting){
             System.out.println("Setting up Pipeline,\n input file: " + infile);
             System.out.println("Workspace: " + workspace);
-            System.out.println("TypeAhead: " + typeAhead);
             System.out.println("Testing: " + testing);
             System.out.println("Reporting: " + reporting);
         }
-        //make sure we have type-ahead indexed before wo go-ahead and do the load:
-        typeAhead.index(workspace, reporting);
         VCF2VariantPipe vcf = new VCF2VariantPipe(sender, true, false);
         Pipe p = getPipeline(vcf, infile);
 
@@ -226,7 +214,6 @@ public class VCFParser implements ParserInterface {
                 }else {//production
                     //System.out.println(bo.toString());
                     col.save(removeDots(bo, reporting));
-                    addToTypeAhead(bo, workspace,jsonmeta);
                 }
                 if(reporting){
                     System.out.println("i:" + i + "\ts:" + s.length());
@@ -271,7 +258,6 @@ public class VCFParser implements ParserInterface {
             if(reporting){System.out.println("indexing...");}
             index(workspace, vcf, reporting);
             if(reporting){System.out.println("saving type-ahead results to the database");}
-            typeAhead.index(workspace, reporting);
         }
         if(reporting){ System.out.println("done!");}
         return i; //the number of records processed
@@ -381,31 +367,6 @@ public class VCFParser implements ParserInterface {
     }
 
     /**
-     *
-     * @param vcfLine
-     * @param workspace
-     * @param metadata  - what the header says about the field (e.g. is it a number, if so, then don't do a type-ahead!)
-     */
-    private void addToTypeAhead(DBObject vcfLine, String workspace, DBObject metadata){
-        DBObject info = (DBObject) vcfLine.get("INFO"); //only care about info field for type-ahead
-        if(info != null){
-            for(String key : info.keySet()) {
-                String ikey = "INFO." + key;
-                if(isStringOrCharacter(key,metadata)) { //check to see if its a String or Character
-                    Object o = info.get(key);
-                    if (o instanceof BasicDBList) {
-                        //it is a list of String or Character
-                        addArrToTypeAhead((BasicDBList) o, workspace, ikey);
-                    } else {
-                        // it is a single String or Character value
-                        typeAhead.put(workspace, ikey, String.valueOf(o));
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * ##SAMPLE LINES need to be added to their own collection so that later code can query it.
      *    DBObject metadata
      */
@@ -430,42 +391,6 @@ public class VCFParser implements ParserInterface {
         sm.indexSampleDocuments();
     }
 
-    /**
-     *
-     * @param values - a list of strings, doubles or ints.
-     * @param workspace - string, workspace we
-     */
-    private void addArrToTypeAhead(BasicDBList values, String workspace, String ikey){
-        //System.out.println("Adding Array: " + ikey);
-        for(Object o : values){
-            if (o instanceof String) {
-                typeAhead.put(workspace, ikey, o.toString());
-                //System.out.println(ikey + ((String) o));
-            } else if (o instanceof Integer) {
-                typeAhead.put(workspace, ikey, String.valueOf((Integer) o));
-            } else if (o instanceof Double) {
-                typeAhead.put(workspace, ikey, String.valueOf((Double) o));
-            }
-        }
-
-    }
-
-    /**
-     * Adds the {@link SampleDefinition} values of type string to the typeahead backend.
-     * @param def
-     *      The {@link SampleDefinition} to be used.
-     * @param workspace
-     *      The workspace key.
-     */
-    public void addToTypeAhead(SampleDefinition def, String workspace) {
-        for (String stringMetaKey: def.getStringKeys()) {
-            final String ikey = "META." + stringMetaKey;
-            for (String value: def.getStringValues(stringMetaKey)) {
-                typeAhead.put(workspace, ikey, value);
-            }
-        }
-    }
-
     private DBObject metadata = null;
     /**
      * for testing...
@@ -474,12 +399,9 @@ public class VCFParser implements ParserInterface {
         return metadata;
     }
 
-    public int parse(Task task, String inputVCFFile, String workspace, TypeAheadInterface typeAhead, boolean testing) throws ProcessTerminatedException {
+    public int parse(Task task, String inputVCFFile, String workspace, boolean testing) throws ProcessTerminatedException {
         if(task != null)
             context = task;
-        if(typeAhead != null){
-            this.typeAhead = typeAhead;
-        }
         this.testing = testing;
         this.reporting = reporting;
         return parse(inputVCFFile, workspace);
@@ -938,13 +860,14 @@ public class VCFParser implements ParserInterface {
         this.testing = testing;
     }
 
+    //TODO: REMOVE ME
     @Override
     public void setTypeAhead(TypeAheadInterface typeAheadInterface) {
-        this.typeAhead = typeAheadInterface;//To change body of implemented methods use File | Settings | File Templates.
     }
 
+    // TODO: REMOVE ME
     public TypeAheadInterface getTypeAhead(){
-        return typeAhead;
+        return null;
     }
 
     public boolean isReporting() {

@@ -36,7 +36,7 @@ public class FunctionalTestUtil {
 
         LOGGER.info("Loading data into a new workspace...");
         VCFParser parser = new VCFParser();
-        parser.parse(null, vcf.getAbsolutePath(), workspaceKey, overflowThreshold, reporting, false);  //put true in the second to last param for verbose load reporting
+        parser.parse(null, vcf.getAbsolutePath(), workspaceKey, reporting, false);  //put true in the second to last param for verbose load reporting
         return workspaceKey;
     }
 

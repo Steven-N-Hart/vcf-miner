@@ -154,7 +154,7 @@ public class VCFParserITCase {
         System.out.println("Running: edu.mayo.ve.VCFParser.VCFParserITCase.testHang");
         String collection = "thisshouldnot";
         VCFParser parser = new VCFParser();
-        parser.parse(null, "src/test/resources/testData/dbSNP4Variants.vcf",workspace,1000,true, reporting);
+        parser.parse(null, "src/test/resources/testData/dbSNP4Variants.vcf",workspace,true, reporting);
         HashMap<Integer, String> col = parser.getTestingCollection();
         int i =0;
         for(String s : dbSNP4){
@@ -172,7 +172,7 @@ public class VCFParserITCase {
         System.out.println("Running: edu.mayo.ve.VCFParser.VCFParserITCase.testSoftSearch");
         String softSearchVCF = "src/test/resources/testData/SoftSearch_for_Dan.vcf";
         VCFParser parser = new VCFParser();
-        parser.parse(null, softSearchVCF,workspace,1000000,true, reporting);
+        parser.parse(null, softSearchVCF,workspace,true, reporting);
         HashMap<Integer, String> col = parser.getTestingCollection();
 //        for(String s : col.values()){
 //            System.out.println(s);
@@ -327,7 +327,7 @@ public class VCFParserITCase {
         String alias = "CaseControls";
         String workspaceID = provision(alias);
         VCFParser parser = new VCFParser();
-        parser.parse(null, VCF, workspaceID, overflowThreshold, false, reporting);
+        parser.parse(null, VCF, workspaceID, false, reporting);
 
         //delete the workspace
         System.out.println("Deleting Workspace: " + workspaceID);
@@ -401,39 +401,4 @@ public class VCFParserITCase {
         results = ((BasicDBList)samps.get("results"));
         assertEquals(0, results.size());
     }
-
-    @Test
-    public void addToTypeAhead() {
-
-        final String workspaceID = provision("alias");
-
-        VCFParser parser = new VCFParser();
-
-        SampleDefinition def = new SampleDefinition("SAMPLE1");
-        def.addString("KEY1", "value1");
-        def.addString("KEY1", "value2");
-        def.addString("KEY1", "value3");
-        def.addString("KEY1", "foo");
-        def.addString("KEY1", "bar");
-
-        parser.addToTypeAhead(def, workspaceID);
-
-        TypeAheadResource resrc = new TypeAheadResource();
-
-        assertEquals(
-                "{ \"META.KEY1\" : [ \"value1\" , \"value2\" , \"value3\"]}",
-                resrc.getTypeAhead4Value(workspaceID, "META.KEY1", "val", 100)
-        );
-
-        assertEquals(
-                "{ \"META.KEY1\" : [ \"foo\"]}",
-                resrc.getTypeAhead4Value(workspaceID, "META.KEY1", "f", 100)
-        );
-
-        assertEquals(
-                "{ \"META.KEY1\" : [ \"bar\"]}",
-                resrc.getTypeAhead4Value(workspaceID, "META.KEY1", "b", 100)
-        );
-    }
-
 }

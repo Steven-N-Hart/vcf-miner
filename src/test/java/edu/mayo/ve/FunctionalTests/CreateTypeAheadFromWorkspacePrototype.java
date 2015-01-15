@@ -57,7 +57,7 @@ public class CreateTypeAheadFromWorkspacePrototype {
 
                 "var value = this.INFO[name];" +
 
-                "if (typeof value == 'string' || value instanceof String) {" +
+                "if ((typeof value == 'string' || value instanceof String) && (value != '.')) {" +
 
                     "var key = name + '|' + value;" +
                     "emit(key, 1);" +
@@ -83,12 +83,24 @@ public class CreateTypeAheadFromWorkspacePrototype {
 //                "} ";
 
 
-        String finalize = "";
+        String finalize =
+        "function (key, reducedCount) {" +
+
+            "var nameValueArray = key.split('|');" +
+
+            "var typeahead = new Object();" +
+            "typeahead.field = nameValueArray[0];" +
+            "typeahead.value = nameValueArray[1];" +
+            "typeahead.count = reducedCount;" +
+
+            "return typeahead;" +
+        "}";
 
         long start = System.currentTimeMillis();
         //MapReduceCommand.OutputType :: INLINE - Return results inline, no result is written to the DB server REPLACE - Save the job output to a collection, replacing its previous content MERGE - Merge the job output with the existing contents of outputTarget collection REDUCE - Reduce the job output with the existing contents of outputTarget collection
         MapReduceCommand cmd = new MapReduceCommand(col, map, reduce,
                 outWorkspace, MapReduceCommand.OutputType.REPLACE, null);//getQuery());
+        cmd.setFinalize(finalize);
 
 
         MapReduceOutput out = col.mapReduce(cmd);
