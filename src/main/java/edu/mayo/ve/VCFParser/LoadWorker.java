@@ -240,10 +240,15 @@ public class LoadWorker implements WorkerLogic {
 
                             "var value = this.INFO[name];" +
 
-                            "if ((typeof value == 'string' || value instanceof String) && (value != '.')) {" +
+                            "if ((typeof value == 'string') && (value != '.')) {" +
 
                                 "var key = name + '|' + value;" +
                                 "emit(key, 1);" +
+                            "}" +
+                            "else if ((value instanceof Array) && (typeof value[0] == 'string')) {" +
+                                "for(var i=0; i < value.length; i++) {" +
+                                    "emit(name + '|' + value[i], 1);" +
+                                "}" +
                             "}" +
                         "}" +
                 "}";
