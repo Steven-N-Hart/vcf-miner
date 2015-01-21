@@ -10,18 +10,16 @@ import com.google.gson.JsonObject;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import com.tinkerpop.pipes.Pipe;
-import com.tinkerpop.pipes.transform.IdentityPipe;
 import com.tinkerpop.pipes.util.Pipeline;
 import edu.mayo.TypeAhead.TypeAheadInterface;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.index.Index;
 import edu.mayo.parsers.ParserInterface;
-import edu.mayo.pipes.MergePipe;
-import edu.mayo.pipes.ReplaceAllPipe;
 import edu.mayo.pipes.UNIX.CatPipe;
 import edu.mayo.pipes.bioinformatics.SampleDefinition;
 import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
+import edu.mayo.pipes.history.History;
 import edu.mayo.pipes.history.HistoryInPipe;
 import edu.mayo.pipes.iterators.Compressor;
 import edu.mayo.senders.FileSender;
@@ -38,6 +36,7 @@ import java.io.LineNumberReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 //import edu.mayo.cli.CommandPlugin; TO DO! get this to work :(
 
@@ -63,6 +62,9 @@ public class VCFParser implements ParserInterface {
 
     private Double initialLinePerformance = 0.0;
     private Double averageLinePerformance = 0.0;
+
+    private static final Pattern ID_PATTERN = Pattern.compile("\"_id\":");
+    private static final Pattern INFINITY_PATTERN = Pattern.compile("Infinity");
 
     public static void usage(){
             System.out.println("This program will parse a VCF file, obtain the 'schema' for that VCF and populate a MongoDB database with the variants in the VCF.");
@@ -133,16 +135,11 @@ public class VCFParser implements ParserInterface {
      */
     public Pipe getPipeline(VCF2VariantPipe vcf, String infile){
         Pipe p = new Pipeline(new CatPipe(),
-                new ReplaceAllPipe("\\{",""),
-                new ReplaceAllPipe("\\}",""),
+// TODO: necessary to account for these here?  or put in vcf-miner documentation?
+//                new ReplaceAllPipe("\\{",""),
+//                new ReplaceAllPipe("\\}",""),
                 new HistoryInPipe(),
-                vcf,
-                new MergePipe("\t"),
-                new ReplaceAllPipe("^.*\t\\{", "{"),
-                new ReplaceAllPipe("\"_id\":","\"_ident\":"),
-                new ReplaceAllPipe("Infinity","2147483648"),
-                //new PrintPipe(),
-                new IdentityPipe()
+                vcf
         );
         p.setStarts(Arrays.asList(infile));
         return p;
@@ -177,6 +174,7 @@ public class VCFParser implements ParserInterface {
         if(reporting) System.out.println("Processing Data....");
         try {
             for(i=0; p.hasNext(); i++){
+
                 if(context!=null){ if(context.isTerminated()) throw new ProcessTerminatedException(); }
 
                 if (!storedVariantCount) {
@@ -196,8 +194,14 @@ public class VCFParser implements ParserInterface {
                 }
 
                 if(reporting) System.out.println(col.count());
-                String s = (String) p.next();
-                //System.out.println(s);
+                History h = (History) p.next();
+                // last column in history is the JSON produced by the VCF2VariantPipe
+                String s = h.get(h.size() - 1);
+                // swap "_id" with "_ident" prior to inserting into mongo
+                s = ID_PATTERN.matcher(s).replaceAll("\"_ident\":");
+                // swap "Infinity" text for number
+                s = INFINITY_PATTERN.matcher(s).replaceAll("2147483648");
+
                 BasicDBObject bo = (BasicDBObject) JSON.parse(s);
 
                 //for type-ahead, we need access to the metadata inside the loop, try to force that here
@@ -212,7 +216,6 @@ public class VCFParser implements ParserInterface {
                 if(testing){
                     testingCollection.put(new Integer(i), s);
                 }else {//production
-                    //System.out.println(bo.toString());
                     col.save(removeDots(bo, reporting));
                 }
                 if(reporting){
