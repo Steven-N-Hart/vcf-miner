@@ -80,7 +80,7 @@ public class ProblemVCFITCase {
         DBObject raw = index.getIndexedFields(col);
         System.out.println("AFTER LOAD");  //HERE TYPEAHEAD SHOULD BE INDEXED
         System.out.println(raw.toString());
-        deleteCheck(workspace, 0, 1036);
+        deleteCheck(workspace, 0, 7);
         raw = index.getIndexedFields(col);
         System.out.println("AFTER DELETE"); //HERE TYPEAHEAD SHOULD NOT BE INDEXED
         System.out.println(raw.toString());
@@ -133,7 +133,7 @@ public class ProblemVCFITCase {
         String result = eq.handleBasicQuerry(q);
         System.out.println(result.substring(0,200));
         assertTrue(result.replaceAll("\\s+","").startsWith("{\"totalResults\":22747"));
-        deleteCheck(workspace,0,47124); //todo: we need to generate less warnings!
+        deleteCheck(workspace,0,7);
     }
 
     private long count(String workspace){
@@ -161,8 +161,8 @@ public class ProblemVCFITCase {
         System.out.println("Compressed Records Loaded: " + zcount);
         assertEquals(count, zcount);
         assertTrue(count != 0);
-        deleteCheck(workspace,0,63);//todo: perhaps we should do more with all of these warnings!
-        deleteCheck(zworkspace,0,63);
+        deleteCheck(workspace,0,7);
+        deleteCheck(zworkspace,0,7);
     }
 
 
