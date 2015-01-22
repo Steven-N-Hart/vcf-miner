@@ -11,6 +11,7 @@ import edu.mayo.util.CompareJSON;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.CacheMissException;
+import edu.mayo.ve.VCFParser.LoadWorker;
 import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.resources.Index;
 import edu.mayo.ve.resources.Provision;
@@ -60,6 +61,8 @@ public class TypeAheadITCase {
         System.out.println("TypeAheadITCase.Loading data into a new workspace...");
         VCFParser parser = new VCFParser();
         parser.parse(null, inputVCF, workspaceID, false, false);  //put true in the third to last param for verbose load reporting
+
+        LoadWorker.createTypeAheadCollection(MongoConnection.getDB().getCollection(workspaceID));
 
     }
 

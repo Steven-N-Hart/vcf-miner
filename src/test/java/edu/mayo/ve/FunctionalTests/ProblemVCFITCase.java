@@ -4,32 +4,29 @@ import com.mongodb.*;
 import com.mongodb.util.JSON;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.util.CompareJSON;
+import edu.mayo.util.MongoConnection;
+import edu.mayo.util.SystemProperties;
 import edu.mayo.util.Tokens;
-import edu.mayo.ve.CacheMissException;
 import edu.mayo.ve.VCFParser.ErrorStats;
+import edu.mayo.ve.VCFParser.LoadWorker;
 import edu.mayo.ve.VCFParser.VCFErrorFileUtils;
 import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.index.Index;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.message.SampleNumberFilter;
-import edu.mayo.ve.resources.*;
-import edu.mayo.util.MongoConnection;
-import edu.mayo.util.SystemProperties;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import edu.mayo.ve.resources.ExeQuery;
+import edu.mayo.ve.resources.MetaData;
+import edu.mayo.ve.resources.Provision;
+import edu.mayo.ve.resources.Workspace;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -221,6 +218,8 @@ public class ProblemVCFITCase {
         VCFParser parser = new VCFParser();
         parser.parse(null, inputVCF, workspaceID, false, reporting);  //put true in the second to last param for verbose load reporting
         parser.setTypeAhead(null);//remove the type-ahead, because it could be consuming too much ram...
+        LoadWorker.createTypeAheadCollection(MongoConnection.getDB().getCollection(workspaceID));
+
         return workspaceID;
     }
 
