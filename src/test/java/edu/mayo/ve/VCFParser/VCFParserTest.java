@@ -5,8 +5,8 @@ import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import com.tinkerpop.pipes.Pipe;
 import edu.mayo.TypeAhead.TypeAheadCollection;
-import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
+import edu.mayo.pipes.history.History;
 import edu.mayo.senders.FileSender;
 import edu.mayo.senders.Sender;
 import org.junit.Ignore;
@@ -112,7 +112,8 @@ public class VCFParserTest {
         VCF2VariantPipe vcf = new VCF2VariantPipe(sender, true, false);
         Pipe p = parser.getPipeline(vcf, infile);
         while(p.hasNext()){
-            String json = (String) p.next();
+            History h = (History) p.next();
+            String json = h.get(h.size() - 1);
             if(json.contains("16053863")) {
                 System.out.println(json);
                 //TODO: drill into the resulting json to ensure we have: "CUSTOM":{"max":{"AD":1.0E-307},"min":{"AD":1.0E308
