@@ -73,7 +73,7 @@ public class DownloadVCFTestITCase extends TestCase {
                 "##INFO=<ID=RPA,Number=.,Type=Integer,Description=\"Number of times tandem repeat unit is repeated, for each allele (including reference)\">\n" +
                 "##INFO=<ID=MQ0,Number=1,Type=Integer,Description=\"Total Mapping Quality Zero Reads\">\n" +
                 "##INFO=<ID=UniprotID,Number=.,Type=String,Description=\"The UniProt identifier provided by the EBI.\">\n" +
-                "##INFO=<ID=SNPEFF_Effect,Number=.,Type=String,Description=\"Effect of this variant. INTERGENIC, UPSTREAM, UTR_5_PRIME, UTR_5_DELETED, START_GAINED, SPLICE_SITE_ACCEPTOR, SPLICE_SITE_DONOR, START_LOST, SYNONYMOUS_START, CDS, GENE, TRANSCRIPT, EXON, EXON_DELETED, NON_SYNONYMOUS_CODING, SYNONYMOUS_CODING, FRAME_SHIFT, CODON_CHANGE, CODON_INSERTION, CODON_CHANGE_PLUS_CODON_INSERTION, CODON_DELETION, CODON_CHANGE_PLUS_CODON_DELETION, STOP_GAINED, SYNONYMOUS_STOP, STOP_LOST, INTRON, UTR_3_PRIME, UTR_3_DELETED, DOWNSTREAM, INTRON_CONSERVED, INTERGENIC_CONSERVED, INTRAGENIC, RARE_AMINO_ACID, NON_SYNONYMOUS_START\">\n" +
+                "##INFO=<ID=SNPEFF_Effect,Number=.,Type=String,Description=\"Effect of this variant. {INTERGENIC, UPSTREAM, UTR_5_PRIME, UTR_5_DELETED, START_GAINED, SPLICE_SITE_ACCEPTOR, SPLICE_SITE_DONOR, START_LOST, SYNONYMOUS_START, CDS, GENE, TRANSCRIPT, EXON, EXON_DELETED, NON_SYNONYMOUS_CODING, SYNONYMOUS_CODING, FRAME_SHIFT, CODON_CHANGE, CODON_INSERTION, CODON_CHANGE_PLUS_CODON_INSERTION, CODON_DELETION, CODON_CHANGE_PLUS_CODON_DELETION, STOP_GAINED, SYNONYMOUS_STOP, STOP_LOST, INTRON, UTR_3_PRIME, UTR_3_DELETED, DOWNSTREAM, INTRON_CONSERVED, INTERGENIC_CONSERVED, INTRAGENIC, RARE_AMINO_ACID, NON_SYNONYMOUS_START}\">\n" +
                 "##INFO=<ID=VEP_Protein_position,Number=.,Type=String,Description=\"Relative position of amino acid in protein.\">\n" +
                 "##INFO=<ID=PolyPhen_TERM,Number=.,Type=String,Description=\"The PolyPhen prediction.\">\n" +
                 "##INFO=<ID=HapMap_CEU_MAF,Number=.,Type=Float,Description=\"Other allele frequency(Utah residents with Northern and Western European ancestry from the CEPH collection)\">\n" +
@@ -84,7 +84,7 @@ public class DownloadVCFTestITCase extends TestCase {
                 "##INFO=<ID=SNPEFF_Gene_name,Number=.,Type=String,Description=\"Gene name\">\n" +
                 "##INFO=<ID=VEP_Allele,Number=.,Type=String,Description=\"The variant allele used to calculate the consequence.\">\n" +
                 "##INFO=<ID=SNPEFF_Amino_acid_change,Number=.,Type=String,Description=\"Amino acid change: old_AA AA_position/new_AA (e.g. 'E30K').\">\n" +
-                "##INFO=<ID=SNPEFF_Coding,Number=.,Type=String,Description=\"This field is 'CODING' if any transcript of the gene is marked as protein coding. CODING, NON_CODING\">\n" +
+                "##INFO=<ID=SNPEFF_Coding,Number=.,Type=String,Description=\"This field is 'CODING' if any transcript of the gene is marked as protein coding. {CODING, NON_CODING}\">\n" +
                 "##INFO=<ID=VEP_Feature,Number=.,Type=String,Description=\"Ensembl stable ID of feature.\">\n" +
                 "##INFO=<ID=VEP_CDS_position,Number=.,Type=String,Description=\"Relative position of base pair in coding sequence.\">\n" +
                 "##INFO=<ID=VEP_HGNC,Number=.,Type=String,Description=\"The HGNC gene identifier.\">\n" +
@@ -94,7 +94,7 @@ public class DownloadVCFTestITCase extends TestCase {
                 "##INFO=<ID=OMIM_Disease,Number=.,Type=String,Description=\"Phenotypes observed\">\n" +
                 "##INFO=<ID=SIFT_TERM,Number=.,Type=String,Description=\"The SIFT prediction.\">\n" +
                 "##INFO=<ID=VEP_Consequence,Number=.,Type=String,Description=\"Consequence type, a term defined by the Sequence Ontology (SO), of this variation.\">\n" +
-                "##INFO=<ID=SNPEFF_Functional_class,Number=.,Type=String,Description=\"Functional class. NONE, SILENT, MISSENSE, NONSENSE\">\n" +
+                "##INFO=<ID=SNPEFF_Functional_class,Number=.,Type=String,Description=\"Functional class. {NONE, SILENT, MISSENSE, NONSENSE}\">\n" +
                 "##INFO=<ID=COSMIC_strand,Number=.,Type=String,Description=\"Strand based on GRCh37 genome build\">\n" +
                 "##INFO=<ID=PolyPhen_Score,Number=.,Type=Float,Description=\"The PolyPhen score.\">\n" +
                 "##INFO=<ID=1000Genomes_AMR_AF,Number=.,Type=Float,Description=\"Allele Frequency for samples from AMR based on AC/AN\">\n" +
@@ -104,7 +104,7 @@ public class DownloadVCFTestITCase extends TestCase {
                 "##INFO=<ID=VEP_cDNA_position,Number=.,Type=String,Description=\"Relative position of base pair in cDNA sequence.\">\n" +
                 "##INFO=<ID=SNPEFF_Transcript,Number=.,Type=String,Description=\"Transcript ID (usually ENSEMBL IDs).\">\n" +
                 "##INFO=<ID=SNPEFF_Gene_bioType,Number=.,Type=String,Description=\"Transcript bioType, if available.\">\n" +
-                "##INFO=<ID=SNPEFF_Effect_impact,Number=.,Type=String,Description=\"Effects are categorized by 'impact' categories to help users find more significant variants. HIGH, MODERATE, LOW, MODIFIER\">\n" +
+                "##INFO=<ID=SNPEFF_Effect_impact,Number=.,Type=String,Description=\"Effects are categorized by 'impact' categories to help users find more significant variants. {HIGH, MODERATE, LOW, MODIFIER}\">\n" +
                 "##INFO=<ID=ESP6500_EUR_MAF,Number=.,Type=Float,Description=\"European American Minor Allele Frequency (in percent)\">\n" +
                 "##INFO=<ID=SIFT_Score,Number=.,Type=Float,Description=\"The SIFT score.\">\n" +
                 "##INFO=<ID=1000Genomes_AFR_AF,Number=.,Type=Float,Description=\"Allele Frequency for samples from AFR based on AC/AN\">\n" +
