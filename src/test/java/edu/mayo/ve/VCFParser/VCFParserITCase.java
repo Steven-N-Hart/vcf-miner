@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.jayway.jsonpath.JsonPath;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import com.tinkerpop.pipes.Pipe;
@@ -22,12 +23,15 @@ import edu.mayo.util.CompareJSON;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.resources.*;
 import edu.mayo.util.MongoConnection;
+import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -400,5 +404,51 @@ public class VCFParserITCase {
         samps = smeta.getAllSampleDocuments4WorkspaceImpl(workspace);
         results = ((BasicDBList)samps.get("results"));
         assertEquals(0, results.size());
+    }
+
+    @Test
+    /**
+     * Tests whether the pipeline can handle curly brances in the input VCF file
+     */
+    public void testCurlyBraces() throws IOException, ProcessTerminatedException {
+
+
+        String alias = "alias";
+        String workspaceID = provision(alias);
+        File temp = File.createTempFile(workspaceID, "");
+
+        try {
+            List<String> lines = Arrays.asList(
+                    "##INFO=<ID=INFO1,Number=1,Type=String,Description=\"a{b}c\">",
+                    "##FORMAT=<ID=FORMAT1,Number=1,Type=String,Description=\"d{e}f\">",
+                    "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tSAMPLE1",
+                    "chr5\t68667262\t.\tTTCCC\tT\t105474.92\t.\tINFO1=h{i}j\tFORMAT1\tk{l}m"
+            );
+            FileUtils.writeLines(temp, lines);
+
+            VCFParser parser = new VCFParser();
+            parser.parse(temp.getAbsolutePath(), workspaceID);
+
+            DBObject metaEntry = MongoConnection.getDB().getCollection(Tokens.METADATA_COLLECTION).findOne(new BasicDBObject().append(Tokens.KEY, workspaceID));
+            DBObject header    = (DBObject) metaEntry.get("HEADER");
+            DBObject info      = (DBObject) header.get("INFO");
+            DBObject format    = (DBObject) header.get("FORMAT");
+
+            assertEquals("a{b}c", ((DBObject)info.get("INFO1")).get("Description"));
+            assertEquals("d{e}f", ((DBObject)format.get("FORMAT1")).get("Description"));
+
+            DBObject vEntry = MongoConnection.getDB().getCollection(workspaceID).findOne();
+
+            assertEquals("h{i}j", ((DBObject)vEntry.get("INFO")).get("INFO1"));
+
+            // make sure no errors happened
+            String errors = FileUtils.readFileToString(new File(parser.getErrorFile(workspaceID)));
+            assertEquals(errors, 0, errors.length());
+
+        } finally {
+            temp.delete();
+            Workspace wksp = new Workspace();
+            wksp.deleteWorkspace(workspaceID);
+        }
     }
 }
