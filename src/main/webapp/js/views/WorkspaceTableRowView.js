@@ -83,7 +83,8 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
 
     getVariantsCell: function(workspace) {
         switch(workspace.get("status")) {
-            case ReadyStatus.NOT_READY:
+            case ReadyStatus.IMPORTING:
+            case ReadyStatus.INDEXING:
             case ReadyStatus.READY:
                 return workspace.get("statsNumVariants");
             default:
@@ -93,7 +94,7 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
 
     getActionCell: function(workspace) {
 
-        if (workspace.get("status") == ReadyStatus.NOT_READY) {
+        if (workspace.get("status") == ReadyStatus.IMPORTING) {
             var percentComplete;
             if (workspace.get("statsTotalVariants") == 0) {
                 percentComplete = 0;
@@ -107,7 +108,8 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
                 '</div>';
 
             return html;
-
+        } else if (workspace.get("status") == ReadyStatus.INDEXING) {
+            return '';
         } else {
             var actionHtml = '<div style="white-space:normal;">';
 
@@ -152,8 +154,10 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
      */
     getDisplayStatus: function(workspace) {
         switch(workspace.get("status")) {
-            case ReadyStatus.NOT_READY:
+            case ReadyStatus.IMPORTING:
                 return "Importing";
+            case ReadyStatus.INDEXING:
+                return "Indexing";
             case ReadyStatus.READY:
                 return "Available";
             case ReadyStatus.FAILED:

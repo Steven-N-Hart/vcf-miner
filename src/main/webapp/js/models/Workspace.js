@@ -3,9 +3,10 @@ var ReadyStatus =
 {
     UNKNOWN:    -2,
     FAILED:     -1,
-    NOT_READY:  0,
     READY:      1,
-    QUEUED:     2
+    QUEUED:     2,
+    IMPORTING:  3,
+    INDEXING:   4
 }
 
 var Workspace = Backbone.Model.extend({

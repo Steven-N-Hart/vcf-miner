@@ -183,8 +183,8 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
                             self.workspaces.add(ws);
 
-                            // auto-update if the workspace is 'not ready' or 'queued'
-                            if (((ws.get("status") == ReadyStatus.NOT_READY) || (ws.get("status") == ReadyStatus.QUEUED))
+                            // auto-update if the workspace is not 'ready' or 'failed'
+                            if ( !((ws.get("status") == ReadyStatus.READY) || (ws.get("status") == ReadyStatus.FAILED))
                                 && ($.inArray(ws.get("key"), self.notReadyKeys) == -1)) {
                                 console.log("Adding auto-updates for key "  + ws.get("key"));
                                 self.notReadyKeys.push(ws.get("key"));
