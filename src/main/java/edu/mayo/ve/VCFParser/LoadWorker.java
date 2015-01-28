@@ -5,6 +5,7 @@ import com.mongodb.util.JSON;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerLogic;
+import edu.mayo.index.Index;
 import edu.mayo.parsers.ParserInterface;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.util.Tokens;
@@ -298,6 +299,10 @@ public class LoadWorker implements WorkerLogic {
         // STEP 3 - delete "temp"
         final DBObject delete = new BasicDBObject("$unset", new BasicDBObject("temp", ""));
         typeaheadCol.update(grabEverythingQuery, delete, false, true);
+
+        // index the field attribute
+        Index indexUtil = new Index();
+        indexUtil.indexField("field", typeaheadCol);
     }
 
     /**
