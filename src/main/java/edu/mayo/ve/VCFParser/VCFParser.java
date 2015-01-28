@@ -153,6 +153,10 @@ public class VCFParser implements ParserInterface {
      * @return lines processed.
      */
     public int parse(String infile, String workspace) throws ProcessTerminatedException{
+        MetaData meta = new MetaData();
+        //change the status from queued to importing:
+        meta.flagAsImporting(workspace);
+
         Sender sender = new FileSender(getErrorFile(workspace));
         if(reporting){ System.out.println("Getting the vcf-miner database from mongo"); }
         DB db = MongoConnection.getDB();
@@ -259,6 +263,8 @@ public class VCFParser implements ParserInterface {
             if(reporting){System.out.println("Updating metadata in database...");}
             updateMetadata(workspace, metadata.toString(), reporting);
             if(reporting){System.out.println("indexing...");}
+            //change the status from queued to importing:
+            meta.flagAsIndexing(workspace);
             index(workspace, vcf, reporting);
             if(reporting){System.out.println("saving type-ahead results to the database");}
         }
@@ -438,13 +444,6 @@ public class VCFParser implements ParserInterface {
         }
 
         //are there other ways we could check / need to check that a load failed?
-
-        //everything looks ok,
-        //now flag the workspace as ready so the UI knows
-        if(reporting) System.out.println("Flagging the workspace as ready");
-
-        //requested change by patrick
-        //metaData.flagAsReady(workspace);
         return true;
     }
 
@@ -735,9 +734,6 @@ public class VCFParser implements ParserInterface {
         // carry forward ALL existing keys/value pairs (owner, key, _id, alias, ready, status)
         replaceWODots.putAll(result);
 
-        //now add the new keys
-        replaceWODots.put("timestamp", getISONow()); //The last time the workspace was touched.
-
         if(reporting) System.out.println(replaceWODots.toString());
         col.save(replaceWODots);
     }
@@ -800,20 +796,6 @@ public class VCFParser implements ParserInterface {
         }
         return output;
     }
-
-
-    /**
-     *
-     * @return the current time in iso format
-     */
-    public String getISONow(){
-        TimeZone tz = TimeZone.getTimeZone("UTC");
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
-        df.setTimeZone(tz);
-        String nowAsISO = df.format(new Date());
-        return nowAsISO;
-    }
-
 
     public HashMap<Integer, String> getTestingCollection() {
         return testingCollection;

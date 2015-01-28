@@ -25,6 +25,13 @@ import java.util.List;
  */
 @Path("/ve/meta")
 public class MetaData {
+
+    public static final int STATUS_FAILED    = -1;
+    public static final int STATUS_READY     = 1;
+    public static final int STATUS_QUEUED    = 2;
+    public static final int STATUS_IMPORTING = 3;
+    public static final int STATUS_INDEXING  = 4;
+
     Mongo m = MongoConnection.getMongo();
     
      @GET
@@ -162,49 +169,43 @@ public class MetaData {
     }
 
     /**
-     * If a workspace is flaged as ready, the ready token will have a value of 1 to indicate it is ready
-     * do something like:
-     * db.meta.update({"key": "wa49233e327247200efecf0c0968f8bc23aa3eb96"},{$set:{"ready":1}})
-     *
-     * for a given workspace, change the ready flag to ready (used by VCFParser and other loaders to tell when a workspace is indexed)
-     * @param workspaceID
+     * Workspace ready token will have a value of {@link MetaData#STATUS_READY}.
      */
     @POST
     @Path("/flagAsReady/w/{workspaceid}")
     @Produces("application/json")
     public String flagAsReady(@PathParam("workspaceid") String workspaceID){
-        return flag(workspaceID, "workspace is ready", 1);
+        return flag(workspaceID, "workspace is ready", STATUS_READY);
     }
 
-
     /**
-     * If a workspace is flaged as ready, the ready token will have a value of 1 to indicate it is ready
-     * do something like:
-     * db.meta.update({"key": "wa49233e327247200efecf0c0968f8bc23aa3eb96"},{$set:{"ready":1}})
-     *
-     * for a given workspace, change the ready flag to ready (used by VCFParser and other loaders to tell when a workspace is indexed)
-     * @param workspaceID
+     * Workspace ready token will have a value of {@link MetaData#STATUS_QUEUED}.
      */
     @POST
     @Path("/flagAsQueued/w/{workspaceid}")
     @Produces("application/json")
     public String flagAsQueued(@PathParam("workspaceid") String workspaceID){
-        return flag(workspaceID, "workspace is queued for loading", 2);
+        return flag(workspaceID, "workspace is queued for loading", STATUS_QUEUED);
     }
 
-
     /**
-     * If a workspace is flaged as not ready, the ready token will have a value of 0 to indicate it is not ready
-     * do something like:
-     * db.meta.update({"key": "wa49233e327247200efecf0c0968f8bc23aa3eb96"},{$set:{"ready":0}})
-     *
-     * @param workspaceID
+     * Workspace ready token will have a value of {@link MetaData#STATUS_IMPORTING}.
      */
     @POST
-    @Path("/flagAsNotReady/w/{workspaceid}")
+    @Path("/flagAsImporting/w/{workspaceid}")
     @Produces("application/json")
-    public String flagAsNotReady(@PathParam("workspaceid") String workspaceID){
-        return flag(workspaceID, "workspace is not ready", 0);
+    public String flagAsImporting(@PathParam("workspaceid") String workspaceID){
+        return flag(workspaceID, "workspace is importing", STATUS_IMPORTING);
+    }
+
+    /**
+     * Workspace ready token will have a value of {@link MetaData#STATUS_INDEXING}.
+     */
+    @POST
+    @Path("/flagAsIndexing/w/{workspaceid}")
+    @Produces("application/json")
+    public String flagAsIndexing(@PathParam("workspaceid") String workspaceID){
+        return flag(workspaceID, "workspace is indexing", STATUS_INDEXING);
     }
 
     /**
@@ -221,7 +222,6 @@ public class MetaData {
             @PathParam("failMessage") String failMessage){
         DBObject ret = new BasicDBObject();
         BasicDBList l = new BasicDBList();
-        //return flag(workspaceID, failMessage, -1);
 
         //get all of the
         DB db = MongoConnection.getDB();
@@ -233,7 +233,7 @@ public class MetaData {
             DBObject next = cursor.next();
             String key =(String) next.get("key");
             l.add(key);
-            flag(key, failMessage, -1);
+            flag(key, failMessage, STATUS_FAILED);
         }
         ret.put("workspacesFlagedAsFailed", l);
 
@@ -250,7 +250,7 @@ public class MetaData {
     @Path("/flagAsFailed/w/{workspaceid}/m/{failMessage}")
     @Produces("application/json")
     public String flagAsFailed(@PathParam("workspaceid") String workspaceID, @PathParam("failMessage") String failMessage){
-        return flag(workspaceID, failMessage, -1);
+        return flag(workspaceID, failMessage, STATUS_FAILED);
     }
 
     private String flag(String workspaceID, String message, int readyStatus){

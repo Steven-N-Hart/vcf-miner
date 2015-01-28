@@ -1,6 +1,7 @@
 package edu.mayo.ve.VCFParser;
 
 import com.mongodb.*;
+import com.mongodb.util.JSON;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerLogic;
@@ -13,7 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 /**
  * Created with IntelliJ IDEA.
@@ -70,16 +75,12 @@ public class LoadWorker implements WorkerLogic {
                 setMongo();
                 if(report) System.out.println("I am working on loading this file: " + loadfile);
 
-                //change the status from queued to loading:
-                meta.flagAsNotReady(workspace);
-
                 if(report) System.out.println("Parsing the file...");
                 parser.parse(loadfile,workspace); //make the third to last one false in production!   make the second to last one false in production!
                 if(report) System.out.println("File loading done");
 
                 if(report) System.out.println("Checking to see if the file upload worked or failed.");
                 HashMap<String,Integer> icontext = (HashMap) t.getCommandContext(); //need to cast this to an integer
-                parser.checkAndUpdateLoadStatus(workspace, icontext.get(Tokens.DATA_LINE_COUNT), false);
 
                 if(report) System.out.println("Running map-reduce to produce TypeAhead collection...");
                 createTypeAheadCollection(MongoConnection.getDB().getCollection(workspace));
@@ -94,6 +95,8 @@ public class LoadWorker implements WorkerLogic {
 
                 //update the system's metadata with loading statistics
                 meta.updateLoadStatistics(workspace,icontext);
+                setWorkspaceCompletionTimestamp(workspace);
+                parser.checkAndUpdateLoadStatus(workspace, icontext.get(Tokens.DATA_LINE_COUNT), false);
                 meta.flagAsReady(workspace);
 
             }catch(Throwable e){   //this thread is working in the background... so we need to make sure that it outputs an error if one came up
@@ -295,5 +298,29 @@ public class LoadWorker implements WorkerLogic {
         // STEP 3 - delete "temp"
         final DBObject delete = new BasicDBObject("$unset", new BasicDBObject("temp", ""));
         typeaheadCol.update(grabEverythingQuery, delete, false, true);
+    }
+
+    /**
+     * Sets the timestamp for the workspace being completely loaded.
+     *
+     * @param workspaceID
+     */
+    public void setWorkspaceCompletionTimestamp(String workspaceID){
+        BasicDBObject query = new BasicDBObject().append(Tokens.KEY, workspaceID);
+        BasicDBObject update = new BasicDBObject();
+        update.append("$set", new BasicDBObject().append("timestamp", getISONow()));
+        MongoConnection.getDB().getCollection(Tokens.METADATA_COLLECTION).update(query, update);
+    }
+
+    /**
+     *
+     * @return the current time in iso format
+     */
+    public String getISONow(){
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
+        df.setTimeZone(tz);
+        String nowAsISO = df.format(new Date());
+        return nowAsISO;
     }
 }

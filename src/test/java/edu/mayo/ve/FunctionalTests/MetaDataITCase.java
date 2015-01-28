@@ -139,31 +139,31 @@ public class MetaDataITCase {
     @Test
     public void testChangeState(){
         MetaData meta = new MetaData();
-        meta.flagAsNotReady(workspace);
+        meta.flagAsImporting(workspace);
         HashMap md = (HashMap) JSON.parse(meta.getWorkspaceJSON(workspace));
         assertEquals("test", md.get("owner"));
-        assertEquals((long) 0, md.get("ready"));
-        assertEquals("workspace is not ready", md.get("status"));
+        assertEquals((long) MetaData.STATUS_IMPORTING, md.get("ready"));
+        assertEquals("workspace is importing", md.get("status"));
 
         //queued
         meta.flagAsQueued(workspace);
         md = (HashMap) JSON.parse(meta.getWorkspaceJSON(workspace));
         assertEquals("test", md.get("owner"));
-        assertEquals((long) 2, md.get("ready"));
+        assertEquals((long) MetaData.STATUS_QUEUED, md.get("ready"));
         assertEquals("workspace is queued for loading", md.get("status"));
 
         //failed
         meta.flagAsFailed(workspace, "example fail");
         md = (HashMap) JSON.parse(meta.getWorkspaceJSON(workspace));
         assertEquals("test", md.get("owner"));
-        assertEquals((long) -1, md.get("ready"));
+        assertEquals((long) MetaData.STATUS_FAILED, md.get("ready"));
         assertEquals("example fail", md.get("status"));
 
         //back to ready
         meta.flagAsReady(workspace);
         md = (HashMap) JSON.parse(meta.getWorkspaceJSON(workspace));
         assertEquals("test", md.get("owner"));
-        assertEquals((long) 1, md.get("ready"));
+        assertEquals((long) MetaData.STATUS_READY, md.get("ready"));
         assertEquals("workspace is ready", md.get("status"));
 
     }
