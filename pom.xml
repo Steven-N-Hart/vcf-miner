@@ -94,9 +94,9 @@
     </dependencies>
 
     <scm>
-        <connection>scm:svn:https://bsisvn/main/projects/m/mongo_svr/tags/mongo_svr-3.0.0</connection>
-        <developerConnection>scm:svn:https://bsisvn/main/projects/m/mongo_svr/tags/mongo_svr-3.0.0</developerConnection>
-        <url>https://bsisvn/main/projects/m/mongo_svr/tags/mongo_svr-3.0.0</url>
+        <connection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mongo_svr/tags/mongo_svr-3.0.0</connection>
+        <developerConnection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mongo_svr/tags/mongo_svr-3.0.0</developerConnection>
+        <url>https://bsisvn.mayo.edu/main/projects/m/mongo_svr/tags/mongo_svr-3.0.0</url>
     </scm>
 
     <!-- Distribution through Nexus -->
