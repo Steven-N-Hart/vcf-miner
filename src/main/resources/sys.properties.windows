@@ -1,13 +1,13 @@
-## Properties for localhost / testing / default
+## Properties for Windows deployment
 hostname = localhost
 mongo_server = localhost
 mongo_port = 27017
 mongo_user =
 mongo_password =
 mongo_database = vcf_miner_dev
-TEMPDIR = /tmp
+TEMPDIR = /Mayo/temp
 securityuserapp_server = localhost
-securityuserapp_port = 8080
+securityuserapp_port = 8181
 
 ##global properties for all configurations...
 #value for the number of strings that a type-ahead collection can contain. The default is greater than the number of protein encoding genes

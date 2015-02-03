@@ -1,11 +1,11 @@
-## Properties for localhost / testing / default
+## Properties for virtualbox deployment
 hostname = localhost
 mongo_server = localhost
 mongo_port = 27017
 mongo_user =
 mongo_password =
 mongo_database = vcf_miner_dev
-TEMPDIR = /tmp
+TEMPDIR = /mongo_svr
 securityuserapp_server = localhost
 securityuserapp_port = 8080
 

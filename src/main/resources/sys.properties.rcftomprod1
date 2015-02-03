@@ -1,11 +1,11 @@
-## Properties for localhost / testing / default
+## Properties for production server: rcftomprod1.mayo.edu
 hostname = localhost
-mongo_server = localhost
+mongo_server = mongo-bsi-prod
 mongo_port = 27017
-mongo_user =
-mongo_password =
-mongo_database = vcf_miner_dev
-TEMPDIR = /tmp
+mongo_user = TU05313
+mongo_password = (CONTACT MIKE, PATRICK, OR DAN FOR PASSWORD)
+mongo_database = vcf_miner
+TEMPDIR = /local2/tmp
 securityuserapp_server = localhost
 securityuserapp_port = 8080
 
