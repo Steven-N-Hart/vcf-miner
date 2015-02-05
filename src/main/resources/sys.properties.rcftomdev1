@@ -7,7 +7,7 @@ mongo_password = (CONTACT MIKE, PATRICK, OR DAN FOR PASSWORD)
 mongo_database = vcf_miner
 TEMPDIR = /local2/tmp
 securityuserapp_server = localhost
-securityuserapp_port = 8080
+securityuserapp_port = 8886
 
 ##global properties for all configurations...
 #value for the number of strings that a type-ahead collection can contain. The default is greater than the number of protein encoding genes
