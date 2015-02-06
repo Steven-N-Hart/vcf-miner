@@ -1,9 +1,13 @@
 package edu.mayo.ve.resources;
 
+
+import edu.mayo.security.CWEUtils;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -40,10 +44,14 @@ public class ClientDownloadProxy {
             final @FormParam("content") String content
     ) throws Exception {
 
-        response.setHeader("Content-Type", mimeType);
+        try {
+            response.setHeader("Content-Type", CWEUtils.neutralizeCRLF(MediaType.valueOf(mimeType).getType()));
+        } catch (IllegalArgumentException e) {
+            throw new Exception(String.format("Invalid mimeType: %s", mimeType));
+        }
 
         // set name of file, causes browser to always do "Save as..." dialog
-        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", filename));
+        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", CWEUtils.neutralizeCRLF(filename)));
 
         return new StreamingOutput() {
             public void write(OutputStream output) throws IOException, WebApplicationException {
@@ -55,5 +63,4 @@ public class ClientDownloadProxy {
             }
         };
     }
-
 }

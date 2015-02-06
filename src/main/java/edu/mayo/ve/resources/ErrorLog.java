@@ -33,8 +33,7 @@ public class ErrorLog {
             @PathParam("workspace") String workspace,
             @PathParam("numberOfErrors") int errors
     ) throws IOException {
-        String path = VCFErrorFileUtils.getLoadErrorFilePath(workspace);
-        List<String> lines = VCFErrorFileUtils.getNErrors(path,errors);
+        List<String> lines = VCFErrorFileUtils.getNErrors(workspace,errors);
         System.out.println("Returning error file");
         System.out.println(errors);
         StringBuilder sb = new StringBuilder();

@@ -2,6 +2,7 @@ package edu.mayo.ve.resources;
 
 import com.google.gson.Gson;
 import com.mongodb.*;
+import edu.mayo.security.CWEUtils;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.message.DisplayedFilterVariants;
@@ -11,6 +12,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -44,9 +46,8 @@ public class DownloadVCF {
         } catch (Exception e){
             return d.failedInputMessage(json);
         }
-        String outFileName = getFileName(q.getWorkspace());
         // set name of file, causes browser to always do "Save as..." dialog
-        response.setHeader("Content-Disposition", "attachment; filename=\""+outFileName+".vcf\"");
+        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s.vcf\"", CWEUtils.neutralizeCRLF(getFileName(q.getWorkspace()))));
 
         final QuerryDownload finalQ = q;
         return new StreamingOutput() {

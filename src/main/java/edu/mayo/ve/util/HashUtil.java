@@ -7,9 +7,7 @@ package edu.mayo.ve.util;
 import java.io.UnsupportedEncodingException; 
 import java.security.MessageDigest; 
 import java.security.NoSuchAlgorithmException; 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import java.security.SecureRandom;
 
 /**
  *
@@ -30,31 +28,18 @@ public class HashUtil {
             } while(two_halfs++ < 1);
         } 
         return buf.toString();
-    } 
- 
-    public static String SHA1(String text) 
-    throws NoSuchAlgorithmException, UnsupportedEncodingException  { 
+    }
+
+    public static String SHA256(String text)
+    throws NoSuchAlgorithmException, UnsupportedEncodingException  {
         MessageDigest md;
-        md = MessageDigest.getInstance("SHA-1");//or md5 whatever...
-        byte[] sha1hash = new byte[40];
+        md = MessageDigest.getInstance("SHA-256");//or md5 whatever...
         md.update(text.getBytes("iso-8859-1"), 0, text.length());
-        sha1hash = md.digest();
-        return convertToHex(sha1hash);
-    } 
-    
+        byte[] sha256hash = md.digest();
+        return convertToHex(sha256hash);
+    }
+
     public static String randcat(String text){
-        return text + new Double(Math.random()).toString();
+        return text + (new SecureRandom()).toString();
     }
-    
-    public static void main(String[] args){
-        try {
-            System.out.println( SHA1("hello there!") );          //75b2ea46404ca4d043d9592dc313b3a28fde41a9
-            System.out.println( SHA1(randcat("hello there!")) ); //96988172ce7b021fe03995c5fc3f9a4807e22b46
-            
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(HashUtil.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(HashUtil.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-} 
+}

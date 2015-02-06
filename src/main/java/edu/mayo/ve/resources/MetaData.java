@@ -117,11 +117,11 @@ public class MetaData {
      * @param workspace
      */
     public DBObject constructStatsObject(String workspace, HashMap<String,Long> context) throws IOException {
-        String errorFile = VCFErrorFileUtils.getLoadErrorFilePath(workspace);
-        ErrorStats estats = VCFErrorFileUtils.calculateErrorStatistics(errorFile);
+        ErrorStats estats = VCFErrorFileUtils.calculateErrorStatistics(workspace);
         DBObject stats = new BasicDBObject();
         stats.put("ERRORS", (long) estats.getErrors());
         stats.put("WARNINGS", (long) estats.getWarnings());
+        String errorFile = VCFErrorFileUtils.getLoadErrorFilePath(workspace);
         File f = new File(errorFile.replaceAll("\\.errors$",""));
         long filesize = 0;
         if(f.exists()){

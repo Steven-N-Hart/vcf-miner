@@ -135,18 +135,6 @@ public class Index {
         return field;
     }
 
-    public static void main(String[] args){
-        Mongo m = MongoConnection.getMongo();
-        Index i = new Index();
-        String workspaceID = "wbf34e9a3d0e0f829381be058cb253c5890623551";
-        DB db = m.getDB(Tokens.WORKSPACE_DATABASE);
-        DBCollection col = db.getCollection(workspaceID);
-        List<String> l = i.getIndexedFieldsAsStrings(col, false);
-        for(String s: l){
-            System.out.println(s);
-        }
-    }
-
     public DBObject getIndexedFields(DBCollection col){
         DBObject message = new BasicDBObject();
         BasicDBList fields = new BasicDBList();

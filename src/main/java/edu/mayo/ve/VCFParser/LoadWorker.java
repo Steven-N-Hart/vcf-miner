@@ -36,18 +36,6 @@ public class LoadWorker implements WorkerLogic {
     ParserInterface parser = null;
     private boolean deleteAfterLoad = true;
     private boolean logStackTrace = true;
-    private Mongo m = MongoConnection.getMongo();
-
-       public static void main(String[] args)throws ProcessTerminatedException {
-           VCFParser parser = new VCFParser();
-           LoadWorker worker = new LoadWorker(parser, 100000);
-           Task t = new Task();
-           HashMap<String,String> hm = new HashMap<String,String>();
-           hm.put(Tokens.VCF_LOAD_FILE,"src/test/resources/testData/example.vcf");
-           hm.put(Tokens.KEY,"w9c3fb5f300ab5073128749de49b1ff52d4819099");
-           t.setCommandContext(hm);
-           worker.compute(t);
-       }
 
         private int theadCache;
         public LoadWorker(ParserInterface parser, int lookAheadCacheSize){

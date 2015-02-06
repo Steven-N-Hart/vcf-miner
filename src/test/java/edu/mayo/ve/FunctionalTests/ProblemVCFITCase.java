@@ -232,7 +232,7 @@ public class ProblemVCFITCase {
         System.out.println("Checking Statistics: ");
         SystemProperties sysprop = new SystemProperties();
         String tmp = sysprop.get("TEMPDIR");
-        ErrorStats stats = VCFErrorFileUtils.calculateErrorStatistics(tmp + File.separator + workspaceID + ".errors");
+        ErrorStats stats = VCFErrorFileUtils.calculateErrorStatistics(workspaceID);
         assertEquals(errors, stats.getErrors());
         assertEquals(warnings, stats.getWarnings());
         System.out.println("Deleting Workspace: " + workspaceID);

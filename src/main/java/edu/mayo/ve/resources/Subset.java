@@ -1,8 +1,11 @@
 package edu.mayo.ve.resources;
 
 import com.google.gson.Gson;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.securityuserapp.client.SessionExpiredClientException;
+import edu.mayo.util.MongoConnection;
 import edu.mayo.util.SystemProperties;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.SecurityUserAppHelper;
@@ -82,6 +85,8 @@ public class Subset {
             @HeaderParam("usertoken") String userToken
     ) throws Exception {
 
+        DBCollection workspaceCol = MongoConnection.getDB().getCollection(workspaceKey);
+
         // Create new empty workspace for subset vcf
         String json = provision.provision(user, alias);
         HashMap workspaceMeta = gson.fromJson(json, java.util.HashMap.class);
@@ -100,7 +105,7 @@ public class Subset {
         meta.flagAsQueued(subsetWorkspaceKey);
 
         // TODO: fix temp space location
-        File exportVCF = new File(String.format("/tmp/%s", workspaceKey + "_export.vcf"));
+        File exportVCF = new File(String.format("/tmp/%s_export.vcf", workspaceCol.getName()));
         final String exportFileLocation = exportVCF.getAbsolutePath();
 
         QuerryDownload querryDownload = new QuerryDownload();

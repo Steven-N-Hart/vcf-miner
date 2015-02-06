@@ -4,34 +4,14 @@
  */
 package edu.mayo.ve.resources;
 
-import com.mongodb.WriteResult;
-import java.io.IOException;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-
-import com.mongodb.Mongo;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.DBCursor;
-import com.mongodb.util.JSON;
-import edu.mayo.util.Tokens;
-import edu.mayo.ve.util.CreateUser;
+import com.mongodb.*;
 import edu.mayo.util.MongoConnection;
-import java.net.UnknownHostException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.PUT;
-import javax.ws.rs.PathParam;
+import edu.mayo.util.Tokens;
 
-import org.bson.types.ObjectId;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import javax.ws.rs.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 
 /**
@@ -73,13 +53,6 @@ public class User {
         }
         return new ArrayList<String>(allUsers);
     }
-
-    public static void main(String[] args){
-        User u = new User();
-        u.getAllUsersFromMeta();
-    }
-
-
     
     //create workspace by alias
 //    @Path("/{ownerid}/a/{alias}")

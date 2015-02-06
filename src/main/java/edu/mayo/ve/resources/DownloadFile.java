@@ -2,12 +2,10 @@ package edu.mayo.ve.resources;
 
 import com.google.gson.Gson;
 import com.mongodb.*;
-import com.sun.jersey.api.representation.Form;
+import edu.mayo.security.CWEUtils;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.message.DisplayedFilterVariants;
-import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.message.QuerryDownload;
-import edu.mayo.ve.message.Rresults;
 import edu.mayo.util.MongoConnection;
 
 import javax.servlet.http.HttpServletResponse;
@@ -46,9 +44,9 @@ public class DownloadFile {
         } catch (Exception e){
             return failedInputMessage(json);
         }
-        String outFileName = getFileName(q.getWorkspace());
+
         // set name of file, causes browser to always do "Save as..." dialog
-        response.setHeader("Content-Disposition", "attachment; filename=\""+outFileName+".tsv\"");
+        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s.tsv\"", CWEUtils.neutralizeCRLF(getFileName(q.getWorkspace()))));
 
         final QuerryDownload finalQ = q;
         return new StreamingOutput() {
@@ -147,52 +145,6 @@ public class DownloadFile {
                 }
             }
         }
-    }
-
-
-//    //@Path("/download/")
-//    //@POST
-//    //@Produces("text/plain")
-//    //@Consumes(MediaType.APPLICATION_JSON)   //text plain field name coming through called 'data'
-//    //@Produces({"application/pdf"})
-    public StreamingOutput generateFile(final QuerryDownload q) throws Exception {
-        return new StreamingOutput() {
-            public void write(OutputStream output) throws IOException, WebApplicationException {
-                try {
-                    DB db = MongoConnection.getDB();
-                    DBCollection col = db.getCollection(q.getWorkspace());
-                    DBObject query = q.createQuery();
-                    //System.out.println(q.getCustomReturnSelect().toString());
-                    DBCursor documents = col.find(query, q.getCustomReturnSelect());
-                    output.write("#".getBytes());
-                    int i = 0;
-                    for(String header : q.getReturnFields()){
-                        output.write(header.getBytes());
-                        i++;
-                        if(i== q.getReturnFields().size()){
-                            output.write("\n".getBytes());
-                        }else{
-                            output.write("\t".getBytes());
-                        }
-                    }
-                    for( i = 0; documents.hasNext(); i++){
-                        DBObject next = documents.next();
-                        int j=0;
-                        for(String field : q.getReturnFields()){
-                            output.write(format(field, next));
-                            j++;
-                            if(j== q.getReturnFields().size()){
-                                output.write("\n".getBytes());
-                            }else{
-                                output.write("\t".getBytes());
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    throw new WebApplicationException(e);
-                }
-            }
-        };
     }
 
     public byte[] format(String key, DBObject dbo){

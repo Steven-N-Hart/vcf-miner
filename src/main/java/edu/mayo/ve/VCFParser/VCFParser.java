@@ -22,6 +22,7 @@ import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
 import edu.mayo.pipes.history.History;
 import edu.mayo.pipes.history.HistoryInPipe;
 import edu.mayo.pipes.iterators.Compressor;
+import edu.mayo.security.CWEUtils;
 import edu.mayo.senders.FileSender;
 import edu.mayo.senders.Sender;
 import edu.mayo.util.MongoConnection;
@@ -72,34 +73,6 @@ public class VCFParser implements ParserInterface {
             System.out.println("Make sure to check your sys.properties file fo the MongoDB IP/Port combination, otherwised this script may fail");
             System.out.println("usage: VCFParser <input.vcf> <workspace_id>");
 
-    }
-
-    public static void main(String[] args) throws IOException, ProcessTerminatedException {
-        SystemProperties sysprops = new SystemProperties();
-        String mongoPort = sysprops.get("mongo_port");
-        VCFParser parser = new VCFParser();
-        if( args.length != 2 ) {
-            usage();
-            System.exit(1);
-        }
-
-        String infile = args[0];
-        String workspace = args[1];
-//        String infile = "/data/VCFExamples/BATCH4.vcf";
-//        String outfile = "/data/VCFExamples/BATCH4.json";
-//        String workspace = "w7ee29742ff80d61953d5e6f84e1686957fbe36f7";
-
-        System.out.println("#Input File:  " + infile);
-        System.out.println("#Workspace:  " + workspace);
-        System.out.println("#mongo_server: " + sysprops.get("mongo_server") );
-        System.out.println("#mongo port: " + new Integer(sysprops.get("mongo_port")));
-        parser.setReporting(true);
-        int datalines = parser.parse(null, infile, workspace, false, true);
-        parser.checkAndUpdateLoadStatus(workspace, datalines, true);
-        parser.m.close();
-        //note the following will only work if you have a document in mongo like:
-        //{ "_id" : { "$oid" : "51afa2710364d3ebd97b533a"} , "owner" : "steve" , "alias" : "foo" , "key" : "w7ee29742ff80d61953d5e6f84e1686957fbe36f7"}
-        //parser.updateMetadata(workspace, "{ \"hosting\" : \"hostA\" , \"clients\" : \"888\" , \"type\" : \"vps\"}");
     }
 
     /**
@@ -330,7 +303,7 @@ public class VCFParser implements ParserInterface {
     private int getLineCount(File f) throws IOException {
 
         // use compressor to figure out how to handle .zip, .gz, .bz2, etc...
-        File fakeOutFile = File.createTempFile("fake", "fake");
+        File fakeOutFile = CWEUtils.createSecureTempFile();
         Compressor compressor = new Compressor(f, fakeOutFile);
 
         LineNumberReader reader = null;

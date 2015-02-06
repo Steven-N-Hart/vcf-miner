@@ -114,20 +114,4 @@ public class BottomCleaner {
         neg.removeAll(set1);
         return new ArrayList(neg);
     }
-
-    public static void main(String[] args){
-        BottomCleaner bc = new BottomCleaner();
-        List<String> all = bc.allWorkspaceCollections();
-        System.out.println(all);
-        System.out.println("********************************");
-        HashMap<String,DBObject> hm = bc.allWorkspacesWithMetadata();
-        System.out.println(hm.toString());
-        List<String> wometa = bc.allWorkspacesWithoutMetadata();
-        for(String w: wometa){
-            System.out.println(w);
-        }
-    }
-
-
-
 }

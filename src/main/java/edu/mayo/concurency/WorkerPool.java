@@ -181,31 +181,4 @@ public class WorkerPool {
         executor = null;
     }
 
-    /**
-     * example usage
-     * @param args
-     */
-    public static void main(String[] args) throws InterruptedException {
-        ExampleWorkerLogic logic = new ExampleWorkerLogic(100000000);
-        WorkerPool wp = new WorkerPool(logic, 10);
-        for(int i=1; i<10000;i++){
-            Task<Integer,Long> t = new Task();
-            t.setCommandContext(new Integer(i));
-            wp.addTask(t);           //this will add the UUID to the task
-            wp.startTask(t.getId());
-        }
-        //now get the results for the tasks spawned
-        for(int i=1; i<10000;i++){
-            List<Task> tasks  = wp.getAllCompletedTasks();
-            for(Task t : tasks){
-                if(t==null){
-                    //This will never happen because java will block, waiting for the result
-                    //System.out.println("null happened");
-                }
-            }
-        }
-        wp.shutdown(1);
-    }
-
-
 }
