@@ -43,7 +43,6 @@ public class ProblemVCFITCase {
 //        pvcf.testAsif100G();
 //    }
     
-    Mongo m = MongoConnection.getMongo();
     private String user = "test";
     private int overflowThreshold = 50000;
 
@@ -59,7 +58,7 @@ public class ProblemVCFITCase {
     public void testAsif100G() throws IOException, ProcessTerminatedException {
         String vcf = "src/test/resources/testData/Asif1000G.vcf";
         //check to see if the type-ahead is indexed.
-        DB database = m.getDB("workspace");
+        DB database = MongoConnection.getDB();
 
         String workspace = load(vcf, false);
 
