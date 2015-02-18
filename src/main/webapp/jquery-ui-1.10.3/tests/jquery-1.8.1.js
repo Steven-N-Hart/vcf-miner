@@ -5186,7 +5186,7 @@ if ( document.querySelectorAll ) {
 Expr.setFilters["nth"] = Expr.setFilters["eq"];
 
 // Back-compat
-Expr.filters = Expr.pseudos;
+Expr.filterSteps = Expr.pseudos;
 
 // Override sizzle attribute retrieval
 Sizzle.attr = jQuery.attr;
@@ -6910,7 +6910,7 @@ jQuery.each([ "height", "width" ], function( i, name ) {
 if ( !jQuery.support.opacity ) {
 	jQuery.cssHooks.opacity = {
 		get: function( elem, computed ) {
-			// IE uses filters for opacity
+			// IE uses filterSteps for opacity
 			return ropacity.test( (computed && elem.currentStyle ? elem.currentStyle.filter : elem.style.filter) || "" ) ?
 				( 0.01 * parseFloat( RegExp.$1 ) ) + "" :
 				computed ? "1" : "";
@@ -6926,7 +6926,7 @@ if ( !jQuery.support.opacity ) {
 			// Force it by setting the zoom level
 			style.zoom = 1;
 
-			// if setting opacity to 1, and no other filters exist - attempt to remove filter attribute #6652
+			// if setting opacity to 1, and no other filterSteps exist - attempt to remove filter attribute #6652
 			if ( value >= 1 && jQuery.trim( filter.replace( ralpha, "" ) ) === "" &&
 				style.removeAttribute ) {
 
@@ -6985,13 +6985,13 @@ jQuery(function() {
 
 });
 
-if ( jQuery.expr && jQuery.expr.filters ) {
-	jQuery.expr.filters.hidden = function( elem ) {
+if ( jQuery.expr && jQuery.expr.filterSteps ) {
+	jQuery.expr.filterSteps.hidden = function( elem ) {
 		return ( elem.offsetWidth === 0 && elem.offsetHeight === 0 ) || (!jQuery.support.reliableHiddenOffsets && ((elem.style && elem.style.display) || curCSS( elem, "display" )) === "none");
 	};
 
-	jQuery.expr.filters.visible = function( elem ) {
-		return !jQuery.expr.filters.hidden( elem );
+	jQuery.expr.filterSteps.visible = function( elem ) {
+		return !jQuery.expr.filterSteps.hidden( elem );
 	};
 }
 
@@ -9051,8 +9051,8 @@ jQuery.fx.speeds = {
 // Back Compat <1.8 extension point
 jQuery.fx.step = {};
 
-if ( jQuery.expr && jQuery.expr.filters ) {
-	jQuery.expr.filters.animated = function( elem ) {
+if ( jQuery.expr && jQuery.expr.filterSteps ) {
+	jQuery.expr.filterSteps.animated = function( elem ) {
 		return jQuery.grep(jQuery.timers, function( fn ) {
 			return elem === fn.elem;
 		}).length;

@@ -834,7 +834,7 @@ $.extend(Datepicker.prototype, {
 			inst = this._getInst(obj),
 			isRTL = this._get(inst, "isRTL");
 
-		while (obj && (obj.type === "hidden" || obj.nodeType !== 1 || $.expr.filters.hidden(obj))) {
+		while (obj && (obj.type === "hidden" || obj.nodeType !== 1 || $.expr.filterSteps.hidden(obj))) {
 			obj = obj[isRTL ? "previousSibling" : "nextSibling"];
 		}
 

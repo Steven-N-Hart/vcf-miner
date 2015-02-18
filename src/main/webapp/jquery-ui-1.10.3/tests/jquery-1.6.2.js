@@ -3316,7 +3316,7 @@ if ( !jQuery.support.changeBubbles ) {
 	};
 
 	jQuery.event.special.change = {
-		filters: {
+		filterSteps: {
 			focusout: testChange,
 
 			beforedeactivate: testChange,
@@ -3369,7 +3369,7 @@ if ( !jQuery.support.changeBubbles ) {
 		}
 	};
 
-	changeFilters = jQuery.event.special.change.filters;
+	changeFilters = jQuery.event.special.change.filterSteps;
 
 	// Handle when the input is .focus()'d
 	changeFilters.focus = changeFilters.beforeactivate;
@@ -4313,7 +4313,7 @@ var Expr = Sizzle.selectors = {
 		}
 	},
 
-	filters: {
+	filterSteps: {
 		enabled: function( elem ) {
 			return elem.disabled === false && elem.type !== "hidden";
 		},
@@ -4438,7 +4438,7 @@ var Expr = Sizzle.selectors = {
 	filter: {
 		PSEUDO: function( elem, match, i, array ) {
 			var name = match[1],
-				filter = Expr.filters[ name ];
+				filter = Expr.filterSteps[ name ];
 
 			if ( filter ) {
 				return filter( elem, i, match, array );
@@ -5140,7 +5140,7 @@ var posProcess = function( selector, context ) {
 // EXPOSE
 jQuery.find = Sizzle;
 jQuery.expr = Sizzle.selectors;
-jQuery.expr[":"] = jQuery.expr.filters;
+jQuery.expr[":"] = jQuery.expr.filterSteps;
 jQuery.unique = Sizzle.uniqueSort;
 jQuery.text = Sizzle.getText;
 jQuery.isXMLDoc = Sizzle.isXML;
@@ -6451,7 +6451,7 @@ jQuery.each(["height", "width"], function( i, name ) {
 if ( !jQuery.support.opacity ) {
 	jQuery.cssHooks.opacity = {
 		get: function( elem, computed ) {
-			// IE uses filters for opacity
+			// IE uses filterSteps for opacity
 			return ropacity.test( (computed && elem.currentStyle ? elem.currentStyle.filter : elem.style.filter) || "" ) ?
 				( parseFloat( RegExp.$1 ) / 100 ) + "" :
 				computed ? "1" : "";
@@ -6604,16 +6604,16 @@ function getWH( elem, name, extra ) {
 	return val + "px";
 }
 
-if ( jQuery.expr && jQuery.expr.filters ) {
-	jQuery.expr.filters.hidden = function( elem ) {
+if ( jQuery.expr && jQuery.expr.filterSteps ) {
+	jQuery.expr.filterSteps.hidden = function( elem ) {
 		var width = elem.offsetWidth,
 			height = elem.offsetHeight;
 
 		return (width === 0 && height === 0) || (!jQuery.support.reliableHiddenOffsets && (elem.style.display || jQuery.css( elem, "display" )) === "none");
 	};
 
-	jQuery.expr.filters.visible = function( elem ) {
-		return !jQuery.expr.filters.hidden( elem );
+	jQuery.expr.filterSteps.visible = function( elem ) {
+		return !jQuery.expr.filterSteps.hidden( elem );
 	};
 }
 
@@ -8543,8 +8543,8 @@ jQuery.extend( jQuery.fx, {
 	}
 });
 
-if ( jQuery.expr && jQuery.expr.filters ) {
-	jQuery.expr.filters.animated = function( elem ) {
+if ( jQuery.expr && jQuery.expr.filterSteps ) {
+	jQuery.expr.filterSteps.animated = function( elem ) {
 		return jQuery.grep(jQuery.timers, function( fn ) {
 			return elem === fn.elem;
 		}).length;
