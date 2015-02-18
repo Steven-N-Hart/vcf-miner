@@ -402,6 +402,7 @@
 
                                 <div class="well">
                                     <div id="searchFiltersRegion"></div>
+                                    <br>
 
                                     <button title="Add Filter to your Analysis" class="btn btn-primary"
                                             id="show_add_filter_dialog_button">Add Filter
@@ -819,7 +820,7 @@
 
     <script id="add-filter-dialog-layout-template" type="text/template">
         <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <button type="button" class="close cancel" aria-hidden="true">×</button>
             <h3 id="add_filter_label">Add Filter</h3>
         </div>
         <div class="modal-body">
@@ -859,8 +860,10 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-primary" aria-hidden="true" id="add_filter">Add</button>
-            <button class="btn" data-dismiss="modal" aria-hidden="true" id="add_filter_close">Cancel</button>
+            <button class="btn btn-primary" aria-hidden="true" id="run_filter">Run Filter</button>
+            <button class="btn btn-primary hide" aria-hidden="true" id="run_combo_filter">Run Filter(s)</button>
+            <button class="btn" aria-hidden="true" id="add_another_filter">Add Another Filter</button>
+            <button class="btn cancel" aria-hidden="true" id="add_filter_close">Cancel</button>
         </div>
     </script>
 
@@ -1069,23 +1072,40 @@
     </script>
 
     <!-- single row in the search filter table -->
-    <script id="search-filter-row-template" type="text/template">
-        <span class="label"><td><%=displayName%></td></span>
-        <span class="label"><td><%=displayOperator%></td></span>
-        <span id="<%=id%>_display_value_label" class="label"><td><%=displayValue%></td></span>
-        <td><span class="badge badge-info" id="<%=id%>_num_matches_label"><%=numMatches%></span></td>
-        <td><button title="Remove filter from your Analysis" type="button" class="btn btn-mini remove" id="<%=id%>_remove_button" style="<% if(!removable){%> display: none <%}%>"><i class="icon-remove"></i></button></td>
+    <script id="search-filter-step-row-template" type="text/template">
+        <!-- FILTER COLUMN -->
+        <td style="padding-top:5px;padding-bottom:5px;border-bottom:1pt solid silver;">
+            <% _.each(filters.models, function(filter) { %>
+                <table>
+                    <tr>
+                        <td style="vertical-align: text-top;"> <%=filter.get('displayName')%> </td>
+                        <td style="vertical-align: text-top;padding-left:10px;padding-right:10px;"> <%=filter.get('displayOperator')%> </td>
+                        <td style="vertical-align: text-top;"> <%=filter.get('displayValue')%> </td>
+                    </tr>
+                </table>
+            <% }); %>
+        </td>
 
+        <!-- VARIANT COLUMN -->
+        <td class="text-center" style="padding-top:5px;padding-bottom:5px;border-bottom:1pt solid silver;">
+            <% if(numMatches != null){ %><span class="badge badge-info" id="<%=id%>_num_matches_label" style="vertical-align: text-top;"><%=numMatches%></span><%}%>
+        </td>
+
+        <!-- ACTION COLUMN -->
+        <td style="padding-top:5px;padding-bottom:5px;border-bottom:1pt solid silver;">
+            <button title="Remove filter from your Analysis" type="button" class="btn btn-mini remove" id="<%=id%>_remove_button" style="vertical-align: text-top;<% if(!removable){%> display: none <%}%>"><i class="icon-remove"></i></button>
+        </td>
     </script>
 
     <!-- the search filter table -->
-    <script id="search-filter-table-template" type="text/html">
-        <table class="table">
+    <script id="search-filter-step-table-template" type="text/html">
+        <table style="width: 100%;border-collapse: collapse;">
             <thead>
                 <tr>
-                    <th colspan="3">Filter</th>
-                    <th>Variants</th>
-                    <th></th>
+                    <!--<th colspan="3">Filter</th>-->
+                    <th class="text-left" style="width: 100%;border-bottom:1pt solid silver;"><h3>Filter</h3></th>
+                    <th class="text-left" style="border-bottom:1pt solid silver;"><h3>Variants</h3></th>
+                    <th style="border-bottom:1pt solid silver;"></th>
                 </tr>
             </thead>
 
@@ -1142,7 +1162,7 @@
     </script>
 
     <!-------------------------------------------------------------------------
-        Overall layout for the sample filters region.
+        Overall layout for the sample filterSteps region.
     -------------------------------------------------------------------------->
     <script id="sample-filters-layout-template" type="text/template">
 
@@ -1177,7 +1197,7 @@
 
 
     <!-------------------------------------------------------------------------
-        table that contains the sample filters (1 row per filter)
+        table that contains the sample filterSteps (1 row per filter)
     -------------------------------------------------------------------------->
     <script id="sample-filter-table-template" type="text/html">
         <table class="table">
@@ -1213,9 +1233,9 @@
 
             <!-- region for boolean fields -->
             <div id="booleanRegion" class="sample_filter_region" style="float: left; margin-left: 20px; margin-right: 10px; margin-top: 0px;">
-                <label class='radio inline'><input type='radio' name='boolean_group' id="boolean_group" value="true" CHECKED> True</label>
+                <label class='radio inline'><input type='radio' name='boolean_group' value="true" CHECKED> True</label>
                 <br/>
-                <label class='radio inline'><input type='radio' name='boolean_group' id="boolean_group" value="false"> False</label>
+                <label class='radio inline'><input type='radio' name='boolean_group' value="false"> False</label>
             </div>
 
             <!-- region for string fields -->
@@ -1264,7 +1284,7 @@
     </script>
 
     <!---------------------------------------------------------------------------------------------------------------------------------
-    Samples table at the bottom of the "Subset" tab (lets you select individual samples after applying filters on the sample values)
+    Samples table at the bottom of the "Subset" tab (lets you select individual samples after applying filterSteps on the sample values)
     ----------------------------------------------------------------------------------------------------------------------------------->
     <script id="sample-selection-layout-template" type="text/template">
         <div class="container-fluid">
@@ -1334,9 +1354,11 @@
     <script src="js/views/IndexTableView.js" type="text/javascript"></script>
     <script src="js/views/IndexTableRowView.js" type="text/javascript"></script>
 
+    <script src="js/models/FilterStep.js" type="text/javascript"></script>
     <script src="js/models/Filter.js" type="text/javascript"></script>
     <script src="js/models/GroupFilter.js" type="text/javascript"></script>
     <script src="js/models/AltAlleleDepthFilter.js" type="text/javascript"></script>
+    <script src="js/collections/FilterStepList.js" type="text/javascript"></script>
     <script src="js/collections/FilterList.js" type="text/javascript"></script>
 
     <script src="js/models/SampleGroup.js" type="text/javascript"></script>
