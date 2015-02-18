@@ -270,7 +270,7 @@ var Filter = Backbone.Model.extend({
 
     getNameAsHTML: function()
     {
-        var name = this.get("name");
+        var name = '<strong>'+this.get("name")+'</strong>';
         var nameLabel = '<label title="'+this.get("description")+'">' + name + "</label>";
         var html;
 
@@ -442,11 +442,9 @@ var Filter = Backbone.Model.extend({
             valueFunction:   FilterValueFunction.NONE,
             value:           "NA",
             displayValue:    "NA", // may be abbreviated
-            numMatches:      0,
             category:        FilterCategory.UNKNOWN,
             id:              guid(),
             includeNulls:    false,
-            removable:       false
         };
     }
 });

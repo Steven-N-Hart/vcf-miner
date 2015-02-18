@@ -24,7 +24,7 @@ var SubsetController = Backbone.Marionette.Controller.extend({
     samplesAllList: null,
 
     /**
-     * A subset of {@link SubsetController#samplesAllList} after {@link SubsetController#filters} has been applied.
+     * A subset of {@link SubsetController#samplesAllList} after {@link SubsetController#filterSteps} has been applied.
      *
      * NOTE: NULL initially because this is passed in through the constructor options
      */
@@ -63,11 +63,11 @@ var SubsetController = Backbone.Marionette.Controller.extend({
 
 
         // Wire events to functions
-        MongoApp.vent.on("addFilter", function () {
+        MongoApp.vent.on("addFilterComponentComponent", function () {
             self.addFilter();
         });
 
-        MongoApp.vent.on("removeFilter", function (sampleFilter) {
+        MongoApp.vent.on("removeFilterComponentComponent", function (sampleFilter) {
             self.removeFilter(sampleFilter);
         });
         MongoApp.vent.on("applyFilters", function () {
@@ -109,11 +109,11 @@ var SubsetController = Backbone.Marionette.Controller.extend({
 
 
     //=========================================================================================================
-    // Apply filters functions
+    // Apply filterSteps functions
     //=========================================================================================================
 
     /**
-     * Applies the sample filters {@link SubsetController#sampleFilterList} to
+     * Applies the sample filterSteps {@link SubsetController#sampleFilterList} to
      * all the samples {@link SubsetController#samplesAllList}.  The filtered results
      * are saved to the filtered samples collection {@link SubsetController#filteredSamples}.
      */
@@ -123,7 +123,7 @@ var SubsetController = Backbone.Marionette.Controller.extend({
             this.sampleSubsetList.pop();
         }
 
-        // Loop through the full list of samples, then loop through the filters and if it passes the filter criteria, include it
+        // Loop through the full list of samples, then loop through the filterSteps and if it passes the filter criteria, include it
         for (var i = 0; i < this.samplesAllList.length; i++) {
             var isPassesAllFilters = true;
             var sample = this.samplesAllList.models[i];
@@ -137,7 +137,7 @@ var SubsetController = Backbone.Marionette.Controller.extend({
                     break;
                 }
             }
-            // If the sample has passed all filters, then add it
+            // If the sample has passed all filterSteps, then add it
             if (isPassesAllFilters) {
                 this.sampleSubsetList.add(sample);
             }

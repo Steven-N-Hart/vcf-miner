@@ -103,11 +103,11 @@ function getDateString(timestamp)
 /**
  * Builds a query object.
  *
- * @param filterList Backbone collection of filter models.
+ * @param filterStepList Backbone collection of filter models.
  * @param workspaceKey
  * @returns {Object} Query object
  */
-function buildQuery(filterList, workspaceKey) {
+function buildQuery(filterStepList, workspaceKey) {
     // build query from FILTER model
     var query = new Object();
     query.numberResults = MongoApp.settings.maxFilteredVariants;
@@ -122,37 +122,40 @@ function buildQuery(filterList, workspaceKey) {
     var customNumberFilters = new Array();
 
     // loop through filter collection
-    _.each(filterList.models, function(filter) {
-        // assign filter value to correct query object attribute
-        switch (filter.get("category"))
-        {
-            case FilterCategory.INFO_FLAG:
-                infoFlagFilters.push(filter.toInfoFlagFilterPojo());
-                break;
-            case FilterCategory.INFO_INT:
-            case FilterCategory.INFO_FLOAT:
-                infoNumberFilters.push(filter.toInfoNumberFilterPojo());
-                break;
-            case FilterCategory.INFO_STR:
-                infoStringFilters.push(filter.toInfoStringFilterPojo());
-                break;
-            case FilterCategory.IN_GROUP:
-            case FilterCategory.NOT_IN_GROUP:
-                var inSample;
-                if (filter.get("category") == FilterCategory.IN_GROUP)
-                    inSample = true;
-                if (filter.get("category") == FilterCategory.NOT_IN_GROUP)
-                    inSample = false;
-                sampleGroups.push(filter.toSampleGroupPOJO(workspaceKey, inSample));
-                break;
-            case FilterCategory.FORMAT:
-                sampleNumberFilters.push(filter.toSampleNumberFilterPojo());
-                break;
-        }
+    _.each(filterStepList.models, function(filterStep) {
 
-        if (filter instanceof AltAlleleDepthFilter) {
-            customNumberFilters.push(filter.toSampleNumberFilterPojo());
-        }
+        _.each(filterStep.get("filters").models, function(filter) {
+            // assign filter value to correct query object attribute
+            switch (filter.get("category"))
+            {
+                case FilterCategory.INFO_FLAG:
+                    infoFlagFilters.push(filter.toInfoFlagFilterPojo());
+                    break;
+                case FilterCategory.INFO_INT:
+                case FilterCategory.INFO_FLOAT:
+                    infoNumberFilters.push(filter.toInfoNumberFilterPojo());
+                    break;
+                case FilterCategory.INFO_STR:
+                    infoStringFilters.push(filter.toInfoStringFilterPojo());
+                    break;
+                case FilterCategory.IN_GROUP:
+                case FilterCategory.NOT_IN_GROUP:
+                    var inSample;
+                    if (filter.get("category") == FilterCategory.IN_GROUP)
+                        inSample = true;
+                    if (filter.get("category") == FilterCategory.NOT_IN_GROUP)
+                        inSample = false;
+                    sampleGroups.push(filter.toSampleGroupPOJO(workspaceKey, inSample));
+                    break;
+                case FilterCategory.FORMAT:
+                    sampleNumberFilters.push(filter.toSampleNumberFilterPojo());
+                    break;
+            }
+
+            if (filter instanceof AltAlleleDepthFilter) {
+                customNumberFilters.push(filter.toSampleNumberFilterPojo());
+            }
+        });
     });
 
     query.sampleGroups        = sampleGroups;

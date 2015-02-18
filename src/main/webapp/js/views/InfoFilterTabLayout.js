@@ -70,7 +70,7 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
 
         var self = this;
 
-        <!-- sub-view that renders available filters in a dropdown choicebox -->
+        <!-- sub-view that renders available filterSteps in a dropdown choicebox -->
         var ListView = Backbone.View.extend({
 
             initialize: function() {
@@ -91,7 +91,7 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
             render: function(){
                 var self = this;
                 var infoDataFields = this.model;
-                // render current filters in collection
+                // render current filterSteps in collection
                 _.each(infoDataFields.models, function(infoDataField) {
                     self.addOne(infoDataField);
                 });

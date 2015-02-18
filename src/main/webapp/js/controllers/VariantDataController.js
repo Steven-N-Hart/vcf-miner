@@ -19,10 +19,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_FILTER_ADDED, function (search, async) {
-            self.changedSearch(search, async);
-        });
-        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_FILTER_REMOVED, function (search, async) {
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_CHANGED, function (search, async) {
             self.changedSearch(search, async);
         });
         this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspace) {
@@ -61,7 +58,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
      */
     refreshData: function(workspace, search, async) {
         // send query request to server
-        var query = buildQuery(search.get("filters"), workspace.get("key"));
+        var query = buildQuery(search.get("filterSteps"), workspace.get("key"));
         this.sendQuery(query, async);
     },
 
@@ -84,6 +81,8 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
 //        pleaseWaitDiv.modal();
 
         console.debug("Sending query to server:" + JSON.stringify(query));
+
+        MongoApp.showPleaseWait();
 
         $.ajax({
             type: "POST",
@@ -143,7 +142,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
                 self.varTableRows.trigger("finalize");
 
                 // update count on LAST Filter only
-                var lastFilter = _.last(MongoApp.search.get("filters").models);
+                var lastFilter = _.last(MongoApp.search.get("filterSteps").models);
                 lastFilter.set("numMatches", json.totalResults);
 
                 if (json.totalResults > MongoApp.settings.maxFilteredVariants) {
@@ -186,7 +185,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         this.varTableCols.add(new VariantTableColumn({visible:true,  name:'REF',    displayName:'REF',    description:'The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).'}));
         this.varTableCols.add(new VariantTableColumn({visible:true,  name:'ALT',    displayName:'ALT',    description:'Comma separated list of alternate non-reference alleles called on at least one of the samples.'}));
         this.varTableCols.add(new VariantTableColumn({visible:false, name:'QUAL',   displayName:'QUAL',   description:'Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).'}));
-        this.varTableCols.add(new VariantTableColumn({visible:false, name:'FILTER', displayName:'FILTER', description:'PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
+        this.varTableCols.add(new VariantTableColumn({visible:false, name:'FILTER', displayName:'FILTER', description:'PASS if this position has passed all filterSteps, i.e. a call is made at this position. Otherwise, if the site has not passed all filterSteps, a semicolon-separated list of codes for filterSteps that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
         this.varTableCols.add(new VariantTableColumn({visible:true,  name:'FORMAT.GenotypePostitiveCount', displayName:'#_Samples', description:'The number of samples.'}));
         this.varTableCols.add(new VariantTableColumn({visible:true,  name:'FORMAT.GenotypePositiveList',  displayName:'Samples',   description:'The names of samples.'}));
         // update VariantTableColumn models to include info fields
@@ -205,7 +204,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
     download: function(workspace, search)
     {
         // send query request to server
-        var query = buildQuery(search.get("filters"), workspace.get("key"));
+        var query = buildQuery(search.get("filterSteps"), workspace.get("key"));
 
         var returnFields = new Array();
         var displayFields = new Array();
@@ -224,7 +223,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         query.displayFields = displayFields;
 
         var displayFiltersApplied = new Array();
-        _.each(search.get("filters").models, function(filter)
+        _.each(search.get("filterSteps").models, function(filter)
         {
             displayFiltersApplied.push(
                 {

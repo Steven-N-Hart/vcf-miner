@@ -28,7 +28,7 @@ SubsetFilterTabLayout = Backbone.Marionette.Layout.extend({
 
         this.sampleFilterLayout = new SampleFilterLayout({
             metadataFields:    options.metadataFields,
-            sampleFilters:     options.filters,
+            sampleFilters:     options.filterSteps,
             samplesAllList:    options.samplesAllList,
             typeAheadFunction: options.typeAheadFunction
         });

@@ -11,7 +11,7 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
         "change #fieldDropdown" : "fieldChanged",
 
         // Listen for clicks on the 'X' button
-        "click .removeFilter"   : "removeFilter",
+        "click .removeFilter"   : "removeFilterComponentComponent",
 
         // Look for all clicks on checkboxes within the row (for the checkbox combobox)
         "change input[type='checkbox']" : "changeCheckboxComboboxValue"
@@ -215,7 +215,7 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
 
 
     /** When adding a filter, make sure to change the boolean radio button group name so they are unique.
-     *  Otherwise if there are 3 boolean filters each with a true/false radio button pair, only one radio button could be selected out of the six.
+     *  Otherwise if there are 3 boolean filterSteps each with a true/false radio button pair, only one radio button could be selected out of the six.
      */
     changeBooleanRadioButtonGroupNames : function() {
         // Get the radio buttons in the radio button group under the current row
@@ -371,12 +371,12 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
     },
     removeFilter: function(event) {
         // fire event that this model should be removed
-        MongoApp.vent.trigger("removeFilter", this.model);
+        MongoApp.vent.trigger("removeFilterComponentComponent", this.model);
     },
 
     updateAddFilterVisibility: function() {
         var isLast = this.model.get("isLast");
-        var addFilterButton = this.$el.find('.addFilter');
+        var addFilterButton = this.$el.find('.addFilterComponentComponent');
 
         if (isLast) {
             addFilterButton.toggle(true);

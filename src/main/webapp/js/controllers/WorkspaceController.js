@@ -396,7 +396,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 generalDataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, name:'REF',    description:'The reference base(s). Each base must be one of A,C,G,T,N (case insensitive).'}));
                 generalDataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, name:'ALT',    description:'Comma separated list of alternate non-reference alleles called on at least one of the samples.'}));
                 generalDataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, name:'QUAL',   description:'Phred-scaled quality score for the assertion made in ALT. i.e. -10log_10 prob(call in ALT is wrong).'}));
-                generalDataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, name:'FILTER', description:'PASS if this position has passed all filters, i.e. a call is made at this position. Otherwise, if the site has not passed all filters, a semicolon-separated list of codes for filters that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
+                generalDataFields.add(new VCFDataField({category: VCFDataCategory.GENERAL, name:'FILTER', description:'PASS if this position has passed all filterSteps, i.e. a call is made at this position. Otherwise, if the site has not passed all filterSteps, a semicolon-separated list of codes for filterSteps that fail. e.g. “q10;s50” might indicate that at this site the quality is below 10 and the number of samples with data is below 50% of the total number of samples.'}));
 
 
                 if (json.HEADER != undefined) {

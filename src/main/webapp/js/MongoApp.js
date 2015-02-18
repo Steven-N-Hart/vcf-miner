@@ -67,16 +67,13 @@ MongoApp.addInitializer(function () {
         SEARCH_LOAD: 'searchLoad',
 
         // signals that a new filter should be added to the search
-        SEARCH_FILTER_ADD: 'filterAdd',
+        SEARCH_FILTER_STEP_ADD: 'filterAdd',
 
-        // signals that a filter has been added to the search
-        SEARCH_FILTER_ADDED: 'searchFilterAdded',
+        // signals that a search has changed and search results should be updated
+        SEARCH_CHANGED: 'searchChanged',
 
         // signals that an existing filter should be removed from the search
-        SEARCH_FILTER_REMOVE: 'filterRemove',
-
-        // signals that an existing filter has been removed from the search
-        SEARCH_FILTER_REMOVED: 'searchFilterRemoved',
+        SEARCH_FILTER_STEP_REMOVE: 'filterRemove',
 
         // signals that the search should be saved to the server-side persistence store
         SEARCH_SAVE: 'saveSearch',
@@ -190,22 +187,29 @@ MongoApp.addInitializer(function () {
         var s = newSearch.clone();
 
         // detach backbone collection attributes
-        var filters = s.get("filters");
-        s.unset("filters");
+        var filterSteps = s.get("filterSteps");
+        s.unset("filterSteps");
 
         // carry over non-collection attributes
         MongoApp.search.set(s.attributes);
 
         // rebuild backbone collection attributes
-        MongoApp.search.get("filters").reset();
-        var async = false; // async is FALSE because we need to add multiple filters in sequence
-        if (filters.length == 0) {
+        MongoApp.search.get("filterSteps").reset();
+        var async = false; // async is FALSE because we need to add multiple filterSteps in sequence
+        if (filterSteps.length == 0) {
             // only have the NONE filter, okay to have it async
             async = true;
         }
-        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_ADD, MongoApp.FILTER_NONE, async);
-        _.each(filters.models, function(filter) {
-            MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_ADD, filter, async);
+
+        // NONE step (always there by default)
+        var noneStep = new FilterStep();
+        noneStep.get("filters").add(MongoApp.FILTER_NONE);
+        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_STEP_ADD, noneStep);
+        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_CHANGED, MongoApp.search, async);
+
+        _.each(filterSteps.models, function(filterStep) {
+            MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_STEP_ADD, filterStep);
+            MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_CHANGED, MongoApp.search, async);
         });
 
         MongoApp.search.set("saved", true);

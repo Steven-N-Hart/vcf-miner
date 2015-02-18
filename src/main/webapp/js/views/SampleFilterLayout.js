@@ -4,7 +4,7 @@
  */
 SampleFilterLayout = Backbone.Marionette.Layout.extend({
 
-    template: "#sample-filters-layout-template",
+    template: "#sample-filterSteps-layout-template",
 
     regions: {
         filterTableRegion: "#sampleFilterTableRegion"
@@ -40,10 +40,10 @@ SampleFilterLayout = Backbone.Marionette.Layout.extend({
 
     /**
      * Add Filter button event
-     *  NOTE: This triggers a call to the function "addFilter" in SubsetController
+     *  NOTE: This triggers a call to the function "addFilterStep" in SubsetController
      */
     addFilterClicked: function() {
-        MongoApp.vent.trigger("addFilter");
+        MongoApp.vent.trigger("addFilterComponentComponent");
     },
 
     /**

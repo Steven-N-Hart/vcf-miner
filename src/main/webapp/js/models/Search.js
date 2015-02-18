@@ -7,7 +7,7 @@ var Search = Backbone.Model.extend({
             description: "This is the description of My Analysis.",
             timestamp:   null,
             user:   "NA",
-            filters: new FilterList(),
+            filterSteps: new FilterStepList(),
             preload: false,
             id:     guid(),
             saved: true

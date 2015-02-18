@@ -18,11 +18,11 @@ var SearchController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_FILTER_ADD, function (filter, async) {
-            self.addFilter(filter, async);
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_FILTER_STEP_ADD, function (filterStep) {
+            self.addFilterStep(filterStep);
         });
-        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_FILTER_REMOVE, function (filter) {
-            self.removeFilter(filter);
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_FILTER_STEP_REMOVE, function (filterStep) {
+            self.removeFilterStep(filterStep);
         });
         this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_SAVE, function (search) {
             self.saveSearch(search);
@@ -61,57 +61,40 @@ var SearchController = Backbone.Marionette.Controller.extend({
 
     showSearchFilterTable: function (options) {
         this.searchFilterView = new SearchFilterTableView({
-            collection: MongoApp.search.get("filters")
+            collection: MongoApp.search.get("filterSteps")
         });
         options.region.show(this.searchFilterView);
     },
 
-    addFilter: function (filter, async) {
-        MongoApp.showPleaseWait();
+    addFilterStep: function (filterStep) {
+        MongoApp.search.get("filterSteps").add(filterStep);
 
-        MongoApp.search.get("filters").add(filter);
-
-        if (filter.get('id') != MongoApp.FILTER_NONE.get('id'))
+        if (!this.isNoneFilterStep(filterStep))
             MongoApp.search.set("saved", false);
 
-        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_ADDED, MongoApp.search, async);
         this.updateFilterRemovable();
     },
 
-    removeFilter: function (filter) {
-        MongoApp.showPleaseWait();
-
-        MongoApp.search.get("filters").remove(filter);
+    removeFilterStep: function (filterStep) {
+        MongoApp.search.get("filterSteps").remove(filterStep);
         MongoApp.search.set("saved", false);
-        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_REMOVED, MongoApp.search);
         this.updateFilterRemovable();
     },
 
     /**
-     * Loops through ALL filters and updates their removable attribute.
+     * Loops through ALL filterSteps and updates their removable attribute.
      */
-    updateFilterRemovable: function()
-    {
-        var lastFilter = _.last(MongoApp.search.get("filters").models);
-
-        // loop through filter collection
-        // filter is removable ONLY if it's
-        // 1.) not the NONE filter
-        // 2.) is the last filter in the list
-        var self = this;
-        _.each(MongoApp.search.get("filters").models, function(filter)
-        {
-            var button =  $("#" + filter.get("id") + "_remove_button");
-            if ((filter.get("id") != MongoApp.FILTER_NONE.get("id")) &&
-                (filter.get("id") == lastFilter.get("id")))
-            {
-                filter.set("removable", true);
-            }
-            else
-            {
-                filter.set("removable", false);
-            }
+    updateFilterRemovable: function() {
+        // mark all steps as not removable
+        _.each(MongoApp.search.get("filterSteps").models, function(filterStep) {
+            filterStep.set("removable", false);
         });
+
+        // only make LAST filter step removable if it's not the NONE filter
+        var lastFilter = _.last(MongoApp.search.get("filterSteps").models);
+        if (!this.isNoneFilterStep(lastFilter)) {
+            lastFilter.set("removable", true);
+        }
     },
 
     /**
@@ -344,15 +327,21 @@ var SearchController = Backbone.Marionette.Controller.extend({
         filterHistory.filters     = new Array();
 
         // translate Filter model to Querry object (except for NONE filter)
-        _.each(search.get("filters").models, function(filter) {
+        var that = this;
+        _.each(search.get("filterSteps").models, function(filterStep) {
 
-            var filterList = new FilterList();
-            filterList.add(filter);
+            if (!that.isNoneFilterStep(filterStep)) {
+                // split up so that 1 filter == 1 query
+                _.each(filterStep.get("filters").models, function(filter) {
+                    var singleStep = new FilterStep();
+                    singleStep.get("filters").add(filter);
+                    var singleStepList = new FilterStepList();
+                    singleStepList.add(singleStep);
+                    var querry = buildQuery(singleStepList, search.get("key"));
 
-            var querry = buildQuery(filterList, search.get("key"));
-
-            filterHistory.filters.push(querry);
-
+                    filterHistory.filters.push(querry);
+                });
+            }
         });
 
         return filterHistory;
@@ -377,7 +366,9 @@ var SearchController = Backbone.Marionette.Controller.extend({
 
             // each Querry object is a Filter model
             var filter = this.querryToFilter(querry);
-            search.get("filters").add(filter);
+            var filterStep = new FilterStep();
+            filterStep.get("filters").add(filter);
+            search.get("filterSteps").add(filterStep);
         }
 
         return search;
@@ -425,5 +416,21 @@ var SearchController = Backbone.Marionette.Controller.extend({
             filter.setFilterDisplay();
 
         return filter;
+    },
+
+    /**
+     * Determines whether the given FILTER STEP is the "NONE" step.
+     * @param filterStep
+     * @returns {boolean}
+     */
+    isNoneFilterStep: function(filterStep) {
+        var firstFilterID = _.first(filterStep.get('filters').models).get('id');
+
+        if(firstFilterID == MongoApp.FILTER_NONE.get("id")) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 });

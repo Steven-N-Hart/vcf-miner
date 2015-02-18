@@ -2,7 +2,7 @@ SearchFilterRowView = Backbone.Marionette.ItemView.extend({
 
     tagName: "tr",
 
-    template: '#search-filter-row-template',
+    template: '#search-filter-step-row-template',
 
     events: {
         "click .remove" : "removeFilter"
@@ -24,6 +24,7 @@ SearchFilterRowView = Backbone.Marionette.ItemView.extend({
     },
 
     removeFilter: function(e) {
-        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_REMOVE, this.model);
+        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_STEP_REMOVE, this.model);
+        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_CHANGED, MongoApp.search, false);
     }
 });
