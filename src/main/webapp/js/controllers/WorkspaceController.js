@@ -598,14 +598,11 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
             url: "/mongo_svr/ve/samples/savegroup",
             contentType: "application/json",
             data: JSON.stringify(pojo),
-            dataType: "json",
-            success: function(json)
+            success: function()
             {
                 console.debug("saved group: " + pojo.alias);
 
                 workspace.get("sampleGroups").add(group);
-
-                MongoApp.dispatcher.trigger(MongoApp.events.WKSP_CHANGE, workspace);
             },
             error: jqueryAJAXErrorHandler
         });
