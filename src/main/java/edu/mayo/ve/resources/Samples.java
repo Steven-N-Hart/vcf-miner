@@ -122,26 +122,22 @@ public class Samples {
      */
     @POST
     @Path("/savegroup")
-    @Produces("application/json")
     @Consumes(MediaType.APPLICATION_JSON)
-    public String saveGroupsToWorkspace(SampleGroup group){
+    public void saveGroupsToWorkspace(SampleGroup group){
         DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.SAMPLE_GROUP_COLLECTION);
         BasicDBObject q = group.getBasicDBObject();
-        WriteResult wr = col.insert(q);
-        return "{\"result\":\"" + wr.toString() + "\"}";
+        col.insert(q);
     }
 
     @POST
     @Path("/deletegroup")
-    @Produces("application/json")
     @Consumes(MediaType.APPLICATION_JSON)
-    public String deleteGroup(SampleGroup group){
+    public void deleteGroup(SampleGroup group){
         DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.SAMPLE_GROUP_COLLECTION);
         BasicDBObject q = group.getBasicDBObject();
-        WriteResult wr = col.remove(q);
-        return "{\"result\":\"" + wr.toString() + "\"}";
+        col.remove(q);
     }
     
 }
