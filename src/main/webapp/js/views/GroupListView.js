@@ -88,7 +88,7 @@ GroupListView = Backbone.View.extend({
         var option = $('<option/>');
         option.text(group.get("name"));
         option.attr('id', group.get("id"));
-        option.attr('value', this.model.get("id"));
+        option.attr('value', group.get("id"));
         return option;
     },
 
