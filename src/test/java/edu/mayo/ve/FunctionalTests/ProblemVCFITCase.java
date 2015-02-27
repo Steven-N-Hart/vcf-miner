@@ -135,7 +135,7 @@ public class ProblemVCFITCase {
         deleteCheck(workspace,0,7);
     }
 
-    private long count(String workspace){
+    public long count(String workspace){
         ExeQuery q = new ExeQuery();
         DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspace);

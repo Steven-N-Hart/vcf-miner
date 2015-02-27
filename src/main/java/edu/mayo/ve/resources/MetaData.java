@@ -68,6 +68,44 @@ public class MetaData {
         return dbc.next();
     }
 
+    public DBObject updateInfoField(String key, String newField, int number, String type, String description){
+        return null;
+    }
+
+    /**
+     *
+     * @param key - the workspace key
+     * @param field - the field we want to check if it exists
+     * @return
+     */
+    public boolean checkFieldExists(String key, String field){
+        String[] tokens = field.split("\\.");
+        DB db = MongoConnection.getDB();
+        DBCollection col = db.getCollection(Tokens.METADATA_COLLECTION);
+        BasicDBObject query = new BasicDBObject();
+        query.put("key",key);
+        DBCursor c = col.find(query);
+        if(c.hasNext()){
+            DBObject next = c.next();
+            if(next==null) return false;
+            if(tokens.length > 1){
+                //only handle 2 levels deep
+                BasicDBObject bo = (BasicDBObject) next.get(tokens[0]);
+                Object o = bo.get(tokens[1]);
+                if (o != null){
+                    return true;
+                }
+            } else {
+                Object o = next.get(field);
+                if(o!=null){
+                    return true;
+                }
+            }
+        }
+        return false; //it can't have the field, there is no metadata
+
+    }
+
 
     public void updateLoadStatistics(String workspace, HashMap<String, Integer> context) throws IOException {
         DB db = MongoConnection.getDB();
