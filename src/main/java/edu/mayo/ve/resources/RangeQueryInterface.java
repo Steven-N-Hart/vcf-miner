@@ -134,11 +134,14 @@ public class RangeQueryInterface {
      */
     public String validate(String s, String workspace) throws Exception {
         //first check to see that the metadata does not already contain a field with the same name, if it does -> invalid
-        //todo:
+        MetaData meta = new MetaData();
+        if(meta.checkFieldExists(workspace, "HEADER.INFO." + s)==true){
+            throw new Exception("Proposed Field Name is Already in use: " + s);
+        }
         //next check that the name does not contain dot '.' and other funky characters if so -> invalid
-        //todo:
-        //finally check that the workspace we want to update exists, if not -> invalid
-        //todo:
+        if(!s.matches("[a-z,A-Z,0-9,_]+")){
+            throw new Exception("Proposed Field Name must contain only 0-9,A-Z,a-z: " + s);
+        }
         //if it is valid, we can return the string, it is good to go!
         return s;
     }
