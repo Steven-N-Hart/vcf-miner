@@ -68,8 +68,22 @@ public class MetaData {
         return dbc.next();
     }
 
-    public DBObject updateInfoField(String key, String newField, int number, String type, String description){
-        return null;
+    public void updateInfoField(String key, String newField, int number, String type, String description){
+        //make it robust to calls with INFO. on them and those without...
+        String prefix = "INFO.";
+        if(newField.startsWith(prefix)){
+            prefix = "";
+        }
+        DB db = MongoConnection.getDB();
+        DBCollection col = db.getCollection(Tokens.METADATA_COLLECTION);
+        BasicDBObject newobj = new BasicDBObject();
+        newobj.append("number", number);
+        newobj.append("type", type);
+        newobj.append("Description", description);
+        newobj.append("EntryType","INFO");
+        BasicDBObject updateQuery = new BasicDBObject();
+        updateQuery.append("$set", new BasicDBObject().append("HEADER." + prefix + newField, newobj));
+        col.update(new BasicDBObject().append("key",key), updateQuery);
     }
 
     /**

@@ -50,8 +50,110 @@ public class RangeQueryInterface {
             @FormDataParam("file") InputStream uploadedInputStream
     ) throws Exception {
         String response = "Workspace: " + workspace + " " + "name: " + intervalsName + " intervalDescription: " + intervalDescription + "\n rangeSetText: " + rangeSets + "\n";
+        //validate the interval name (e.g. can't have period or other funky characters, can't already be used)
+        String name = validate(intervalsName, workspace);
+        //copy the contents of the input stream to a temp file, this will allow us to validate that all of the intervals in the file are correctly formed.
+        String uploadedFileLocation = getUploadFileLocation(workspace, name);
+        File outputFile = new File(uploadedFileLocation);
+        OutputStream outStream = new FileOutputStream(outputFile);
+        try {
+            // copy data to file system
+            IOUtils.copyLarge(uploadedInputStream, outStream);
+        } finally {
+            outStream.close();
+        }
+
+        //parse the intervals into 'rangeSets' to ensure that they are well formed
+        List<String> rangeLines = checkStrings(rangeSets);
+
+        //parse the file to ensure that all of the intervals are well formed
+        parseRangeFile(uploadedFileLocation);
+
+        //get the update frequency...
+        SystemProperties sysprop = new SystemProperties();
+        String ibsr = sysprop.get("INTERVAL_BULK_INSERT_RATE");
+        int n = 1; //default 1 if not defined
+        if(ibsr != null && ibsr.length()<1){
+            n = Integer.parseInt(ibsr);
+        }
+
+        //update the workspace to include the new range set as a flag (intervals from form)
+        bulkUpdate(workspace,rangeLines.iterator(),n,name);
+
+        //update the workspace to include the new range set as a flag (file intervals)
+        File intervalFile = new File(uploadedFileLocation);
+        BufferedReader br = new BufferedReader(new FileReader(intervalFile));
+        bulkUpdate(workspace, new FileIterator(br), n, name);
+
+        //update the metadata
+        updateMetadata(workspace,name,intervalDescription);
+
+        //delete the temp file
+        outputFile.delete();
+
         return Response.status(200).entity(response).build();
         //return uploadIntervalsFromFile(workspace, alias, uploadedInputStream);
+    }
+
+    /**
+     *
+     * @param workspace    - the workspace that will get the metadata update
+     * @param name         - the new name of the field
+     * @param description  - the description of the new field
+     */
+    public void updateMetadata(String workspace, String name, String description) throws Exception {
+        MetaData meta = new MetaData(); //front end interface to the metadata collections
+        if(meta.checkFieldExists(workspace,name)){
+            throw new Exception("Invalid Field Name!, it already exists.  FIELD: " + name + " KEY: " + workspace);
+        }
+        meta.updateInfoField(workspace,name,0,"Flag",description);
+
+    }
+
+    /**
+     * given a string s, that has unparsed intervals one per line (\n delimited) return a list of strings representing intervals that pass validation
+     * @return
+     */
+    public List<String> checkStrings(String intervals) throws ParseException {
+        List<String> rangeLines = new ArrayList<String>();
+        String[] lines = intervals.split("\n");
+        for(String line : lines){
+            if(line.length()>5) { //we need at least 5 characters to be a valid range e.g. 1:0-1
+                //attempt to parse it into a range
+                Range r = new Range(line);
+                //add the range to the valid ranges checked
+                rangeLines.add(line); //bulk update requires lines not ranges
+            }
+        }
+        return rangeLines;
+    }
+
+    /**
+     * validates that the name proposed by the user for an interval set is ok.
+     * @param
+     */
+    public String validate(String s, String workspace) throws Exception {
+        //first check to see that the metadata does not already contain a field with the same name, if it does -> invalid
+        //todo:
+        //next check that the name does not contain dot '.' and other funky characters if so -> invalid
+        //todo:
+        //finally check that the workspace we want to update exists, if not -> invalid
+        //todo:
+        //if it is valid, we can return the string, it is good to go!
+        return s;
+    }
+
+    /**
+     *
+     * @param wkspID       - the workspace key
+     * @param name  - a valid (INFO) name
+     * @return
+     * @throws IOException
+     */
+    public String getUploadFileLocation(String wkspID, String name) throws IOException {
+        SystemProperties sysprop = new SystemProperties();
+        String tmpdir = sysprop.get("TEMPDIR");
+        return tmpdir + File.separator + wkspID + "." + name;
     }
 
     public Response uploadIntervalsFromFile(String workspace, String alias, InputStream uploadedInputStream) throws IOException {
@@ -167,7 +269,7 @@ public class RangeQueryInterface {
      *
      * @param workspace - the workspace that we want to do the update on
      * @param rangeItter - an iterator that comes from a file or from a list of raw ranges
-     * @param n - send the bulk update every n ranges processed
+     * @param n - send the bulk update every n ranges processed  todo: change the update to use mongo's bulk interface (requires mongodb 2.6)
      * @param rangeSet - the validated name for the range set (e.g. it is not already a name in INFO)
      * @throws ParseException
      * @return number of records updated
@@ -195,6 +297,19 @@ public class RangeQueryInterface {
 
         }
         return updateCount;
+    }
+
+
+    class FileIterator implements Iterator<String>
+    {
+        BufferedReader reader;
+        FileIterator(BufferedReader myReader) { reader = myReader; };
+        @Override
+        public boolean hasNext() { try { return reader.ready(); }catch(Exception e){ throw new RuntimeException(e); } };
+        @Override
+        public String next() { try { return reader.readLine(); }catch(Exception e){ throw new RuntimeException(e); } };
+        @Override
+        public void remove() { throw new RuntimeException("Remove not supported!"); };
     }
 
 }
