@@ -30,9 +30,11 @@ CustomFilterTabLayout = Backbone.Marionette.Layout.extend({
 
         // register for Marionette events
         this.stopListening();
-        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspace) {
-            self.initWorkspace(workspace);
-        });
+
+        // synchronize local sampleGroups when a model gets added
+        this.listenTo(MongoApp.workspace.get("sampleGroups"), "add", self.sampleGroupAdded);
+
+        this.initWorkspace(MongoApp.workspace);
 
         // add custom validation method for the group drowdown to make sure a group
         // is selected
@@ -50,15 +52,14 @@ CustomFilterTabLayout = Backbone.Marionette.Layout.extend({
     },
 
     initWorkspace: function(workspace) {
-        var self = this;
+        this.resetSampleGroups(workspace);
+        this.resetFilters();
+    },
+
+    resetFilters: function() {
 
         // remember what the user has selected
         var selectedFilter = this.getSelectedFilter();
-
-        this.sampleGroups.reset();
-        _.each(workspace.get("sampleGroups").models, function(group) {
-            self.sampleGroups.add(group);
-        });
 
         this.filters.reset();
 
@@ -71,7 +72,25 @@ CustomFilterTabLayout = Backbone.Marionette.Layout.extend({
         if (selectedFilter != undefined) {
             var filterName = selectedFilter.get("name");
             this.$el.find("#custom_field_list option:contains('"+filterName+"')").prop('selected', true);
-        }        
+        }
+    },
+
+    /**
+     * Synchronizes local collection by adding a model.
+     * @param sampleGroup
+     */
+    sampleGroupAdded: function(sampleGroup) {
+        this.sampleGroups.add(sampleGroup);
+    },
+
+    resetSampleGroups: function(workspace) {
+
+        var self = this;
+
+        this.sampleGroups.reset();
+        _.each(workspace.get("sampleGroups").models, function(group) {
+            self.sampleGroups.add(group);
+        });
     },
     
     onShow: function() {
