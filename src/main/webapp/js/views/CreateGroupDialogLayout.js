@@ -74,7 +74,7 @@ CreateGroupDialogLayout = Backbone.Marionette.Layout.extend({
             render: function(){
                 var self = this;
                 var filters = this.model;
-                // render current filterSteps in collection
+                // render current filters in collection
                 _.each(filters.models, function(filter) {
                     self.addOne(filter);
                 });
@@ -94,7 +94,7 @@ CreateGroupDialogLayout = Backbone.Marionette.Layout.extend({
 
         new ListView({
             "el": this.$el.find('#sample_field_list'),
-            "model": this.filterSteps
+            "model": this.filters
         });
 
         // show modal dialog
