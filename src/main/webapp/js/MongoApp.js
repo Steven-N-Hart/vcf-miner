@@ -164,6 +164,8 @@ MongoApp.addInitializer(function () {
     this.settingsController = new SettingsController();
     this.searchController = new SearchController();
     this.variantDataController = new VariantDataController();
+    this.rangeQueryController = new RangeQueryController();
+
 
     // Wire Marionette events to function callbacks
     this.listenTo(MongoApp.dispatcher, MongoApp.events.ERROR, function (errorMessage) {

@@ -5,7 +5,8 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
     regions: {
         sampleRegion: "#tab_content_sample_region",
         infoRegion: "#tab_content_info_region",
-        customRegion: "#tab_content_custom_region"
+        customRegion: "#tab_content_custom_region",
+        rangeRegion: "#tab_content_range_region"
 
         // TODO: DISABLED SUBSET
 //        subsetRegion: "#tab_content_subset_region"
@@ -43,6 +44,7 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
         this.sampleFilterTabLayout = new SampleFilterTabLayout();
         this.infoFilterTabLayout = new InfoFilterTabLayout();
         this.customFilterTabLayout = new CustomFilterTabLayout();
+        this.rangeFilterTabLayout = new RangeQueryFilterTabLayout();
 
         var workspaceKey = "ws01";
         var userToken = "aaa:bbb";
@@ -69,6 +71,7 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
         this.sampleRegion.show(this.sampleFilterTabLayout);
         this.infoRegion.show(this.infoFilterTabLayout);
         this.customRegion.show(this.customFilterTabLayout);
+        this.rangeRegion.show(this.rangeFilterTabLayout);
 
         // TODO: DISABLED SUBSET
 //        this.subsetController.showSubsetTab({region: this.subsetRegion });

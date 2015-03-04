@@ -87,19 +87,19 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         // TODO: replace TestApplication at integration time
         // If the event mentioned above that is tied to the "Create Range Annotation" button is triggered,
         //     then trigger the RangeQueryController.uploadRangeQueries() function
-        TestApplication.vent.trigger("uploadRangeQueries", this.rangeQuery);
+        MongoApp.vent.trigger("uploadRangeQueries", this.rangeQuery);
     },
 
     validateRangeQueries: function(event) {
         // Trigger event when losing focus on the range textarea.
         // Call RangeQueryController.validateRangeQueries() function
-        TestApplication.vent.trigger("validateRangeQueries", this.rangeQuery);
+        MongoApp.vent.trigger("validateRangeQueries", this.rangeQuery);
     },
 
     validateName: function(event) {
         // Trigger event when text changes in the "Name" textfield.
         // Call RangeQueryController.validateName() function
-        TestApplication.vent.trigger("validateName", this.rangeQuery);
+        MongoApp.vent.trigger("validateName", this.rangeQuery);
     }
 
 });

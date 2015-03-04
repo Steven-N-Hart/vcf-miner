@@ -35,15 +35,15 @@ var RangeQueryController = Backbone.Marionette.Controller.extend({
         // TODO: replace TestApplication at integration time
         // The event mentioned in RangeQueryFilterTabLayout will trigger this listener,
         // and thus call the uploadRangeQueries() function
-        TestApplication.vent.on("uploadRangeQueries", function (rangeQuery) {
+        MongoApp.vent.on("uploadRangeQueries", function (rangeQuery) {
             rangeQueryControllerInstance.validateAndUploadRangeQueries(rangeQuery);
         });
 
-        TestApplication.vent.on("validateRangeQueries", function (rangeQuery) {
+        MongoApp.vent.on("validateRangeQueries", function (rangeQuery) {
             rangeQueryControllerInstance.validateRangeQueries(rangeQuery);
         });
 
-        TestApplication.vent.on("validateName", function (rangeQuery) {
+        MongoApp.vent.on("validateName", function (rangeQuery) {
             rangeQueryControllerInstance.validateName(rangeQuery);
         });
 

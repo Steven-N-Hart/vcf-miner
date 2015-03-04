@@ -103,6 +103,8 @@
 
     <!-- underscorejs templates -->
 
+    <div id="placeholder-range-query-tab-layout-template"></div>
+
     <script id="login-layout-template" type="text/template">
 
         <div class="container-fluid hero-unit">
@@ -828,9 +830,10 @@
                 <div class="row-fluid"> <!-- tabs -->
                     <div class="span12">
                         <ul class="nav nav-tabs" id="add_filter_tabs">
-                            <li class="active"><a href="#tab_content_info">Info</a></li>
+                            <li class="active"><a href="#tab_content_info">Annotation</a></li>
                             <li><a href="#tab_content_sample">Sample</a></li>
                             <li><a href="#tab_content_custom">Custom</a></li>
+                            <li><a href="#tab_content_range">Range</a></li>
                             <!-- TODO -- DISABLED SUBSET
                             <li><a href="#tab_content_subset">Subset</a></li>
                             -->
@@ -848,6 +851,9 @@
                             </div>
                             <div class="tab-pane" id="tab_content_custom"> <!-- CUSTOM tab -->
                                 <div id="tab_content_custom_region"></div>
+                            </div>
+                            <div class="tab-pane" id="tab_content_range"> <!-- RANGE tab -->
+                                <div id="tab_content_range_region"></div>
                             </div>
                             <!-- TODO -- DISABLED SUBSET
                             <div class="tab-pane" id="tab_content_subset">
@@ -1413,6 +1419,9 @@
     <script src="js/controllers/SettingsController.js"></script>
     <script src="js/controllers/VariantDataController.js"></script>
     <script src="js/controllers/WorkspaceController.js"></script>
+    <script src="js/models/RangeQuery.js"></script>
+    <script src="js/controllers/RangeQueryController.js"></script>
+    <script src="js/views/RangeQueryFilterTabLayout.js"></script>
     <script src="js/MongoApp.js"></script>
 
     <script type="text/javascript">
@@ -1423,6 +1432,15 @@
                 window.location = "not_supported.html"
             }
             else {
+
+                // Load the rangeQueryFilterTab.html file into the "rangeQueryFilterTab" div in the index.html file
+                // NOTE: This MUST be loaded before trying to perform any operations on the div elements in the html!!!!
+                $("#placeholder-range-query-tab-layout-template").load("rangeQueryFilterTab.html", function( response, status, xhr ) {
+                    if ( status == "error" ) {
+                        alert( xhr.status + " " + xhr.statusText );
+                    }
+                });
+
                 <!-- Start Marionette Application -->
                 MongoApp.start();
             }
