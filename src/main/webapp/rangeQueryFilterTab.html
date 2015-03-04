@@ -1,0 +1,178 @@
+
+
+
+<!-- ==============================================================
+    OVERALL layout for the Range Query filter tab.
+    This is called from RangeQueryFilterTabLayout.js
+  =================================================================== -->
+<script id="range-query-tab-layout-template" type="text/template">
+
+  <div id="rangeQueryRegion">
+    <!-- "Create Range Annotation" header -->
+    <div class="row-fluid control-group">
+        <div class="span11"><h3>Create Range Annotation</h3></div>
+    </div>
+
+
+    <!-- "Range Name" row -->
+    <!-- NOTE: When using span#, each span number is a certain percentage of the screen (ex: span1 = 1/12, span2 = 2/12, span3 = 3/12, ... span12 = full width) -->
+    <div class="row-fluid" style="clear: both">
+        <div class="span1" style="width: 100px; float: left">Range Name:</div>
+        <div style="float: left"><input id="range_name_field" name="range_name_field" class="form-control" type="text" placeholder="(Insert range name...)"  style="width: 500px;" /></div>
+        <div id="nameErrorStar" style="float: left; color: red; font-size: 500%; display: none;" title="Error: Name can only contain letters, numbers, and underscores">*</div>
+    </div>
+
+    <!-- "Description" row -->
+    <div class="row-fluid control-group" style="clear: both">
+        <div class="span1" style="width: 100px; float:left;">Description:</div>
+        <div style="float:left;"><input id="range_desc_field" name="range_desc_field" class="form-control" type="text" placeholder="(Description)"  style="width: 500px;" /></div>
+    </div>
+
+
+
+    <!-- "Specify a range" rich-text area (with # errors mentioned below it).  The rich-text area is the "editor" id
+      https://mindmup.github.io/bootstrap-wysiwyg/  -->
+    <div class="row-fluid">Specify a range: &#xa0; &#xa0; <span id="numErrors" title="(Bad ranges are highlighted)">(0 errors)</span></div>
+    <div  class="row-fluid">
+        <!-- First column with rich-text area for ranges entered manually by user -->
+        <div class="span4"  id="editor" placeholder="Ex: 1:100-200"  style="border:1px solid black;  overflow:scroll;   height:200px;   width:300px;"></div>
+        <!-- Second column for example ranges -->
+        <div class="span3">
+            <div class="row-fluid"><strong>Example ranges:</strong></div>
+            <div class="row-fluid">1 100 200</div>
+            <div class="row-fluid">1:100-200</div>
+            <div class="row-fluid">1:100 200</div>
+            <div class="row-fluid">1:100-200  a  b  c  d</div>
+        </div>
+    </div>
+
+    <!-- Error message line below the rich-text area.
+         This will be used to display errors when validating the rich-text area, but then fade out after 5 seconds -->
+    <div class="row-fluid">
+        <span  id="errorMsg"  style="color: red; font-weight: bold"></span>
+    </div>
+
+
+      <!-- Separator row -->
+    <div class="row-fluid">&#xa0;</div>
+
+
+    <!-- "Upload a BED file" -->
+    <div class="row-fluid">Upload a BED file  (extra columns after first 3 are ignored)</div>
+    <div class="row-fluid"><input type="file"  id="bedFileUpload"  name="bedFileUpload" value="Select BED file"></input></div>
+    <br/><br/>
+
+    <!-- Note about where to find new annotation, and the "Create Range Annotation" button -->
+    <div class="row-fluid">
+        <div class="span3"><b>See "Annotation" filter tab once this is imported</b></div>
+        <!-- NOTE: The class name 'uploadRangeQueries' is what ties the button to the event listeners in RangeQueryFilterTabLayout and RangeQueryController
+                   (event setup in RangeQueryFilterTabLayout, caught/listening in RangeQueryController)  -->
+        <div class="span2"><input type="button" value="Create Range Annotation" name="createRangeAnnotationButton" class="uploadRangeQueries"></input></div>
+    </div>
+
+      <!-- Error message for upload problems.
+           This will be used to display errors after clicking the "Create Range Annotation" button, and will fade to 30% opacity after 5 seconds -->
+      <div class="row-fluid">
+          <span  id="errorMsgAfterUpload"  style="color: red; font-weight: bold"></span>
+      </div>
+
+  </div>
+</script>
+
+
+
+<!-- ======================================================================
+    Rich-text area for list of ranges
+    https://mindmup.github.io/bootstrap-wysiwyg/
+=========================================================================== -->
+<!--
+<script id="rangeQueryTextArea" type="text/template">
+<div class="btn-toolbar" data-role="editor-toolbar" data-target="#editor">
+  <div class="btn-group">
+      <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font"><i class="icon-font"></i><b class="caret"></b></a>
+      <ul class="dropdown-menu">
+      </ul>
+  </div>
+  <div class="btn-group">
+      <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font Size"><i class="icon-text-height"></i>&#xa0;<b class="caret"></b></a>
+      <ul class="dropdown-menu">
+          <li><a data-edit="fontSize 5"><font size="5">Huge</font></a></li>
+          <li><a data-edit="fontSize 3"><font size="3">Normal</font></a></li>
+          <li><a data-edit="fontSize 1"><font size="1">Small</font></a></li>
+      </ul>
+  </div>
+  <div class="btn-group">
+      <a class="btn" data-edit="bold" title="Bold (Ctrl/Cmd+B)"><i class="icon-bold"></i></a>
+      <a class="btn" data-edit="italic" title="Italic (Ctrl/Cmd+I)"><i class="icon-italic"></i></a>
+      <a class="btn" data-edit="strikethrough" title="Strikethrough"><i class="icon-strikethrough"></i></a>
+      <a class="btn" data-edit="underline" title="Underline (Ctrl/Cmd+U)"><i class="icon-underline"></i></a>
+  </div>
+  <div class="btn-group">
+      <a class="btn" data-edit="insertunorderedlist" title="Bullet list"><i class="icon-list-ul"></i></a>
+      <a class="btn" data-edit="insertorderedlist" title="Number list"><i class="icon-list-ol"></i></a>
+      <a class="btn" data-edit="outdent" title="Reduce indent (Shift+Tab)"><i class="icon-indent-left"></i></a>
+      <a class="btn" data-edit="indent" title="Indent (Tab)"><i class="icon-indent-right"></i></a>
+  </div>
+  <div class="btn-group">
+      <a class="btn" data-edit="justifyleft" title="Align Left (Ctrl/Cmd+L)"><i class="icon-align-left"></i></a>
+      <a class="btn" data-edit="justifycenter" title="Center (Ctrl/Cmd+E)"><i class="icon-align-center"></i></a>
+      <a class="btn" data-edit="justifyright" title="Align Right (Ctrl/Cmd+R)"><i class="icon-align-right"></i></a>
+      <a class="btn" data-edit="justifyfull" title="Justify (Ctrl/Cmd+J)"><i class="icon-align-justify"></i></a>
+  </div>
+  <div class="btn-group">
+      <a class="btn dropdown-toggle" data-toggle="dropdown" title="Hyperlink"><i class="icon-link"></i></a>
+      <div class="dropdown-menu input-append">
+          <input class="span2" placeholder="URL" type="text" data-edit="createLink"/>
+          <button class="btn" type="button">Add</button>
+      </div>
+      <a class="btn" data-edit="unlink" title="Remove Hyperlink"><i class="icon-cut"></i></a>
+
+  </div>
+
+  <div class="btn-group">
+      <a class="btn" title="Insert picture (or just drag & drop)" id="pictureBtn"><i class="icon-picture"></i></a>
+      <input type="file" data-role="magic-overlay" data-target="#pictureBtn" data-edit="insertImage" />
+  </div>
+  <div class="btn-group">
+      <a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)"><i class="icon-undo"></i></a>
+      <a class="btn" data-edit="redo" title="Redo (Ctrl/Cmd+Y)"><i class="icon-repeat"></i></a>
+  </div>
+  <input type="text" data-edit="inserttext" id="voiceBtn" x-webkit-speech="">
+</div>
+</script>
+-->
+
+
+
+<!-- STATIC HTML LAYOUT BELOW FOR VISUAL ALIGNMENT -->
+
+<!--
+<hr/>
+<h1 id="XSplit">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</h1>
+(Static html area below)
+<hr/>
+
+<table>
+    <tr><td rowspan="100" width="20"></td></tr>
+    <tr><td colspan="2">Create Range Annotation</td></tr>
+    <tr><td>Range Name: <input type="text"></td></tr>
+    <tr><td>Specify a range:</td></tr>
+    <tr><td><textarea rows=8 cols=50>
+Examples:
+17 100 200
+17:100-200
+17 100-200
+17  100 200
+        </textarea></td></tr>
+    <tr><td>3 errors  (Bad ranges are highlighted)</td></tr>
+    <tr><td height="20"></td></d></tr>
+    <form method="post" action="file-upload-1.htm" name="submit" enctype="multipart/form-data">
+      <tr><td colspan="2">Upload a bed file  (Example line: 17 100 200) (Extra columns after 3 are ignored)</td></tr>
+      <tr><td><input type="file" name="bedFileUpload" value="Select BED file"></td></tr>
+    </form>
+    <tr><td height="20"></td></tr>
+    <tr><td><b>See "Annotation" filter tab once this is imported</b></td><td align="right"><input type="button" value="Create Range Annotation"></td></tr>
+    <tr><td height="20"></td></tr>
+</table>
+-->
+
