@@ -14,8 +14,8 @@ var RangeQuery = Backbone.Model.extend({
             /** User-entered range queries in the rich-text area */
             ranges: null,
 
-            /** Filename to upload as a set of ranges */
-            filename: null
+            /** File object to upload as a set of ranges */
+            file: null
         };
     }
 });

@@ -84,7 +84,9 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
      *  NOTE: This triggers a call to the function "uploadRangeQueries" in RangeQueryController
      */
     uploadRangeQueries: function(event) {
-        // TODO: replace TestApplication at integration time
+        // TODO:  Create a rangeQuery from the fields using jQuery selections.  Use this until bindings are working.
+        this.rangeQuery = this.createRangeQueryFromFields();
+
         // If the event mentioned above that is tied to the "Create Range Annotation" button is triggered,
         //     then trigger the RangeQueryController.uploadRangeQueries() function
         MongoApp.vent.trigger("uploadRangeQueries", this.rangeQuery);
@@ -100,7 +102,32 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         // Trigger event when text changes in the "Name" textfield.
         // Call RangeQueryController.validateName() function
         MongoApp.vent.trigger("validateName", this.rangeQuery);
-    }
+    },
 
+    // TEMP:  Create a rangeQuery from the fields using jQuery selections.  Use this until bindings are working.
+    createRangeQueryFromFields : function() {
+        var rangeQuery = new RangeQuery({
+            name : $("#range_name_field").val(),
+            description : $("#range_desc_field").val(),
+            ranges : this.removeTags($("#editor").html()),
+            file : $('#bedFileUpload')[0].files[0]
+        } );
+        return rangeQuery;
+    },
+
+    // Given a string, remove all the tags that cause highlighting on rows with errors (font, bold and italics opening and closing tags)
+    removeTags : function(txt) {
+        // Remove opening tags: font, bold, italics
+        var t1 = txt.replace(/<font color="red"><b><i>/g,  "");
+        // Remove closing tags: italics, bold, font
+        var t2 = t1.replace(/<\/i><\/b><\/font>/g, "");
+        // Remove non-breaking spaces
+        var t3 = t2.replace(/&nbsp;/g, "");
+        // Remove line breaks by replacing with newlines
+        var t4 = t3.replace(/<br>/g,  "\n");
+
+        return t4;
+        //return txt.split("<font color='red'><b><i>").join().split("</i></b></font>").join();
+    }
 });
 

@@ -93,22 +93,8 @@ var RangeQueryController = Backbone.Marionette.Controller.extend({
         var isNameOk = this.validateName(rangeQuery);
 
         if (numErrors == 0  &&  isNameOk) {
-            // TEMP:  Create a rangeQuery from the fields using jQuery selections.  Use this until bindings are working.
-            rangeQuery = this.createRangeQueryFromFields();
             this.uploadRanges(rangeQuery);
         }
-    },
-
-
-    // TEMP:  Create a rangeQuery from the fields using jQuery selections.  Use this until bindings are working.
-    createRangeQueryFromFields : function() {
-        var rangeQuery = new RangeQuery({
-            name : $("#range_name_field").val(),
-            description : $("#range_desc_field").val(),
-            ranges : this.removeTags($("#editor").html()),
-            filename : $("#bedFileUpload").val()
-            } );
-        return rangeQuery;
     },
 
     /* VAlidate the rich-text field range queries, and return number of errors */
@@ -204,40 +190,34 @@ var RangeQueryController = Backbone.Marionette.Controller.extend({
 
     // Upload the ranges to the server and get a response.  If error, then display an error in the message line
     uploadRanges : function(rangeQuery) {
-        // REST call to upload ranges:
-        var urlStr   = "/mongosvr/ve/rangeSet/workspace/" + rangeQuery.workspaceKey + "/name/" + rangeQuery.rangeQueryName;
-        var dataJson = {
-            workspace:              rangeQuery.workspaceKey,
-            name:                   rangeQuery.rangeQueryName,
-            intervalDescription:    rangeQuery.rangeQueryDescription,
-            rangeSetText:           rangeQuery.rangeQueryText,
-            rangeBedFilename:       rangeQuery.rangeBedFilename
+
+        var xhr = new XMLHttpRequest();
+
+        xhr.open('POST', "/mongo_svr/ve/rangeSet/workspace/" + MongoApp.workspace.get("key"), true);
+
+        xhr.onload = function(oEvent) {
+            if (xhr.status == 200) {
+                console.log("Uploaded!");
+
+                // TODO:
+
+            } else {
+                console.log("Error " + xhr.status + " occurred uploading file");
+                genericAJAXErrorHandler(xhr);
+
+                // If there were errors, then show them in the error dialog
+                if( errorMsg != "" )
+                    this.showErrorMsg("Error uploading ranges: " + errorMsg);
+            }
         };
 
-        // Perform a *synchronous* call and get response
-        var errorMsg = "";
-        $.ajax({
-            type:   "POST",
-            url:    urlStr,
-            data:   dataJson,
-            dataType: "json",
+        var formData = new FormData;
+        formData.append('name',                rangeQuery.get("name"));
+        formData.append('intervalDescription', rangeQuery.get("description"));
+        formData.append('rangeSetText',        rangeQuery.get("ranges"));
+        formData.append('file',                rangeQuery.get("file"));
 
-            success: function(jsonResponse) {
-                // TODO: Change all this
-                try {
-                    console.log("Returned json response.  Check for any errors from server validation and processing");
-                } catch (exception) {
-                    console.log("Failed to upload range queries");
-                    jqueryAJAXErrorHandler(exception.jqXHR, exception.textStatus, exception.errorThrown);
-                    MongoApp.dispatcher.trigger(MongoApp.events.METADATA_FIELDS_RETRIEVAL_FAILED);
-                }
-            },
-            error: jqueryAJAXErrorHandler
-         });
-
-        // If there were errors, then show them in the error dialog
-        if( errorMsg != "" )
-            showErrorMsg("Error uploading ranges: " + errorMsg);
+        xhr.send(formData);
     },
 
 
