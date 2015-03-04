@@ -40,7 +40,7 @@ public class RangeQueryInterface {
      * @throws Exception
      */
     @POST
-    @Path("/workspace/{workspace}/name/{name}")
+    @Path("/workspace/{workspace}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadFile(
             @PathParam("workspace") String workspace,
@@ -51,7 +51,11 @@ public class RangeQueryInterface {
     ) throws Exception {
         String response = "Workspace: " + workspace + " " + "name: " + intervalsName + " intervalDescription: " + intervalDescription + "\n rangeSetText: " + rangeSets + "\n";
         //validate the interval name (e.g. can't have period or other funky characters, can't already be used)
-        String name = validate(intervalsName, workspace);
+
+        // TODO: this is not working
+        //String name = validate(intervalsName, workspace);
+        String name = intervalsName;
+
         //copy the contents of the input stream to a temp file, this will allow us to validate that all of the intervals in the file are correctly formed.
         String uploadedFileLocation = getUploadFileLocation(workspace, name);
         File outputFile = new File(uploadedFileLocation);
