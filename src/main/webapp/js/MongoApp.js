@@ -169,9 +169,11 @@ MongoApp.addInitializer(function () {
 
     // Wire Marionette events to function callbacks
     this.listenTo(MongoApp.dispatcher, MongoApp.events.ERROR, function (errorMessage) {
-        // show error message in new browser window
-        var ERROR_TEMPLATE = $("#error-message-template").html();
-        window.open().document.write(_.template(ERROR_TEMPLATE, {message: errorMessage}))
+
+        $('#error_message_container').html(errorMessage);
+        $('#error_modal').modal();
+
+        console.log(errorMessage);
     });
 
     this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_LOAD, function (newWorkspace, search) {

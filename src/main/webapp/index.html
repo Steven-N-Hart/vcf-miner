@@ -1140,12 +1140,6 @@
         </div>
     </script>
 
-    <script id="error-message-template" type="text/template">
-        <div class="alert alert-error">
-            <%=message%>
-        </div>
-    </script>
-
     <!-------------------------------------------------------------------------
         Overall layout for the subset tab.
     -------------------------------------------------------------------------->
@@ -1592,6 +1586,23 @@
         <h3>Running Filters.  Please wait...</h3>
     </div>
     <div class="modal-body"></div>
+</div>
+
+<!-- Modal -->
+<div id="error_modal" data-backdrop="static" class="modal wide-modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-header">
+        <h3>Error</h3>
+    </div>
+    <div class="modal-body">
+        <div class="pre-scrollable">
+            <div id="error_message_container">
+                <!-- added by javascript -->
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
 </div>
 
 </html>

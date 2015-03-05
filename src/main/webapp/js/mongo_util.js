@@ -185,8 +185,25 @@ function genericAJAXErrorHandler(xmlHttpRequest) {
 
     } else {
 
-        MongoApp.dispatcher.trigger(MongoApp.events.ERROR, xmlHttpRequest.responseText);
+        var originalErrorText = xmlHttpRequest.responseText;
 
+        // defaults to original error text
+        var errorText = originalErrorText;
+
+        // If we're dealing with an HTML page, pull out content inside <body> ... </body> tags
+        var beginBodyTag = originalErrorText.indexOf('<body>');
+        var endBodyTag   = originalErrorText.indexOf('</body>');
+        if ((beginBodyTag != -1) && (endBodyTag != -1)) {
+            errorText = originalErrorText.substring(beginBodyTag + '<body>'.length, endBodyTag);
+
+            // replace <h1> tags with bootstrap <strong>
+            errorText = errorText.replace('<h1>', '<strong>');
+            errorText = errorText.replace('<H1>', '<strong>');
+            errorText = errorText.replace('</h1>', '</strong>');
+            errorText = errorText.replace('</H1>', '</strong>');
+        }
+
+        MongoApp.dispatcher.trigger(MongoApp.events.ERROR, errorText);
     }
 }
 
