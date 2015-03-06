@@ -88,9 +88,37 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
             //     then trigger the RangeQueryController.uploadRangeQueries() function
             MongoApp.vent.trigger("uploadRangeQueries", this.rangeQuery);
 
+            // interactive - automatically add a new filter for this new range INFO FLAG field
+            this.addNewBooleanFilter(this.rangeQuery.get("name"));
+
             // signal back to the parent dialog that we're done
             this.eventAggregator.trigger("tabFinished");
         }
+    },
+
+    /**
+     *
+     * @param infoFieldName
+     */
+    addNewBooleanFilter: function(infoFieldName) {
+        // refresh everything about the current workspace to pick up the new INFO metadata
+        MongoApp.vent.trigger(MongoApp.events.WKSP_REFRESH, MongoApp.workspace.get("key"));
+
+        var filter = new Filter();
+        filter.set("name",     infoFieldName);
+        filter.set("description", ""); // TODO:
+        filter.set("operator", FilterOperator.EQ);
+        filter.set("category", FilterCategory.INFO_FLAG);
+        filter.set("value",    true);
+        filter.setFilterDisplay();
+
+        var newFilterStep = new FilterStep();
+        newFilterStep.get("filters").add(filter);
+
+        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_STEP_ADD, newFilterStep);
+
+        var async = true; // asynchronous is TRUE so that the UI can nicely show the "please wait" dialog
+        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_CHANGED, MongoApp.search, async);
     },
 
     // TEMP:  Create a rangeQuery from the fields using jQuery selections.  Use this until bindings are working.

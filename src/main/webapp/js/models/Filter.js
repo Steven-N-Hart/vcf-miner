@@ -444,7 +444,7 @@ var Filter = Backbone.Model.extend({
             displayValue:    "NA", // may be abbreviated
             category:        FilterCategory.UNKNOWN,
             id:              guid(),
-            includeNulls:    false,
+            includeNulls:    false
         };
     }
 });

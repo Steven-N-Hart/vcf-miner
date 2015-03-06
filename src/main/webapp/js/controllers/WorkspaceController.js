@@ -30,6 +30,9 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_GROUP_CREATE, function (group, workspace) {
             self.createSampleGroup(group, workspace);
         });
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_REFRESH, function (workspaceKey) {
+            self.refreshWorkspace(workspaceKey);
+        });
 
         // automatic polling to update "not ready" workspaces
         var TIMER_INTERVAL = 10000; // 10 seconds
@@ -132,6 +135,34 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         this.workspaceGroupLayout.disableDropdown();
         this.refreshAllWorkspaces();
         this.workspaceGroupLayout.enableDropdown();
+    },
+
+    /**
+     * Refreshes a specific {@link Workspace} model by querying the server.
+     *
+     * NOTE: this is synchronous
+     *
+     * @param workspaceKey
+     */
+    refreshWorkspace: function(workspaceKey) {
+
+        console.log("refreshing workspace " + workspaceKey);
+
+        var ws = this.workspaces.findWhere({key: workspaceKey});
+
+        // get workspace information from server
+        var self = this;
+        $.ajax({
+            url: "/mongo_svr/ve//document/find/" + workspaceKey,
+            dataType: "json",
+            async: false,
+            success: function(workspaceJSON) {
+
+                self.initWorkspace(workspaceJSON, ws);
+
+            },
+            error: jqueryAJAXErrorHandler
+        });
     },
 
     /**

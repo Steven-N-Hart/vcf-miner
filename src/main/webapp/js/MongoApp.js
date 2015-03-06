@@ -48,6 +48,9 @@ MongoApp.addInitializer(function () {
         // User is choosing a different workspace
         WKSP_LOAD: 'workspaceLoad',
 
+        // Refresh the currently loaded workspace information (param=workspaceKey)
+        WKSP_REFRESH: 'workspaceRefresh',
+
         // current Workspace model has been changed
         WKSP_CHANGE: 'workspaceChange',
 
