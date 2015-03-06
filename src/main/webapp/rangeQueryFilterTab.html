@@ -62,14 +62,6 @@
     <div class="row-fluid"><input type="file"  id="bedFileUpload"  name="bedFileUpload" value="Select BED file"></div>
     <br/><br/>
 
-    <!-- Note about where to find new annotation, and the "Create Range Annotation" button -->
-    <div class="row-fluid">
-        <div class="span3"><b>See "Annotation" filter tab once this is imported</b></div>
-        <!-- NOTE: The class name 'uploadRangeQueries' is what ties the button to the event listeners in RangeQueryFilterTabLayout and RangeQueryController
-                   (event setup in RangeQueryFilterTabLayout, caught/listening in RangeQueryController)  -->
-        <div class="span2"><input type="button" value="Create Range Annotation" name="createRangeAnnotationButton" class="uploadRangeQueries"></div>
-    </div>
-
       <!-- Error message for upload problems.
            This will be used to display errors after clicking the "Create Range Annotation" button, and will fade to 30% opacity after 5 seconds -->
       <div class="row-fluid">

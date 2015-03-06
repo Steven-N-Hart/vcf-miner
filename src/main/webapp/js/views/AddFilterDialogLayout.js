@@ -1,5 +1,11 @@
 AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
 
+    /**
+     * Marionette EventAggregate for communicating from the parent modal dialog
+     * to the children tabs.
+     */
+    eventAggregator: new Backbone.Wreqr.EventAggregator(),
+
     template: "#add-filter-dialog-layout-template",
 
     regions: {
@@ -17,6 +23,7 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
         "click #run_filter" : "addFilter",
         "click #run_combo_filter" : "runComboFilter",
         "click #add_another_filter" : "addAnother",
+        "click #createRangeAnnotation": "createRangeAnnotation",
         "click .cancel" : "cancelComboFilter",
         "keypress #add_filter_modal form" : "formKeyPress"
     },
@@ -24,6 +31,17 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
     showTab: function(e) {
         e.preventDefault();
         $(e.currentTarget).tab('show');
+
+        var tabId = $(e.currentTarget).attr("href").split("#")[1];
+
+        // based on which tab is selected, show the correct action buttons
+        if (tabId == 'tab_content_range') {
+            $('#filterActionButtons').hide();
+            $('#rangeActionButtons').show();
+        } else {
+            $('#filterActionButtons').show();
+            $('#rangeActionButtons').hide();
+        }
     },
 
     formKeyPress: function(e) {
@@ -41,10 +59,15 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
      */
     initialize: function() {
 
+        var that = this;
+        this.eventAggregator.on("tabFinished", function(){
+            that.close();
+        });
+
         this.sampleFilterTabLayout = new SampleFilterTabLayout();
         this.infoFilterTabLayout = new InfoFilterTabLayout();
         this.customFilterTabLayout = new CustomFilterTabLayout();
-        this.rangeFilterTabLayout = new RangeQueryFilterTabLayout();
+        this.rangeFilterTabLayout = new RangeQueryFilterTabLayout({eventAggregator: this.eventAggregator});
 
         var workspaceKey = "ws01";
         var userToken = "aaa:bbb";
@@ -78,6 +101,9 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
 
         // show modal dialog
         this.$el.parents('.modal').modal();
+
+        // by default, have the Annotation (INFO) tab selected
+        this.$el.find('a[href="#tab_content_info"]').click();
     },
 
     /**
@@ -187,5 +213,9 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
 
     onClose: function() {
         this.$el.parents('.modal').modal('hide');
+    },
+
+    createRangeAnnotation: function() {
+        this.eventAggregator.trigger("createRangeAnnotation");
     }
 });

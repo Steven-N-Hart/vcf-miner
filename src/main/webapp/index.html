@@ -830,7 +830,7 @@
                 <div class="row-fluid"> <!-- tabs -->
                     <div class="span12">
                         <ul class="nav nav-tabs" id="add_filter_tabs">
-                            <li class="active"><a href="#tab_content_info">Annotation</a></li>
+                            <li><a href="#tab_content_info">Annotation</a></li>
                             <li><a href="#tab_content_sample">Sample</a></li>
                             <li><a href="#tab_content_custom">Custom</a></li>
                             <li><a href="#tab_content_range">Range</a></li>
@@ -866,9 +866,13 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-primary" aria-hidden="true" id="run_filter">Run Filter</button>
-            <button class="btn btn-primary hide" aria-hidden="true" id="run_combo_filter">Run Filter(s)</button>
-            <button class="btn" aria-hidden="true" id="add_another_filter">Add Another Filter</button>
+            <div id="filterActionButtons" style="display:inline;">
+                <button class="btn btn-primary" aria-hidden="true" id="run_filter">Run Filter</button>
+                <button class="btn" aria-hidden="true" id="add_another_filter">Add Another Filter</button>
+            </div>
+            <div id="rangeActionButtons" style="display:inline;">
+                <button class="btn btn-primary" aria-hidden="true" id="createRangeAnnotation">Create Range Annotation</button>
+            </div>
             <button class="btn cancel" aria-hidden="true" id="add_filter_close">Cancel</button>
         </div>
     </script>

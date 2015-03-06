@@ -21,10 +21,6 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
     },
 
     events: {
-        // The class defined in the button element in the html is linked to the event listener here as ".uploadRangeQueries"
-        // (calls the function within this class which in turns calls the function within RangeQueryController (thru TestApplication)
-        "click .uploadRangeQueries" : "createRangeAnnotation",
-
         // Validate the ranges when the text field loses focus
         // (calls the function within this class which in turns calls the function within RangeQueryController (thru TestApplication)
         "blur  #editor" : "validateRangeQueries",
@@ -54,7 +50,14 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
      * Called when the view is first created
      */
     initialize: function(options) {
-        this.rangeQuery = options.rangeQuery;
+
+        this.eventAggregator = options.eventAggregator;
+
+        var that = this;
+
+        this.eventAggregator.on("createRangeAnnotation", function(){
+            that.createRangeAnnotation();
+        });
     },
 
     // This is called by RangeQueryController.js to show the regions that are created in the initialize() method above
@@ -75,10 +78,7 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
 
     },
 
-    /** "Upload Range Query"  button event
-     *  NOTE: This triggers a call to the function "uploadRangeQueries" in RangeQueryController
-     */
-    createRangeAnnotation: function(event) {
+    createRangeAnnotation: function() {
 
         if (this.isAllValid()) {
             // TODO:  Create a rangeQuery from the fields using jQuery selections.  Use this until bindings are working.
@@ -87,6 +87,9 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
             // If the event mentioned above that is tied to the "Create Range Annotation" button is triggered,
             //     then trigger the RangeQueryController.uploadRangeQueries() function
             MongoApp.vent.trigger("uploadRangeQueries", this.rangeQuery);
+
+            // signal back to the parent dialog that we're done
+            this.eventAggregator.trigger("tabFinished");
         }
     },
 
