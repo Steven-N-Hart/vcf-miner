@@ -59,7 +59,7 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
     },
 
     /**
-     * Translates the given workspace model object into an aaDataRow expected by the DataTables widget.
+     * Translates the given workspaceKey model object into an aaDataRow expected by the DataTables widget.
      *
      * @param workspace
      */
@@ -147,7 +147,7 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
     },
 
     /**
-     * Gets human readable display status for the given workspace.
+     * Gets human readable display status for the given workspaceKey.
      *
      * @param workspace
      * @returns {string}

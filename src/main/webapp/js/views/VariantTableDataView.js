@@ -187,6 +187,6 @@ VariantTableDataView = Backbone.Marionette.Layout.extend({
     },
 
     download: function() {
-        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_DOWNLOAD, MongoApp.workspace, MongoApp.search);
+        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_DOWNLOAD, MongoApp.workspaceKey, MongoApp.search);
     }
 });

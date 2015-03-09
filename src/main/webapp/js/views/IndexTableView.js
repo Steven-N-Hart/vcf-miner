@@ -15,7 +15,7 @@ var IndexTableView = Backbone.View.extend({
      *
      * custom option: fnSetWorkspaceCallback
      *      Function callback that takes a Workspace as a parameter.  This function is called
-     *      when the user changes the workspace.     */
+     *      when the user changes the workspaceKey.     */
     initialize: function(options)
     {
         this.table_uid = "index_table_" + guid();

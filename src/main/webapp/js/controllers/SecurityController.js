@@ -337,12 +337,12 @@ SecurityController = Backbone.Marionette.Controller.extend({
     },
 
     /**
-     * Gets workspace keys authorized to the specified group.
+     * Gets workspaceKey keys authorized to the specified group.
      *
      * @param userGroup
      *
      * @return
-     *      An {@link Array} of strings, each string representing a workspace key.
+     *      An {@link Array} of strings, each string representing a workspaceKey key.
      *
      * @throws AJAXRequestException
      */

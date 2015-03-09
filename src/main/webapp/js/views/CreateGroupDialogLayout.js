@@ -24,7 +24,7 @@ CreateGroupDialogLayout = Backbone.Marionette.Layout.extend({
      * Called when the view is first created
      */
     initialize: function() {
-        var workspace = MongoApp.workspace;
+        var workspace = MongoApp.workspaceController.getWorkspace(MongoApp.workspaceKey);
         this.workspaceKey   = workspace.get("key");
         this.allSampleNames = workspace.get("sampleNames");
         this.sampleGroups   = workspace.get("sampleGroups");
@@ -112,7 +112,7 @@ CreateGroupDialogLayout = Backbone.Marionette.Layout.extend({
         var sampleNames = $.map(this.ui.groupSamplesList.find('option'), function(e) { return e.value; });
         group.set("sampleNames", sampleNames);
 
-        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_GROUP_CREATE, group, MongoApp.workspace);
+        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_GROUP_CREATE, group, MongoApp.workspaceKey);
     },
 
     addSamples: function() {

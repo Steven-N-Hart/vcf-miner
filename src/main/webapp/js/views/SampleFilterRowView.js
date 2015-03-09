@@ -371,7 +371,7 @@ SampleFilterRowView = Backbone.Marionette.ItemView.extend({
     },
     removeFilter: function(event) {
         // fire event that this model should be removed
-        MongoApp.vent.trigger("removeFilterComponentComponent", this.model);
+        MongoApp.dispatcher.trigger("removeFilterComponentComponent", this.model);
     },
 
     updateAddFilterVisibility: function() {

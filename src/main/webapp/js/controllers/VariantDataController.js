@@ -22,11 +22,11 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_CHANGED, function (search, async) {
             self.changedSearch(search, async);
         });
-        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspace) {
-            self.changeWorkspace(workspace);
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspaceKey) {
+            self.changeWorkspace(workspaceKey);
         });
-        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_DOWNLOAD, function (workspace, search) {
-            self.download(workspace, search);
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_DOWNLOAD, function (workspaceKey, search) {
+            self.download(workspaceKey, search);
         });
     },
 
@@ -44,21 +44,21 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
     },
 
     changedSearch: function (search, async) {
-        this.refreshData(MongoApp.workspace, search, async);
+        this.refreshData(MongoApp.workspaceKey, search, async);
     },
 
     /**
      * Uses the current Search model and re-executes a server-side query to get the latest
      * VCF data.
      *
-     * @param workspace
+     * @param workspaceKey
      * @param search
      * @param async
      *      Determines whether this is executed asynchronously or not.
      */
-    refreshData: function(workspace, search, async) {
+    refreshData: function(workspaceKey, search, async) {
         // send query request to server
-        var query = buildQuery(search.get("filterSteps"), workspace.get("key"));
+        var query = buildQuery(search.get("filterSteps"), workspaceKey);
         this.sendQuery(query, async);
     },
 
@@ -167,12 +167,14 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
     },
 
     /**
-     * Updates models based on the workspace selection changing.
+     * Updates models based on the workspaceKey selection changing.
      *
-     * @param workspace
+     * @param workspaceKey
      */
-    changeWorkspace: function(workspace)
+    changeWorkspace: function(workspaceKey)
     {
+        var workspace = MongoApp.workspaceController.getWorkspace(workspaceKey);
+
         var self = this;
 
         this.varTableCols.reset();
@@ -201,10 +203,10 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
     /**
      * Downloads data in TSV format for the given query and selected columns.
      */
-    download: function(workspace, search)
+    download: function(workspaceKey, search)
     {
         // send query request to server
-        var query = buildQuery(search.get("filterSteps"), workspace.get("key"));
+        var query = buildQuery(search.get("filterSteps"), workspaceKey);
 
         var returnFields = new Array();
         var displayFields = new Array();

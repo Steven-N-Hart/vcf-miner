@@ -15,8 +15,8 @@ SampleFilterTabLayout = Backbone.Marionette.Layout.extend({
 
         // register for Marionette events
         this.stopListening();
-        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspace) {
-            self.initWorkspace(workspace);
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspaceKey) {
+            self.initWorkspace(workspaceKey);
         });
 
         // jQuery validate plugin config
@@ -37,7 +37,10 @@ SampleFilterTabLayout = Backbone.Marionette.Layout.extend({
         );
     },
 
-    initWorkspace: function(workspace) {
+    initWorkspace: function(workspaceKey) {
+
+        var workspace = MongoApp.workspaceController.getWorkspace(workspaceKey);
+
         var self = this;
 
         // remember what the user has selected
@@ -77,7 +80,7 @@ SampleFilterTabLayout = Backbone.Marionette.Layout.extend({
     },
     
     onShow: function() {
-        this.initWorkspace(MongoApp.workspace);
+        this.initWorkspace(MongoApp.workspaceKey);
 
         <!-- sub-view that renders available filters in a dropdown choicebox -->
         var ListView = Backbone.View.extend({

@@ -79,10 +79,10 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
 //        var options = {
 //            workspaceKey:       workspaceKey,
 //            userToken:          userToken,
-//            metadataFieldList:  MongoApp.workspace.get("sampleMetaFields"),
+//            metadataFieldList:  MongoApp.workspaceKey.get("sampleMetaFields"),
 //            sampleFilterList:   sampleFilterList,
-//            sampleList:         MongoApp.workspace.get("samples"),
-//            sampleSubsetList:   MongoApp.workspace.get("samples").clone() // Initially, make the sampleFilteredList contain the same samples as sampleList
+//            sampleList:         MongoApp.workspaceKey.get("samples"),
+//            sampleSubsetList:   MongoApp.workspaceKey.get("samples").clone() // Initially, make the sampleFilteredList contain the same samples as sampleList
 //        };
 //
 //        // instantiate a new controller

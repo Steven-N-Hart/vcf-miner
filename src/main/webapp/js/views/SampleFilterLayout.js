@@ -43,7 +43,7 @@ SampleFilterLayout = Backbone.Marionette.Layout.extend({
      *  NOTE: This triggers a call to the function "addFilterStep" in SubsetController
      */
     addFilterClicked: function() {
-        MongoApp.vent.trigger("addFilterComponentComponent");
+        MongoApp.dispatcher.trigger("addFilterComponentComponent");
     },
 
     /**
@@ -51,6 +51,6 @@ SampleFilterLayout = Backbone.Marionette.Layout.extend({
      *  NOTE: This triggers a call to the function "applyFilters" in SubsetController
      */
     applyClicked: function() {
-        MongoApp.vent.trigger("applyFilters");
+        MongoApp.dispatcher.trigger("applyFilters");
     }
 });

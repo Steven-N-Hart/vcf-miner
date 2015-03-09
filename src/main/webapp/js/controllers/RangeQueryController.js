@@ -22,7 +22,7 @@ var RangeQueryController = Backbone.Marionette.Controller.extend({
 
         // The event mentioned in RangeQueryFilterTabLayout will trigger this listener,
         // and thus call the uploadRangeQueries() function
-        MongoApp.vent.on("uploadRangeQueries", function (rangeQuery) {
+        MongoApp.dispatcher.on("uploadRangeQueries", function (rangeQuery) {
             rangeQueryControllerInstance.uploadRanges(rangeQuery);
         });
     },
@@ -37,7 +37,8 @@ var RangeQueryController = Backbone.Marionette.Controller.extend({
 
         var xhr = new XMLHttpRequest();
 
-        xhr.open('POST', "/mongo_svr/ve/rangeSet/workspace/" + MongoApp.workspace.get("key"), true);
+        var async = false;
+        xhr.open('POST', "/mongo_svr/ve/rangeSet/workspace/" + MongoApp.workspaceKey, async);
 
         xhr.onload = function(oEvent) {
             if (xhr.status == 200) {

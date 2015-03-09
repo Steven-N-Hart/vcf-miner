@@ -62,7 +62,7 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
         var workspaces = this.collection;
         var workspace = workspaces.findWhere({key: workspaceKey});
 
-        // TODO: enhance to be the 'default' search for the workspace
+        // TODO: enhance to be the 'default' search for the workspaceKey
         var search;
         if (searchID == undefined) {
             // default is a blank search
@@ -77,7 +77,7 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
         // Trigger event is fired in separate timer so that the analyze() function can complete immediately
         // This has the desired effect of the dropdown closing and the please wait dialog showing right away
         setTimeout(function() {
-            MongoApp.dispatcher.trigger(MongoApp.events.WKSP_LOAD, workspace, search);
+            MongoApp.dispatcher.trigger(MongoApp.events.WKSP_LOAD, workspace.get("key"), search);
         }, 0);
 
     },
@@ -94,7 +94,7 @@ WorkspaceTableView = Backbone.Marionette.CompositeView.extend({
             "Delete " + workspace.get('alias') + "?",
             "Delete",
             function() {
-                MongoApp.dispatcher.trigger(MongoApp.events.WKSP_REMOVE, workspace);
+                MongoApp.dispatcher.trigger(MongoApp.events.WKSP_REMOVE, workspaceKey);
             }
         );
         confirmDialog.show();

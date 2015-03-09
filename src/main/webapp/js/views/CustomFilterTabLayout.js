@@ -32,9 +32,10 @@ CustomFilterTabLayout = Backbone.Marionette.Layout.extend({
         this.stopListening();
 
         // synchronize local sampleGroups when a model gets added
-        this.listenTo(MongoApp.workspace.get("sampleGroups"), "add", self.sampleGroupAdded);
+        var workspace = MongoApp.workspaceController.getWorkspace(MongoApp.workspaceKey);
+        this.listenTo(workspace.get("sampleGroups"), "add", self.sampleGroupAdded);
 
-        this.initWorkspace(MongoApp.workspace);
+        this.initWorkspace(MongoApp.workspaceKey);
 
         // add custom validation method for the group drowdown to make sure a group
         // is selected
@@ -51,8 +52,8 @@ CustomFilterTabLayout = Backbone.Marionette.Layout.extend({
         }, "A group must be selected.");
     },
 
-    initWorkspace: function(workspace) {
-        this.resetSampleGroups(workspace);
+    initWorkspace: function(workspaceKey) {
+        this.resetSampleGroups(workspaceKey);
         this.resetFilters();
     },
 
@@ -83,10 +84,10 @@ CustomFilterTabLayout = Backbone.Marionette.Layout.extend({
         this.sampleGroups.add(sampleGroup);
     },
 
-    resetSampleGroups: function(workspace) {
+    resetSampleGroups: function(workspaceKey) {
 
         var self = this;
-
+        var workspace = MongoApp.workspaceController.getWorkspace(workspaceKey);
         this.sampleGroups.reset();
         _.each(workspace.get("sampleGroups").models, function(group) {
             self.sampleGroups.add(group);
@@ -95,7 +96,7 @@ CustomFilterTabLayout = Backbone.Marionette.Layout.extend({
     
     onShow: function() {
 
-        this.initWorkspace(MongoApp.workspace);
+        this.initWorkspace(MongoApp.workspaceKey);
 
         var self = this;
 

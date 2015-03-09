@@ -45,25 +45,25 @@ MongoApp.addInitializer(function () {
         // user's session has expired
         SESSION_EXPIRED: 'sessionExpired',
 
-        // User is choosing a different workspace
+        // User is choosing a different workspace to be analyzed
         WKSP_LOAD: 'workspaceLoad',
 
-        // Refresh the currently loaded workspace information (param=workspaceKey)
+        // Refresh the currently Workspace model associated with MongoApp.workspaceKey
         WKSP_REFRESH: 'workspaceRefresh',
 
         // current Workspace model has been changed
         WKSP_CHANGE: 'workspaceChange',
 
-        // metadata for current workspace has been loaded
+        // metadata for current workspaceKey has been loaded
         WKSP_META_LOADED: 'workspaceMetaLoaded',
 
         // signals that a new sample group should be created
         WKSP_GROUP_CREATE: 'workspaceGroupCreate',
 
-        // signals that the given workspace should be removed
+        // signals that the given workspaceKey should be removed
         WKSP_REMOVE: 'workspaceRemove',
 
-        // download the current search results of the workspace
+        // download the current search results of the workspaceKey
         WKSP_DOWNLOAD: 'workspaceDownload',
 
         // User is choosing a different search
@@ -179,12 +179,12 @@ MongoApp.addInitializer(function () {
         console.log(errorMessage);
     });
 
-    this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_LOAD, function (newWorkspace, search) {
-        MongoApp.workspace = newWorkspace;
+    this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_LOAD, function (newWorkspaceKey, search) {
+        MongoApp.workspaceKey = newWorkspaceKey;
 
-        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_CHANGE, MongoApp.workspace);
+        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_CHANGE, MongoApp.workspaceKey);
 
-        search.set("key", MongoApp.workspace.get("key"));
+        search.set("key", MongoApp.workspaceKey);
         MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_LOAD, search);
     });
 

@@ -15,7 +15,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     selectedUserGroup: null,
 
     /**
-     * Array of workspace keys that should be updated automatically
+     * Array of workspaceKey keys that should be updated automatically
      */
     notReadyKeys: new Array(),
 
@@ -24,11 +24,11 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_REMOVE, function (workspace) {
-            self.removeWorkspace(workspace);
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_REMOVE, function (workspaceKey) {
+            self.removeWorkspace(workspaceKey);
         });
-        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_GROUP_CREATE, function (group, workspace) {
-            self.createSampleGroup(group, workspace);
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_GROUP_CREATE, function (group, workspaceKey) {
+            self.createSampleGroup(group, workspaceKey);
         });
         this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_REFRESH, function (workspaceKey) {
             self.refreshWorkspace(workspaceKey);
@@ -94,7 +94,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     },
 
     /**
-     * Show workspaces table and populate with latest workspace data.
+     * Show workspaces table and populate with latest workspaceKey data.
      *
      * @param options
      */
@@ -116,7 +116,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
             self.selectedUserGroup = null; // NULL indicates all user groups
 
-            // do not allow the user to change the workspace while refresh is happening
+            // do not allow the user to change the workspaceKey while refresh is happening
             self.workspaceGroupLayout.disableDropdown();
             self.refreshAllWorkspaces();
             self.workspaceGroupLayout.enableDropdown();
@@ -125,7 +125,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
             self.selectedUserGroup = userGroup;
 
-            // do not allow the user to change the workspace while refresh is happening
+            // do not allow the user to change the workspaceKey while refresh is happening
             self.workspaceGroupLayout.disableDropdown();
                 self.refreshAllWorkspaces();
             self.workspaceGroupLayout.enableDropdown();
@@ -138,6 +138,14 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     },
 
     /**
+     * Gets a {@link Workspace} model that corresponds to the given key.
+     * @param workspaceKey
+     */
+    getWorkspace: function(workspaceKey) {
+        return this.workspaces.findWhere({key: workspaceKey});
+    },
+
+    /**
      * Refreshes a specific {@link Workspace} model by querying the server.
      *
      * NOTE: this is synchronous
@@ -146,19 +154,22 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
      */
     refreshWorkspace: function(workspaceKey) {
 
-        console.log("refreshing workspace " + workspaceKey);
+        // synchronous
+        var async = false;
 
-        var ws = this.workspaces.findWhere({key: workspaceKey});
+        console.log("refreshing workspaceKey " + workspaceKey);
 
-        // get workspace information from server
+        var ws = this.getWorkspace(workspaceKey);
+
+        // get workspaceKey information from server
         var self = this;
         $.ajax({
-            url: "/mongo_svr/ve//document/find/" + workspaceKey,
+            url: "/mongo_svr/ve/meta/workspace/" + workspaceKey,
             dataType: "json",
-            async: false,
+            async: async,
             success: function(workspaceJSON) {
 
-                self.initWorkspace(workspaceJSON, ws);
+                self.initWorkspace(workspaceJSON, ws, async);
 
             },
             error: jqueryAJAXErrorHandler
@@ -228,8 +239,8 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         });
     },
 
-    initWorkspace: function(workspaceJSON, ws) {
-        // each workspace object has an increment num as the attr name
+    initWorkspace: function(workspaceJSON, ws, async) {
+        // each workspaceKey object has an increment num as the attr name
         ws.set("key",   workspaceJSON.key);
         ws.set("alias", workspaceJSON.alias);
         ws.set("status", workspaceJSON.ready);
@@ -251,10 +262,10 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
             }
         }
 
-        // load extra information about workspace
-        this.loadMetadata(ws);
-        this.loadSampleGroups(ws);
-        this.loadSamples(ws);
+        // load extra information about workspaceKey
+        this.loadMetadata(ws, async);
+        this.loadSampleGroups(ws, async);
+        this.loadSamples(ws, async);
     },
 
     updateNotReadyWorkspaces: function()
@@ -265,14 +276,14 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
             return;
         }
 
-        // get workspace information from server
+        // get workspaceKey information from server
         $.ajax({
             url: "/mongo_svr/ve/q/owner/list_workspaces/" + MongoApp.securityController.user.get("username"),
             dataType: "json",
             headers: {usertoken: MongoApp.securityController.user.get("token")},
             success: function(json) {
 
-                // each workspace object has an increment num as the attr name
+                // each workspaceKey object has an increment num as the attr name
                 for (var attr in json) {
                     if (json.hasOwnProperty(attr)) {
                         var workspaceJSON = json[attr];
@@ -280,8 +291,8 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
                         if($.inArray(key, self.notReadyKeys) != -1) {
                             console.log("updating status for key " + key);
-                            var ws = self.workspaces.findWhere({key: key});
-                            self.initWorkspace(workspaceJSON, ws);
+                            var ws = self.getWorkspace(key);
+                            self.initWorkspace(workspaceJSON, ws, true);
 
                             if ((ws.get("status") == ReadyStatus.READY) ||
                                 (ws.get("status") == ReadyStatus.FAILED)) {
@@ -301,7 +312,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     },
 
     /**
-     * Uploads a VCF to the server to create a new workspace.
+     * Uploads a VCF to the server to create a new workspaceKey.
      */
     addWorkspace: function() {
         var self = this;
@@ -309,7 +320,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         var uploadFile = $( '#vcf_file_upload' )[0].files[0]
 
         var name = $("#vcf_name_field").val();
-        console.debug("Adding workspace with name=" + name);
+        console.debug("Adding workspaceKey with name=" + name);
 
         // progress on transfers from the server to the client (downloads)
         function updateProgress (oEvent) {
@@ -336,7 +347,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 $("#progress").css('width','100%');
 
                 // refresh the workspaces
-                // this will include the newly imported workspace
+                // this will include the newly imported workspaceKey
                 self.refreshAllWorkspaces();
 
                 $('#upload_vcf_progress_modal').modal('hide');
@@ -357,25 +368,25 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     },
 
     /**
-     * Deletes the specified workspace from the server and the local Backbone collection.
+     * Deletes the specified workspaceKey from the server and the local Backbone collection.
      *
-     * @param workspace
+     * @param workspaceKey
      */
-    removeWorkspace: function(workspace) {
-        var workspaceKey = workspace.get("key");
+    removeWorkspace: function(workspaceKey) {
+        var workspace = this.getWorkspace(workspaceKey);
 
         console.debug("Deleting working with name=" + workspace.get("alias") + " and key=" + workspaceKey);
 
         var self = this;
 
         try {
-            // STEP #1: Delete the workspace in mongodb
+            // STEP #1: Delete the workspaceKey in mongodb
             $.ajax({
                 type: "DELETE",
                 url: "/mongo_svr/ve/delete_workspace/" + workspaceKey,
                 async: false,
                 success: function() {
-                    console.log("Deleted workspace from mongodb with key: " + workspaceKey);
+                    console.log("Deleted workspaceKey from mongodb with key: " + workspaceKey);
                     self.workspaces.remove(workspace);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
@@ -408,16 +419,17 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     },
 
     /**
-     * Loads metadata to the given workspace model.
+     * Loads metadata to the given workspaceKey model.
      *
      * @param workspace
      */
-    loadMetadata: function(workspace) {
+    loadMetadata: function(workspace, async) {
         var self = this;
 
         $.ajax({
             url: "/mongo_svr/ve/meta/workspace/" + workspace.get("key"),
             dataType: "json",
+            async: async,
             success: function(json)
             {
                 var generalDataFields = new VCFDataFieldList();
@@ -466,15 +478,14 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
      *
      * @param workspace
      */
-    loadSamples: function(workspace) {
+    loadSamples: function(workspace, async) {
 
         $.ajax({
             url: "/mongo_svr/SampleMeta/" + workspace.get("key"),
             dataType: "json",
+            async: async,
             success: function(json)
             {
-                console.log(JSON.stringify(json));
-
                 var sampleArray = json.results;
                 for (var i = 0; i < sampleArray.length; i++) {
                     var serverSideSample = sampleArray[i];
@@ -586,17 +597,18 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     },
 
     /**
-     * Loads Sample Groups for the specified workspace.
+     * Loads Sample Groups for the specified workspaceKey.
      *
      * @param workspace
      */
-    loadSampleGroups: function(workspace) {
+    loadSampleGroups: function(workspace, async) {
 
         workspace.get("sampleGroups").reset();
 
         $.ajax({
             url: "/mongo_svr/ve/samples/groups/w/" + workspace.get("key"),
             dataType: "json",
+            async: async,
             success: function(json) {
                 var groupArray = json.sampleGroups;
                 for (var i = 0; i < groupArray.length; i++) {
@@ -613,11 +625,13 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
         });
     },
 
-    createSampleGroup: function(group, workspace)
+    createSampleGroup: function(group, workspaceKey)
     {
+        var workspace = MongoApp.workspaceController.getWorkspace(workspaceKey);
+
         // translate backbone model to pojo expected by server
         var pojo = {};
-        pojo.workspace   = workspace.get("key");
+        pojo.workspaceKey   = workspaceKey;
         pojo.alias       = group.get("name");
         pojo.description = group.get("description");
         pojo.samples     = group.get("sampleNames");

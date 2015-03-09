@@ -190,9 +190,9 @@ var SearchController = Backbone.Marionette.Controller.extend({
                 console.log("delete successful!");
                 // TODO: give user feedback
 
-                // if the user deletes the current search, then reload the workspace w/ default search
+                // if the user deletes the current search, then reload the workspaceKey w/ default search
                 if (search.get('id') == MongoApp.search.get('id')) {
-                    MongoApp.dispatcher.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspace, new Search());
+                    MongoApp.dispatcher.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspaceKey, new Search());
                 }
             },
             error: jqueryAJAXErrorHandler
@@ -200,7 +200,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
     },
 
     /**
-     * Queries server for a current listing of Search objects for the given workspace.
+     * Queries server for a current listing of Search objects for the given workspaceKey.
      */
     getSearches: function(workspaceKey) {
 
@@ -234,7 +234,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
 
         // refresh searches
         this.searches.reset();
-        this.searches.set(this.getSearches(MongoApp.workspace.get("key")).models);
+        this.searches.set(this.getSearches(MongoApp.workspaceKey.get("key")).models);
 
         var searchTableView = new SearchTableView({
             collection: this.searches

@@ -86,7 +86,7 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
 
             // If the event mentioned above that is tied to the "Create Range Annotation" button is triggered,
             //     then trigger the RangeQueryController.uploadRangeQueries() function
-            MongoApp.vent.trigger("uploadRangeQueries", this.rangeQuery);
+            MongoApp.dispatcher.trigger("uploadRangeQueries", this.rangeQuery);
 
             // interactive - automatically add a new filter for this new range INFO FLAG field
             this.addNewBooleanFilter(this.rangeQuery.get("name"));
@@ -101,12 +101,15 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
      * @param infoFieldName
      */
     addNewBooleanFilter: function(infoFieldName) {
-        // refresh everything about the current workspace to pick up the new INFO metadata
-        MongoApp.vent.trigger(MongoApp.events.WKSP_REFRESH, MongoApp.workspace.get("key"));
+        // refresh everything about the current workspaceKey to pick up the new INFO metadata
+        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_REFRESH, MongoApp.workspaceKey);
+
+        var workspace = MongoApp.workspaceController.getWorkspace(MongoApp.workspaceKey);
+        var infoField = workspace.get("dataFields").findWhere({name: infoFieldName});
 
         var filter = new Filter();
         filter.set("name",     infoFieldName);
-        filter.set("description", ""); // TODO:
+        filter.set("description", infoField.get("description"));
         filter.set("operator", FilterOperator.EQ);
         filter.set("category", FilterCategory.INFO_FLAG);
         filter.set("value",    true);
@@ -179,7 +182,7 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
      * RETURN: A JSON object with status on range queries that were uploaded
      * -----
      * Example curl call:
-     *      curl -X POST  -F file=@interval.file --form rangeSetText=somerange --form intervalDescription="I Love Puppies"  http://localhost:8080/ve/rangeSet/workspace/foo/name/bar
+     *      curl -X POST  -F file=@interval.file --form rangeSetText=somerange --form intervalDescription="I Love Puppies"  http://localhost:8080/ve/rangeSet/workspaceKey/foo/name/bar
      */
     isAllValid: function() {
         // Validate the ranges, highlight any that have errors, and show the error count

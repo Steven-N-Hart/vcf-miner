@@ -283,8 +283,8 @@ var SubsetController = Backbone.Marionette.Controller.extend({
     //=========================================================================================================
 
 //    /**
-//     * Get the list of metadata fields (along with their type) for a workspace
-//     * INPUT:  A workspace key which matches one of the workspaces in mongo server
+//     * Get the list of metadata fields (along with their type) for a workspaceKey
+//     * INPUT:  A workspaceKey key which matches one of the workspaces in mongo server
 //     * RETURN: A SampleMetadataFieldList object
 //     */
 //    fetchMetadataFieldList: function(workspaceKey, userToken, sampleMetadataFieldList) {
@@ -300,7 +300,7 @@ var SubsetController = Backbone.Marionette.Controller.extend({
 //         $.ajax({
 //            type: "POST",
 //            url: "/mongosvr/workspaces/metadata",
-//            data: {workspace: '$workspaceKey'},
+//            data: {workspaceKey: '$workspaceKey'},
 //            dataType: "json",
 //
 //            // TODO: Can we just return the SampleMetadataFieldList directly?
@@ -328,7 +328,7 @@ var SubsetController = Backbone.Marionette.Controller.extend({
 //     * Get the list of data to populate the type-ahead combobox for String matching on each sample filter.
 //     * (This is the list when you add a sample filter and select a field that is of type "String")
 //     * MIKE-NOTE: Started with info from mongo_view.SecurityController.login() function
-//     * INPUT:  A workspace key which matches one of the workspaces in mongo server
+//     * INPUT:  A workspaceKey key which matches one of the workspaces in mongo server
 //     * RETURN: A string array containing sample names
 //     */
 //    fetchSampleNamesArray: function(workspaceKey, userToken, sampleNamesArray) {
@@ -341,7 +341,7 @@ var SubsetController = Backbone.Marionette.Controller.extend({
 //        $.ajax({
 //            type: "POST",
 //            url: "/mongosvr/workspaces/samplenames",
-//            data: {workspace: '$workspaceKey'},
+//            data: {workspaceKey: '$workspaceKey'},
 //            dataType: "json",
 //
 //            success: function(sampleNamesArray) {

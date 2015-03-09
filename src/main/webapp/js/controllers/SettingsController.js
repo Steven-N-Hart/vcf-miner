@@ -5,13 +5,15 @@ SettingsController = Backbone.Marionette.Controller.extend({
         var self = this;
 
         // Wire events to functions
-        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspace) {
-            self.changeWorkspace(workspace);
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspaceKey) {
+            self.changeWorkspace(workspaceKey);
         });
     },
 
-    changeWorkspace: function(workspace) {
-        MongoApp.indexController.initialize(workspace.get("key"), workspace.get("dataFields"));
+    changeWorkspace: function(workspaceKey) {
+        var ws = MongoApp.workspaceController.getWorkspace(workspaceKey);
+
+        MongoApp.indexController.initialize(workspaceKey, ws.get("dataFields"));
         MongoApp.indexController.refreshIndexes();
     }
 

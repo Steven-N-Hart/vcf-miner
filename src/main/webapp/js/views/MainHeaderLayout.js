@@ -29,9 +29,11 @@ MainHeaderLayout = Backbone.Marionette.Layout.extend({
 
         var self = this;
 //        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_META_LOADED, function () {
-        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function () {
-            // update navbar to have a new tab for the workspace
-            $('#navbar_tab_table a').html('<i class="fa fa-file"></i> ' + MongoApp.workspace.get("alias"));
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspaceKey) {
+            var workspace = MongoApp.workspaceController.getWorkspace(workspaceKey);
+
+            // update navbar to have a new tab for the workspaceKey
+            $('#navbar_tab_table a').html('<i class="fa fa-file"></i> ' + workspace.get("alias"));
             $('#navbar_tab_table').toggle(true); // set visible if not already
 
             // simulate clicking on it
