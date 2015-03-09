@@ -234,7 +234,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
 
         // refresh searches
         this.searches.reset();
-        this.searches.set(this.getSearches(MongoApp.workspaceKey.get("key")).models);
+        this.searches.set(this.getSearches(MongoApp.workspaceKey).models);
 
         var searchTableView = new SearchTableView({
             collection: this.searches
