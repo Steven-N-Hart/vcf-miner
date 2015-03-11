@@ -6,6 +6,7 @@ package edu.mayo.ve.resources;
 
 import com.mongodb.*;
 import com.mongodb.util.JSON;
+
 import edu.mayo.util.MongoConnection;
 import edu.mayo.util.SystemProperties;
 import edu.mayo.util.Tokens;
@@ -13,6 +14,7 @@ import edu.mayo.ve.VCFParser.ErrorStats;
 import edu.mayo.ve.VCFParser.VCFErrorFileUtils;
 
 import javax.ws.rs.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -99,25 +101,16 @@ public class MetaData {
         BasicDBObject query = new BasicDBObject();
         query.put("key",key);
         DBCursor c = col.find(query);
+        boolean isKeyFound = false;
         if(c.hasNext()){
             DBObject next = c.next();
-            if(next==null) return false;
-            if(tokens.length > 1){
-                //only handle 2 levels deep
-                BasicDBObject bo = (BasicDBObject) next.get(tokens[0]);
-                Object o = bo.get(tokens[1]);
-                if (o != null){
-                    return true;
-                }
-            } else {
-                Object o = next.get(field);
-                if(o!=null){
-                    return true;
-                }
-            }
+            int i=0;
+            do {
+            	next = (DBObject) next.get(tokens[i++]);
+            } while( i < tokens.length  &&  next != null );
+            isKeyFound = next != null;
         }
-        return false; //it can't have the field, there is no metadata
-
+        return isKeyFound;
     }
 
 

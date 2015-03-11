@@ -2,6 +2,7 @@ package edu.mayo.ve.FunctionalTests;
 
 import com.mongodb.*;
 import com.mongodb.util.JSON;
+
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.util.CompareJSON;
 import edu.mayo.util.MongoConnection;
@@ -15,7 +16,9 @@ import edu.mayo.ve.resources.ExeQuery;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.ve.resources.Provision;
 import edu.mayo.ve.resources.RangeQueryInterface;
+import edu.mayo.ve.resources.interfaces.DatabaseImplMongo;
 import junit.framework.Assert;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -57,30 +60,31 @@ public class RangeITCase {
     public void testRangeQuery() throws IOException, ProcessTerminatedException, ParseException, Exception {
         System.out.println("Loading 197 Variants to test interval queries");
         String rangeSetName = "RangeSet1";
-        RangeQueryInterface rangeQ = new RangeQueryInterface();
+        DatabaseImplMongo dbImplMongo = new DatabaseImplMongo();
+        RangeQueryInterface rangeQ = new RangeQueryInterface(dbImplMongo);
         //tests
         //make sure there are 197 records in the collection
         long count = util.count(workspace);
         assertEquals(197,count);
 
         Range r1 = new Range("chr1:537589-537602");
-        assertEquals(4,rangeQ.count(workspace, r1));
+        assertEquals(4, dbImplMongo.count(workspace, r1));
         Range r2 = new Range("chr1:537589-537589");
-        assertEquals(1,rangeQ.count(workspace, r2));
+        assertEquals(1,dbImplMongo.count(workspace, r2));
 
         String updateRange = "chr1:537589-537602";
         List<String> rawRanges = Arrays.asList(updateRange);
-        Cursor b = rangeQ.queryRange(workspace,new Range(updateRange));
+        Cursor b = dbImplMongo.queryRange(workspace,new Range(updateRange));
         List<DBObject> before = new ArrayList<DBObject>();
         while(b.hasNext()){
             DBObject next = b.next();
             before.add(next);
         }
         //do the update
-        int recordsUpdated = rangeQ.bulkUpdate(workspace, rawRanges.iterator(), 1, rangeSetName);
+        int recordsUpdated = dbImplMongo.bulkUpdate(workspace, rawRanges.iterator(), 1, rangeSetName);
         //check that the update is correct.
         assertEquals(4,recordsUpdated);
-        Cursor c = rangeQ.queryRange(workspace, new Range(updateRange));
+        Cursor c = dbImplMongo.queryRange(workspace, new Range(updateRange));
         for(int i=0;c.hasNext();i++){
             DBObject next = c.next();
             BasicDBObject db = ((BasicDBObject) getBefore((String)next.get("CHROM"), (String)next.get("POS"), before));

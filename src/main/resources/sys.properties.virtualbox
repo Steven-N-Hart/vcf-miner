@@ -18,6 +18,7 @@ sample_meta_collection = samplemetacollection
 
 # The number of concurrent imports allowed
 num_workers = 5
+# The number of concurrent range updates allowed
 num_workers_range = 4
 
 #Values for INFINITY, 1/INFINITY, NotANumber ect that work in both the javascript importer AND java.

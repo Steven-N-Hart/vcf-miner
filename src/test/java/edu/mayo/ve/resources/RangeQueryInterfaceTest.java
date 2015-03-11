@@ -1,36 +1,78 @@
 package edu.mayo.ve.resources;
 
-import junit.framework.TestCase;
 
-import java.util.ArrayList;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class RangeQueryInterfaceTest extends TestCase {
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+import java.text.ParseException;
 
-    public void testValidate() throws Exception {
-        //this unit test, will only test the regex in testValidate, this way it need not connect to Mongo.  Testing that the workspace exists and the field is not in use
-        //is covered by RangeITCase
-        RangeQueryInterface rangeQ = new RangeQueryInterface();
-        ArrayList<Boolean> passedTests = new ArrayList<Boolean>();
-        String workspace = "foo";
-        rangeQ.validate("abc123ABC", workspace); //works
-        passedTests.add(true);
-        try {
-            rangeQ.validate("ab.c", workspace); //fails
-        }catch(Exception e){
-            //should get here
-            passedTests.add(true);
-        }
-        rangeQ.validate("a_c", workspace); //fails
-        passedTests.add(true);
+import org.junit.Before;
+import org.junit.Test;
 
-        try {
-            rangeQ.validate("ab#c", workspace); //fails
-        }catch(Exception e){
-            //should get here
-            passedTests.add(true);
-        }
+import edu.mayo.ve.resources.interfaces.DatabaseImplStub;
 
-        assertEquals(4, passedTests.size());
+public class RangeQueryInterfaceTest {
 
+	private DatabaseImplStub mDbImplStub = null;
+	private RangeQueryInterface mRangeQuery = null;
+	
+	@Before
+	public void beforeEach() {
+		mDbImplStub = new DatabaseImplStub();
+		mRangeQuery = new RangeQueryInterface(mDbImplStub);
+	}
+	
+    /** This unit test, will only test the regex in testValidate, this way it need not connect to Mongo.
+	    Testing that the workspace exists and the field is not in use is covered by RangeITCase   */
+	@Test
+    public void testValidateName() throws Exception {
+        String workspaceKey = "foo";
+        mDbImplStub.addInfoField(workspaceKey, "Chrom1_100_to_1000", 0, "Flag", "Chromosome 1 from 100 to 1000");
+        
+        // These names are all ok
+        assertTrue( isValidName("abc123ABC", 	workspaceKey));
+        assertTrue( isValidName("a_c", 			workspaceKey));
+        assertTrue( isValidName("123abc",		workspaceKey));
+        
+        // These are all bad (name cannot contain any character that is not a number, letter, or underscore)
+        assertFalse(isValidName("ab.c", 		workspaceKey));
+        assertFalse(isValidName("ab#c", 		workspaceKey));
+        assertFalse(isValidName("a b c", 		workspaceKey));
+        assertFalse(isValidName("Mike's", 		workspaceKey));
+        
+        // Bad - name already exists in database
+        assertFalse(isValidName("Chrom1_100_to_1000", workspaceKey));
     }
+	
+	private boolean isValidName(String intervalsName, String workspace) {
+		try {
+			mRangeQuery.validateName(workspace, intervalsName);
+            return true;
+        }catch(Exception e){
+        	return false;
+        }
+	}
+    
+    @Test (expected=FileNotFoundException.class)
+    public void validateFileRanges_nonexistentFile() throws IOException, ParseException {
+    	// Try with file that does not exist
+    	mRangeQuery.parseRangeFile(new File("/tmp/nonexistent.file"));
+    	fail("Fail if it reached this far as the parser should throw a FileNotFoundException");
+    }
+    
+    @Test
+    public void validateFileRanges_emptyFile() throws IOException, ParseException {
+    	// Try with file that has 0 bytes
+    	URL url = getClass().getResource("/testData/emtpyFile.txt");
+    	File emptyFile = new File(url.getPath());
+    	assertTrue( emptyFile.exists() );
+    	// Should work ok - just no ranges to check
+    	mRangeQuery.parseRangeFile(emptyFile);
+    }
+
 }
