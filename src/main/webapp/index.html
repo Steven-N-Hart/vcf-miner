@@ -1370,6 +1370,7 @@
     <script src="js/views/GroupListView.js" type="text/javascript"></script>
 
     <script src="js/ConfirmDialog.js" type="text/javascript"></script>
+    <script src="js/MessageDialog.js" type="text/javascript"></script>
 
     <script src="js/models/VariantTableColumn.js" type="text/javascript"></script>
     <script src="js/models/VariantTableRow.js" type="text/javascript"></script>
@@ -1478,6 +1479,20 @@
     <div class="modal-footer">
         <button class="btn btn-primary" aria-hidden="true" id="confirm_modal_ok">Ok</button>
         <button class="btn" id="confirm_modal_cancel">Cancel</button>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="message_modal" data-backdrop="static" class="modal hide fade" tabindex="-1" role="dialog"
+     aria-labelledby="message_label" aria-hidden="true">
+    <div class="modal-header">
+        <h3 id="message_label"><!-- added by javascript --></h3>
+    </div>
+    <div class="modal-body">
+        <!-- added by javascript -->
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" aria-hidden="true" id="message_modal_ok">Ok</button>
     </div>
 </div>
 
