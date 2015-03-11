@@ -6,6 +6,7 @@ import com.sun.jersey.multipart.FormDataParam;
 import edu.mayo.security.CWEUtils;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.VCFLoaderPool;
+import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.message.Range;
 import edu.mayo.ve.resources.interfaces.DatabaseImplMongo;
 import edu.mayo.ve.resources.interfaces.DatabaseInterface;
@@ -62,40 +63,50 @@ public class RangeQueryInterface {
             @FormDataParam("rangeSetText") String rangeSets,
             @FormDataParam("file") InputStream uploadedInputStream
     ) throws Exception {
-        //validate the interval name (e.g. can't have period or other funky characters, can't already be used)
-
-        validateName(workspace, intervalsName);
-
-        //parse the intervals into 'rangeSets' to ensure that they are well formed
-        List<String> rangeLines = checkStrings(rangeSets);
-
-        // Save the file stream to a file
-    	File tempFile = CWEUtils.createSecureTempFile();
-        saveStreamToFile(tempFile, uploadedInputStream);
-
-        //parse the file to ensure that all of the intervals are well formed
-        parseRangeFile(tempFile);
-        
-        int updateFrequency = getUpdateFrequency();
-
-        //update the workspace to include the new range set as a flag (intervals from text area)
-        mDbInterface.bulkUpdate(workspace, rangeLines.iterator(), updateFrequency, intervalsName);
-
-        //update the workspace to include the new range set as a flag (file intervals)
-        BufferedReader br = new BufferedReader(new FileReader(tempFile));
-        mDbInterface.bulkUpdate(workspace, new FileIterator(br), updateFrequency, intervalsName);
-
-        //update the metadata
-        updateMetadata(workspace, intervalsName, intervalDescription);
-
-        //delete the temp file
-        tempFile.delete();
+    	File tempFile = null;
+    	try {
+	        //validate the interval name (e.g. can't have period or other funky characters, can't already be used)
+	        validateName(workspace, intervalsName);
+	
+	        //parse the intervals into 'rangeSets' to ensure that they are well formed
+	        List<String> rangeLines = checkStrings(rangeSets);
+	
+	        // Save the file stream to a file
+	    	tempFile = CWEUtils.createSecureTempFile();
+	        saveStreamToFile(tempFile, uploadedInputStream);
+	        // Read the number of non-empty lines in the file
+	        int numRangesInFile = countNonEmptyLines(tempFile);
+	        
+	        // If there are no ranges defined in either the text area OR the file, then throw an exception
+	        if( (rangeLines.size() + numRangesInFile) == 0 )
+	        	throw new Exception("ERROR: Please specify at least one range in either the file or the text area.");
+	
+	        //parse the file to ensure that all of the intervals are well formed
+	        parseRangeFile(tempFile);
+	        
+	        int updateFrequency = getUpdateFrequency();
+	
+	        //update the workspace to include the new range set as a flag (intervals from text area)
+	        mDbInterface.bulkUpdate(workspace, rangeLines.iterator(), updateFrequency, intervalsName);
+	
+	        //update the workspace to include the new range set as a flag (file intervals)
+	        BufferedReader br = new BufferedReader(new FileReader(tempFile));
+	        mDbInterface.bulkUpdate(workspace, new FileIterator(br), updateFrequency, intervalsName);
+	
+	        //update the metadata
+	        updateMetadata(workspace, intervalsName, intervalDescription);
+    	} finally {
+    		//delete the temp file if it is not null and it exists
+    		if( tempFile != null  &&  tempFile.exists() )
+    			tempFile.delete();
+    	}
 
         String response = "Workspace: " + workspace + " " + "name: " + intervalsName + " intervalDescription: " + intervalDescription + "\n rangeSetText: " + rangeSets + "\n";
         return Response.status(200).entity(response).build();
         //return uploadIntervalsFromFile(workspace, alias, uploadedInputStream);
     }
     
+    /** Save the input stream to a file */
     private void saveStreamToFile(File fileToSaveTo, InputStream uploadedInputStream) throws IOException {
         //copy the contents of the input stream to a temp file, this will allow us to validate that all of the intervals in the file are correctly formed.
         OutputStream outStream = new FileOutputStream(fileToSaveTo);
@@ -112,6 +123,25 @@ public class RangeQueryInterface {
         	fileToSaveTo.createNewFile();
         }
 	}
+    
+    /** Lines should have text on them - a file with one empty line counts as 0 
+     * @throws IOException */
+    int countNonEmptyLines(File file) throws IOException {
+    	BufferedReader fin = null;
+    	int nonEmptyLineCount = 0;
+    	try {
+    		fin = new BufferedReader(new FileReader(file));
+    		String line = null;
+    		while( (line = fin.readLine()) != null ) {
+    			if( line.trim().length() > 0 )
+    				nonEmptyLineCount++;
+    		}
+    	} finally {
+    		if( fin != null ) 
+    			fin.close();
+    	}
+    	return nonEmptyLineCount;
+    }
     
     // Check if a file contains only the characters "null".  This will happen if the user did not specify a file
     private boolean isFileContentsNull(File file) throws IOException {

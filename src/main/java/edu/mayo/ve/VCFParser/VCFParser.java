@@ -300,7 +300,7 @@ public class VCFParser implements ParserInterface {
      *      The line count for the given file.
      * @throws IOException
      */
-    private int getLineCount(File f) throws IOException {
+    public int getLineCount(File f) throws IOException {
 
         // use compressor to figure out how to handle .zip, .gz, .bz2, etc...
         File fakeOutFile = CWEUtils.createSecureTempFile();
@@ -311,7 +311,8 @@ public class VCFParser implements ParserInterface {
 
             reader = new LineNumberReader(compressor.getReader());
             reader.skip(Long.MAX_VALUE);
-            return reader.getLineNumber();
+            // First line is 0, so add one
+            return reader.getLineNumber() + 1;
 
         } finally {
             reader.close();
