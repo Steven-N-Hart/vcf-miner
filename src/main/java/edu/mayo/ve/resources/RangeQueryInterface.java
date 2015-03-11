@@ -150,8 +150,9 @@ public class RangeQueryInterface {
     		fin = new FileInputStream(file);
     		byte[] buff = new byte[100];
     		int len = fin.read(buff);
-    		String s = new String(buff, 0, len);
-    		return "null".equals(s);
+    		// Special case: file could be specified but empty, in which case the length will return -1 which is valid (not null)
+    		// Need to check the length before converting to a string, or it will throw a StringIndexOutOfBoundsException
+    		return  (len >= 0)  &&  "null".equals(new String(buff, 0, len));
     	} finally {
     		fin.close();
     	}
