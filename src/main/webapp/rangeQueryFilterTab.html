@@ -14,12 +14,13 @@
 
   <div id="rangeQueryRegion">
 
+
     <!-- "Range Name" row -->
     <!-- NOTE: When using span#, each span number is a certain percentage of the screen (ex: span1 = 1/12, span2 = 2/12, span3 = 3/12, ... span12 = full width) -->
     <div class="row-fluid" style="clear: both">
         <div class="span1" style="width: 100px; float: left">Range Name:</div>
         <div style="float: left"><input id="range_name_field" name="range_name_field" class="form-control" type="text" placeholder="(Insert range name...)"  style="width: 500px;" /></div>
-        <div id="nameErrorStar" style="float: left; color: red; font-size: 500%; display: none;" title="Error: Name can only contain letters, numbers, and underscores">*</div>
+        <div id="nameErrorStar" style="float: left; color: red; font-size: 200%; display: none;" title="Error: Name can only contain letters, numbers, and underscores">&#9888;</div>
     </div>
 
     <!-- "Description" row -->
@@ -32,8 +33,10 @@
 
     <!-- "Specify a range" rich-text area (with # errors mentioned below it).  The rich-text area is the "editor" id
       https://mindmup.github.io/bootstrap-wysiwyg/  -->
-    <div class="row-fluid">Specify a range: &#xa0; &#xa0; <span id="numErrors" title="(Bad ranges are highlighted)">(0 errors)</span></div>
-    <div  class="row-fluid">
+    <div class="row-fluid"><b>Specify a range and/or upload a file</b></div>
+    <div class="row-fluid"  style="border: 1px solid;  border-color: lightgray;  border-radius: 10px; padding: 10px 10px 10px 10px;">
+      <div class="row-fluid">Specify a range: &#xa0; &#xa0; <span id="numErrors" title="(Bad ranges are highlighted)">(0 errors)</span></div>
+      <div  class="row-fluid">
         <!-- First column with rich-text area for ranges entered manually by user -->
         <div class="span4"  id="editor" placeholder="Ex: 1:100-200"  style="border:1px solid black;  overflow:scroll;   height:200px;   width:300px;"></div>
         <!-- Second column for example ranges -->
@@ -42,24 +45,38 @@
             <div class="row-fluid">1 100 200</div>
             <div class="row-fluid">1:100-200</div>
             <div class="row-fluid">1:100 200</div>
+            <div class="row-fluid">1,100,200</div>
+            <div class="row-fluid">1 &lt;tab&gt; 100 &lt;tab&gt; 200</div>
             <div class="row-fluid">1:100-200  a  b  c  d</div>
+            <div class="row-fluid">chr1:100-200  a  b  c  d</div>
         </div>
-    </div>
+      </div>
 
-    <!-- Error message line below the rich-text area.
-         This will be used to display errors when validating the rich-text area, but then fade out after 5 seconds -->
-    <div class="row-fluid">
+      <!-- Error message line below the rich-text area.
+          This will be used to display errors when validating the rich-text area, but then fade out after 5 seconds -->
+      <div class="row-fluid">
         <span  id="errorMsg"  style="color: red; font-weight: bold"></span>
-    </div>
+      </div>
 
 
       <!-- Separator row -->
-    <div class="row-fluid">&#xa0;</div>
+      <div class="row-fluid">&#xa0;</div>
 
 
-    <!-- "Upload a BED file" -->
-    <div class="row-fluid">Upload a BED file  (extra columns after first 3 are ignored)</div>
-    <div class="row-fluid"><input type="file"  id="bedFileUpload"  name="bedFileUpload" value="Select BED file"></div>
+      <!-- "Upload a BED file" -->
+      <div class="row-fluid">Upload a BED file  (format should match one of those above; extra columns after first 3 are ignored)</div>
+      <div class="row-fluid">
+          <button type="button" class="btn btn-default"  id="resetFileButton">Reset</button>
+          <!-- NOTE: To stylize your own file upload button, try:
+                http://stackoverflow.com/questions/572768/styling-an-input-type-file-button
+          -->
+          <button  id="browseFileButton"  type="button" class="btn btn-default" >Browse...</button>
+          <span  id="filenameLabel"  class="label label-default"  style="font-size: 100%; padding: 6px 10px 6px 10px">(No file selected)</span>
+
+          <!-- Hide the ACTUAL file upload button as it is FUGLY  (however, it still needs to exist as it actually holds the file object!) -->
+          <div style="display: none"><input type="file"  id="bedFileUpload"  name="bedFileUpload" value="Select BED file"></input></div>
+      </div>
+    </div>
     <br/><br/>
 
       <!-- Error message for upload problems.
