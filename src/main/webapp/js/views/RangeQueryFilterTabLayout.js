@@ -27,7 +27,29 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         //"input  #editor" : "validateRangeQueries"
 
         // Add listener to "Name" field - show '*' (and error msg as hint text) if name doesn't contain only letters, numbers, underscores
-        "input  #range_name_field" : "validateName"
+        "input  #range_name_field" : "validateName",
+
+        // Add listener to rich-text field to catch any tabs and jump to next field, instead of inserting an html indent code (which requires SHIFT-TAB to remove)
+        // Ex: http://javascript.info/tutorial/keyboard-events
+        // TODO: Need to figure out how to capture tabs yet
+        // TODO: Main issue: The #editor is a "div", not an "input" element - how do you capture character codes in divs?
+        // TODO: Can we get the underlying "input" element and put an event listener on that?
+        "keyup  #editor" : "escapeTabs",
+        "keydown #editor" : "escapeTabs",
+        "keypress #editor" : "escapeTabs",
+        "input   #editor"  : "escapeTabs",
+        "keydown" : "escapeTabs",
+
+        // TEMP
+        "keydown #range_name_field" : "escapeTabs",
+        // ---------
+
+        "click  #resetFileButton" : "resetFile",
+
+
+        // Handle the file upload with better looking components:
+        "click   #browseFileButton"  : "browseForFile",
+        "change  #bedFileUpload"     : "putFileNameInLabel"
     },
 
 
@@ -174,7 +196,7 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
      * RETURN: A JSON object with status on range queries that were uploaded
      * -----
      * Example curl call:
-     *      curl -X POST  -F file=@interval.file --form rangeSetText=somerange --form intervalDescription="I Love Puppies"  http://localhost:8080/ve/rangeSet/workspaceKey/foo/name/bar
+     *      curl -X POST  -F file=@interval.file --form rangeSetText=somerange --form intervalDescription="I Love Puppies"  http://localhost:8080/ve/rangeSet/workspace/foo/name/bar
      */
     isAllValid: function() {
         // Validate the ranges, highlight any that have errors, and show the error count
@@ -311,6 +333,50 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         window.setTimeout(function() {
             errorMsgObj.fadeTo(2000, 0);
         }, 5000);
+    },
+
+   // Trigger event when text changes in the rich-text field for ranges.
+    escapeTabs: function(eventObj) {
+        var TABKEY = 9;
+        var c1 = eventObj.charCode;
+        var c2 = eventObj.keyCode;
+        var c3 = eventObj.which;
+        var charCode = eventObj.charCode || eventObj.keyCode || eventObj.which;
+        return;
+        var keyCode = event.keyCode;
+        // If tab is detected, then set focus on the next field, which is the file upload, and cancel the tab character input
+        // See: http://stackoverflow.com/questions/3362/capturing-tab-key-in-text-box
+        if(keyCode == TABKEY) {
+            var fileUploadObj = $("#bedFileUpload");
+            fileUploadObj.focus();
+            if(e.preventDefault) {
+                e.preventDefault();
+            }
+            return false;
+        }
+    },
+
+
+    // Reset the file path
+    resetFile: function() {
+        var fileUploadObj = $("#bedFileUpload");
+        // Clear the file path  (wrap in a form and reset all objects in the form, then unwrap)
+        //   SEE:  http://stackoverflow.com/questions/1043957/clearing-input-type-file-using-jquery/13351234#13351234
+        fileUploadObj.wrap('<form>').closest('form').get(0).reset();
+        fileUploadObj.unwrap();
+
+        // Clear out the label as well (it has a copy of the filename as well):
+        $("#filenameLabel").html("(No file selected)");
+    },
+
+
+    browseForFile: function(){
+        $("#bedFileUpload").click();
+    },
+
+    putFileNameInLabel : function(fileObj){
+        var filename = fileObj.target.value;
+        $("#filenameLabel").html(filename);
     }
 });
 
