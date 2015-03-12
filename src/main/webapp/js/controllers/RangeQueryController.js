@@ -22,7 +22,7 @@ var RangeQueryController = Backbone.Marionette.Controller.extend({
 
         // The event mentioned in RangeQueryFilterTabLayout will trigger this listener,
         // and thus call the uploadRangeQueries() function
-        MongoApp.vent.on("uploadRangeQueries", function (rangeQuery) {
+        MongoApp.dispatcher.on("uploadRangeQueries", function (rangeQuery) {
             rangeQueryControllerInstance.uploadRanges(rangeQuery);
         });
     },
