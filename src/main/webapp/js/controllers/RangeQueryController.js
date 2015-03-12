@@ -11,7 +11,7 @@ var RangeQueryController = Backbone.Marionette.Controller.extend({
     rangeQueryFilterTabLayout: null,
 
 
-    /** This is initialized when the RangeQueryController object is created in TestApplication.js ??????? */
+    /** This is initialized when the RangeQueryController object is created in MongoApp.js ??????? */
     initialize: function (options) {
 
         //===================================================================
@@ -22,13 +22,14 @@ var RangeQueryController = Backbone.Marionette.Controller.extend({
 
         // The event mentioned in RangeQueryFilterTabLayout will trigger this listener,
         // and thus call the uploadRangeQueries() function
-        MongoApp.dispatcher.on("uploadRangeQueries", function (rangeQuery) {
+        MongoApp.vent.on("uploadRangeQueries", function (rangeQuery) {
             rangeQueryControllerInstance.uploadRanges(rangeQuery);
         });
     },
 
     // This is called from TestApplication, passing in the mainRegion id from the html file
     showRangeQueryTab: function (options) {
+        this.rangeQueryFilterTabLayout = new RangeQueryFilterTabLayout();
         options.region.show(this.rangeQueryFilterTabLayout);
     },
 
