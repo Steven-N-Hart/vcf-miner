@@ -89,7 +89,7 @@ var GroupFilter = Filter.extend({
         var sampleGroup = this.get("value");
 
         var pojo = {};
-        pojo.workspaceKey   = workspaceKey;
+        pojo.workspace   = workspaceKey;
         pojo.alias       = sampleGroup.get("name");
         pojo.description = sampleGroup.get("description");
         pojo.samples     = sampleGroup.get("sampleNames");

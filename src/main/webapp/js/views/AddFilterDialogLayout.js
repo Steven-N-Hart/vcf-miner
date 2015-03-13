@@ -1,11 +1,5 @@
 AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
 
-    /**
-     * Marionette EventAggregate for communicating from the parent modal dialog
-     * to the children tabs.
-     */
-    eventAggregator: new Backbone.Wreqr.EventAggregator(),
-
     template: "#add-filter-dialog-layout-template",
 
     regions: {
@@ -57,17 +51,19 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
     /**
      * Called when the view is first created
      */
-    initialize: function() {
+    initialize: function(options) {
+
+        this.localDispatcher = options.localDispatcher;
 
         var that = this;
-        this.eventAggregator.on("tabFinished", function(){
+        this.localDispatcher.on("tabFinished", function(){
             that.close();
         });
 
         this.sampleFilterTabLayout = new SampleFilterTabLayout();
         this.infoFilterTabLayout = new InfoFilterTabLayout();
         this.customFilterTabLayout = new CustomFilterTabLayout();
-        this.rangeFilterTabLayout = new RangeQueryFilterTabLayout({eventAggregator: this.eventAggregator});
+        this.rangeFilterTabLayout = new RangeQueryFilterTabLayout({localDispatcher: this.localDispatcher});
 
         var workspaceKey = "ws01";
         var userToken = "aaa:bbb";
@@ -104,77 +100,6 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
 
         // by default, have the Annotation (INFO) tab selected
         this.$el.find('a[href="#tab_content_info"]').click();
-    },
-
-    /**
-     * Adds a filter to the collection of filterSteps that are searched
-     */
-    addFilter: function() {
-
-        var filter = this.getCurrentFilter();
-        if (filter === undefined) {
-            return;
-        }
-
-        var newFilterStep = new FilterStep();
-        newFilterStep.get("filters").add(filter);
-
-        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_STEP_ADD, newFilterStep);
-
-        var async = true; // asynchronous is TRUE so that the UI can nicely show the "please wait" dialog
-        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_CHANGED, MongoApp.search, async);
-
-        this.close();
-    },
-
-    /**
-     * Adds a filter to the collection of filterSteps that are searched, but does not execute it right away.
-     */
-    addAnother: function() {
-
-        var filter = this.getCurrentFilter();
-        if (filter === undefined) {
-            return;
-        }
-
-        if (this.comboFilterStep == undefined) {
-
-            // swap out buttons
-            $('#run_filter').toggle();
-            $('#run_combo_filter').toggle();
-
-            this.comboFilterStep = new FilterStep();
-            this.comboFilterStep.get("filters").add(filter);
-
-            var async = true; // asynchronous is TRUE so that the UI can nicely show the "please wait" dialog
-            MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_STEP_ADD, this.comboFilterStep, async);
-        } else {
-            this.comboFilterStep.get("filters").add(filter);
-            // force model change
-            this.comboFilterStep.set("forceUpdate", guid());
-        }
-
-        // update button text
-        $('#run_combo_filter').text('Run ' + this.comboFilterStep.get("filters").length + ' Filter(s)');
-    },
-
-
-    runComboFilter: function() {
-
-        var async = true; // asynchronous is TRUE so that the UI can nicely show the "please wait" dialog
-        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_CHANGED, MongoApp.search, async);
-
-        this.close();
-    },
-
-    cancelComboFilter: function() {
-        // remove the COMBO filter step
-        if (this.comboFilterStep !== undefined) {
-            var async = true; // asynchronous is TRUE so that the UI can nicely show the "please wait" dialog
-            MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_FILTER_STEP_REMOVE, this.comboFilterStep, async);
-        }
-
-        this.close();
     },
 
     /**
@@ -216,6 +141,33 @@ AddFilterDialogLayout = Backbone.Marionette.Layout.extend({
     },
 
     createRangeAnnotation: function() {
-        this.eventAggregator.trigger("createRangeAnnotation");
+        this.localDispatcher.trigger("createRangeAnnotation");
+    },
+
+    addFilter: function() {
+        var filter = this.getCurrentFilter();
+        if (filter === undefined) {
+            return;
+        }
+        this.localDispatcher.trigger("addFilter", filter);
+        this.close();
+    },
+
+    addAnother: function() {
+        var filter = this.getCurrentFilter();
+        if (filter === undefined) {
+            return;
+        }
+        this.localDispatcher.trigger("addAnother", filter);
+    },
+
+    runComboFilter: function() {
+        this.localDispatcher.trigger("runCombo");
+        this.close();
+    },
+
+    cancelComboFilter: function() {
+        this.localDispatcher.trigger("cancelCombo");
+        this.close();
     }
 });

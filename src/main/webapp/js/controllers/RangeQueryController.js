@@ -36,65 +36,50 @@ var RangeQueryController = Backbone.Marionette.Controller.extend({
     // Upload the ranges to the server and get a response.  If error, then display an error in the message line
     uploadRanges : function(rangeQuery) {
 
-        var xhr = new XMLHttpRequest();
-
-        var async = false;
-        xhr.open('POST', "/mongo_svr/ve/rangeSet/workspace/" + MongoApp.workspaceKey, async);
-
-        var self = this;
-        xhr.onload = function(oEvent) {
-            if (xhr.status == 200) {
-
-                // TODO: based on the response determine background or interactive
-                self.handleCreateAnnotationResponse('interactive', rangeQuery.get("name"));
-
-            } else {
-
-                // TODO:
-
-                console.log("Error " + xhr.status + " occurred uploading file");
-                genericAJAXErrorHandler(xhr);
-
-                // If there were errors, then show them in the error dialog
-                if( errorMsg != "" )
-                    this.showErrorMsg("Error uploading ranges: " + errorMsg);
-            }
-        };
-
         var formData = new FormData;
         formData.append('name',                rangeQuery.get("name"));
         formData.append('intervalDescription', rangeQuery.get("description"));
         formData.append('rangeSetText',        rangeQuery.get("ranges"));
         formData.append('file',                rangeQuery.get("file"));
 
-        xhr.send(formData);
+        var self = this;
+        $.ajax({
+            url: "/mongo_svr/ve/rangeSet/workspace/" + MongoApp.workspaceKey,
+            type: 'POST',
+            async: false,
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function(rangeUploadResponse) {
+
+                var isBackground = rangeUploadResponse.isBackground;
+                self.handleCreateAnnotationResponse(isBackground, rangeQuery.get("name"));
+
+            },
+            error: jqueryAJAXErrorHandler
+        });
     },
 
     /**
      * Act accordingly based the server's action to process the new range annotation.
-     * @param serverAction
-     *      Indicates how the server is processing the range annotation (interactive or background)
+     * @param isBackground
+     *      Server is processing in the background TRUE/FLASE
      * @param rangeName
      *      The name of the range annotation.
      */
-    handleCreateAnnotationResponse: function(serverAction, rangeName) {
+    handleCreateAnnotationResponse: function(isBackground, rangeName) {
 
         // refresh everything about the current workspaceKey to pick up the new INFO metadata
         MongoApp.dispatcher.trigger(MongoApp.events.WKSP_REFRESH, MongoApp.workspaceKey);
 
-        var isBackground = false;
-        if (serverAction == 'interactive') {
-            isBackground = false;
+        if (!isBackground) {
 
             // automatically add a new filter for this new range INFO FLAG field
             this.addNewBooleanFilter(rangeName);
         }
-        else if (serverAction == 'background') {
 
-            isBackground = true;
-        }
-
-        MongoApp.dispatcher.trigger('uploadRangeQueriesComplete', isBackground);
+        MongoApp.dispatcher.trigger('uploadRangeQueriesComplete', isBackground, rangeName);
     },
 
     /**

@@ -388,6 +388,12 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                 success: function() {
                     console.log("Deleted workspaceKey from mongodb with key: " + workspaceKey);
                     self.workspaces.remove(workspace);
+
+                    // check for case where user deletes the workspace they currently are analyzing
+                    if (workspaceKey == MongoApp.workspaceKey) {
+                        // close tab
+                        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_CLOSE);
+                    }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     throw new AJAXRequestException(jqXHR, textStatus, errorThrown);
@@ -631,7 +637,7 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
 
         // translate backbone model to pojo expected by server
         var pojo = {};
-        pojo.workspaceKey   = workspaceKey;
+        pojo.workspace   = workspaceKey;
         pojo.alias       = group.get("name");
         pojo.description = group.get("description");
         pojo.samples     = group.get("sampleNames");

@@ -189,7 +189,7 @@
                     <div class="pull-left"><a class="brand">VCF-Miner</a></div>
                     <ul id="navbar_tabs" class="nav">
                         <li class="active"><a id="home_tab"><i class="fa fa-home"></i> Home</a></li>
-                        <li><a id="settings_tab"><i class="fa fa-gears"></i> Advanced</a></li>
+                        <li id="navbar_tab_advanced" class="hide"><a id="settings_tab"><i class="fa fa-gears"></i> Advanced</a></li>
 
                         <!-- hidden at the start because no VCF has been loaded yet -->
                         <li id="navbar_tab_table" class="hide"><a id="table_tab">SET_BY_JAVASCRIPT</a></li>
@@ -1419,6 +1419,7 @@
     <script src="js/controllers/SettingsController.js"></script>
     <script src="js/controllers/VariantDataController.js"></script>
     <script src="js/controllers/WorkspaceController.js"></script>
+    <script src="js/controllers/AddFilterController.js"></script>
     <script src="js/models/RangeQuery.js"></script>
     <script src="js/controllers/RangeQueryController.js"></script>
     <script src="js/views/RangeQueryFilterTabLayout.js"></script>

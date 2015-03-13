@@ -35,9 +35,20 @@ MainHeaderLayout = Backbone.Marionette.Layout.extend({
             // update navbar to have a new tab for the workspaceKey
             $('#navbar_tab_table a').html('<i class="fa fa-file"></i> ' + workspace.get("alias"));
             $('#navbar_tab_table').toggle(true); // set visible if not already
+            $('#navbar_tab_advanced').toggle(true);
 
             // simulate clicking on it
             $('#table_tab').click(); // register click event to switch to that tab
+        });
+
+        MongoApp.dispatcher.on(MongoApp.events.WKSP_CLOSE, function() {
+
+            // hide the tab
+            $('#navbar_tab_table').toggle(false);
+            $('#navbar_tab_advanced').toggle(false);
+
+            // switch back to home tab
+            self.switchHomeTab();
         });
     },
 

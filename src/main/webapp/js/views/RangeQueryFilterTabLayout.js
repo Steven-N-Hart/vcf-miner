@@ -73,16 +73,16 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
      */
     initialize: function(options) {
 
-        this.eventAggregator = options.eventAggregator;
+        this.localDispatcher = options.localDispatcher;
 
         var self = this;
 
-        this.eventAggregator.on("createRangeAnnotation", function(){
+        this.localDispatcher.on("createRangeAnnotation", function(){
             self.createRangeAnnotation();
         });
 
-        MongoApp.dispatcher.on("uploadRangeQueriesComplete", function(isBackground){
-            self.handleUploadRangeQueriesComplete(isBackground);
+        MongoApp.dispatcher.on("uploadRangeQueriesComplete", function(isBackground, rangeName){
+            self.handleUploadRangeQueriesComplete(isBackground, rangeName);
         });
     },
 
@@ -116,17 +116,24 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         }
     },
 
-    handleUploadRangeQueriesComplete: function(isBackground) {
+    handleUploadRangeQueriesComplete: function(isBackground, rangeName) {
 
         var self = this;
 
         if (isBackground) {
-            var messageDialog = new MessageDialog('Range Annotation Status', 'Range Annotation is being processed...');
-            messageDialog.eventAggregator.on(messageDialog.EVENTS.EVENT_OK, function() {
+
+            var title = 'Range Annotation Status';
+            var mesg  = '<p>Your range annotation has been successfully submitted and will be processed.</p>' +
+                        '<p>When processing completes, your VCF File will contain a new annotation named <strong>' + rangeName + '</strong>.  ' +
+                        'You can utilize this new annotation by clicking the Add Filter button and selecting it in the Annotation tab.</p>'+
+                        '<p>You will now go back to the Home screen.</p>';
+            var messageDialog = new MessageDialog(title, mesg);
+            messageDialog.localDispatcher.on(messageDialog.EVENTS.EVENT_OK, function() {
                 // signal back to the parent dialog that we're done
-                self.eventAggregator.trigger("tabFinished");
+                self.localDispatcher.trigger("tabFinished");
 
                 // close tab
+                MongoApp.dispatcher.trigger(MongoApp.events.WKSP_CLOSE);
             });
             messageDialog.show();
 
@@ -134,7 +141,7 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
             // INTERACTIVE
 
             // signal back to the parent dialog that we're done
-            this.eventAggregator.trigger("tabFinished");
+            this.localDispatcher.trigger("tabFinished");
         }
     },
 

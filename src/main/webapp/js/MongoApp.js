@@ -54,6 +54,9 @@ MongoApp.addInitializer(function () {
         // current Workspace model has been changed
         WKSP_CHANGE: 'workspaceChange',
 
+        // closes the current Workspace model
+        WKSP_CLOSE: 'workspaceClose',
+
         // metadata for current workspaceKey has been loaded
         WKSP_META_LOADED: 'workspaceMetaLoaded',
 
@@ -168,6 +171,7 @@ MongoApp.addInitializer(function () {
     this.searchController = new SearchController();
     this.variantDataController = new VariantDataController();
     this.rangeQueryController = new RangeQueryController();
+    this.addFilterController = new AddFilterController();
 
 
     // Wire Marionette events to function callbacks

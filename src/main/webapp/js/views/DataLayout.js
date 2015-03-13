@@ -43,7 +43,8 @@ DataLayout = Backbone.Marionette.Layout.extend({
             el: this.$el.find("#add_filter_modal")
         });
 
-        region.show(new AddFilterDialogLayout());
+        // delegate to add filter controller
+        MongoApp.addFilterController.showAddFilterDialog(region);
     },
 
     /**

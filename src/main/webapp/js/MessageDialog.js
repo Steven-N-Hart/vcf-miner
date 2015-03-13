@@ -14,16 +14,16 @@ MessageDialog = function (title, message) {
     };
 
     /**
-     * Marionette EventAggregate for communicating events.
+     * Marionette EventAggregator for communicating events.
      */
-    var eventAggregator = new Backbone.Wreqr.EventAggregator();
+    var localDispatcher = new Backbone.Wreqr.EventAggregator();
 
 
     // private variables
 
     $('#message_modal_ok').click(function() {
 
-        eventAggregator.trigger(EVENTS.EVENT_OK);
+        localDispatcher.trigger(EVENTS.EVENT_OK);
 
         close();
 
@@ -44,7 +44,7 @@ MessageDialog = function (title, message) {
 
         EVENTS: EVENTS,
 
-        eventAggregator: eventAggregator,
+        localDispatcher: localDispatcher,
 
         /**
          * Shows the dialog
