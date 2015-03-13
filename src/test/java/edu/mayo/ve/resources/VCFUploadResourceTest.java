@@ -1,17 +1,8 @@
 package edu.mayo.ve.resources;
 
-import com.tinkerpop.pipes.util.Pipeline;
-import edu.mayo.concurrency.workerQueue.WorkerPool;
-import edu.mayo.pipes.PrintPipe;
-import edu.mayo.pipes.UNIX.CatPipe;
-import edu.mayo.util.Tokens;
-import edu.mayo.ve.VCFLoaderPool;
-import edu.mayo.ve.VCFParser.LoadWorker;
-import edu.mayo.ve.VCFParser.VCFParser;
 import org.junit.Test;
 
 import java.io.*;
-import java.util.Arrays;
 
 
 /**

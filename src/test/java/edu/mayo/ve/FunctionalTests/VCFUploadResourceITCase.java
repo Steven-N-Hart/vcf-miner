@@ -10,7 +10,7 @@ import com.mongodb.DBObject;
 import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.SecurityUserAppHelper;
-import edu.mayo.ve.VCFLoaderPool;
+import edu.mayo.ve.LoaderPool;
 import edu.mayo.ve.VCFParser.LoadWorker;
 import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.resources.ExeQuery;
@@ -48,7 +48,7 @@ public class VCFUploadResourceITCase {
     public static void setupLoaderPool() {
         LoadWorker logic = new LoadWorker(new VCFParser(), 50000);
         wp = new WorkerPool(logic, 1);
-        VCFLoaderPool.setWp(wp);
+        LoaderPool.setWp(wp);
         WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
     }
 
@@ -109,7 +109,7 @@ public class VCFUploadResourceITCase {
      * @throws InterruptedException
      *      Can potentially be thrown during the 1 second sleep between polls.
      */
-    private void waitForImportStatus(String workspaceKey, String expectedStatus) throws InterruptedException {
+    public void waitForImportStatus(String workspaceKey, String expectedStatus) throws InterruptedException {
 
         DB db = MongoConnection.getDB();
 

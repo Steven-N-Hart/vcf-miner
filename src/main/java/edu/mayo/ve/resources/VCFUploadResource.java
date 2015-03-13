@@ -23,10 +23,8 @@ import edu.mayo.securityuserapp.client.ResourceMgmtClient;
 import edu.mayo.securityuserapp.client.SessionExpiredClientException;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.SecurityUserAppHelper;
-import edu.mayo.ve.VCFLoaderPool;
-import edu.mayo.ve.VCFParser.LoadWorker;
+import edu.mayo.ve.LoaderPool;
 import edu.mayo.util.SystemProperties;
-import edu.mayo.ve.VCFParser.VCFParser;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -117,7 +115,7 @@ public class VCFUploadResource {
             @FormDataParam("file") InputStream uploadedInputStream
     ) throws Exception {
         if(reportingset == true){
-            VCFLoaderPool.reset(maxTypeAheadCache);
+            LoaderPool.reset(maxTypeAheadCache);
             reportingset = false;
         }
         return uploadFile(user,alias,"FALSE",compression,userToken,uploadedInputStream);
@@ -231,7 +229,7 @@ public class VCFUploadResource {
      */
     public boolean processFile(String filenamepath, String compression, String user, String alias, boolean reporting, boolean deleteAfterLoad){
         reportingset = reporting;
-        WorkerPool wp = VCFLoaderPool.getWp();
+        WorkerPool wp = LoaderPool.getWp();
 
         //figure out compression based on the filename
 
@@ -278,12 +276,12 @@ public class VCFUploadResource {
 
             if(reporting.equalsIgnoreCase("TRUE")){
                 if(reportingset == false){
-                    VCFLoaderPool.setReportingTrueAndResetPool(maxTypeAheadCache);
+                    LoaderPool.setReportingTrueAndResetPool(maxTypeAheadCache);
                 }
                 reportingset = true;
             }
 
-            WorkerPool wp = VCFLoaderPool.getWp();
+            WorkerPool wp = LoaderPool.getWp();
 
             //System.out.println("Uploading VCF started! ");
             //provision a new workspace

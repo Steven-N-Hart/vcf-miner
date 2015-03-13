@@ -85,7 +85,7 @@ public class MetaData {
         newobj.append("EntryType","INFO");
         BasicDBObject updateQuery = new BasicDBObject();
         updateQuery.append("$set", new BasicDBObject().append("HEADER." + prefix + newField, newobj));
-        col.update(new BasicDBObject().append("key",key), updateQuery);
+        col.update(new BasicDBObject().append("key", key), updateQuery);
     }
 
     /**
@@ -111,6 +111,11 @@ public class MetaData {
             isKeyFound = next != null;
         }
         return isKeyFound;
+    }
+
+
+    public boolean checkINFOFieldExists(String key, String field){
+        return checkFieldExists(key, "HEADER.INFO." + field);
     }
 
 

@@ -27,6 +27,9 @@ public class RangeTest extends TestCase {
         assertEquals("CHR1", r.getChrom());
         assertEquals(100,r.getMinBP());
         assertEquals(2000,r.getMaxBP());
+
+
+        //do some bad ones that throw the exception
     }
 
 }

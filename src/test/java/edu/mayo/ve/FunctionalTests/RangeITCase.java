@@ -2,8 +2,9 @@ package edu.mayo.ve.FunctionalTests;
 
 import com.mongodb.*;
 import com.mongodb.util.JSON;
-
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
+import edu.mayo.concurrency.workerQueue.Task;
+import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.util.CompareJSON;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.util.Tokens;
@@ -12,22 +13,22 @@ import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.message.InfoFlagFilter;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.message.Range;
+import edu.mayo.ve.LoaderPool;
+import edu.mayo.ve.range.RangeWorker;
 import edu.mayo.ve.resources.ExeQuery;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.ve.resources.Provision;
 import edu.mayo.ve.resources.RangeQueryInterface;
 import edu.mayo.ve.resources.interfaces.DatabaseImplMongo;
 import junit.framework.Assert;
+import org.junit.AfterClass;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.*;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
@@ -42,12 +43,17 @@ public class RangeITCase {
     private static ProblemVCFITCase util = new ProblemVCFITCase();
     private static String workspace = "wd092764710a636c967ed9d2b1944c24d64121b16";
     private static final String vcf = "src/test/resources/testData/Case.control.snpeff.hgvs.annovar.part300.vcf.gz";
-
+    private static final String rangeFile = "src/test/resources/testData/Cas    e.control.snpeff.hgvs.annovar.part.intervals";
 
     @BeforeClass
     public static void setup() throws Exception {
         workspace = util.load(vcf, false);
         System.out.println(workspace);
+    }
+
+    @AfterClass
+    public static void teardown() throws Exception {
+        util.deleteCheck(workspace,0,0);
     }
 
     //example insert
@@ -166,12 +172,21 @@ public class RangeITCase {
 
     @Test
     public void testRESTENDPOINT() throws Exception {
-        RangeQueryInterface rangeQ = new RangeQueryInterface();
-        String intervalsName = "TESTREST";
+        //startup the worker pool -- this is needed for the REST call to work
+        LoaderPool pool = new LoaderPool();
+        pool.resetRangePool(); //this is needed in a unit testing (should be fine in production)
+
+        RangeQueryInterface rangeQ = new RangeQueryInterface(true); //set verbose mode
+        String intervalsName = "INTERVALTESTREST";
         String description = "An Interval set that tests the REST interface to upload genomic intervals";
         String rangeSets = "chr1:231504-231557\nchr1:255909-255925";
-        InputStream in = new FileInputStream(new File("src/test/resources/testData/Case.control.snpeff.hgvs.annovar.part.intervals"));
+        InputStream in = new FileInputStream(new File(rangeFile));
         rangeQ.uploadFile(workspace, intervalsName, description, rangeSets, in);
+
+
+        //wait until the status is changed and all of the work is done
+        System.out.println("Waiting for status to change to ready!");
+        new VCFUploadResourceITCase().waitForImportStatus(workspace, "workspace is ready");
 
         //now build a query, there should be 20 records flagged with 'TESTREST'
         BasicDBList rlist = qResults(intervalsName);
@@ -183,7 +198,35 @@ public class RangeITCase {
         boolean exists = meta.checkFieldExists(workspace,"HEADER.INFO." + intervalsName);
         assertTrue(exists);
 
+        pool.shutdown(0);
+
     }
+
+
+    /**
+     * tests that the RangeWorker is doing the correct thing...
+     */
+    @Test
+    public void testLogicInRangeWorker() throws Exception {
+
+        String intervalsName = "BACKGROUNDPROC";
+        RangeQueryInterface rangeQ = new RangeQueryInterface();
+        RangeWorker worker = new RangeWorker();
+        Task<HashMap,HashMap> t = rangeQ.getTask(workspace,rangeFile,intervalsName,1);
+        //update the metadata manually because it is not in the front end call
+        rangeQ.updateMetadata(workspace,intervalsName,"test on the background worker");
+
+        //update the collection outside of the thread pool
+        worker.compute(t);
+
+
+        //check that the workspace is indeed updated correctly
+        BasicDBList rlist = qResults(intervalsName);
+        assertEquals(16, rlist.size());
+
+
+    }
+
 
 
     public void check(String key, DBObject db, DBObject next){

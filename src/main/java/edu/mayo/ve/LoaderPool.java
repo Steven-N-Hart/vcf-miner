@@ -10,6 +10,7 @@ import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.VCFParser.LoadWorker;
 import edu.mayo.ve.VCFParser.VCFParser;
+import edu.mayo.ve.range.RangeWorker;
 import edu.mayo.ve.resources.WorkerPoolManager;
 import edu.mayo.ve.util.SystemProperties;
 import org.apache.log4j.Logger;
@@ -22,23 +23,37 @@ import javax.servlet.http.HttpSessionListener;
 import javax.servlet.http.HttpSessionBindingEvent;
 import java.io.IOException;
 
-public class VCFLoaderPool implements ServletContextListener,
+/**
+ * this class is started when the code is deployed to Tomcat or any other web container.
+ * There is a singe instance of it (static) and it holds a reference to the WorkerPools that
+ * load the data into the VCF-Miner app.  (BED files / VCF-Files ect).
+ */
+public class LoaderPool implements ServletContextListener,
         HttpSessionListener, HttpSessionAttributeListener {
 
-    private static final Logger log = Logger.getLogger(VCFLoaderPool.class);
+    private static final Logger log = Logger.getLogger(LoaderPool.class);
 
-    private static WorkerPool wp = null;
+    private static WorkerPool wp = null;  //worker pool is for the VCF files
+    private static WorkerPool wpr = null; //worker pool for the range updates (BED files)
     private static int maxCache = 50000;
     // Public constructor is required by servlet spec
-    public VCFLoaderPool() {
+    public LoaderPool() {
     }
 
 
     public static final String NUM_WORKERS = "num_workers";
+    public static final String NUM_WORKERS_RANGE = "num_workers_range";
     private static int numberworkers = 1;
+    private static int numberworkersrange = 1;
     public static int initNumberWorkers() throws IOException {
         SystemProperties sysprop = new SystemProperties();
         String v = sysprop.get(NUM_WORKERS);
+        return Integer.parseInt(v);
+    }
+
+    public static int initNumberWorkersRange() throws IOException {
+        SystemProperties sysprop = new SystemProperties();
+        String v = sysprop.get(NUM_WORKERS_RANGE);
         return Integer.parseInt(v);
     }
 
@@ -54,7 +69,9 @@ public class VCFLoaderPool implements ServletContextListener,
         if(wp == null){
             try {
                 numberworkers = initNumberWorkers();
-                log.info("Number of Threads in the Workder Pool: " + numberworkers);
+                log.info("Number of Threads in the Worker Pool: " + numberworkers);
+                numberworkersrange = initNumberWorkersRange();
+                log.info("Number of Threads in the RANGE Worker Pool: " + numberworkersrange);
             }catch (IOException e){
                 throw new RuntimeException(e.getMessage(),e);    //todo: probably a better way to handle this exception!
             }
@@ -114,11 +131,11 @@ public class VCFLoaderPool implements ServletContextListener,
     }
 
     public static void setWp(WorkerPool wp) {
-        VCFLoaderPool.wp = wp;
+        LoaderPool.wp = wp;
     }
 
     public static void setReportingTrueAndResetPool(int typeAheadCacheSize){
-        LoadWorker logic = new LoadWorker(new VCFParser(), typeAheadCacheSize, true);
+        LoadWorker logic = new LoadWorker(new VCFParser(), typeAheadCacheSize, true); //the vcf parser
         logic.setLogStackTrace(true);
         wp = new WorkerPool(logic, numberworkers);
         WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
@@ -130,6 +147,31 @@ public class VCFLoaderPool implements ServletContextListener,
         wp = new WorkerPool(logic, numberworkers);
         WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
         return;
+    }
+
+    public static final String RANGE_WORKERS = "range_workers";
+    public static void setReportingTrueAndResetRangePool(){
+        RangeWorker logic = new RangeWorker(); //the VCF updater
+        logic.setVerboseMode(true);
+        wpr = new WorkerPool(logic, numberworkers);
+        WorkerPoolManager.registerWorkerPool(RANGE_WORKERS, wpr);
+        return;
+    }
+
+    public static void resetRangePool(){
+        RangeWorker logic = new RangeWorker();
+        wpr = new WorkerPool(logic, numberworkers);
+        WorkerPoolManager.registerWorkerPool(RANGE_WORKERS, wpr);
+        return;
+    }
+
+    public static WorkerPool getRangeWorkerPool(){
+        return wpr;
+    }
+
+    public static void shutdown(int seconds) throws InterruptedException {
+        wp.shutdown(seconds);
+        wpr.shutdown(seconds);
     }
 
 

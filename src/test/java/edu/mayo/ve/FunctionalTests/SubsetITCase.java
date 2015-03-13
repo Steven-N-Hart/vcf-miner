@@ -1,14 +1,13 @@
 package edu.mayo.ve.FunctionalTests;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mongodb.*;
 import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.util.MongoConnection;
+import edu.mayo.ve.LoaderPool;
 import edu.mayo.ve.SecurityUserAppHelper;
-import edu.mayo.ve.VCFLoaderPool;
+import edu.mayo.ve.LoaderPool;
 import edu.mayo.ve.VCFParser.LoadWorker;
 import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.message.Querry;
@@ -55,7 +54,7 @@ public class SubsetITCase {
     public static void setupLoaderPool() {
         LoadWorker logic = new LoadWorker(new VCFParser(), 50000);
         wp = new WorkerPool(logic, 1);
-        VCFLoaderPool.setWp(wp);
+        LoaderPool.setWp(wp);
         WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
     }
 
