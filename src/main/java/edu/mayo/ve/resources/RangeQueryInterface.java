@@ -8,6 +8,7 @@ import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.VCFLoaderPool;
 import edu.mayo.ve.VCFParser.VCFParser;
 import edu.mayo.ve.message.Range;
+import edu.mayo.ve.message.RangeUploadResponse;
 import edu.mayo.ve.resources.interfaces.DatabaseImplMongo;
 import edu.mayo.ve.resources.interfaces.DatabaseInterface;
 import edu.mayo.ve.util.SystemProperties;
@@ -56,7 +57,8 @@ public class RangeQueryInterface {
     @POST
     @Path("/workspace/{workspace}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response uploadFile(
+    @Produces("application/json")
+    public RangeUploadResponse uploadFile(
             @PathParam("workspace") String workspace,
             @FormDataParam("name") String intervalsName,
             @FormDataParam("intervalDescription") String intervalDescription,
@@ -101,9 +103,15 @@ public class RangeQueryInterface {
     			tempFile.delete();
     	}
 
-        String response = "Workspace: " + workspace + " " + "name: " + intervalsName + " intervalDescription: " + intervalDescription + "\n rangeSetText: " + rangeSets + "\n";
-        return Response.status(200).entity(response).build();
-        //return uploadIntervalsFromFile(workspace, alias, uploadedInputStream);
+        // TODO: Currently hardcoded to look for the word "background" in the name
+        // TODO: if found, treated as background.  Otherwise, treated as interactive
+        RangeUploadResponse response = new RangeUploadResponse();
+        boolean isBackground = false;
+        if (intervalsName.contains("background")) {
+            isBackground = true;
+        }
+        response.setIsBackground(isBackground);
+        return response;
     }
     
     /** Save the input stream to a file */
