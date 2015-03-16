@@ -175,7 +175,7 @@ public class RangeITCase {
     public void testRESTENDPOINT() throws Exception {
         //startup the worker pool -- this is needed for the REST call to work
         LoaderPool pool = new LoaderPool();
-        pool.resetRangePool(); //this is needed in a unit testing (should be fine in production)
+        pool.setReportingTrueAndResetRangePool(); //this is needed in a unit testing (should be fine in production)
 
         RangeQueryInterface rangeQ = new RangeQueryInterface(true); //set verbose mode
         String intervalsName = "INTERVALTESTREST";
@@ -188,6 +188,7 @@ public class RangeITCase {
         //wait until the status is changed and all of the work is done
         System.out.println("Waiting for status to change to ready!");
         new VCFUploadResourceITCase().waitForImportStatus(workspace, "workspace is ready");
+        //Thread.sleep(4000);
 
         //now build a query, there should be 20 records flagged with 'TESTREST'
         BasicDBList rlist = qResults(intervalsName);
@@ -195,8 +196,15 @@ public class RangeITCase {
 
         MetaData meta = new MetaData();
         String wjson = meta.getWorkspaceJSON(workspace);
-        //check the field we added does exist
-        boolean exists = meta.checkFieldExists(workspace, intervalsName);
+        System.out.println(wjson);
+
+        //check that the status of the workspace is updated to: "workspace is ready"
+        DBObject dbObject = (DBObject) JSON.parse(wjson);
+        String status = (String)dbObject.get("status");
+        assertEquals("workspace is ready", status);
+
+        //check the metadata for the field we added does exist
+        boolean exists = meta.checkFieldExists(workspace, "HEADER.INFO." + intervalsName);
         assertTrue(exists);
 
         pool.shutdown(0);

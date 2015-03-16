@@ -27,6 +27,10 @@ public class RangeWorker implements WorkerLogic {
 
     @Override
     public Object compute(Task t) throws ProcessTerminatedException {
+        File intervalFile = null;
+        if(verboseMode){
+            log.info("Starting compute to update ranges... verboseMode:" + verboseMode );
+        }
         HashMap<String,String> context = (HashMap) t.getCommandContext();
         String workspace = context.get(Tokens.KEY);
         String loadfile = context.get(RANGE_FILE);
@@ -37,18 +41,26 @@ public class RangeWorker implements WorkerLogic {
 
         try {
             //update the workspace to include the new range set as a flag (file intervals)
-            File intervalFile = new File(loadfile);
+            intervalFile = new File(loadfile);
             BufferedReader br = new BufferedReader(new FileReader(intervalFile));
-            if(verboseMode){ log.info("Updating the range"); }
+            //if(verboseMode){
+                log.info("Updating the range");
+            //}
             DatabaseImplMongo dim = new DatabaseImplMongo();
             dim.bulkUpdate(workspace, new FileIterator(br), n, name);
 
             //need to flag the workspace as ready
             if(verboseMode){ log.info("Flagging the Workspace as ready"); }
-            meta.flagAsReady(workspace);
 
         }catch (Throwable e){
             //todo: need to log the errors to some sort of file and produce another REST call so that the UI can get the errors!
+            log.error("Error updating ranges", e);
+            throw new ProcessTerminatedException();
+        }finally {
+            //delete the temp file if it is not null and it exists
+            if( intervalFile != null  &&  intervalFile.exists() )
+                intervalFile.delete();
+            meta.flagAsReady(workspace);
         }
 
         return null;

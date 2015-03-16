@@ -170,8 +170,12 @@ public class LoaderPool implements ServletContextListener,
     }
 
     public static void shutdown(int seconds) throws InterruptedException {
-        wp.shutdown(seconds);
-        wpr.shutdown(seconds);
+        if(wp != null) {
+            wp.shutdown(seconds);
+        }
+        if(wpr != null) {
+            wpr.shutdown(seconds);
+        }
     }
 
 

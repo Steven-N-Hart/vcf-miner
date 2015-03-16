@@ -88,64 +88,56 @@ public class RangeQueryInterface {
             @FormDataParam("file") InputStream uploadedInputStream
     ) throws Exception {
         File tempFile = null;
-        try {
 
-            //validate the interval name (e.g. can't have period or other funky characters, can't already be used)
-            validateName(workspace, intervalsName);
+        //validate the interval name (e.g. can't have period or other funky characters, can't already be used)
+        validateName(workspace, intervalsName);
 
-            //parse the intervals into 'rangeSets' to ensure that they are well formed
-            List<String> rangeLines = validateRangeLines(rangeSets);
-
-
-            //copy the contents of the input stream to a temp file, this will allow us to validate that all of the intervals in the file are correctly formed.
-            if (verboseMode) {
-                log.info("Copying the interval file to the local filesystem");
-            }
-            // Save the file stream to a file
-            tempFile = CWEUtils.createSecureTempFile();
-            saveStreamToFile(tempFile, uploadedInputStream);
-            // Read the number of non-empty lines in the file
-            int numRangesInFile = countNonEmptyLines(tempFile);
-
-            // If there are no ranges defined in either the text area OR the file, then throw an exception
-            if ((rangeLines.size() + numRangesInFile) == 0)
-                throw new Exception("ERROR: Please specify at least one range in either the file or the text area.");
-
-            //parse the file to ensure that all of the intervals are well formed
-            //add a try catch to inform the user that the validation failed on the file upload
-            parseRangeFile(tempFile);
-
-            //get the update frequency...
-            int updateFrequency = getUpdateFrequency();
-
-            //update the workspace to include the new range set as a flag (intervals from form)
-            mDbInterface.bulkUpdate(workspace, rangeLines.iterator(), updateFrequency, intervalsName);
+        //parse the intervals into 'rangeSets' to ensure that they are well formed
+        List<String> rangeLines = validateRangeLines(rangeSets);
 
 
-            //update the workspace to include the new range set as a flag (file intervals)
-            BufferedReader br = new BufferedReader(new FileReader(tempFile));
-            mDbInterface.bulkUpdate(workspace, new FileIterator(br), updateFrequency, intervalsName);
-
-
-            //update the metadata  --perhaps we need to not do this if the operation failed?  todo:!
-            updateMetadata(workspace, intervalsName, intervalDescription);
-
-            //flag the workspace as queued
-            MetaData meta = new MetaData();
-            meta.flagAsQueued(workspace);
-
-            //update the workspace to include the new range set as a flag (file intervals)
-            //doing update inline...
-            //File intervalFile = new File(uploadedFileLocation);
-            //BufferedReader br = new BufferedReader(new FileReader(intervalFile));
-            //bulkUpdate(workspace, new FileIterator(br), n, name);
-            addTaskToWorkerPool(workspace, tempFile.getCanonicalPath(), intervalsName);
-
-        }finally {
-            //delete the temp file if it is not null and it exists
-            if( tempFile != null  &&  tempFile.exists() )
-                tempFile.delete();
+        //copy the contents of the input stream to a temp file, this will allow us to validate that all of the intervals in the file are correctly formed.
+        if (verboseMode) {
+            log.info("Copying the interval file to the local filesystem");
         }
+        // Save the file stream to a file
+        tempFile = CWEUtils.createSecureTempFile();
+        saveStreamToFile(tempFile, uploadedInputStream);
+        // Read the number of non-empty lines in the file
+        int numRangesInFile = countNonEmptyLines(tempFile);
+
+        // If there are no ranges defined in either the text area OR the file, then throw an exception
+        if ((rangeLines.size() + numRangesInFile) == 0)
+            throw new Exception("ERROR: Please specify at least one range in either the file or the text area.");
+
+        //parse the file to ensure that all of the intervals are well formed
+        //add a try catch to inform the user that the validation failed on the file upload
+        if (verboseMode) {log.info("Parsing intervals in the file to ensure that they are all well formed");}
+        parseRangeFile(tempFile);
+
+        //get the update frequency...
+        int updateFrequency = getUpdateFrequency();
+
+        //update the workspace to include the new range set as a flag (intervals from form)
+        if (verboseMode) {log.info("Updating the workspace with the intervals from the form");}
+        mDbInterface.bulkUpdate(workspace, rangeLines.iterator(), updateFrequency, intervalsName);
+
+        //update the metadata  --perhaps we need to not do this if the operation failed?  todo:!
+        if (verboseMode) {log.info("Updating the metadata");}
+        updateMetadata(workspace, intervalsName, intervalDescription);
+
+        //flag the workspace as queued
+        if (verboseMode) {log.info("Flagging the workspace as queued");}
+        MetaData meta = new MetaData();
+        meta.flagAsQueued(workspace);
+
+        //update the workspace to include the new range set as a flag (file intervals)
+        //doing update inline...
+        //BufferedReader br = new BufferedReader(new FileReader(tempFile));
+        //new DatabaseImplMongo().bulkUpdate(workspace, new FileIterator(br), updateFrequency, intervalsName);
+        if (verboseMode) {log.info("Adding loading task to the worker pool");}
+        addTaskToWorkerPool(workspace, tempFile.getCanonicalPath(), intervalsName);
+
 
         // TODO: Currently hardcoded to look for the word "background" in the name
         // TODO: if found, treated as background.  Otherwise, treated as interactive
@@ -233,6 +225,11 @@ public class RangeQueryInterface {
      */
     public Task addTaskToWorkerPool(String workspace, String inputFile, String field) {
         int freq = 1;
+        try {
+            freq = getUpdateFrequency();
+        }catch (Exception e){
+            log.info("The update frequencey for range/bed files is not defined in the sys.properties file, please define INTERVAL_BULK_INSERT_RATE.  For now it is set to 1 which could be slow");
+        }
         return addTaskToWorkerPool(workspace,inputFile,field,freq);
     }
 
