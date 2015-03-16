@@ -21,6 +21,7 @@ import edu.mayo.ve.resources.Provision;
 import edu.mayo.ve.resources.RangeQueryInterface;
 import edu.mayo.ve.resources.interfaces.DatabaseImplMongo;
 import junit.framework.Assert;
+import junit.framework.TestCase;
 import org.junit.AfterClass;
 
 import org.junit.BeforeClass;
@@ -195,7 +196,7 @@ public class RangeITCase {
         MetaData meta = new MetaData();
         String wjson = meta.getWorkspaceJSON(workspace);
         //check the field we added does exist
-        boolean exists = meta.checkFieldExists(workspace,"HEADER.INFO." + intervalsName);
+        boolean exists = meta.checkFieldExists(workspace, intervalsName);
         assertTrue(exists);
 
         pool.shutdown(0);
@@ -225,6 +226,16 @@ public class RangeITCase {
         assertEquals(16, rlist.size());
 
 
+    }
+
+    /**
+     * tests the logic on name validation (the part that makes sure the key is not in the workspace only)
+     */
+    @Test
+    public void testValidateName(){
+        DatabaseImplMongo mDbInterface = new DatabaseImplMongo();
+        assertFalse(mDbInterface.isInfoFieldExists(workspace, "FOOBARBAZ"));
+        assertTrue(mDbInterface.isInfoFieldExists(workspace, "LOF"));
     }
 
 

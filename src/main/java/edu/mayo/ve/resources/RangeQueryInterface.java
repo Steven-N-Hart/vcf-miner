@@ -298,6 +298,9 @@ public class RangeQueryInterface {
      * @throws Exception
      */
     public void validateName(String workspaceKey, String intervalsName) throws Exception {
+        if(mDbInterface == null){
+            mDbInterface = new DatabaseImplMongo();
+        }
         // First, verify that the name only contains letters, numbers, or underscores
         if( ! intervalsName.matches("[a-z,A-Z,0-9,_]+") ){
             throw new Exception("Proposed Field Name must contain only letter, numbers, or underscores.  Name: " + intervalsName);
