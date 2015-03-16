@@ -43,7 +43,7 @@ public class RangeITCase {
     private static ProblemVCFITCase util = new ProblemVCFITCase();
     private static String workspace = "wd092764710a636c967ed9d2b1944c24d64121b16";
     private static final String vcf = "src/test/resources/testData/Case.control.snpeff.hgvs.annovar.part300.vcf.gz";
-    private static final String rangeFile = "src/test/resources/testData/Cas    e.control.snpeff.hgvs.annovar.part.intervals";
+    private static final String rangeFile = "src/test/resources/testData/Case.control.snpeff.hgvs.annovar.part.intervals";
 
     @BeforeClass
     public static void setup() throws Exception {

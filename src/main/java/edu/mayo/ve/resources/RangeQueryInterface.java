@@ -231,9 +231,9 @@ public class RangeQueryInterface {
      * @param inputFile  - bed/ tabix interval file that we get the intervals from
      * @param field      - the name of the new INFO field
      */
-    public void addTaskToWorkerPool(String workspace, String inputFile, String field) {
+    public Task addTaskToWorkerPool(String workspace, String inputFile, String field) {
         int freq = 1;
-        addTaskToWorkerPool(workspace,inputFile,field,freq);
+        return addTaskToWorkerPool(workspace,inputFile,field,freq);
     }
 
     /**
@@ -243,11 +243,12 @@ public class RangeQueryInterface {
      * @param field      - the name of the new INFO field
      * @param updateFreq - for bulk insert, the number of records we should parse before sending the update to mongo
      */
-    public void addTaskToWorkerPool(String workspace, String inputFile, String field, int updateFreq) {
+    public Task addTaskToWorkerPool(String workspace, String inputFile, String field, int updateFreq) {
         WorkerPool pool = LoaderPool.getRangeWorkerPool();
         Task<HashMap,HashMap> t = getTask(workspace,inputFile,field,updateFreq);
         pool.addTask(t);
         pool.startTask(t.getId());
+        return t;
     }
 
     public Task getTask(String workspace, String inputFile, String field, int updateFreq){

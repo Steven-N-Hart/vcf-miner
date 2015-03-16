@@ -46,10 +46,10 @@ public class DatabaseImplMongo implements DatabaseInterface {
 	
     /**
     *
-    * @param workspace - the workspace that we want to do the update on
+    * @param workspaceKey - the workspace that we want to do the update on
     * @param rangeIterator - an iterator that comes from a file or from a list of raw ranges
     * @param numRangesGrouped - send the bulk update every n ranges processed  todo: change the update to use mongo's bulk interface (requires mongodb 2.6)
-    * @param rangeSet - the validated name for the range set (e.g. it is not already a name in INFO)
+    * @param intervalsName - the validated name for the range set (e.g. it is not already a name in INFO)
     * @throws ParseException
     * @return number of records updated
     */

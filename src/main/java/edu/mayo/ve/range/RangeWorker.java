@@ -6,6 +6,7 @@ import edu.mayo.concurrency.workerQueue.WorkerLogic;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.ve.resources.RangeQueryInterface;
+import edu.mayo.ve.resources.interfaces.DatabaseImplMongo;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -39,7 +40,8 @@ public class RangeWorker implements WorkerLogic {
             File intervalFile = new File(loadfile);
             BufferedReader br = new BufferedReader(new FileReader(intervalFile));
             if(verboseMode){ log.info("Updating the range"); }
-            rangeQ.bulkUpdate(workspace, new FileIterator(br), n, name);
+            DatabaseImplMongo dim = new DatabaseImplMongo();
+            dim.bulkUpdate(workspace, new FileIterator(br), n, name);
 
             //need to flag the workspace as ready
             if(verboseMode){ log.info("Flagging the Workspace as ready"); }
