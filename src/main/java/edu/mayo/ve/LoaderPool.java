@@ -70,14 +70,24 @@ public class LoaderPool implements ServletContextListener,
             try {
                 numberworkers = initNumberWorkers();
                 log.info("Number of Threads in the Worker Pool: " + numberworkers);
-                numberworkersrange = initNumberWorkersRange();
-                log.info("Number of Threads in the RANGE Worker Pool: " + numberworkersrange);
             }catch (IOException e){
                 throw new RuntimeException(e.getMessage(),e);    //todo: probably a better way to handle this exception!
             }
             LoadWorker logic = new LoadWorker(new VCFParser(), maxCache);//do we want to let them pass this value?
             wp = new WorkerPool(logic, numberworkers);
             WorkerPoolManager.registerWorkerPool(Tokens.VCF_WORKERS, wp);
+        }
+
+        if (wpr == null) {
+            try {
+                numberworkersrange = initNumberWorkersRange();
+                log.info("Number of Threads in the RANGE Worker Pool: " + numberworkersrange);
+            }catch (IOException e){
+                throw new RuntimeException(e.getMessage(),e);    //todo: probably a better way to handle this exception!
+            }
+            RangeWorker logic = new RangeWorker(); //the VCF updater
+            wpr = new WorkerPool(logic, numberworkers);
+            WorkerPoolManager.registerWorkerPool(RANGE_WORKERS, wpr);
         }
     }
 
