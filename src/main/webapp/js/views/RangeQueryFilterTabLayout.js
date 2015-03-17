@@ -8,51 +8,40 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
     template: "#range-query-tab-layout-template",
 
     rangeQuery: null,
+    numRanges : 0,
+    numRangeErrors : 0,
+    errorMsgTimeoutEventValidation : null,
+    errorMsgTimeoutEventRanges : null,
 
     regions: {
         rangeQueryRegion: "#rangeQueryRegion"
-        //rangesRichTextAreaRegion: "#rangeQueryTextArea"
     },
 
-    /**
-     * Maps UI elements by their jQuery selectors
-     */
+    /** Maps UI elements by their jQuery selectors    */
     ui: {
     },
 
     events: {
-        // Validate the ranges when the text field loses focus
+        // The html button id "uploadRangeQueries" is linked to the event listener
         // (calls the function within this class which in turns calls the function within RangeQueryController (thru TestApplication)
-        "blur  #editor" : "validateRangeQueries",
-        //"input  #editor" : "validateRangeQueries"
+        "click #uploadRangeQueries" : "createRangeAnnotation",
 
         // Add listener to "Name" field - show '*' (and error msg as hint text) if name doesn't contain only letters, numbers, underscores
         "input  #range_name_field" : "validateName",
 
-        // Add listener to rich-text field to catch any tabs and jump to next field, instead of inserting an html indent code (which requires SHIFT-TAB to remove)
-        // Ex: http://javascript.info/tutorial/keyboard-events
-        // TODO: Need to figure out how to capture tabs yet
-        // TODO: Main issue: The #editor is a "div", not an "input" element - how do you capture character codes in divs?
-        // TODO: Can we get the underlying "input" element and put an event listener on that?
-        "keyup  #editor" : "escapeTabs",
-        "keydown #editor" : "escapeTabs",
-        "keypress #editor" : "escapeTabs",
-        "input   #editor"  : "escapeTabs",
-        "keydown" : "escapeTabs",
-
-        // TEMP
-        "keydown #range_name_field" : "escapeTabs",
-        // ---------
+        // Add listener to ranges text-area to highlight any rows that are bad
+        // Do this on blur and focus
+        "keyup  #rangesTextArea"  : "highlightBadRangeRows",
+        "blur   #rangesTextArea"  : "validateRangeQueries",
 
         "click  #resetFileButton" : "resetFile",
-
 
         // Handle the file upload with better looking components:
         "click   #browseFileButton"  : "browseForFile",
         "change  #bedFileUpload"     : "putFileNameInLabel"
     },
 
-
+    // TODO: Bindings not currently working - uses createRangeAnnotation() method to create the ranges to send to the controller
     // stickit 2-way binding setup - tie the fields on the panel to the "model" which is the RangeQuery object
     bindings: {
         // Bind html text field with id "range_name_field" to RangeQuery.name
@@ -62,7 +51,7 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         '#range_desc_field': 'description',
 
         // Bind html rich-text area with id "editor" to RangeQuery.ranges
-        '#editor': 'ranges',
+        '#rangesTextArea': 'ranges',
 
         // Bind html file upload component with id "bedFileUpload" to RangeQuery.filename
         '#bedFileUpload': 'file'
@@ -84,36 +73,62 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         MongoApp.dispatcher.on("uploadRangeQueriesComplete", function(isBackground, rangeName){
             self.handleUploadRangeQueriesComplete(isBackground, rangeName);
         });
+	
+    	// Initialize the highlighting of the text area only once
+        // Afterwards we will update the ranges after each keypress and refresh the highlight
+        // See:
+        //      http://mistic100.github.io/jquery-highlighttextarea/
+        //      http://bebo.minka.name/k2work/libs.js/jquery/2.1.0/highlightTextarea/
+        $('#rangesTextArea').highlightTextarea({
+            color: 'orange'
+        });
+
     },
 
     // This is called by RangeQueryController.js to show the regions that are created in the initialize() method above
     onShow: function() {
-        //this.rangeQueryRegion.show(????);
-
-        //this.filtersRegion.show(this.sampleFilterLayout);
-        //this.samplesRegion.show(this.sampleSelectionLayout);
-
-        // TEMP:  Try fading out the bed file upload div just to see if this javascript works
-        //$('#bedFileUpload').hide();
-        //$('#XSplit').hide();
-
-        // Show the rich text editor for the user-entered ranges
-        // http://mindmup.github.io/bootstrap-wysiwyg/
-        var editor = $('#editor');
-        $('#editor').wysiwyg();
-
     },
 
-    createRangeAnnotation: function() {
+    /** "Upload Range Query"  button event
+     *  NOTE: This triggers a call to the function "uploadRangeQueries" in RangeQueryController
+     */
+    createRangeAnnotation: function(event) {
+        // Clear the error msg at the bottom in case there was one there previously
+        $("#errorMsgAfterUpload").text("");
 
-        if (this.isAllValid()) {
-            // TODO:  Create a rangeQuery from the fields using jQuery selections.  Use this until bindings are working.
-            this.rangeQuery = this.createRangeQueryFromFields();
-
-            // If the event mentioned above that is tied to the "Create Range Annotation" button is triggered,
-            //     then trigger the RangeQueryController.uploadRangeQueries() function
-            MongoApp.dispatcher.trigger("uploadRangeQueries", this.rangeQuery);
+        var isNameOk = this.validateName();
+        if( ! isNameOk ) {
+            this.showValidationErrorMsg("Error: Name must be at least one character and can only contain letters, numbers, or underscores");
+            return;
         }
+
+        if( this.numRangeErrors > 0 ) {
+            this.showValidationErrorMsg("Error: One or more ranges in the text area contain errors");
+            return
+        }
+
+        var fileObj = $("#bedFileUpload")[0];
+        var filename = "";
+        if( fileObj.files.length > 0 )
+            filename = fileObj.files[0].name;
+        if( this.numRanges == 0  &&  ( ! filename  ||  filename.length == 0) ) {
+            this.showValidationErrorMsg("Error: You must specify at least one valid range in the text area, or a file containing ranges");
+            return;
+        }
+
+        //---------------------------------------------------------------------
+        // If we've reach this far, that means we have:
+        //   - a valid name
+        //   - no range errors in the text area
+        //   - at least one valid range in the text area, or a filename to upload
+        // So, create a RangeQuery object and send it to the RangeQueryController.uploadRangeQueries() function
+        //---------------------------------------------------------------------
+        // TODO:  Create a rangeQuery from the fields using jQuery selections.  Use this until bindings are working.
+        this.rangeQuery = this.createRangeQueryFromFields();
+
+        // If the event mentioned above that is tied to the "Create Range Annotation" button is triggered,
+        //     then trigger the RangeQueryController.uploadRangeQueries() function
+        MongoApp.dispatcher.trigger("uploadRangeQueries", this.rangeQuery);
     },
 
     handleUploadRangeQueriesComplete: function(isBackground, rangeName) {
@@ -147,31 +162,14 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
 
     // TEMP:  Create a rangeQuery from the fields using jQuery selections.  Use this until bindings are working.
     createRangeQueryFromFields : function() {
-
-        var rangeHtml = $("#editor").html();
-        // Remove line breaks by replacing with newlines
-        var rangeText = rangeHtml.replace(/<br>/g,  "\n");
-
+        var rangesText = $("#rangesTextArea").val();
         var rangeQuery = new RangeQuery({
             name : $("#range_name_field").val(),
             description : $("#range_desc_field").val(),
-            ranges : rangeText,
+            ranges : rangesText,
             file : $('#bedFileUpload')[0].files[0]
         } );
         return rangeQuery;
-    },
-
-    // Given a string, remove all the tags that cause highlighting on rows with errors (font, bold and italics opening and closing tags)
-    removeTags : function(txt) {
-        // Remove opening tags: font, bold, italics
-        var t1 = txt.replace(/<font color="red"><b><i>/g,  "");
-        // Remove closing tags: italics, bold, font
-        var t2 = t1.replace(/<\/i><\/b><\/font>/g, "");
-        // Remove non-breaking spaces
-        var t3 = t2.replace(/&nbsp;/g, "");
-
-        return t3;
-        //return txt.split("<font color='red'><b><i>").join().split("</i></b></font>").join();
     },
 
     // Check if the name is valid.  If not, show error '*' on end and color text field font red.  Return true if ok, false if invalid.
@@ -192,95 +190,27 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         return isOk;
     },
 
-    /** Send range query to server for validation and processing when user clicks the "Create Range Annotation" button at the bottom of the panel
-     * INPUT: RangeQuery object which should contain:
-     *      Workspace key that matches one of the workspaces in Mongo server
-     *      Usertoken for authentication and authorization
-     *      Name of range query
-     *      Description
-     *      List of ranges from textarea
-     *      Name of file to stream to server
-     * RETURN: A JSON object with status on range queries that were uploaded
-     * -----
-     * Example curl call:
-     *      curl -X POST  -F file=@interval.file --form rangeSetText=somerange --form intervalDescription="I Love Puppies"  http://localhost:8080/ve/rangeSet/workspace/foo/name/bar
-     */
-    isAllValid: function() {
-        // Validate the ranges, highlight any that have errors, and show the error count
-        var numErrors = this.validateRangeQueries();
-
-        var isNameOk = this.validateName();
-
-        // TODO: add the following validation checks
-        // 1. at least text area range OR file must be specified
-        var isRangeOrFileSpecified = true;
-
-        if (numErrors == 0  &&  isNameOk && isRangeOrFileSpecified) {
-            return true;
-        } else {
-            return false;
-        }
-    },
-
-    /* VAlidate the rich-text field range queries, and return number of errors */
+    /* When the ranges text area loses focus, show an error msg if there are any errors with the ranges. */
     validateRangeQueries: function() {
-        // Validate the ranges, highlight any that have errors, and show the error count
-        // (Returns 'true' if all ranges were ok)
-        var numErrors = this.countBadRanges();
-
-        // Update the error count in parentheses
-        this.updateErrorCount(numErrors);
-
-        // Update the ranges regardless of whether there were errors or not, since we want to remove bad tags and
-        // update the text area in case there were errors previously (to clear the highlighted errors)
-        this.highlightBadRanges();
-
-        if (numErrors > 0 ) {
-            this.showErrorMsg("Please correct the errors in the ranges.");
+        if (this.numRangeErrors > 0 ) {
+            this.showRangeErrorMsg("Please correct the errors in the ranges.");
+        } else {
+            this.showRangeErrorMsg("");
         }
-
-        return numErrors;
     },
 
-    updateErrorCount : function(numErrors) {
-        var numErrorsMsg = "(" + numErrors + " errors)";
+    updateErrorCount : function(numErrors, numRanges) {
+        var numErrorsStr = numErrors + " errors";
         if( numErrors == 1 )
-            numErrorsMsg = "(1 error)";
-        $("#numErrors").html(numErrorsMsg);
-    },
+            numErrorsStr = "1 error";
 
-    // Validate all ranges in the user-entered rich-text field.
-    // Return "true" if all ranges are valid, else return "false"
-    countBadRanges : function() {
-        // Get the HTML value from the rich-text editor
-        var rangesAll = $("#editor").html();
-        var txt = $("#editor").text();
-        var lenTxt = txt.length;
-        var chars = txt.split('');
+        var numRangesStr = numRanges + " ranges";
+        if( numRanges == 1 )
+            numRangesStr = "1 range";
 
-        //  This appears to do nothing:
-        //var rangesAll = $("#editor").val();
-        //  This gets the text all jumbled together (no <br> tags for line breaks)
-        //var rangesAll = $("#editor").text();
-        rangesAll = this.removeTags(rangesAll);
+        var msg = "(" + numErrorsStr + ", " + numRangesStr + ")";
 
-        // Split into lines  (new lines appear as "<br>" tags in the html value for the element)
-        var rows = rangesAll.split("<br>");
-        var numBadRanges = 0;
-        for( var i=0; i < rows.length; i++) {
-            var row = rows[i].trim();
-
-            // If the row is blank or empty spaces/tabs, then ignore it
-            if( row.length == 0 )
-                continue;
-
-            // If first 3 columns are valid (chrom, start (int), stop (int)) it has less than 3 columns, return false (bad line)
-            if( ! this.isValidRow(row) )
-                numBadRanges++;
-        }
-
-        // Made it through all rows, so all are valid
-        return numBadRanges;
+        $("#numErrors").html(msg);
     },
 
     // Take a string and check that:
@@ -297,72 +227,88 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         return !isNaN(parseFloat(n)) && isFinite(n);
     },
 
-    // Highlight those ranges within the rich text area that do NOT meet the range criteria and
-    // bold, italicize, and red-color them
-    // NOTE: We will have to strip out any tags before uploading on subsequent calls.
-    highlightBadRanges: function() {
-        var rangesAll = $("#editor").html();
-        rangesAll = this.removeTags(rangesAll);
-        var rows = rangesAll.split("<br>");
-        var newText = "";
+    showRangeErrorMsg: function(errorMsg) {
+        // Cancel any previous event timing
+        clearTimeout(this.errorMsgTimeoutEventRanges);
 
-        // Go through each row, highlight it if not valid, then concatenate it to the new text (with a new line at the end since we split that out)
-        for(var i=0; i < rows.length; i++) {
-            // If the row is blank, don't add it (discard all blank rows)
-            if( rows[i].trim().length == 0 )
-                continue;
-            else if( this.isValidRow(rows[i]) )
-                newText = newText.concat(rows[i]);
-            else
-                newText = newText.concat("<font color=red><b><i>").concat(rows[i]).concat("</i></b></font>");
-
-            // Add the <br> tag to the end of each line except the last one
-            if( i < (rows.length - 1) )
-                newText = newText.concat("<br>");
-        }
-
-        // Now, update the value in the textarea
-        $("#editor").html(newText);
-
-        return newText;
-    },
-
-    showErrorMsg: function(errorMsg) {
-        var errorMsgObj = $("#errorMsg");
+        var errorMsgObj = $("#rangesErrorMsg");
 
         // Set the error msg
         errorMsgObj.text(errorMsg);
 
         // Show the error msg  (NOTE: fadeIn() doesn't appear to work)
+        // Fade in to full intensity after 300ms
         errorMsgObj.fadeTo(300,1);
 
-        // Have error msg fade out 5 seconds
-        window.setTimeout(function() {
+        // After 5000ms, begin fading out completely over 2000ms
+        this.errorMsgTimeoutEventRanges = window.setTimeout(function() {
             errorMsgObj.fadeTo(2000, 0);
         }, 5000);
     },
 
-   // Trigger event when text changes in the rich-text field for ranges.
-    escapeTabs: function(eventObj) {
-        var TABKEY = 9;
-        var c1 = eventObj.charCode;
-        var c2 = eventObj.keyCode;
-        var c3 = eventObj.which;
-        var charCode = eventObj.charCode || eventObj.keyCode || eventObj.which;
-        return;
-        var keyCode = event.keyCode;
-        // If tab is detected, then set focus on the next field, which is the file upload, and cancel the tab character input
-        // See: http://stackoverflow.com/questions/3362/capturing-tab-key-in-text-box
-        if(keyCode == TABKEY) {
-            var fileUploadObj = $("#bedFileUpload");
-            fileUploadObj.focus();
-            if(e.preventDefault) {
-                e.preventDefault();
-            }
-            return false;
-        }
+    showValidationErrorMsg: function(errorMsg) {
+        // Cancel any previous event timing
+        clearTimeout(this.errorMsgTimeoutEventValidation);
+
+        var errorMsgObj = $("#errorMsgAfterUpload");
+
+        // Set the error msg
+        errorMsgObj.text(errorMsg);
+
+        // Show the error msg  (NOTE: fadeIn() doesn't appear to work)
+        // Fade in to full intensity after 300ms
+        errorMsgObj.fadeTo(300,1);
+
+        // After 5000ms, begin fading out to 30% intensity over 2000ms
+        this.errorMsgTimeoutEventValidation = window.setTimeout(function() {
+            errorMsgObj.fadeTo(2000, 0.3);
+        }, 5000);
     },
 
+
+    // Trigger event when text changes in the text-area
+    // Highlight rows that are not valid ranges
+    highlightBadRangeRows : function(eventObj) {
+        // Split the ranges text area by newlines
+        var rangesAll = $("#rangesTextArea").val();
+        var rows = rangesAll.split("\n");
+        this.numRanges = 0;
+        this.numRangeErrors = 0;
+        var rowStart = 0;
+        var badRangesJson = new Array();
+        // Loop through all lines, and add any bad ones to the badRangesJson array
+        for(var i=0; i < rows.length; i++) {
+            // If the row is blank, disregard it
+            var isBlank = rows[i].trim().length == 0;
+            // Else, if it is bad, then add it to the badRanges array
+            var end = rowStart + rows[i].length;
+            if( ! isBlank ) {
+                this.numRanges++;
+                if( ! this.isValidRow(rows[i]) ) {
+                    badRangesJson.push([rowStart, end]);
+                    this.numRangeErrors++;
+                }
+            }
+            // Add 1 to the end to skip the newline character at the end of each row
+            rowStart = end + 1;
+        }
+
+        // Highlight the badRanges rows in orange within the text area
+        // Format of the json object must be similar to:       "["mike","bad"]"
+        // Where internal quotes are escaped with backslashes: "[\"mike\",\"bad\"]"
+        // OR an array of ranges: "[[0,1],[3,10]]"
+        //    var badRangesJson2 = JSON.parse("[[0,15],[20,25],[26,34],[35,43]]");
+        //    var badRangesJson3 = [[0,15],[20,25]];
+        // SEE:  http://mistic100.github.io/jquery-highlighttextarea/
+        // IMPORTANT:  This is how to update it after the initialization!!!:
+        //     http://bebo.minka.name/k2work/libs.js/jquery/2.1.0/highlightTextarea/
+        $('#rangesTextArea').highlightTextarea('setOptions', {color : 'orange'});
+        $('#rangesTextArea').highlightTextarea('setRanges', badRangesJson);
+        $('#rangesTextArea').highlightTextarea('highlight');
+
+        // Update the error count above the text area
+        this.updateErrorCount(this.numRangeErrors, this.numRanges);
+    },
 
     // Reset the file path
     resetFile: function() {
