@@ -30,6 +30,7 @@ import edu.mayo.util.SystemProperties;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.ve.resources.SampleMeta;
+import edu.mayo.ve.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -255,7 +256,7 @@ public class VCFParser implements ParserInterface {
     private void storeVariantCount(File vcf, int headerLineCount, String workspaceID) throws IOException {
 
         long timestamp = System.currentTimeMillis();
-        int variantCount = getLineCount(vcf) - headerLineCount;
+        int variantCount = IOUtils.getLineCount(vcf) - headerLineCount;
         long delta = System.currentTimeMillis() - timestamp;
         int totalLines = variantCount + headerLineCount;
         System.out.println("Took " + delta + "ms to get line count for file " + vcf.getAbsolutePath());
@@ -292,33 +293,7 @@ public class VCFParser implements ParserInterface {
         return dividend & (divisor - 1);
     }
 
-    /**
-     * Gets the total line count for the given file.
-     * @param f
-     *      The file to be inspected.
-     * @return
-     *      The line count for the given file.
-     * @throws IOException
-     */
-    public int getLineCount(File f) throws IOException {
 
-        // use compressor to figure out how to handle .zip, .gz, .bz2, etc...
-        File fakeOutFile = CWEUtils.createSecureTempFile();
-        Compressor compressor = new Compressor(f, fakeOutFile);
-
-        LineNumberReader reader = null;
-        try {
-
-            reader = new LineNumberReader(compressor.getReader());
-            reader.skip(Long.MAX_VALUE);
-            // First line is 0, so add one
-            return reader.getLineNumber() + 1;
-
-        } finally {
-            reader.close();
-            fakeOutFile.delete();
-        }
-    }
 
     /**
      * Checks whether the given INFO field has a metadata type of String or Character.
