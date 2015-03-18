@@ -23,7 +23,7 @@ public class RangeQueryInterfaceTest {
 	@Before
 	public void beforeEach() {
 		mDbImplStub = new DatabaseImplStub();
-		mRangeQuery = new RangeQueryInterface(mDbImplStub);
+		mRangeQuery = new RangeQueryInterface(mDbImplStub, true);
 	}
 	
     /** This unit test, will only test the regex in testValidate, this way it need not connect to Mongo.
@@ -60,7 +60,7 @@ public class RangeQueryInterfaceTest {
     @Test (expected=FileNotFoundException.class)
     public void validateFileRanges_nonexistentFile() throws IOException, ParseException {
     	// Try with file that does not exist
-    	mRangeQuery.parseRangeFile(new File("/tmp/nonexistent.file"));
+    	mRangeQuery.validateRangesInFile(new File("/tmp/nonexistent.file"), "text area");
     	fail("Fail if it reached this far as the parser should throw a FileNotFoundException");
     }
     
@@ -70,7 +70,7 @@ public class RangeQueryInterfaceTest {
     	File emptyFile = fromPath("/testData/emtpyFile.txt");
     	assertTrue( emptyFile.exists() );
     	// Should work ok - just no ranges to check
-    	mRangeQuery.parseRangeFile(emptyFile);
+    	mRangeQuery.validateRangesInFile(emptyFile, "file upload");
     }
 
     

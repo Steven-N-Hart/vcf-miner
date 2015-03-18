@@ -25,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.sun.jersey.multipart.FormDataParam;
 
+import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.ve.LoaderPool;
@@ -47,34 +48,36 @@ import edu.mayo.ve.util.Tokens;
 @Path("/ve/rangeSet")
 public class RangeQueryInterface {
     
-    private boolean verboseMode = false;
-    private static final Logger log = Logger.getLogger(RangeQueryInterface.class.getCanonicalName());
+    private boolean mIsVerboseMode = false;
+    private static final Logger mLog = Logger.getLogger(RangeQueryInterface.class.getCanonicalName());
 
 	private DatabaseInterface mDbInterface = null;
 	
 	/** This constructor will be called when the REST service is called */ 
     public RangeQueryInterface(){
-    	mDbInterface = new DatabaseImplMongo();
+    	this(new DatabaseImplMongo(), true);
     }
-    
-    /** This constructor can be used by test cases to pass in an implementation of the DatabaseInterface */
-    public RangeQueryInterface(DatabaseInterface dbInterface) {
-    	mDbInterface = dbInterface;
-    }
-    
-    
 
     /**
      * for more detailed logging, use verbose = true in the constructor
      * @param verbose
      */
-    public RangeQueryInterface(boolean verbose){
-        verboseMode = verbose;
-        setVerboseMode();
+    public RangeQueryInterface(boolean isVerbose){
+        this(new DatabaseImplMongo(), isVerbose);
     }
 
-    public void setVerboseMode(){
-        LoaderPool.setReportingTrueAndResetRangePool();
+    /** This constructor can be used by test cases to pass in an implementation of the DatabaseInterface
+     *  @param dbInterface  The implementation of the DatabaseInterface to use
+     *  @param isVerbose  If true, turn on detailed logging */
+    public RangeQueryInterface(DatabaseInterface dbInterface, boolean isVerbose) {
+    	mDbInterface = dbInterface;
+    	mIsVerboseMode = isVerbose;
+    	setVerboseMode(isVerbose);
+    }
+    
+    
+    public void setVerboseMode(boolean isVerbose){
+        LoaderPool.setReportingTrueAndResetRangePool(isVerbose);
     }
 
 
@@ -96,72 +99,60 @@ public class RangeQueryInterface {
             @FormDataParam("rangeSetText") String rangeSets,
             @FormDataParam("file") InputStream uploadedInputStream
     ) throws Exception {
-        File tempFile = null;
-        RangeUploadResponse response = null;
-        try {
-	        //validate the interval name (e.g. can't have period or other funky characters, can't already be used)
-	        validateName(workspace, intervalsName);
-	
-	        //parse the intervals into 'rangeSets' to ensure that they are well formed
-	        List<String> rangeLines = validateRangeLines(rangeSets);
-	
-	
-	        //copy the contents of the input stream to a temp file, this will allow us to validate that all of the intervals in the file are correctly formed.
-	        // Save the file stream to a file
-	        tempFile = edu.mayo.ve.util.IOUtils.createTempFile();
-	        saveStreamToFile(tempFile, uploadedInputStream);
-	        // Read the number of non-empty lines in the file
-	        int numRangesInFile = edu.mayo.ve.util.IOUtils.countNonEmptyLines(tempFile);
-	
-	        // If there are no ranges defined in either the text area OR the file, then throw an exception
-	        if ((rangeLines.size() + numRangesInFile) == 0)
-	            throw new Exception("ERROR: Please specify at least one range in either the file or the text area.");
-	
-	        //parse the file to ensure that all of the intervals are well formed
-	        //add a try catch to inform the user that the validation failed on the file upload
-	        parseRangeFile(tempFile);
-	
-	        //get the update frequency...
-	        int updateFrequency = getUpdateFrequency();
-	
-	        //update the workspace to include the new range set as a flag (intervals from form)
-	        if (verboseMode) {log.info("Updating the workspace with the intervals from the form");}
-	        mDbInterface.bulkUpdate(workspace, rangeLines.iterator(), updateFrequency, intervalsName);
-	
-	        //update the metadata  --perhaps we need to not do this if the operation failed?  todo:!
-	        if (verboseMode) {log.info("Updating the metadata");}
-	        updateMetadata(workspace, intervalsName, intervalDescription);
+        // Validate the interval name (names must contain only letters, numbers, and underscores, and can't already exist in the metadata)
+        validateName(workspace, intervalsName);
 
-            //flag the workspace as annotating
-            if (verboseMode) {log.info("Flagging the workspace as annotating");}
-            MetaData meta = new MetaData();
-            meta.flagAsAnnotating(workspace);
-	
-	        //update the workspace to include the new range set as a flag (file intervals)
-	        //doing update inline...
-	        //BufferedReader br = new BufferedReader(new FileReader(tempFile));
-	        //new DatabaseImplMongo().bulkUpdate(workspace, new FileIterator(br), updateFrequency, intervalsName);
-	        if (verboseMode) {log.info("Adding loading task to the worker pool");}
-	        addTaskToWorkerPool(workspace, tempFile.getCanonicalPath(), intervalsName);
+        // Save the text area string to the temp file 
+        File tempFile = edu.mayo.ve.util.IOUtils.createTempFile();
+        saveStreamToFile(tempFile, IOUtils.toInputStream(rangeSets));
 
+        // Validate the ranges in the text area - parse the intervals into 'rangeSets' to ensure that they are well formed
+        validateRangesInFile(tempFile, "text area");
+        int numRangesInTextArea = edu.mayo.ve.util.IOUtils.countNonEmptyLines(tempFile);
+        
+        // Save the file stream to a file
+        saveStreamToFile(tempFile, uploadedInputStream);
+        
+        // Validate the ranges from the uploaded file
+        validateRangesInFile(tempFile, "uploaded file");
+        int numRangesInUploadedFile = edu.mayo.ve.util.IOUtils.countNonEmptyLines(tempFile);
 
-            // Treated as background if there are intervals in the file
-            response = new RangeUploadResponse();
-            boolean isBackground = false;
-            if (numRangesInFile > 0) {
-                isBackground = true;
-            }
-            response.setIsBackground(isBackground);            
-        } finally {
-        	if( tempFile != null  &&  tempFile.exists() )
-        		tempFile.delete();
-        }
+        // If there are no ranges defined in either the text area OR the file, then throw an exception
+        if ( (numRangesInTextArea + numRangesInUploadedFile) == 0)
+            throw new Exception("Error: Please specify at least one range in either the file or the text area.");
+
+        // Append the text area ranges to the end of the uploaded file
+        edu.mayo.ve.util.IOUtils.appendToFile(tempFile, rangeSets);
+
+        final int BACKGROUND_THRESHOLD = 20;
+        boolean isBackgroundProcess = (numRangesInTextArea + numRangesInUploadedFile) > BACKGROUND_THRESHOLD;
+        applyRanges(workspace, tempFile, intervalsName, intervalDescription, isBackgroundProcess);
+
+    	RangeUploadResponse response = new RangeUploadResponse(isBackgroundProcess);
         return response;
     }
     
-    /** Save the input stream to a file */
+    private void applyRanges(String workspaceKey, File rangesFile, String intervalName, String intervalDescription, boolean isBackgroundProcess) throws IOException, ProcessTerminatedException {
+        //get the update frequency...
+        int updateFrequency = getUpdateFrequency();
+
+        // Create a task for running the range query update
+        Task<HashMap,HashMap> task = getTask(workspaceKey, rangesFile, intervalName, intervalDescription, updateFrequency);
+        
+        // Determine whether it should run as a background process or stay interactive (background if > 20 ranges)
+    	// update the workspace to include the new range set as a flag (intervals from form)
+        if( isBackgroundProcess ) {
+        	if (mIsVerboseMode) {mLog.info("The number of ranges exceeds the threshold, so running as a background process (adding to range worker pool).");}
+	        addTaskToWorkerPool(task);
+        } else {
+        	if (mIsVerboseMode) {mLog.info("There are only a few ranges, so running interactively/synchronously.");}
+        	new RangeWorker().compute(task);
+        }
+	}
+
+	/** Save the input stream to a file */
     protected void saveStreamToFile(File fileToSaveTo, InputStream uploadedInputStream) throws IOException {
-        if (verboseMode) {  log.info("Copying the interval file to the local filesystem: " + fileToSaveTo.getCanonicalPath()); }
+        if (mIsVerboseMode) {  mLog.info("Copying the interval file to the local filesystem: " + fileToSaveTo.getCanonicalPath()); }
 
         //copy the contents of the input stream to a temp file, this will allow us to validate that all of the intervals in the file are correctly formed.
         OutputStream outStream = new FileOutputStream(fileToSaveTo);
@@ -179,13 +170,15 @@ public class RangeQueryInterface {
         }
     }
 
+    /** Get the update frequency from the sys.properties file */
     protected int getUpdateFrequency() throws IOException {
-        //get the update frequency...
-        SystemProperties sysprop = new SystemProperties();
-        String ibsr = sysprop.get("INTERVAL_BULK_INSERT_RATE");
-        int freq = 1; //default 1 if not defined
-        if(ibsr != null && ibsr.length()<1){
-            freq = Integer.parseInt(ibsr);
+    	int freq = 1; // Default
+    	try {
+    		SystemProperties sysprop = new SystemProperties();
+    		String ibsr = sysprop.get("INTERVAL_BULK_INSERT_RATE");
+    		freq = Integer.parseInt(ibsr);
+        } catch( Exception e ) {
+            mLog.info("The update frequency for range/bed files is not defined in the sys.properties file.  Please define INTERVAL_BULK_INSERT_RATE.  For now it is set to 1 which could be slow");
         }
         return freq;
     }
@@ -209,87 +202,36 @@ public class RangeQueryInterface {
 
 
     /**
-     * adds the task of inserting the interval as a new field to the range worker pool as a background process.  gets updateFreq
-     * from the configuration file
-     * @param workspace  - the key for the workspace we are modifying
-     * @param inputFile  - bed/ tabix interval file that we get the intervals from
-     * @param field      - the name of the new INFO field
-     */
-    public Task addTaskToWorkerPool(String workspace, String inputFile, String field) {
-        int freq = 1;
-        try {
-            freq = getUpdateFrequency();
-        }catch (Exception e){
-            log.info("The update frequencey for range/bed files is not defined in the sys.properties file, please define INTERVAL_BULK_INSERT_RATE.  For now it is set to 1 which could be slow");
-        }
-        return addTaskToWorkerPool(workspace,inputFile,field,freq);
-    }
-
-    /**
      * adds the task of inserting the interval as a new field to the range worker pool as a background process.
      * @param workspace  - the key for the workspace we are modifying
      * @param inputFile  - bed/ tabix interval file that we get the intervals from
      * @param field      - the name of the new INFO field
      * @param updateFreq - for bulk insert, the number of records we should parse before sending the update to mongo
+     * @throws IOException 
      */
-    public Task addTaskToWorkerPool(String workspace, String inputFile, String field, int updateFreq) {
+    public void addTaskToWorkerPool(Task task) throws IOException {
         WorkerPool pool = LoaderPool.getRangeWorkerPool();
-        Task<HashMap,HashMap> t = getTask(workspace,inputFile,field,updateFreq);
-        pool.addTask(t);
-        pool.startTask(t.getId());
-        return t;
+        pool.addTask(task);
+        pool.startTask(task.getId());
     }
 
-    public Task getTask(String workspace, String inputFile, String field, int updateFreq){
-        Task<HashMap,HashMap> t = new Task<HashMap,HashMap>();
+    public Task getTask(String workspaceKey, File rangesFile, String intervalName, String intervalDescription, int updateFreq) throws IOException{
+        Task<HashMap,HashMap> task = new Task<HashMap,HashMap>();
         HashMap<String,String> fields = new HashMap<String,String>();
-        fields.put(RangeWorker.INTERVAL_NAME,field);
-        fields.put(RangeWorker.RANGE_FILE, inputFile);
+        fields.put(RangeWorker.INTERVAL_NAME, intervalName);
+        fields.put(RangeWorker.INTERVAL_DESCRIPTION, intervalDescription);
+        fields.put(RangeWorker.RANGE_FILE, rangesFile.getCanonicalPath());
         fields.put(RangeWorker.UPDATE_FREQ, String.valueOf(updateFreq));
-        fields.put(Tokens.KEY,workspace);
-        t.setCommandContext(fields);
-        return t;
+        fields.put(Tokens.KEY,workspaceKey);
+        task.setCommandContext(fields);
+        return task;
     }
 
-    /**
-     *
-     * @param workspaceKey    - the workspace that will get the metadata update
-     * @param intervalsName - the new name of the field
-     * @param description  - the description of the new field
-     */
-    public void updateMetadata(String workspaceKey, String intervalsName, String description) throws Exception {
-    	if( mDbInterface.isInfoFieldExists(workspaceKey, intervalsName) ) {
-            throw new Exception("Invalid Field Name!, it already exists.  FIELD: " + intervalsName + " KEY: " + workspaceKey);
-        }
-    	mDbInterface.addInfoField(workspaceKey, intervalsName, 0, "Flag", description);
-    }
-
-    /**
-     * given a string s, that has unparsed intervals one per line (\n delimited) return a list of strings representing intervals that pass validation
-     * @return
-     */
-    public List<String> validateRangeLines(String intervals) throws ParseException {
-        List<String> rangeLines = new ArrayList<String>();
-        String[] lines = intervals.split("\n");
-        for(String line : lines){
-            if(line.length()>5) { //we need at least 5 characters to be a valid range e.g. 1:0-1
-                //attempt to parse it into a range
-                new Range(line);
-                //add the range to the valid ranges checked
-                rangeLines.add(line); //bulk update requires lines not ranges
-            }
-        }
-        return rangeLines;
-    }
-    
 
     /**
      * @throws Exception
      */
     public void validateName(String workspaceKey, String intervalsName) throws Exception {
-        if(mDbInterface == null){
-            mDbInterface = new DatabaseImplMongo();
-        }
         // First, verify that the name only contains letters, numbers, or underscores
         if( ! intervalsName.matches("[a-z,A-Z,0-9,_]+") ){
             throw new Exception("Proposed Field Name must contain only letter, numbers, or underscores.  Name: " + intervalsName);
@@ -297,7 +239,7 @@ public class RangeQueryInterface {
         
         // Then, verify the metadata does not already contain a field with the same name, if it does -> invalid
         if( mDbInterface.isInfoFieldExists(workspaceKey, intervalsName) )  {
-            throw new Exception("Proposed Field Name is Already in use: " + intervalsName);
+            throw new Exception("Proposed intervals name is already in use: " + intervalsName);
         }
         
         //if no exceptions were thrown then it is good to go!
@@ -307,12 +249,13 @@ public class RangeQueryInterface {
     /**
      * Validate the range file by parsing it, looking for errors as it goes through it.
      * @param fileWithRanges
+     * @param srcOfData  A string that will appear in the exception if a range cannot be parsed.  Ex: "text area" or "uploaded file"
      * @return
      * @throws IOException
      * @throws ParseException
      */
-    public void parseRangeFile(File fileWithRanges) throws IOException, ParseException {
-        if (verboseMode) {log.info("Parsing intervals in the file to ensure that they are all well formed");}
+    public void validateRangesInFile(File fileWithRanges, String srcOfData) throws IOException, ParseException {
+        if (mIsVerboseMode) {mLog.info("Parsing intervals in the file to ensure that they are all well formed");}
 
         BufferedReader br = null;
         try {
@@ -324,9 +267,10 @@ public class RangeQueryInterface {
 	        	if( line.trim().length() == 0 )
 	        		continue;
 	            try {
-	                Range range = new Range(line);
+	            	// Try to parse the range
+	                new Range(line);
 	            }catch (ParseException pe){
-	                throw new ParseException("filename: " + fileWithRanges + ",  Line_Number: " + lineNum + ", Line_Content: " + line + "\n" + pe.getMessage(), 0);
+	                throw new ParseException("Error: Range not valid (" + srcOfData + "). Line_Number: " + lineNum + ", line: " + line + "\n" + pe.getMessage(), 0);
 	            }
 	        }
         } finally {

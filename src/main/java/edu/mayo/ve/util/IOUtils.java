@@ -5,6 +5,8 @@ import edu.mayo.security.CWEUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -63,6 +65,17 @@ public class IOUtils {
         }
         return nonEmptyLineCount;
     }
+
+	public static void appendToFile(File tempFile, String str) throws IOException {
+		FileOutputStream fout = null;
+		try {
+			fout = new FileOutputStream(tempFile, true);
+			fout.write(str.getBytes());
+		} finally {
+			if( fout != null )
+				fout.close();
+		}
+	}
 
 
 }

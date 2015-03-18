@@ -160,9 +160,9 @@ public class LoaderPool implements ServletContextListener,
     }
 
     public static final String RANGE_WORKERS = "range_workers";
-    public static void setReportingTrueAndResetRangePool(){
+    public static void setReportingTrueAndResetRangePool(boolean isVerbose){
         RangeWorker logic = new RangeWorker(); //the VCF updater
-        logic.setVerboseMode(true);
+        logic.setVerboseMode(isVerbose);
         wpr = new WorkerPool(logic, numberworkers);
         WorkerPoolManager.registerWorkerPool(RANGE_WORKERS, wpr);
         return;
