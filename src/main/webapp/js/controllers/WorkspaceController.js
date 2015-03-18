@@ -218,6 +218,9 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                             var ws = new Workspace();
                             self.initWorkspace(workspaceJSON, ws);
                             self.workspaces.add(ws);
+                            console.log("workspace:");
+                            console.log("\tname:\t"+ws.get("alias"));
+                            console.log("\tkey :\t"+ws.get("key"));
                         }
                     }
                 }
@@ -227,10 +230,6 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     },
 
     initWorkspace: function(workspaceJSON, ws, async) {
-
-        console.log("workspace:");
-        console.log("\tname:\t"+ws.get("alias"));
-        console.log("\tkey :\t"+ws.get("key"));
 
         // each workspaceKey object has an increment num as the attr name
         ws.set("key",   workspaceJSON.key);
