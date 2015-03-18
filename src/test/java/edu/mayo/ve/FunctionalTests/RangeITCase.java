@@ -36,6 +36,7 @@ import edu.mayo.ve.resources.ExeQuery;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.ve.resources.RangeQueryInterface;
 
+
 /**
  * Created by m102417 on 2/9/15.
  */
@@ -69,7 +70,7 @@ public class RangeITCase {
         System.out.println("Loading 197 Variants to test interval queries");
         String rangeSetName = "RangeSet1";
         DatabaseImplMongo dbImplMongo = new DatabaseImplMongo();
-        RangeQueryInterface rangeQ = new RangeQueryInterface(dbImplMongo);
+        RangeQueryInterface rangeQ = new RangeQueryInterface(dbImplMongo, true);
         //tests
         //make sure there are 197 records in the collection
         long count = util.count(workspace);
@@ -133,7 +134,7 @@ public class RangeITCase {
 
         //update the metadata... different seperate call than the bulk update, so need to call it manually
         String description = "Some Test Range Set";
-        rangeQ.updateMetadata(workspace,rangeSetName,description);
+        new DatabaseImplMongo().addInfoField(workspace, rangeSetName, 0, "Flag", description);
 
         //finally check that the update also updated the metadata.
         MetaData meta = new MetaData();
@@ -176,7 +177,7 @@ public class RangeITCase {
     public void testRESTENDPOINT() throws Exception {
         //startup the worker pool -- this is needed for the REST call to work
         LoaderPool pool = new LoaderPool();
-        pool.setReportingTrueAndResetRangePool(); //this is needed in a unit testing (should be fine in production)
+        pool.setReportingTrueAndResetRangePool(true); //this is needed in a unit testing (should be fine in production)
 
         RangeQueryInterface rangeQ = new RangeQueryInterface(true); //set verbose mode
         String intervalsName = "INTERVALTESTREST";
@@ -220,11 +221,12 @@ public class RangeITCase {
     public void testLogicInRangeWorker() throws Exception {
 
         String intervalsName = "BACKGROUNDPROC";
+        String intervalsDesc = "Some description here";
         RangeQueryInterface rangeQ = new RangeQueryInterface();
         RangeWorker worker = new RangeWorker();
-        Task<HashMap,HashMap> t = rangeQ.getTask(workspace,rangeFile,intervalsName,1);
+        Task<HashMap,HashMap> t = rangeQ.getTask(workspace, new File(rangeFile), intervalsName, intervalsDesc, 1);
         //update the metadata manually because it is not in the front end call
-        rangeQ.updateMetadata(workspace,intervalsName,"test on the background worker");
+        new DatabaseImplMongo().addInfoField(workspace, intervalsName, 0, "Flag", "test on the background worker");
 
         //update the collection outside of the thread pool
         worker.compute(t);
