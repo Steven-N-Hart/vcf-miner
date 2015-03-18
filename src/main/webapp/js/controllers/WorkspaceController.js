@@ -216,21 +216,8 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
                         // check filtered keys
                         if ((filterKeys == null) || _.contains(filterKeys, workspaceJSON.key)) {
                             var ws = new Workspace();
-
                             self.initWorkspace(workspaceJSON, ws);
-
-                            console.log("workspace:");
-                            console.log("\tname:\t"+ws.get("alias"));
-                            console.log("\tkey :\t"+ws.get("key"));
-
                             self.workspaces.add(ws);
-
-                            // auto-update if the workspace is not 'ready' or 'failed'
-                            if ( !((ws.get("status") == ReadyStatus.READY) || (ws.get("status") == ReadyStatus.FAILED))
-                                && ($.inArray(ws.get("key"), self.notReadyKeys) == -1)) {
-                                console.log("Adding auto-updates for key "  + ws.get("key"));
-                                self.notReadyKeys.push(ws.get("key"));
-                            }
                         }
                     }
                 }
@@ -240,6 +227,11 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
     },
 
     initWorkspace: function(workspaceJSON, ws, async) {
+
+        console.log("workspace:");
+        console.log("\tname:\t"+ws.get("alias"));
+        console.log("\tkey :\t"+ws.get("key"));
+
         // each workspaceKey object has an increment num as the attr name
         ws.set("key",   workspaceJSON.key);
         ws.set("alias", workspaceJSON.alias);
@@ -262,10 +254,27 @@ var WorkspaceController = Backbone.Marionette.Controller.extend({
             }
         }
 
+        var annotation_count_total = parseInt(workspaceJSON.annotation_count_total);
+        if (!isNaN(annotation_count_total)) {
+            ws.set("statsTotalAnnotations", annotation_count_total);
+        }
+
+        var annotation_count_current = parseInt(workspaceJSON.annotation_count_current);
+        if (!isNaN(annotation_count_current)) {
+            ws.set("statsNumAnnotations", annotation_count_current);
+        }
+
         // load extra information about workspaceKey
         this.loadMetadata(ws, async);
         this.loadSampleGroups(ws, async);
         this.loadSamples(ws, async);
+
+        // auto-update if the workspace is not 'ready' or 'failed'
+        if ( !((ws.get("status") == ReadyStatus.READY) || (ws.get("status") == ReadyStatus.FAILED))
+            && ($.inArray(ws.get("key"), this.notReadyKeys) == -1)) {
+            console.log("Adding auto-updates for key "  + ws.get("key"));
+            this.notReadyKeys.push(ws.get("key"));
+        }
     },
 
     updateNotReadyWorkspaces: function()

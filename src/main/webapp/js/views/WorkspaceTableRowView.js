@@ -94,15 +94,26 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
 
     getActionCell: function(workspace) {
 
-        if (workspace.get("status") == ReadyStatus.IMPORTING) {
+        if ((workspace.get("status") == ReadyStatus.IMPORTING) || (workspace.get("status") == ReadyStatus.ANNOTATING)) {
             var percentComplete;
-            if (workspace.get("statsTotalVariants") == 0) {
+            var current = 0;
+            var total = 0;
+            if (workspace.get("status") == ReadyStatus.IMPORTING) {
+                current = workspace.get("statsNumVariants");
+                total   = workspace.get("statsTotalVariants");
+            } else if (workspace.get("status") == ReadyStatus.ANNOTATING) {
+                current = workspace.get("statsNumAnnotations");
+                total   = workspace.get("statsTotalAnnotations");
+            }
+
+            if (total == 0) {
                 percentComplete = 0;
             } else {
-                percentComplete = Math.ceil((workspace.get("statsNumVariants") / workspace.get("statsTotalVariants")) * 100);
+                percentComplete = Math.ceil((current / total) * 100);
             }
+
             var html =
-                '<p>' + percentComplete + '% (' + workspace.get("statsNumVariants") + ' of ' + workspace.get("statsTotalVariants") + ')</p>' +
+                '<p>' + percentComplete + '% (' + current + ' of ' + total + ')</p>' +
                 '<div class="progress progress-info" style="style="width:200px;">' +
                 '   <div class="bar" style="width: '+percentComplete+'%;"></div>' +
                 '</div>';
@@ -164,6 +175,8 @@ WorkspaceTableRowView = Backbone.Marionette.ItemView.extend({
                 return "Failed";
             case ReadyStatus.QUEUED:
                 return "Queued";
+            case ReadyStatus.ANNOTATING:
+                return "Annotating";
             default:
                 return "NA";
         }

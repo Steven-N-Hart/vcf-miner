@@ -6,7 +6,8 @@ var ReadyStatus =
     READY:      1,
     QUEUED:     2,
     IMPORTING:  3,
-    INDEXING:   4
+    INDEXING:   4,
+    ANNOTATING: 5
 }
 
 var Workspace = Backbone.Model.extend({
@@ -27,7 +28,9 @@ var Workspace = Backbone.Model.extend({
             statsErrors: 0,
             statsWarnings: 0,
             statsNumVariants: 0,
-            statsTotalVariants:0
+            statsTotalVariants:0,
+            statsNumAnnotations: 0,
+            statsTotalAnnotations:0
         };
     }
 });
