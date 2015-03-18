@@ -13,6 +13,8 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
     errorMsgTimeoutEventValidation : null,
     errorMsgTimeoutEventRanges : null,
 
+    highlightTimeout : null,
+
     regions: {
         rangeQueryRegion: "#rangeQueryRegion"
     },
@@ -31,7 +33,7 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
 
         // Add listener to ranges text-area to highlight any rows that are bad
         // Do this on blur and focus
-        "keyup  #rangesTextArea"  : "highlightBadRangeRows",
+        "keyup  #rangesTextArea"  : "setHighlightTimeout",
         "blur   #rangesTextArea"  : "validateRangeQueries",
 
         "click  #resetFileButton" : "resetFile",
@@ -265,12 +267,25 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         }, 5000);
     },
 
+    setHighlightTimeout : function(eventObj) {
+        // Cancel any previous event timing
+        clearTimeout(this.highlightTimeout);
+
+        // After 1000ms, highlight any bad text
+        // This allows a bit of delay so it doesn't look like we are punishing the user immediately for starting to edit a range
+        var thisObj = this;
+        this.highlightTimeout = window.setTimeout(function() {
+            thisObj.highlightBadRangeRows(eventObj);
+        }, 1000);
+    },
+
 
     // Trigger event when text changes in the text-area
     // Highlight rows that are not valid ranges
     highlightBadRangeRows : function(eventObj) {
         // Split the ranges text area by newlines
-        var rangesAll = $("#rangesTextArea").val();
+        var rangesTextAreaObj = $("#rangesTextArea");
+        var rangesAll = rangesTextAreaObj.val();
         var rows = rangesAll.split("\n");
         this.numRanges = 0;
         this.numRangeErrors = 0;
@@ -302,9 +317,9 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         // SEE:  http://mistic100.github.io/jquery-highlighttextarea/
         // IMPORTANT:  This is how to update it after the initialization!!!:
         //     http://bebo.minka.name/k2work/libs.js/jquery/2.1.0/highlightTextarea/
-        $('#rangesTextArea').highlightTextarea('setOptions', {color : 'orange'});
-        $('#rangesTextArea').highlightTextarea('setRanges', badRangesJson);
-        $('#rangesTextArea').highlightTextarea('highlight');
+        rangesTextAreaObj.highlightTextarea('setOptions', {color : 'orange'});
+        rangesTextAreaObj.highlightTextarea('setRanges', badRangesJson);
+        rangesTextAreaObj.highlightTextarea('highlight');
 
         // Update the error count above the text area
         this.updateErrorCount(this.numRangeErrors, this.numRanges);
@@ -332,4 +347,3 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         $("#filenameLabel").html(filename);
     }
 });
-
