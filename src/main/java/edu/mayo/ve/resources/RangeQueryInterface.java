@@ -99,36 +99,45 @@ public class RangeQueryInterface {
             @FormDataParam("rangeSetText") String rangeSets,
             @FormDataParam("file") InputStream uploadedInputStream
     ) throws Exception {
-        // Validate the interval name (names must contain only letters, numbers, and underscores, and can't already exist in the metadata)
-        validateName(workspace, intervalsName);
-
-        // Save the text area string to the temp file 
-        File tempFile = edu.mayo.ve.util.IOUtils.createTempFile();
-        saveStreamToFile(tempFile, IOUtils.toInputStream(rangeSets));
-
-        // Validate the ranges in the text area - parse the intervals into 'rangeSets' to ensure that they are well formed
-        validateRangesInFile(tempFile, "text area");
-        int numRangesInTextArea = edu.mayo.ve.util.IOUtils.countNonEmptyLines(tempFile);
-        
-        // Save the file stream to a file
-        saveStreamToFile(tempFile, uploadedInputStream);
-        
-        // Validate the ranges from the uploaded file
-        validateRangesInFile(tempFile, "uploaded file");
-        int numRangesInUploadedFile = edu.mayo.ve.util.IOUtils.countNonEmptyLines(tempFile);
-
-        // If there are no ranges defined in either the text area OR the file, then throw an exception
-        if ( (numRangesInTextArea + numRangesInUploadedFile) == 0)
-            throw new Exception("Error: Please specify at least one range in either the file or the text area.");
-
-        // Append the text area ranges to the end of the uploaded file
-        edu.mayo.ve.util.IOUtils.appendToFile(tempFile, rangeSets);
-
-        final int BACKGROUND_THRESHOLD = 20;
-        boolean isBackgroundProcess = (numRangesInTextArea + numRangesInUploadedFile) > BACKGROUND_THRESHOLD;
-        applyRanges(workspace, tempFile, intervalsName, intervalDescription, isBackgroundProcess);
-
-    	RangeUploadResponse response = new RangeUploadResponse(isBackgroundProcess);
+    	File tempFileForTextAreaString = null;
+    	RangeUploadResponse response = null;
+    	try {
+	        // Validate the interval name (names must contain only letters, numbers, and underscores, and can't already exist in the metadata)
+	        validateName(workspace, intervalsName);
+	
+	        // Save the text area string to the temp file 
+	        tempFileForTextAreaString = edu.mayo.ve.util.IOUtils.createTempFile();
+	        saveStreamToFile(tempFileForTextAreaString, IOUtils.toInputStream(rangeSets));
+	
+	        // Validate the ranges in the text area - parse the intervals into 'rangeSets' to ensure that they are well formed
+	        validateRangesInFile(tempFileForTextAreaString, "text area");
+	        int numRangesInTextArea = edu.mayo.ve.util.IOUtils.countNonEmptyLines(tempFileForTextAreaString);
+	        
+	        // Save the file stream to a file
+	        File tempFileForAllRanges = edu.mayo.ve.util.IOUtils.createTempFile();
+	        saveStreamToFile(tempFileForAllRanges, uploadedInputStream);
+	        
+	        // Validate the ranges from the uploaded file
+	        validateRangesInFile(tempFileForAllRanges, "uploaded file");
+	        int numRangesInUploadedFile = edu.mayo.ve.util.IOUtils.countNonEmptyLines(tempFileForAllRanges);
+	
+	        // If there are no ranges defined in either the text area OR the file, then throw an exception
+	        if ( (numRangesInTextArea + numRangesInUploadedFile) == 0)
+	            throw new Exception("Error: Please specify at least one range in either the file or the text area.");
+	
+	        // Append the text area ranges to the end of the uploaded file so that both sets of ranges are in the same file
+	        edu.mayo.ve.util.IOUtils.appendToFile(tempFileForAllRanges, rangeSets);
+	
+	        final int BACKGROUND_THRESHOLD = 20;
+	        boolean isBackgroundProcess = (numRangesInTextArea + numRangesInUploadedFile) > BACKGROUND_THRESHOLD;
+	        applyRanges(workspace, tempFileForAllRanges, intervalsName, intervalDescription, isBackgroundProcess);
+	
+	    	response = new RangeUploadResponse(isBackgroundProcess);
+    	} finally {
+    		// Remove ONLY the file for the text area string.  The other temp file will be removed within the RangeWorker
+    		if( tempFileForTextAreaString != null  &&  tempFileForTextAreaString.exists() )
+    			tempFileForTextAreaString.delete();
+    	}
         return response;
     }
     

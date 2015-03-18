@@ -50,7 +50,7 @@ public class RangeWorker implements WorkerLogic {
             BufferedReader br = new BufferedReader(new FileReader(intervalFile));
 
             //flag the workspace as queued
-            log.info("Flagging the workspace as Queued");
+            log.info("Flagging the workspace as Annotating");
             meta.flagAsAnnotating(workspace);
 
             DatabaseImplMongo dim = new DatabaseImplMongo();
@@ -67,7 +67,6 @@ public class RangeWorker implements WorkerLogic {
             // update the metadata to include the new field  (NOTE: status will be set in the "finally" clause)
             log.info("Updating the metadata to include the new field: " + intervalName);
             meta.updateInfoField(workspace, intervalName, 0, "Flag", intervalDesc);
-
         }catch (Throwable e){
             //todo: need to log the errors to some sort of file and produce another REST call so that the UI can get the errors!
             log.error("Error updating ranges", e);

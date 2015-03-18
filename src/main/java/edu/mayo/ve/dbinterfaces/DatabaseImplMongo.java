@@ -64,12 +64,10 @@ public class DatabaseImplMongo implements DatabaseInterface {
 
            //BasicDBObject set = new BasicDBObject("$set", new BasicDBObject().append( rangeSet, true));
            //col.update(query,set);
-           System.out.println("Query: " + query.toString());
-
-
+           //System.out.println("Query: " + query.toString());
 
            BasicDBObject newDocument = new BasicDBObject();
-           newDocument.append("$set", new BasicDBObject().append(VARIANT_INFO_PREFIX + intervalsName, true));  // TODO: Was: "INFO."
+           newDocument.append("$set", new BasicDBObject().append(VARIANT_INFO_PREFIX + intervalsName, true));
 
            col.updateMulti(query,newDocument); //is there a faster way to do this? -- probably but lets get a base implementation in place first
            updateCount += col.count(query);
