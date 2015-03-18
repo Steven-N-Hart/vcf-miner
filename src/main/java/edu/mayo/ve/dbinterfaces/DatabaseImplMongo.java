@@ -10,6 +10,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 import edu.mayo.util.MongoConnection;
+import edu.mayo.util.Tokens;
 import edu.mayo.ve.message.Range;
 import edu.mayo.ve.resources.MetaData;
 
@@ -73,6 +74,8 @@ public class DatabaseImplMongo implements DatabaseInterface {
            col.updateMulti(query,newDocument); //is there a faster way to do this? -- probably but lets get a base implementation in place first
            updateCount += col.count(query);
 
+           // increment by 1 since we're only doing 1 range at a time currently (no batch)
+           incrementMetadataValue(workspaceKey, "annotation_count_current", 1);
        }
        return updateCount;
    }
@@ -104,6 +107,19 @@ public class DatabaseImplMongo implements DatabaseInterface {
         return col.count(query);
     }
 
+    @Override
+    public void setMetadataValue(String workspace, String fieldName, int fieldValue){
+        BasicDBObject query = new BasicDBObject().append(Tokens.KEY, workspace);
+        BasicDBObject update = new BasicDBObject();
+        update.append("$set", new BasicDBObject().append(fieldName, fieldValue));
+        MongoConnection.getDB().getCollection(Tokens.METADATA_COLLECTION).update(query, update);
+    }
 
-
+    @Override
+    public void incrementMetadataValue(String workspace, String fieldName, int amount){
+        BasicDBObject query = new BasicDBObject().append(Tokens.KEY, workspace);
+        BasicDBObject update = new BasicDBObject();
+        update.append("$inc", new BasicDBObject().append(fieldName, amount));
+        MongoConnection.getDB().getCollection(Tokens.METADATA_COLLECTION).update(query, update);
+    }
 }

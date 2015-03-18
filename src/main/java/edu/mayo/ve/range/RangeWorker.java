@@ -8,6 +8,7 @@ import edu.mayo.ve.dbinterfaces.DatabaseImplMongo;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.ve.resources.RangeQueryInterface;
 
+import edu.mayo.ve.util.IOUtils;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -43,11 +44,19 @@ public class RangeWorker implements WorkerLogic {
         try {
             //update the workspace to include the new range set as a flag (file intervals)
             intervalFile = new File(loadfile);
+
             BufferedReader br = new BufferedReader(new FileReader(intervalFile));
             //if(verboseMode){
                 log.info("Updating the range");
             //}
             DatabaseImplMongo dim = new DatabaseImplMongo();
+
+            // store total number of intervals
+            int numIntervals = IOUtils.getLineCount(intervalFile);
+            dim.setMetadataValue(workspace, "annotation_count_total", numIntervals);
+            // initialize
+            dim.setMetadataValue(workspace, "annotation_count_current", 0);
+
             dim.bulkUpdate(workspace, new FileIterator(br), n, name);
 
             //need to flag the workspace as ready

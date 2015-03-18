@@ -131,11 +131,11 @@ public class RangeQueryInterface {
 	        //update the metadata  --perhaps we need to not do this if the operation failed?  todo:!
 	        if (verboseMode) {log.info("Updating the metadata");}
 	        updateMetadata(workspace, intervalsName, intervalDescription);
-	
-	        //flag the workspace as queued
-	        if (verboseMode) {log.info("Flagging the workspace as queued");}
-	        MetaData meta = new MetaData();
-	        meta.flagAsQueued(workspace);
+
+            //flag the workspace as annotating
+            if (verboseMode) {log.info("Flagging the workspace as annotating");}
+            MetaData meta = new MetaData();
+            meta.flagAsAnnotating(workspace);
 	
 	        //update the workspace to include the new range set as a flag (file intervals)
 	        //doing update inline...
@@ -143,22 +143,20 @@ public class RangeQueryInterface {
 	        //new DatabaseImplMongo().bulkUpdate(workspace, new FileIterator(br), updateFrequency, intervalsName);
 	        if (verboseMode) {log.info("Adding loading task to the worker pool");}
 	        addTaskToWorkerPool(workspace, tempFile.getCanonicalPath(), intervalsName);
-	
-	
-	        // TODO: Currently hardcoded to look for the word "background" in the name
-	        // TODO: if found, treated as background.  Otherwise, treated as interactive
-	        response = new RangeUploadResponse();
-	        boolean isBackground = false;
-	        if (intervalsName.contains("background")) {
-	            isBackground = true;
-	        }
-	        response.setIsBackground(isBackground);
+
+
+            // Treated as background if there are intervals in the file
+            response = new RangeUploadResponse();
+            boolean isBackground = false;
+            if (numRangesInFile > 0) {
+                isBackground = true;
+            }
+            response.setIsBackground(isBackground);            
         } finally {
         	if( tempFile != null  &&  tempFile.exists() )
         		tempFile.delete();
         }
         return response;
-
     }
     
     /** Save the input stream to a file */

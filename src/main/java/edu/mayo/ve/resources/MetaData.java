@@ -33,6 +33,7 @@ public class MetaData {
     public static final int STATUS_QUEUED    = 2;
     public static final int STATUS_IMPORTING = 3;
     public static final int STATUS_INDEXING  = 4;
+    public static final int STATUS_ANNOTATING  = 5;
 
     Mongo m = MongoConnection.getMongo();
     
@@ -256,6 +257,16 @@ public class MetaData {
     @Produces("application/json")
     public String flagAsIndexing(@PathParam("workspaceid") String workspaceID){
         return flag(workspaceID, "workspace is indexing", STATUS_INDEXING);
+    }
+
+    /**
+     * Workspace ready token will have a value of {@link MetaData#STATUS_INDEXING}.
+     */
+    @POST
+    @Path("/flagAsAnnotating/w/{workspaceid}")
+    @Produces("application/json")
+    public String flagAsAnnotating(@PathParam("workspaceid") String workspaceID){
+        return flag(workspaceID, "workspace is indexing", STATUS_ANNOTATING);
     }
 
     /**

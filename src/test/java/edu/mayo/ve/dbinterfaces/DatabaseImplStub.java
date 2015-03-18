@@ -59,4 +59,13 @@ public class DatabaseImplStub implements DatabaseInterface {
 		return 0;
 	}
 
+    @Override
+    public void setMetadataValue(String workspace, String fieldName, int fieldValue) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void incrementMetadataValue(String workspace, String fieldName, int amount) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

@@ -26,4 +26,27 @@ public interface DatabaseInterface {
     */
 	public int bulkUpdate(String workspaceKey, Iterator<String> rangeIterator, int numRangesGrouped, String intervalsName) throws ParseException;
 
+    /**
+     * Store a field name/value pair to the metadata.
+     *
+     * @param workspace
+     *      The key for the workspace to be modified.
+     * @param fieldName
+     *      The name of the metadata field.
+     * @param fieldValue
+     *      The value of the metadata field.
+     */
+    public void setMetadataValue(String workspace, String fieldName, int fieldValue);
+
+    /**
+     * Increments a metadata field's value by the specified amount.
+     *
+     * @param workspace
+     *      The key for the workspace to be modified.
+     * @param fieldName
+     *      The name of the metadata field.
+     * @param amount
+     *      The amount to increment the field value by.
+     */
+    public void incrementMetadataValue(String workspace, String fieldName, int amount);
 }
