@@ -1,9 +1,11 @@
-package edu.mayo.ve.resources.interfaces;
+package edu.mayo.ve.dbinterfaces;
 
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
+import edu.mayo.ve.dbinterfaces.DatabaseInterface;
 
 public class DatabaseImplStub implements DatabaseInterface {
 

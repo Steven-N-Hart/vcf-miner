@@ -1,4 +1,4 @@
-package edu.mayo.ve.resources.interfaces;
+package edu.mayo.ve.dbinterfaces;
 
 import java.text.ParseException;
 import java.util.Iterator;

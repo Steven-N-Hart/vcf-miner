@@ -1,39 +1,40 @@
 package edu.mayo.ve.FunctionalTests;
 
-import com.mongodb.*;
-import com.mongodb.util.JSON;
-import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
-import edu.mayo.concurrency.workerQueue.Task;
-import edu.mayo.concurrency.workerQueue.WorkerPool;
-import edu.mayo.util.CompareJSON;
-import edu.mayo.util.MongoConnection;
-import edu.mayo.util.Tokens;
-import edu.mayo.ve.VCFParser.LoadWorker;
-import edu.mayo.ve.VCFParser.VCFParser;
-import edu.mayo.ve.message.InfoFlagFilter;
-import edu.mayo.ve.message.Querry;
-import edu.mayo.ve.message.Range;
-import edu.mayo.ve.LoaderPool;
-import edu.mayo.ve.range.RangeWorker;
-import edu.mayo.ve.resources.ExeQuery;
-import edu.mayo.ve.resources.MetaData;
-import edu.mayo.ve.resources.Provision;
-import edu.mayo.ve.resources.RangeQueryInterface;
-import edu.mayo.ve.resources.interfaces.DatabaseImplMongo;
-import junit.framework.Assert;
-import junit.framework.TestCase;
-import org.junit.AfterClass;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import java.io.*;
-import java.text.ParseException;
-import java.util.*;
-
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.Cursor;
+import com.mongodb.DBObject;
+import com.mongodb.util.JSON;
+
+import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
+import edu.mayo.concurrency.workerQueue.Task;
+import edu.mayo.ve.LoaderPool;
+import edu.mayo.ve.dbinterfaces.DatabaseImplMongo;
+import edu.mayo.ve.message.InfoFlagFilter;
+import edu.mayo.ve.message.Querry;
+import edu.mayo.ve.message.Range;
+import edu.mayo.ve.range.RangeWorker;
+import edu.mayo.ve.resources.ExeQuery;
+import edu.mayo.ve.resources.MetaData;
+import edu.mayo.ve.resources.RangeQueryInterface;
 
 /**
  * Created by m102417 on 2/9/15.

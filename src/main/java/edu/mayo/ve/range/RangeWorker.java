@@ -4,9 +4,10 @@ import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerLogic;
 import edu.mayo.util.Tokens;
+import edu.mayo.ve.dbinterfaces.DatabaseImplMongo;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.ve.resources.RangeQueryInterface;
-import edu.mayo.ve.resources.interfaces.DatabaseImplMongo;
+
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;

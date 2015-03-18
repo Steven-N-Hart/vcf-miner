@@ -3,7 +3,9 @@ package edu.mayo.ve.util;
 import edu.mayo.pipes.iterators.Compressor;
 import edu.mayo.security.CWEUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 
@@ -20,7 +22,7 @@ public class IOUtils {
     public static int getLineCount(File f) throws IOException {
 
         // use compressor to figure out how to handle .zip, .gz, .bz2, etc...
-        File fakeOutFile = CWEUtils.createSecureTempFile();
+        File fakeOutFile = createTempFile();
         Compressor compressor = new Compressor(f, fakeOutFile);
 
         LineNumberReader reader = null;
@@ -36,4 +38,31 @@ public class IOUtils {
             fakeOutFile.delete();
         }
     }
+    
+    /** Create a secure (sufficiently random filename) empty temp file in the TEMPDIR dir referred to in sys.properties */
+    public static File createTempFile() throws IOException {
+        String tmpdir = new SystemProperties().get("TEMPDIR");
+    	return CWEUtils.createSecureTempFile(tmpdir);
+    }
+
+    /** Lines should have text on them - a file with one empty line counts as 0 
+     * @throws IOException */
+    public static int countNonEmptyLines(File file) throws IOException {
+        BufferedReader fin = null;
+        int nonEmptyLineCount = 0;
+        try {
+            fin = new BufferedReader(new FileReader(file));
+            String line = null;
+            while( (line = fin.readLine()) != null ) {
+                if( line.trim().length() > 0 )
+                    nonEmptyLineCount++;
+            }
+        } finally {
+            if( fin != null )
+                fin.close();
+        }
+        return nonEmptyLineCount;
+    }
+
+
 }

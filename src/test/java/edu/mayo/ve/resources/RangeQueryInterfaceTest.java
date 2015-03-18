@@ -1,7 +1,6 @@
 package edu.mayo.ve.resources;
 
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -9,14 +8,12 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.text.ParseException;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.mayo.ve.VCFParser.VCFParser;
-import edu.mayo.ve.resources.interfaces.DatabaseImplStub;
+import edu.mayo.ve.dbinterfaces.DatabaseImplStub;
 
 public class RangeQueryInterfaceTest {
 
@@ -60,20 +57,6 @@ public class RangeQueryInterfaceTest {
         }
 	}
 	
-	@Test
-	public void testNonEmptyLineCount() throws IOException {
-		assertEquals( 39867, mRangeQuery.countNonEmptyLines(fromPath("/testData/genes.bed")) );
-		assertEquals( 3,     mRangeQuery.countNonEmptyLines(fromPath("/testData/genes3.bed")) );
-		assertEquals( 0, 	 mRangeQuery.countNonEmptyLines(fromPath("/testData/genes0.bed")) );
-	}
-	
-	@Test
-	public void testLineCount_VCFParser() throws IOException {
-		assertEquals( 39868, new VCFParser().getLineCount(fromPath("/testData/genes.bed")) );
-		assertEquals( 3,     new VCFParser().getLineCount(fromPath("/testData/genes3.bed")) );
-		assertEquals( 1, 	 new VCFParser().getLineCount(fromPath("/testData/genes0.bed")) );
-	}
-    
     @Test (expected=FileNotFoundException.class)
     public void validateFileRanges_nonexistentFile() throws IOException, ParseException {
     	// Try with file that does not exist
@@ -84,8 +67,7 @@ public class RangeQueryInterfaceTest {
     @Test
     public void validateFileRanges_emptyFile() throws IOException, ParseException {
     	// Try with file that has 0 bytes
-    	URL url = getClass().getResource("/testData/emtpyFile.txt");
-    	File emptyFile = new File(url.getPath());
+    	File emptyFile = fromPath("/testData/emtpyFile.txt");
     	assertTrue( emptyFile.exists() );
     	// Should work ok - just no ranges to check
     	mRangeQuery.parseRangeFile(emptyFile);

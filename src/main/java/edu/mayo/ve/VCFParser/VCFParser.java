@@ -4,13 +4,32 @@
  */
 package edu.mayo.ve.VCFParser;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+import java.util.regex.Pattern;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mongodb.*;
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.Mongo;
 import com.mongodb.util.JSON;
 import com.tinkerpop.pipes.Pipe;
 import com.tinkerpop.pipes.util.Pipeline;
+
 import edu.mayo.TypeAhead.TypeAheadInterface;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
@@ -21,8 +40,6 @@ import edu.mayo.pipes.bioinformatics.SampleDefinition;
 import edu.mayo.pipes.bioinformatics.VCF2VariantPipe;
 import edu.mayo.pipes.history.History;
 import edu.mayo.pipes.history.HistoryInPipe;
-import edu.mayo.pipes.iterators.Compressor;
-import edu.mayo.security.CWEUtils;
 import edu.mayo.senders.FileSender;
 import edu.mayo.senders.Sender;
 import edu.mayo.util.MongoConnection;
@@ -31,14 +48,6 @@ import edu.mayo.util.Tokens;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.ve.resources.SampleMeta;
 import edu.mayo.ve.util.IOUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.LineNumberReader;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Pattern;
 
 //import edu.mayo.cli.CommandPlugin; TO DO! get this to work :(
 
