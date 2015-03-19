@@ -592,6 +592,12 @@ public class VCFParser implements ParserInterface {
      * @param reporting
      */
     private void indexReserved(DBCollection col, boolean reporting){
+
+        // needed for range annotation
+        indexField("CHROM", col, reporting);
+        indexField("_minBP", col, reporting);
+        indexField("_maxBP", col, reporting);
+
         indexField("FORMAT.GenotypePostitiveCount", col, reporting);
         indexField("FORMAT.GenotypePositiveList",col, reporting); //don't need to index this as soon as the query is refactored
         indexField("FORMAT.HeterozygousList",col, reporting);
