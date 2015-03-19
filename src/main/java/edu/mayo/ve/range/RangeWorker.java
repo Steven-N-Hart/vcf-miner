@@ -11,9 +11,7 @@ import edu.mayo.ve.resources.RangeQueryInterface;
 import edu.mayo.ve.util.IOUtils;
 import org.apache.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.util.HashMap;
 
 /**
@@ -47,6 +45,7 @@ public class RangeWorker implements WorkerLogic {
         try {
             //update the workspace to include the new range set as a flag (file intervals)
             intervalFile = new File(loadfile);
+            // TODO: br should be closed in finally clause
             BufferedReader br = new BufferedReader(new FileReader(intervalFile));
 
             //flag the workspace as queued
@@ -67,11 +66,22 @@ public class RangeWorker implements WorkerLogic {
             // update the metadata to include the new field  (NOTE: status will be set in the "finally" clause)
             log.info("Updating the metadata to include the new field: " + intervalName);
             meta.updateInfoField(workspace, intervalName, 0, "Flag", intervalDesc);
-        }catch (Throwable e){
-            //todo: need to log the errors to some sort of file and produce another REST call so that the UI can get the errors!
+        } catch (Throwable e){
+
             log.error("Error updating ranges", e);
+
+            // write stacktrace to the workspace errors log so the user can view it
+            StringWriter stackTraceWriter = new StringWriter();
+            e.printStackTrace(new PrintWriter(stackTraceWriter));
+            try {
+                IOUtils.writeToErrorFile(workspace, stackTraceWriter.toString());
+                meta.updateErrorsAndWarningCounts(workspace);
+            } catch (IOException ioe) {
+                log.error(String.format("Error writing to workspace %s error file", workspace), ioe);
+            }
+
             throw new ProcessTerminatedException();
-        }finally {
+        } finally {
             //delete the temp file if it is not null and it exists
         	// NOTE: This should only be done here within this thread as doing it in the parent thread will remove the file before it can be read!!!
             if( intervalFile != null  &&  intervalFile.exists() )

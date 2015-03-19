@@ -143,7 +143,27 @@ public class MetaData {
 //        System.out.println("workspace");
 //        System.out.println(workspaceID);
 //        System.out.println(coll.find(query).next().toString());
+        updateErrorsAndWarningCounts(workspace);
+    }
 
+    /**
+     * Updates statistics for errors/warnings.
+     * @param workspace
+     * @throws IOException
+     */
+    public void updateErrorsAndWarningCounts(String workspace) throws IOException {
+        DB db = MongoConnection.getDB();
+        DBCollection col = db.getCollection(Tokens.METADATA_COLLECTION);
+
+        ErrorStats estats = VCFErrorFileUtils.calculateErrorStatistics(workspace);
+//        BasicDBObject stats = new BasicDBObject();
+//        stats.append("$set", new BasicDBObject().append("ERRORS",   (long) estats.getErrors()));
+//        stats.append("$set", new BasicDBObject().append("WARNINGS", (long) estats.getWarnings()));
+
+        //get the current object in the workspace:
+        BasicDBObject query = new BasicDBObject().append(Tokens.KEY, workspace);
+        col.update(query, (DBObject) JSON.parse(String.format("{ '$set' : { 'STATISTICS.ERRORS': %s}}", estats.getErrors())));
+        col.update(query, (DBObject) JSON.parse(String.format("{ '$set' : { 'STATISTICS.WARNINGS': %s}}", estats.getWarnings())));
     }
 
     private HashMap<String,Long> castContext(HashMap<String, Integer> context){
@@ -162,16 +182,13 @@ public class MetaData {
     }
 
     /**
-     * constructs a DBObject with statistics for the file that was loaded and statistics for the errors/warnings found in the file.
+     * constructs a DBObject with statistics for the file that was loaded.
      * NOTE: This method can only be called once a VCF file is uploaded into the TEMPDIR (e.g. /tmp) with the error file next to it in
      * the same directory
      * @param workspace
      */
     public DBObject constructStatsObject(String workspace, HashMap<String,Long> context) throws IOException {
-        ErrorStats estats = VCFErrorFileUtils.calculateErrorStatistics(workspace);
         DBObject stats = new BasicDBObject();
-        stats.put("ERRORS", (long) estats.getErrors());
-        stats.put("WARNINGS", (long) estats.getWarnings());
         String errorFile = VCFErrorFileUtils.getLoadErrorFilePath(workspace);
         File f = new File(errorFile.replaceAll("\\.errors$",""));
         long filesize = 0;
@@ -182,6 +199,7 @@ public class MetaData {
         for(String key : context.keySet()){
             stats.put(key, context.get(key));
         }
+
         return stats;
     }
 

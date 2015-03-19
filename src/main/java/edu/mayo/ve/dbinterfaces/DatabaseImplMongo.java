@@ -77,8 +77,11 @@ public class DatabaseImplMongo implements DatabaseInterface {
            col.updateMulti(query,newDocument); //is there a faster way to do this? -- probably but lets get a base implementation in place first
            updateCount += col.count(query);
 
+
            // increment by 1 since we're only doing 1 range at a time currently (no batch)
            incrementMetadataValue(workspaceKey, "annotation_count_current", 1);
+
+           throw new ParseException("FAIL", 0);
        }
        return updateCount;
    }

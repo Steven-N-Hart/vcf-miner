@@ -11,6 +11,7 @@ import edu.mayo.util.MongoConnection;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.util.SystemProperties;
+import edu.mayo.ve.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +111,7 @@ public class LoadWorker implements WorkerLogic {
                             "\n%s"
                     ,stackTraceWriter.toString());
             try {
-                writeToErrorFile(workspace, mesg);
+                IOUtils.writeToErrorFile(workspace, mesg);
                 meta.updateLoadStatistics(workspace, (HashMap) t.getCommandContext());
             } catch (IOException ioe) {
                 ioe.printStackTrace();
@@ -132,25 +133,7 @@ public class LoadWorker implements WorkerLogic {
         return false;
     }
 
-    /**
-     * Writes the given mesg to the workspace errors file.
-     * @param workspace
-     *      The workspace key.
-     * @param mesg
-     *      The error message to write to the file.
-     * @throws IOException
-     */
-    private void writeToErrorFile(String workspace, String mesg) throws IOException {
-        String errorFile = VCFErrorFileUtils.getLoadErrorFilePath(workspace);
 
-        PrintWriter pWtr = new PrintWriter(new FileWriter(errorFile));
-
-        try {
-            pWtr.println("ERROR: " + mesg);
-        } finally {
-            pWtr.close();
-        }
-    }
 
     public static boolean isLoadSamples() {
         return loadSamples;

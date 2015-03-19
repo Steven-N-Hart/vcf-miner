@@ -1,15 +1,10 @@
 package edu.mayo.ve.util;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.LineNumberReader;
-
 import edu.mayo.pipes.iterators.Compressor;
 import edu.mayo.security.CWEUtils;
+import edu.mayo.ve.VCFParser.VCFErrorFileUtils;
+
+import java.io.*;
 
 public class IOUtils {
 
@@ -76,4 +71,24 @@ public class IOUtils {
 				fout.close();
 		}
 	}
+
+    /**
+     * Writes the given mesg to the workspace errors file.
+     * @param workspace
+     *      The workspace key.
+     * @param mesg
+     *      The error message to write to the file.
+     * @throws IOException
+     */
+    public static void writeToErrorFile(String workspace, String mesg) throws IOException {
+        String errorFile = VCFErrorFileUtils.getLoadErrorFilePath(workspace);
+
+        PrintWriter pWtr = new PrintWriter(new FileWriter(errorFile));
+
+        try {
+            pWtr.println("ERROR: " + mesg);
+        } finally {
+            pWtr.close();
+        }
+    }
 }
