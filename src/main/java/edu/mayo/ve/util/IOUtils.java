@@ -1,16 +1,15 @@
 package edu.mayo.ve.util;
 
-import edu.mayo.pipes.iterators.Compressor;
-import edu.mayo.security.CWEUtils;
-
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+
+import edu.mayo.pipes.iterators.Compressor;
+import edu.mayo.security.CWEUtils;
 
 public class IOUtils {
 
@@ -77,6 +76,4 @@ public class IOUtils {
 				fout.close();
 		}
 	}
-
-
 }

@@ -4,8 +4,11 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
+import edu.mayo.ve.util.IOUtils;
+
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,62 +44,27 @@ public class Range {
      * @return
      */
     public Range parseRange(String s) throws ParseException {
-        Range r = new Range();
-        String c;
-        List<String> tokens = new ArrayList<String>();
-        s = s.trim(); //trim off leading and trailing spaces
-        ArrayList<Integer> dataPos = new ArrayList<Integer>();
-        dataPos.add(0);
-        for(int i=1; i<s.length(); i++){
-            if(s.charAt(i) == ' ' || s.charAt(i) == ':' || s.charAt(i) == '-' || s.charAt(i) == '\t' || s.charAt(i) == ',' ) {
-                //gaps we don't care
-            }else {
-                //data
-                dataPos.add(i);
-            }
-        }
-        boolean covered = true;
-        boolean prev = true; //the previous state for covered
-        LinkedList<Integer> stateChanges = new LinkedList<Integer>();
-        stateChanges.add(0);
-        for(int i=0; i<s.length(); i++){
-            prev = covered;
-            if(dataPos.contains(i)){
-                covered=true;
-            }else {
-                covered=false;
-            }
-            //if we change the state from covered to uncovered or uncovered to covered
-            if(prev != covered){
-                stateChanges.add(i);
-            }
+    	try {
+	    	// Split by space, colon, dash, tab, or comma
+	    	// NOTE: You can have any number of spaces around another delimiter (which is what the " *" is allowing),
+	    	//       but two delimiters next to each other is treated as two columns (unless it is multiple spaces, which are allowed)
+	    	String[] cols = s.split(" *[ :\\-\\\t,]{1} *");
+	    	
+	    	if(cols.length < 3) {
+	            throw new ParseException("The following interval line is malformed (incorrect number of columns - minimum of 3 is required): " + s, 0);
+	        }
 
-        }
-        int start = 0;
-        int end = 0;
-        for(int i =1; i< stateChanges.size(); i++){
-            tokens.add(s.substring(stateChanges.get(i - 1),stateChanges.get(i)));
-        }
-        tokens.add(s.substring(stateChanges.get(stateChanges.size()-1)));
-        if(tokens.size() < 3){
-            throw new ParseException("The following interval line is malformed (incorrect number of tokens): " + s, 0);
-        }
-        Integer minBP = null;
-        Integer maxBP = null;
-        String landmark = null;
-        try {
-            landmark = tokens.get(0);
-            minBP = Integer.parseInt(tokens.get(2));
-            maxBP = Integer.parseInt(tokens.get(4));
-            this.chrom = landmark;
-            this.minBP = minBP;
-            this.maxBP = maxBP;
+    		this.chrom = cols[0];
+            this.minBP = Integer.parseInt(cols[1]);
+            this.maxBP = Integer.parseInt(cols[2]);
         } catch (Exception e){
-            String err = "<k,v> landmark= " +  landmark + ", minBP=" + minBP + ", maxBP=" + maxBP;
-            throw new ParseException("The following interval can not be converted to coordinates: " + s + " :: " + err, 0);
+            String err = "<k,v> landmark= " +  this.chrom + ", minBP=" + this.minBP + ", maxBP=" + this.maxBP;
+            throw new ParseException("The following interval can not be converted to coordinates: " + s + "\n" + err + "\n" + e.toString(), 0);
         }
-        return r;
+        return this;
     }
+    
+    
 
     //todo: write a method that converts this into a mongodb object (ideally for upsert) - http://docs.mongodb.org/manual/reference/method/db.collection.update/#multi-parameter
 
@@ -112,17 +80,21 @@ public class Range {
         //  5.                         s-------e
         //  6.        s----------------------e
         //RANGE:           x===============y
-        //1,2 -> NO
-        //3,4,5,6 ->YES
+    	// Do the numbered ranges overlap RANGE?
+        //    1,2 -> NO
+        //    3,4,5,6 ->YES
         BasicDBObject clauses = new BasicDBObject();
         clauses.append("CHROM", chrom);
-        //formula:     e >= x AND s <= y
+        
+        // formula:     e >= x AND s <= y
         BasicDBObject gte = new BasicDBObject();
         gte.append("$gte", minBP); //minBP = x
         clauses.append("_minBP", gte);
+        
         BasicDBObject lte = new BasicDBObject();
         lte.append("$lte", maxBP); //maxBP = y
         clauses.append("_maxBP", lte);
+        
         return clauses;
     }
 

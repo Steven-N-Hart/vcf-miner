@@ -57,8 +57,13 @@ public class DatabaseImplMongo implements DatabaseInterface {
    public int bulkUpdate(String workspaceKey, Iterator<String> rangeIterator, int numRangesGrouped, String intervalsName) throws ParseException {
        DBCollection col = mMongoDb.getCollection(workspaceKey);
        int updateCount = 0;
-       for(int i=0; rangeIterator.hasNext(); i++){
+       while( rangeIterator.hasNext() ){
            String next = rangeIterator.next();
+           
+           // Skip the line if it is blank
+           if( next.trim().length() == 0 )
+        	   continue;
+           
            Range range = new Range(next);
            DBObject query = range.createQueryFromRange(); //this is the select clause for records that will be updated
 
