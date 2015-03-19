@@ -9,7 +9,6 @@ var DatabaseIndexController = function () {
     var workspaceKey;
     var overallStatus = new IndexesStatus();
     var dataFields;
-    var generalIndexes = new DatabaseIndexList();
     var infoIndexes = new DatabaseIndexList();
     var formatIndexes = new DatabaseIndexList();
     var indexNames;
@@ -18,6 +17,8 @@ var DatabaseIndexController = function () {
     var notReadyIndexes = new Array();
     var TIMER_INTERVAL = 5000; // 5 seconds
     setInterval(updateNotReadyIndexes, TIMER_INTERVAL);
+
+    overallStatus.set("numReady", 0);
 
     function loadIndexNames()
     {
@@ -34,6 +35,8 @@ var DatabaseIndexController = function () {
                     var fieldName = getSortedAttrNames(fields[i].key)[0];
                     indexNames.push(fieldName);
                 }
+
+                overallStatus.set("numReady", indexNames.length);
             },
             error: jqueryAJAXErrorHandler
         });
@@ -50,6 +53,7 @@ var DatabaseIndexController = function () {
             dataType: "json",
             success: function(json) {
                 console.log("created index " + indexName + " with return status: " + json.status);
+                loadIndexNames();
             },
             error: jqueryAJAXErrorHandler
         });
@@ -66,6 +70,7 @@ var DatabaseIndexController = function () {
             dataType: "json",
             success: function(json) {
                 console.log("dropped index " + indexName + " with return status: " + json.status);
+                loadIndexNames();
             },
             error: jqueryAJAXErrorHandler
         });
@@ -78,11 +83,10 @@ var DatabaseIndexController = function () {
     {
         console.log("refreshing all indexes");
 
+
         // clear out indexes
-        generalIndexes.reset();
         infoIndexes.reset();
         formatIndexes.reset();
-        overallStatus.set("numReady", 0);
         notReadyIndexes = new Array();
 
         // create Index models
@@ -92,10 +96,6 @@ var DatabaseIndexController = function () {
             var indexList;
             switch (vcfDataField.get("category"))
             {
-                case VCFDataCategory.GENERAL:
-                    fieldIndexNames.push(vcfDataField.get("name"));
-                    indexList = generalIndexes;
-                    break;
                 case VCFDataCategory.INFO:
                     fieldIndexNames.push(vcfDataField.get("name"));
                     indexList = infoIndexes;
@@ -119,7 +119,6 @@ var DatabaseIndexController = function () {
                     // TODO: check for building indexes for auto-updates
 
                     index.set("status", IndexStatus.READY);
-                    overallStatus.set("numReady", overallStatus.get("numReady") + 1);
                 } else {
                     index.set("status", IndexStatus.NONE);
                 }
@@ -135,8 +134,6 @@ var DatabaseIndexController = function () {
 
         switch (vcfDataField.get("category"))
         {
-            case VCFDataCategory.GENERAL:
-                return indexNameBase;
             case VCFDataCategory.INFO:
                 return "INFO." + indexNameBase;
             case VCFDataCategory.FORMAT:
@@ -189,7 +186,6 @@ var DatabaseIndexController = function () {
             if ((status !== IndexStatus.READY) && indexed) {
                 // data field was not indexed, but server is now indicating that it is
                 index.set("status", IndexStatus.READY);
-                overallStatus.set("numReady", overallStatus.get("numReady") + 1);
 
                 // delete key
                 var keyIdx = notReadyIndexes.indexOf(indexName);
@@ -201,7 +197,6 @@ var DatabaseIndexController = function () {
             } else if ((status !== IndexStatus.NONE) && !indexed) {
                 // update Index model
                 index.set("status", IndexStatus.NONE);
-                overallStatus.set("numReady", overallStatus.get("numReady") - 1);
 
                 // delete key
                 var keyIdx = notReadyIndexes.indexOf(indexName);

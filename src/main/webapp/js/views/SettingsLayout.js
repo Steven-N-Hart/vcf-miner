@@ -90,15 +90,6 @@ SettingsLayout = Backbone.Marionette.Layout.extend({
 
         new IndexTableView(
             {
-                "el": this.$el.find('#general_indexes_table_div'),
-                "model": MongoApp.indexController.getGeneralIndexes(),
-                "sortable":false,
-                "createIndexCallback": MongoApp.indexController.createIndex,
-                "dropIndexCallback": MongoApp.indexController.deleteIndex
-            }
-        );
-        new IndexTableView(
-            {
                 "el": this.$el.find('#info_indexes_table_div'),
                 "model": MongoApp.indexController.getInfoIndexes(),
                 "sortable":true,
