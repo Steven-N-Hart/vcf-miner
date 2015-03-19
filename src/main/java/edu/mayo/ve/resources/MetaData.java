@@ -266,7 +266,7 @@ public class MetaData {
     @Path("/flagAsAnnotating/w/{workspaceid}")
     @Produces("application/json")
     public String flagAsAnnotating(@PathParam("workspaceid") String workspaceID){
-        return flag(workspaceID, "workspace is indexing", STATUS_ANNOTATING);
+        return flag(workspaceID, "workspace is annotating", STATUS_ANNOTATING);
     }
 
     /**

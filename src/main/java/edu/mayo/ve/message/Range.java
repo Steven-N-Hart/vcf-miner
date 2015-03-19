@@ -48,7 +48,7 @@ public class Range {
         ArrayList<Integer> dataPos = new ArrayList<Integer>();
         dataPos.add(0);
         for(int i=1; i<s.length(); i++){
-            if(s.charAt(i) == ' ' || s.charAt(i) == ':' || s.charAt(i) == '-' || s.charAt(i) == '\t' ) {
+            if(s.charAt(i) == ' ' || s.charAt(i) == ':' || s.charAt(i) == '-' || s.charAt(i) == '\t' || s.charAt(i) == ',' ) {
                 //gaps we don't care
             }else {
                 //data

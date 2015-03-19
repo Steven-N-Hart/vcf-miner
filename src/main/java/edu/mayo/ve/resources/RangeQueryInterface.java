@@ -126,7 +126,8 @@ public class RangeQueryInterface {
 	            throw new Exception("Error: Please specify at least one range in either the file or the text area.");
 	
 	        // Append the text area ranges to the end of the uploaded file so that both sets of ranges are in the same file
-	        edu.mayo.ve.util.IOUtils.appendToFile(tempFileForAllRanges, rangeSets);
+	        // WARNING: Make sure to prepend a newline before the new ranges in case the user chose a file that didn't have a newline at the end of it
+	        edu.mayo.ve.util.IOUtils.appendToFile(tempFileForAllRanges, "\n" + rangeSets);
 	
 	        final int BACKGROUND_THRESHOLD = 20;
 	        boolean isBackgroundProcess = (numRangesInTextArea + numRangesInUploadedFile) > BACKGROUND_THRESHOLD;
