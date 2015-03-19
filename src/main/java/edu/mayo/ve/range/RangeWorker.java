@@ -42,16 +42,13 @@ public class RangeWorker implements WorkerLogic {
         MetaData meta = new MetaData();
 
         BufferedReader br = null;
+        DatabaseImplMongo dim = null;
         try {
             //update the workspace to include the new range set as a flag (file intervals)
             intervalFile = new File(loadfile);
             br = new BufferedReader(new FileReader(intervalFile));
 
-            //flag the workspace as queued
-            log.info("Flagging the workspace as Annotating");
-            meta.flagAsAnnotating(workspace);
-
-            DatabaseImplMongo dim = new DatabaseImplMongo();
+            dim = new DatabaseImplMongo();
 
             // store total number of intervals
             int numIntervals = IOUtils.countNonEmptyLines(intervalFile);
@@ -97,6 +94,10 @@ public class RangeWorker implements WorkerLogic {
             //need to flag the workspace as ready
             if(verboseMode){ log.info("Flagging the Workspace as ready"); }
             meta.flagAsReady(workspace);
+
+            // reset progress bar stuff
+            dim.setMetadataValue(workspace, "annotation_count_total", 0);
+            dim.setMetadataValue(workspace, "annotation_count_current", 0);
         }
 
         return null;

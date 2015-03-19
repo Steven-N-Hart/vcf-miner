@@ -1,30 +1,6 @@
 package edu.mayo.ve.resources;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.logging.Logger;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-import org.apache.commons.io.IOUtils;
-
 import com.sun.jersey.multipart.FormDataParam;
-
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerPool;
@@ -36,6 +12,14 @@ import edu.mayo.ve.message.RangeUploadResponse;
 import edu.mayo.ve.range.RangeWorker;
 import edu.mayo.ve.util.SystemProperties;
 import edu.mayo.ve.util.Tokens;
+import org.apache.commons.io.IOUtils;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import java.io.*;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.logging.Logger;
 
 /**
  * Created by m102417 on 2/6/15.
@@ -60,7 +44,7 @@ public class RangeQueryInterface {
 
     /**
      * for more detailed logging, use verbose = true in the constructor
-     * @param verbose
+     * @param isVerbose
      */
     public RangeQueryInterface(boolean isVerbose){
         this(new DatabaseImplMongo(), isVerbose);
@@ -128,7 +112,10 @@ public class RangeQueryInterface {
 	        // Append the text area ranges to the end of the uploaded file so that both sets of ranges are in the same file
 	        // WARNING: Make sure to prepend a newline before the new ranges in case the user chose a file that didn't have a newline at the end of it
 	        edu.mayo.ve.util.IOUtils.appendToFile(tempFileForAllRanges, "\n" + rangeSets);
-	
+
+            mLog.info("Flagging the workspace as Annotating");
+            new MetaData().flagAsAnnotating(workspace);
+
 	        final int BACKGROUND_THRESHOLD = 20;
 	        boolean isBackgroundProcess = (numRangesInTextArea + numRangesInUploadedFile) > BACKGROUND_THRESHOLD;
 	        applyRanges(workspace, tempFileForAllRanges, intervalsName, intervalDescription, isBackgroundProcess);
@@ -213,11 +200,7 @@ public class RangeQueryInterface {
 
     /**
      * adds the task of inserting the interval as a new field to the range worker pool as a background process.
-     * @param workspace  - the key for the workspace we are modifying
-     * @param inputFile  - bed/ tabix interval file that we get the intervals from
-     * @param field      - the name of the new INFO field
-     * @param updateFreq - for bulk insert, the number of records we should parse before sending the update to mongo
-     * @throws IOException 
+     * @throws IOException
      */
     public void addTaskToWorkerPool(Task task) throws IOException {
         WorkerPool pool = LoaderPool.getRangeWorkerPool();
@@ -225,6 +208,14 @@ public class RangeQueryInterface {
         pool.startTask(task.getId());
     }
 
+    /**
+     * @param workspaceKey  - the key for the workspace we are modifying
+     * @param rangesFile  - bed/ tabix interval file that we get the intervals from
+     * @param intervalName - the name of the new annotation to be added to INFO
+     * @param intervalDescription - the description of the interval
+     * @param updateFreq - for bulk insert, the number of records we should parse before sending the update to mongo
+     * @throws IOException
+     */
     public Task getTask(String workspaceKey, File rangesFile, String intervalName, String intervalDescription, int updateFreq) throws IOException{
         Task<HashMap,HashMap> task = new Task<HashMap,HashMap>();
         HashMap<String,String> fields = new HashMap<String,String>();
