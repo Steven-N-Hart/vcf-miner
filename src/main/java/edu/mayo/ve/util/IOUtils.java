@@ -5,6 +5,8 @@ import edu.mayo.security.CWEUtils;
 import edu.mayo.ve.VCFParser.VCFErrorFileUtils;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class IOUtils {
 
@@ -83,10 +85,13 @@ public class IOUtils {
     public static void writeToErrorFile(String workspace, String mesg) throws IOException {
         String errorFile = VCFErrorFileUtils.getLoadErrorFilePath(workspace);
 
-        PrintWriter pWtr = new PrintWriter(new FileWriter(errorFile));
+        PrintWriter pWtr = new PrintWriter(new FileWriter(errorFile, true));
 
         try {
-            pWtr.println("ERROR: " + mesg);
+        	// Get date as "yyyy-MM-dd HH:mm:ss"
+        	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        	String dateStr = dateFormat.format(new Date());
+            pWtr.println("ERROR: (" + dateStr + ")  " + mesg);
         } finally {
             pWtr.close();
         }

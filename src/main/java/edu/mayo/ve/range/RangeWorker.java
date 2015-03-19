@@ -1,18 +1,22 @@
 package edu.mayo.ve.range;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+
+import org.apache.log4j.Logger;
+
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerLogic;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.dbinterfaces.DatabaseImplMongo;
 import edu.mayo.ve.resources.MetaData;
-import edu.mayo.ve.resources.RangeQueryInterface;
-
 import edu.mayo.ve.util.IOUtils;
-import org.apache.log4j.Logger;
-
-import java.io.*;
-import java.util.HashMap;
 
 /**
  * Created by m102417 on 3/6/15.
@@ -70,7 +74,7 @@ public class RangeWorker implements WorkerLogic {
             StringWriter stackTraceWriter = new StringWriter();
             e.printStackTrace(new PrintWriter(stackTraceWriter));
             try {
-                IOUtils.writeToErrorFile(workspace, stackTraceWriter.toString());
+                IOUtils.writeToErrorFile(workspace, "Error occurred while updating ranges.  " + stackTraceWriter.toString());
                 meta.updateErrorsAndWarningCounts(workspace);
             } catch (IOException ioe) {
                 log.error(String.format("Error writing to workspace %s error file", workspace), ioe);
