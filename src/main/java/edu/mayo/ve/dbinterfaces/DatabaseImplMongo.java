@@ -80,8 +80,6 @@ public class DatabaseImplMongo implements DatabaseInterface {
 
            // increment by 1 since we're only doing 1 range at a time currently (no batch)
            incrementMetadataValue(workspaceKey, "annotation_count_current", 1);
-
-           throw new ParseException("FAIL", 0);
        }
        return updateCount;
    }
