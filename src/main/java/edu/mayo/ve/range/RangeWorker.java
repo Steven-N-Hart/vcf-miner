@@ -40,13 +40,12 @@ public class RangeWorker implements WorkerLogic {
         Integer updateFreq = Integer.parseInt(context.get(UPDATE_FREQ));
         
         MetaData meta = new MetaData();
-        RangeQueryInterface rangeQ = new RangeQueryInterface();
 
+        BufferedReader br = null;
         try {
             //update the workspace to include the new range set as a flag (file intervals)
             intervalFile = new File(loadfile);
-            // TODO: br should be closed in finally clause
-            BufferedReader br = new BufferedReader(new FileReader(intervalFile));
+            br = new BufferedReader(new FileReader(intervalFile));
 
             //flag the workspace as queued
             log.info("Flagging the workspace as Annotating");
@@ -82,7 +81,15 @@ public class RangeWorker implements WorkerLogic {
 
             throw new ProcessTerminatedException();
         } finally {
-            //delete the temp file if it is not null and it exists
+        	// Close the BufferedReader
+        	try {
+        		if( br != null ) 
+        			br.close();
+        	} catch(Exception e) {
+        		log.error("RangeWorker: Could not close BufferedReader for file");
+        	}
+        	
+        	//delete the temp file if it is not null and it exists
         	// NOTE: This should only be done here within this thread as doing it in the parent thread will remove the file before it can be read!!!
             if( intervalFile != null  &&  intervalFile.exists() )
                 intervalFile.delete();
