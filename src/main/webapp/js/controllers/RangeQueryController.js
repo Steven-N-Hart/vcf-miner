@@ -46,7 +46,6 @@ var RangeQueryController = Backbone.Marionette.Controller.extend({
         $.ajax({
             url: "/mongo_svr/ve/rangeSet/workspace/" + MongoApp.workspaceKey,
             type: 'POST',
-            async: false,
             data: formData,
             contentType: false,
             processData: false,
