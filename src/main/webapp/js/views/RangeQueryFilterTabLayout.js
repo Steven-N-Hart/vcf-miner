@@ -88,17 +88,16 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         $('#rangesTextArea').highlightTextarea({
             color: 'orange'
         });
-
-        $('#rangeQueryWaitDialog').off();
-        $('#rangeQueryWaitDialog').on('shown', function () {
-            // If the event mentioned above that is tied to the "Create Range Annotation" button is triggered,
-            //     then trigger the RangeQueryController.uploadRangeQueries() function
-            MongoApp.dispatcher.trigger("uploadRangeQueries", self.rangeQuery);
-        })
     },
 
     // This is called by RangeQueryController.js to show the regions that are created in the initialize() method above
     onShow: function() {
+        var self = this;
+        $('#rangeQueryWaitDialog').on('shown', function () {
+            // If the event mentioned above that is tied to the "Create Range Annotation" button is triggered,
+            //     then trigger the RangeQueryController.uploadRangeQueries() function
+            MongoApp.dispatcher.trigger("uploadRangeQueries", self.rangeQuery);
+        });
     },
 
     /** "Upload Range Query"  button event
