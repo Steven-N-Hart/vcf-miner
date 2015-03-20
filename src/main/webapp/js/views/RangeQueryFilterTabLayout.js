@@ -73,9 +73,13 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         });
 
         MongoApp.dispatcher.on("uploadRangeQueriesComplete", function(isBackground, rangeName){
+            $('#rangeQueryWaitDialog').modal('hide');
             self.handleUploadRangeQueriesComplete(isBackground, rangeName);
         });
-	
+        MongoApp.dispatcher.on("uploadRangeQueriesFailed", function(){
+            $('#rangeQueryWaitDialog').modal('hide');
+        });
+
     	// Initialize the highlighting of the text area only once
         // Afterwards we will update the ranges after each keypress and refresh the highlight
         // See:
@@ -95,6 +99,7 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
      *  NOTE: This triggers a call to the function "uploadRangeQueries" in RangeQueryController
      */
     createRangeAnnotation: function(event) {
+
         // Clear the error msg at the bottom in case there was one there previously
         $("#errorMsgAfterUpload").text("");
 
@@ -126,6 +131,9 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         // So, create a RangeQuery object and send it to the RangeQueryController.uploadRangeQueries() function
         //---------------------------------------------------------------------
         // TODO:  Create a rangeQuery from the fields using jQuery selections.  Use this until bindings are working.
+
+        $('#rangeQueryWaitDialog').modal('show');
+
         this.rangeQuery = this.createRangeQueryFromFields();
 
         // If the event mentioned above that is tied to the "Create Range Annotation" button is triggered,

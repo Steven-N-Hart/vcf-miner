@@ -57,7 +57,10 @@ var RangeQueryController = Backbone.Marionette.Controller.extend({
                 self.handleCreateAnnotationResponse(isBackground, rangeQuery.get("name"));
 
             },
-            error: jqueryAJAXErrorHandler
+            error: function(jqXHR, textStatus, errorThrown) {
+                MongoApp.dispatcher.trigger('uploadRangeQueriesFailed');
+                jqueryAJAXErrorHandler(jqXHR, textStatus, errorThrown);
+            }
         });
     },
 
