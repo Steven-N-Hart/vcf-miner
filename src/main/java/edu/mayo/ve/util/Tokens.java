@@ -35,4 +35,9 @@ public class Tokens {
 
     //worker pool based tokens
     public static final String VCF_WORKERS = "vcf_workers";
+    
+    /** Variant count threshold for whether to run range query filter as background process */
+    public static final String RANGE_QUERY_BACKGROUND_PROCESS_THRESHOLD_VARIANTS = "rangeThresholdVariants";
+    /** BasePair count threshold for whether to run range query filter as background process */
+    public static final String RANGE_QUERY_BACKGROUND_PROCESS_THRESHOLD_BASEPAIRS = "rangeThresholdBasePairs";
 }

@@ -26,3 +26,9 @@ Double_MAX_VALUE = 1.0e308
 Double_MIN_VALUE = 1.0e-307
 Double_NEGATIVE_INFINITY = -1.0e307
 NaN_KEY = NaN
+
+# Run Range Query filter as background process if Variants in database > variant threshold AND base-pairs in user-specified range > base-pair threshold 
+# Set variant count threshold for Range Query Filter
+rangeThresholdVariants=20000
+# Set base-pair threshold for Range Query Filter
+rangeThresholdBasePairs=500000

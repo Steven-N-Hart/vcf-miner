@@ -49,4 +49,12 @@ public interface DatabaseInterface {
      *      The amount to increment the field value by.
      */
     public void incrementMetadataValue(String workspace, String fieldName, int amount);
+
+    /** Flag the workspace status as currently annotating */
+    public void flagAsAnnotating(String workspace);
+
+    /** Get the variant count from the database/workspace */
+    public long getVariantCount(String workspace);
+
+
 }

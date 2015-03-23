@@ -16,6 +16,8 @@ public class DatabaseImplStub implements DatabaseInterface {
 		public String 	desc;
 	}
 	
+	private long mVariantCount = 0;
+	
 	//private final String INFO_FIELD_PREFIX = "HEADER.INFO.";
 	// Map:  workspaceKey -> infoId -> InfoField
 	private HashMap<String, HashMap<String, InfoField>> mWorkspaceToInfoFieldMap = new HashMap<String, HashMap<String, InfoField>>(); 
@@ -68,4 +70,20 @@ public class DatabaseImplStub implements DatabaseInterface {
     public void incrementMetadataValue(String workspace, String fieldName, int amount) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
+
+	@Override
+	public void flagAsAnnotating(String workspace) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public long getVariantCount(String workspace) {
+		return mVariantCount;
+	}
+	
+	/** ONly for testing */
+	public void setVariantCount(long variantCount) {
+		mVariantCount = variantCount;
+	}
 }

@@ -1,6 +1,7 @@
 package edu.mayo.ve.resources;
 
 import com.sun.jersey.multipart.FormDataParam;
+
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.concurrency.workerQueue.WorkerPool;
@@ -12,10 +13,12 @@ import edu.mayo.ve.message.RangeUploadResponse;
 import edu.mayo.ve.range.RangeWorker;
 import edu.mayo.ve.util.SystemProperties;
 import edu.mayo.ve.util.Tokens;
+
 import org.apache.commons.io.IOUtils;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+
 import java.io.*;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -114,10 +117,9 @@ public class RangeQueryInterface {
 	        edu.mayo.ve.util.IOUtils.appendToFile(tempFileForAllRanges, "\n" + rangeSets);
 
             mLog.info("Flagging the workspace as Annotating");
-            new MetaData().flagAsAnnotating(workspace);
+            mDbInterface.flagAsAnnotating(workspace);
 
-	        final int BACKGROUND_THRESHOLD = 20;
-	        boolean isBackgroundProcess = (numRangesInTextArea + numRangesInUploadedFile) > BACKGROUND_THRESHOLD;
+            boolean isBackgroundProcess = isBackgroundProcess(workspace, tempFileForAllRanges);
 	        applyRanges(workspace, tempFileForAllRanges, intervalsName, intervalDescription, isBackgroundProcess);
 	
 	    	response = new RangeUploadResponse(isBackgroundProcess);
@@ -129,7 +131,25 @@ public class RangeQueryInterface {
         return response;
     }
     
-    private void applyRanges(String workspaceKey, File rangesFile, String intervalName, String intervalDescription, boolean isBackgroundProcess) throws IOException, ProcessTerminatedException {
+    /** Determine whether the process should run in the background or foreground
+     *  Run it as a background process if:
+     *  	The file has > 20k variants AND the ranges cover more than 20k base pairs 
+     * @throws ParseException 
+     * @throws IOException */
+    protected boolean isBackgroundProcess(String workspace, File tempFileForAllRanges) throws IOException, ParseException {
+    	try {
+	    	long variantCount = mDbInterface.getVariantCount(workspace);
+	    	long bpCount = getBasePairCount(tempFileForAllRanges);
+	    	return  (variantCount > getVariantCountThreshold()) && (bpCount > getBasePairThreshold());
+    	}catch(Exception e) {
+    		// If something happens here, we don't want to throw the exception up or it will be eternally "Annotating", 
+    		// so force it to be a background process
+    		return true;
+    	}
+	}
+
+    
+	protected void applyRanges(String workspaceKey, File rangesFile, String intervalName, String intervalDescription, boolean isBackgroundProcess) throws IOException, ProcessTerminatedException {
         //get the update frequency...
         int updateFrequency = getUpdateFrequency();
 
@@ -145,6 +165,27 @@ public class RangeQueryInterface {
         	if (mIsVerboseMode) {mLog.info("There are only a few ranges, so running interactively/synchronously.");}
         	new RangeWorker().compute(task);
         }
+	}
+	
+	protected long getBasePairCount(File rangesFile) throws IOException, ParseException {
+		BufferedReader fin = null;
+		long bpCount = 0;
+		try {
+			fin = new BufferedReader(new FileReader(rangesFile));
+			String line = null;
+			while(  (line = fin.readLine()) != null ) {
+				if( line.length() == 0 )
+					continue;
+				Range range = new Range(line);
+				bpCount += (range.getMaxBP() - range.getMinBP() + 1);
+			}
+		} finally {
+			try {
+				if( fin != null )
+					fin.close();
+			}catch(Exception e) { }
+		}
+		return bpCount;
 	}
 
 	/** Save the input stream to a file */
@@ -180,6 +221,33 @@ public class RangeQueryInterface {
         return freq;
     }
 
+    /** Get the variant count threshold for whether to run as a background process */
+    protected int getVariantCountThreshold() throws IOException {
+    	int variantThreshold = 20000; // Default
+    	try {
+    		SystemProperties sysprop = new SystemProperties();
+    		String valStr = sysprop.get(Tokens.RANGE_QUERY_BACKGROUND_PROCESS_THRESHOLD_VARIANTS);
+    		variantThreshold = Integer.parseInt(valStr);
+        } catch( Exception e ) {
+            mLog.info("The variant threshold for range query background process is not defined in the sys.properties file.  Please define "
+            		+ Tokens.RANGE_QUERY_BACKGROUND_PROCESS_THRESHOLD_VARIANTS + ".  Defaulting to " + variantThreshold);
+        }
+        return variantThreshold;
+    }
+
+    /** Get the basepair count threshold for whether to run as a background process */
+    protected int getBasePairThreshold() throws IOException {
+    	int basePairThreshold = 500000; // Default
+    	try {
+    		SystemProperties sysprop = new SystemProperties();
+    		String valStr = sysprop.get(Tokens.RANGE_QUERY_BACKGROUND_PROCESS_THRESHOLD_BASEPAIRS);
+    		basePairThreshold = Integer.parseInt(valStr);
+        } catch( Exception e ) {
+            mLog.info("The base-pair threshold for range query background process is not defined in the sys.properties file.  Please define "
+            		+ Tokens.RANGE_QUERY_BACKGROUND_PROCESS_THRESHOLD_BASEPAIRS + ".  Defaulting to " + basePairThreshold);
+        }
+        return basePairThreshold;
+    }
 
     // Check if a file contains only the characters "null".  This will happen if the user did not specify a file
     private boolean isFileContentsNull(File file) throws IOException {

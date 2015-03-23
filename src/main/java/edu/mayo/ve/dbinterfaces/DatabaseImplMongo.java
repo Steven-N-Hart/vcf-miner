@@ -126,4 +126,18 @@ public class DatabaseImplMongo implements DatabaseInterface {
         update.append("$inc", new BasicDBObject().append(fieldName, amount));
         MongoConnection.getDB().getCollection(Tokens.METADATA_COLLECTION).update(query, update);
     }
+
+	@Override
+	public void flagAsAnnotating(String workspace) {
+        new MetaData().flagAsAnnotating(workspace);
+	}
+
+	@Override
+	public long getVariantCount(String workspace) {
+		BasicDBObject statsObj = (BasicDBObject) new MetaData().queryMeta(Tokens.KEY, workspace);
+		if( statsObj == null ) 
+			return 0;
+		long numVariants = statsObj.getLong("variant_count_total");
+		return numVariants;
+	}
 }

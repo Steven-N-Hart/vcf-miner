@@ -121,7 +121,7 @@ public class RangeQueryInterfaceTest {
     	String ranges2 = concatLines("4 400-500", "5 500-600");
     	File tempFile = mTempFolder.newFile();
     	// Write the first ranges to the file
-    	new RangeQueryInterface().saveStreamToFile(tempFile, org.apache.commons.io.IOUtils.toInputStream(ranges1));
+    	mRangeQuery.saveStreamToFile(tempFile, org.apache.commons.io.IOUtils.toInputStream(ranges1));
     	// Now append the second set of ranges
     	IOUtils.appendToFile(tempFile, "\n" + ranges2);
     	// Verify the file output
@@ -138,7 +138,7 @@ public class RangeQueryInterfaceTest {
     	String ranges2 = concatLines("4 400-500", "5 500-600");
     	File tempFile = mTempFolder.newFile();
     	// Write the first ranges to the file
-    	new RangeQueryInterface().saveStreamToFile(tempFile, org.apache.commons.io.IOUtils.toInputStream(ranges1));
+    	mRangeQuery.saveStreamToFile(tempFile, org.apache.commons.io.IOUtils.toInputStream(ranges1));
     	// Now append the second set of ranges
     	IOUtils.appendToFile(tempFile, "\n" + ranges2);
     	// Verify the file output
@@ -156,7 +156,7 @@ public class RangeQueryInterfaceTest {
     	String ranges2 = concatLines("4 400-500", "5 500-600");
     	File tempFile = mTempFolder.newFile();
     	// Write the first ranges to the file
-    	new RangeQueryInterface().saveStreamToFile(tempFile, org.apache.commons.io.IOUtils.toInputStream(ranges1));
+    	mRangeQuery.saveStreamToFile(tempFile, org.apache.commons.io.IOUtils.toInputStream(ranges1));
     	// Now append the second set of ranges
     	IOUtils.appendToFile(tempFile, "\n" + ranges2);
     	// Verify the file output
@@ -168,7 +168,58 @@ public class RangeQueryInterfaceTest {
     	assertEquals(expected, actual);
     }
 
-    protected boolean isRangeOk(String range) {
+    
+    @Test
+    public void bpCount() throws IOException, ParseException {
+    	assertEquals(2,    countBasePairs("1 1-2"));
+    	assertEquals(101,  countBasePairs("1 100-200"));
+    	assertEquals(202,  countBasePairs(concatLines("1 100-200", "1 150-250")));
+    	assertEquals(11014,countBasePairs(concatLines("chrX 1000 2000", "chrX 10000 20000", "chrY 1 2", "chrM 1 10")));
+    }
+    
+    /** Save ranges to file, then use the RangeQueryInterface.getBasePairCount() method to count them 
+     * @throws IOException 
+     * @throws ParseException */
+    private long countBasePairs(String ranges) throws IOException, ParseException {
+    	File tempFile = mTempFolder.newFile();
+    	IOUtils.appendToFile(tempFile, ranges);
+    	long count = mRangeQuery.getBasePairCount(tempFile);
+    	return count;
+    }
+    
+    @Test
+    public void isBackgroundProcess() throws IOException, ParseException {
+    	// NOTE: Default for background process is: 20k variants, 500k base-pairs
+    	
+    	// NOT Background - variant count < threshold;  range base pair count < threshold
+    	assertFalse( isBackground(1, "1 1000-2000") );
+    	// NOT Background - variant count < threshold;  range base pair count > threshold
+    	assertFalse( isBackground(1, "1 1-2000000") );
+    	// NOT Background - variant count > threshold;  range base pair count < threshold
+    	assertFalse( isBackground(100000, "1 10000-20000") );
+    	// NOT Background - variant count = threshold;  range base pair count = threshold
+    	assertFalse( isBackground(20000, "1 1-500000") );
+    	
+    	// YES Background - variant count =threshold+1; range base pair count = threshold+1
+    	assertTrue( isBackground(20001, "1 1-500001") );
+    	// YES Background - variant count > threshold;  range base pair count > threshold
+    	assertTrue( isBackground(2000000000, concatLines("1 1-20000", "1 1-400000", "2 1000000-1060000", "3 1-50000")) );
+    }
+    
+    
+    private boolean isBackground(int variantCount, String ranges) throws IOException, ParseException {
+    	// Set the variant count in the database stub
+    	((DatabaseImplStub)mDbImplStub).setVariantCount(variantCount);
+
+    	// Save the ranges to a temp file
+    	File tempFile = mTempFolder.newFile();
+    	IOUtils.appendToFile(tempFile, ranges);
+    	
+    	// Check if it should be a background process
+    	return mRangeQuery.isBackgroundProcess("w11111111", tempFile);
+	}
+
+	protected boolean isRangeOk(String range) {
     	try {
     		validateRanges(range);
     		return true;
