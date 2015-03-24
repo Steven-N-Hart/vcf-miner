@@ -20,26 +20,6 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
         this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspaceKey) {
             self.initWorkspace(workspaceKey);
         });
-
-        // jQuery validate plugin config
-        this.$el.find('#info_tab_form').validate({
-            rules: {
-                int_field_value: {
-                    required: true,
-                    integer: true
-                },
-                float_field_value: {
-                    required: true,
-                    number: true
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('control-group error');
-            },
-            success: function(element) {
-                $(element).parent().removeClass('control-group error');
-            }
-        });
     },
 
     initWorkspace: function(workspaceKey) {
@@ -66,6 +46,20 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
     },
 
     onShow: function() {
+
+        // jQuery validate plugin config
+        var form = this.$el.find('#info_tab_form');
+//        form.validate();
+        form.validate({
+            rules: {
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('control-group error');
+            },
+            success: function(element) {
+                $(element).parent().removeClass('control-group error');
+            }
+        });
 
         this.initWorkspace(MongoApp.workspaceKey);
 
@@ -292,6 +286,17 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
                 valueDiv.append("<div class='row-fluid' id='value_div'><input name='int_field_value' class='input-mini' value='0'></div>");
                 valueDiv.append("<div class='row-fluid'><div class='span12'><hr></div></div>");
                 valueDiv.append(includeNullsHTML);
+
+                // since the FORM's <input> was added dynamically, we need to communicate to the
+                // jQuery validate plugin by adding a validation rule on the fly
+                // @see http://jqueryvalidation.org/rules
+                valueDiv.find("input[name='int_field_value']").rules("add", {
+                    required:true,
+                    integer:true,
+                    messages: {
+                        integer: 'Please enter a non-decimal number.'
+                    }
+                });
                 break;
             case VCFDataType.FLOAT:
                 opList.append(OPTION_EQ);
@@ -303,6 +308,17 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
                 valueDiv.append("<div class='row-fluid' id='value_div'><input name='float_field_value' class='input-mini' step='any' value='0.0'></div>");
                 valueDiv.append("<div class='row-fluid'><div class='span12'><hr></div></div>");
                 valueDiv.append(includeNullsHTML);
+
+                // since the FORM's <input> was added dynamically, we need to communicate to the
+                // jQuery validate plugin by adding a validation rule on the fly
+                // @see http://jqueryvalidation.org/rules
+                valueDiv.find("input[name='float_field_value']").rules("add", {
+                    required:true,
+                    number:true,
+                    messages: {
+                        number: 'Please enter a number.'
+                    }
+                });
                 break;
             case VCFDataType.STRING:
                 opList.append(OPTION_EQ);

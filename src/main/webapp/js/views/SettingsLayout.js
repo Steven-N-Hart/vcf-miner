@@ -10,8 +10,7 @@ SettingsLayout = Backbone.Marionette.Layout.extend({
         // jQuery validate plugin config
         this.$el.find('#settings_general_form').validate(
             {
-                rules:
-                {
+                rules: {
                     max_filtered_variants_field: {
                         required: true,
                         integer: true,
@@ -28,6 +27,11 @@ SettingsLayout = Backbone.Marionette.Layout.extend({
                         integer: true,
                         min:1
                     }
+                },
+                messages: {
+                    max_filtered_variants_field: 'Please enter a non-decimal number greater than or equal to 1.',
+                    popover_time_field:          'Please enter a non-decimal number between 0 and 10.',
+                    max_filter_values_field:     'Please enter a non-decimal number greater than or equal to 1.'
                 },
                 highlight: function(element) {
                     $(element).parent().addClass('control-group error');

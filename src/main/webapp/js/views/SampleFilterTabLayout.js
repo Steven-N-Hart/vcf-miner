@@ -18,23 +18,6 @@ SampleFilterTabLayout = Backbone.Marionette.Layout.extend({
         this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CHANGE, function (workspaceKey) {
             self.initWorkspace(workspaceKey);
         });
-
-        // jQuery validate plugin config
-        this.$el.find('#sample_tab_form').validate({
-                rules: {
-                    sample_filter_value: {
-                        required: true,
-                        number:true
-                    }
-                },
-                highlight: function(element) {
-                    $(element).parent().addClass('control-group error');
-                },
-                success: function(element) {
-                    $(element).parent().removeClass('control-group error');
-                }
-            }
-        );
     },
 
     initWorkspace: function(workspaceKey) {
@@ -78,8 +61,27 @@ SampleFilterTabLayout = Backbone.Marionette.Layout.extend({
         else
             this.$el.find('#no_format_annotation_warning').toggle(true);        
     },
-    
+
     onShow: function() {
+
+        // jQuery validate plugin config
+        var form = this.$el.find('#sample_tab_form');
+        form.validate({
+                rules: {
+                    sample_filter_value: {
+                        required: true,
+                        number:true
+                    }
+                },
+                highlight: function(element) {
+                    $(element).parent().addClass('control-group error');
+                },
+                success: function(element) {
+                    $(element).parent().removeClass('control-group error');
+                }
+            }
+        );
+
         this.initWorkspace(MongoApp.workspaceKey);
 
         <!-- sub-view that renders available filters in a dropdown choicebox -->
