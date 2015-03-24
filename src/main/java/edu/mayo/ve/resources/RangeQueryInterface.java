@@ -119,7 +119,7 @@ public class RangeQueryInterface {
             mLog.info("Flagging the workspace as Annotating");
             mDbInterface.flagAsAnnotating(workspace);
 
-            boolean isBackgroundProcess = isBackgroundProcess(workspace, tempFileForAllRanges);
+            boolean isBackgroundProcess = isBackgroundProcess(workspace, tempFileForAllRanges, (numRangesInTextArea + numRangesInUploadedFile));
 	        applyRanges(workspace, tempFileForAllRanges, intervalsName, intervalDescription, isBackgroundProcess);
 	
 	    	response = new RangeUploadResponse(isBackgroundProcess);
@@ -134,13 +134,14 @@ public class RangeQueryInterface {
     /** Determine whether the process should run in the background or foreground
      *  Run it as a background process if:
      *  	The file has > 20k variants AND the ranges cover more than 20k base pairs 
+     * @param  
      * @throws ParseException 
      * @throws IOException */
-    protected boolean isBackgroundProcess(String workspace, File tempFileForAllRanges) throws IOException, ParseException {
+    protected boolean isBackgroundProcess(String workspace, File tempFileForAllRanges, int numRanges) throws IOException, ParseException {
     	try {
 	    	long variantCount = mDbInterface.getVariantCount(workspace);
 	    	long bpCount = getBasePairCount(tempFileForAllRanges);
-	    	return  (variantCount > getVariantCountThreshold()) && (bpCount > getBasePairThreshold());
+	    	return  ((variantCount > getVariantCountThreshold()) && (bpCount > getBasePairThreshold()))  ||  (numRanges > getRangeCountThreshold());
     	}catch(Exception e) {
     		// If something happens here, we don't want to throw the exception up or it will be eternally "Annotating", 
     		// so force it to be a background process
@@ -247,6 +248,20 @@ public class RangeQueryInterface {
             		+ Tokens.RANGE_QUERY_BACKGROUND_PROCESS_THRESHOLD_BASEPAIRS + ".  Defaulting to " + basePairThreshold);
         }
         return basePairThreshold;
+    }
+
+    /** Get the number of ranges threshold for whether to run as a background process */
+    protected int getRangeCountThreshold() throws IOException {
+    	int rangeCountThreshold = 100; // Default
+    	try {
+    		SystemProperties sysprop = new SystemProperties();
+    		String valStr = sysprop.get(Tokens.RANGE_QUERY_BACKGROUND_PROCESS_THRESHOLD_RANGES);
+    		rangeCountThreshold = Integer.parseInt(valStr);
+        } catch( Exception e ) {
+            mLog.info("The range count threshold for range query background process is not defined in the sys.properties file.  Please define "
+            		+ Tokens.RANGE_QUERY_BACKGROUND_PROCESS_THRESHOLD_RANGES + ".  Defaulting to " + rangeCountThreshold);
+        }
+        return rangeCountThreshold;
     }
 
     // Check if a file contains only the characters "null".  This will happen if the user did not specify a file

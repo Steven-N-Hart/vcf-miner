@@ -32,3 +32,5 @@ NaN_KEY = NaN
 rangeThresholdVariants=20000
 # Set base-pair threshold for Range Query Filter
 rangeThresholdBasePairs=500000
+# Set range count threshold for Range Query Filter
+rangeThresholdRanges=100

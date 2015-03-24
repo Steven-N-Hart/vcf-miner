@@ -188,6 +188,14 @@ public class RangeQueryInterfaceTest {
     }
     
     @Test
+    public void countBasePairsInFile() throws IOException, ParseException {
+    	File allGenesFile = fromPath("/testData/genes.bed");
+    	long count = mRangeQuery.getBasePairCount(allGenesFile);
+    	assertEquals(1406090664, count);
+    }
+    
+    
+    @Test
     public void isBackgroundProcess() throws IOException, ParseException {
     	// NOTE: Default for background process is: 20k variants, 500k base-pairs
     	
@@ -202,8 +210,25 @@ public class RangeQueryInterfaceTest {
     	
     	// YES Background - variant count =threshold+1; range base pair count = threshold+1
     	assertTrue( isBackground(20001, "1 1-500001") );
-    	// YES Background - variant count > threshold;  range base pair count > threshold
+    	// YES Background - variant count > threshold;  range base pair count > threshold; range count < threshold
     	assertTrue( isBackground(2000000000, concatLines("1 1-20000", "1 1-400000", "2 1000000-1060000", "3 1-50000")) );
+    	
+    	// YES Background - variant count < threshold; range base pair count < threshold; **range count > threshold**
+    	assertTrue( isBackground(100, generateRanges(101, 400000)) );
+    	
+    	// YES Background - variant count > threshold; range base pair count > threshold; range count > threshold
+    	assertTrue( isBackground(21000, generateRanges(1000, 600000)) );
+    }
+    
+    private String generateRanges(int numRanges, long numBasePairs) {
+    	StringBuilder str = new StringBuilder();
+    	for(int i=0; i < numRanges; i++) {
+    		long range = numBasePairs/numRanges;
+    		long start = (i*range)+1;
+    		long end   = (i*range)+range;
+    		str.append("1 " + start + "-" + end + "\n");
+    	}
+    	return str.toString();
     }
     
     
@@ -216,7 +241,8 @@ public class RangeQueryInterfaceTest {
     	IOUtils.appendToFile(tempFile, ranges);
     	
     	// Check if it should be a background process
-    	return mRangeQuery.isBackgroundProcess("w11111111", tempFile);
+    	int numRanges = edu.mayo.ve.util.IOUtils.countNonEmptyLines(tempFile);
+    	return mRangeQuery.isBackgroundProcess("w11111111", tempFile, numRanges);
 	}
 
 	protected boolean isRangeOk(String range) {

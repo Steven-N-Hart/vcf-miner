@@ -40,4 +40,6 @@ public class Tokens {
     public static final String RANGE_QUERY_BACKGROUND_PROCESS_THRESHOLD_VARIANTS = "rangeThresholdVariants";
     /** BasePair count threshold for whether to run range query filter as background process */
     public static final String RANGE_QUERY_BACKGROUND_PROCESS_THRESHOLD_BASEPAIRS = "rangeThresholdBasePairs";
+    /** Range count threshold for whether to run range query filter as background process */
+	public static final String RANGE_QUERY_BACKGROUND_PROCESS_THRESHOLD_RANGES = "rangeThresholdRanges";
 }
