@@ -41,12 +41,13 @@
         <div class="row-fluid"><b>Specify a range and/or upload a file</b></div>
         <div class="row-fluid"  style="width: 600px; border: 1px solid;  border-color: lightgray;  border-radius: 10px; padding: 10px 10px 10px 10px;">
             <div class="row-fluid">Specify a range: &#xa0; &#xa0; <span id="numErrors" title="(Bad ranges are highlighted)">(0 errors)</span></div>
+            <!-- Div containing the text area and example ranges to the right -->
             <div class="row-fluid">
                 <!-- First column:  text area for ranges entered manually by user
                      Text area with highlighted rows:  http://mistic100.github.io/jquery-highlighttextarea/
                      Text area with line numbers on the left:  http://www.dhtmlgoodies.com/forum/viewtopic.php?t=506    -->
                 <div style="float: left;">
-                    <textarea id="rangesTextArea" class="form-control" rows="8" cols="40" placeholder="(Enter ranges here - Incorrect ranges will be highlighted)"></textarea>
+                    <textarea id="rangesTextArea" class="form-control" style="width:250px; height: 150px"  placeholder="(Enter ranges here - Incorrect ranges will be highlighted)"></textarea>
                 </div>
 
                 <!-- Second column: example ranges label -->
@@ -64,13 +65,11 @@
 
             <!-- Error message line below the rich-text area.
                 This will be used to display errors when validating the rich-text area, but then fade out after 5 seconds -->
+            <!-- NOTE: The character "&#xa0;" is the space character.  "&nbsp;" was causing problems -->
             <div class="row-fluid">
-                <span  id="rangesErrorMsg"  style="color: red; font-weight: bold"></span>
+                <div style="float: left; height: 20px;"></div>
+                <div id="rangesErrorMsg"  style="color: red; font-weight: bold"></div>
             </div>
-
-            <!-- Separator row -->
-            <div class="row-fluid">&#xa0;</div>
-
 
             <!-- "Upload a BED file" -->
             <div class="row-fluid">Upload a BED file</div>
@@ -86,7 +85,7 @@
                 <div style="display: none"><input type="file"  id="bedFileUpload"  name="bedFileUpload" value="Select BED file"/></div>
             </div>
         </div>
-        <br/><br/>
+        <br/>
 
         <!-- Error message for upload problems.
              This will be used to display errors after clicking the "Create Range Annotation" button, and will fade to 30% opacity after 5 seconds -->
