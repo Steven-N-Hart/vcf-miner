@@ -118,6 +118,7 @@ var Filter = Backbone.Model.extend({
 
         filter.set("name", pojo.key.substring(5));
         filter.set("value", pojo.value);
+        filter.set("operator", FilterOperator.EQ); // always = equals
         filter.set("category", FilterCategory.INFO_FLAG);
 
         return filter;
