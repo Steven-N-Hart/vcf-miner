@@ -88,6 +88,7 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         var rangesTextAreaObj = $('#rangesTextArea');
         // Initialize the highlighter object
         rangesTextAreaObj.highlightTextarea( { color: 'orange' } );
+
         // Run the timeout on the text-area once immediately.
         // This is to flush out the problem of the text-area losing focus after the first keypress
         var thisObj = this;
@@ -191,6 +192,9 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
 
     // Check if the name is valid.  If not, show error '*' on end and color text field font red.  Return true if ok, false if invalid.
     validateName : function() {
+        // Clear out the error message line if one was set:
+        this.showValidationErrorMsg("");
+
         var nameFieldObj     = $("#range_name_field");
         var nameErrorStarObj = $("#nameErrorStar");
         var name = nameFieldObj.val();
@@ -209,6 +213,8 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
 
     /* When the ranges text area loses focus, show an error msg if there are any errors with the ranges. */
     validateRangeQueries: function() {
+    	// Must do an error count first before displaying the message based on that error count
+        this.highlightBadRangeRows();
         if (this.numRangeErrors > 0 ) {
             this.showRangeErrorMsg("Please correct the errors in the ranges.");
         } else {
@@ -283,6 +289,9 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
     },
 
     setHighlightTimeout : function(eventObj) {
+        // Clear out the error message line if one was set:
+        this.showValidationErrorMsg("");
+
         // Cancel any previous event timing so we don't get multiple overlapping timeout events
         clearTimeout(this.highlightTimeout);
 
