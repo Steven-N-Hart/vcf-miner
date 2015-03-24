@@ -85,9 +85,15 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
         // See:
         //      http://mistic100.github.io/jquery-highlighttextarea/
         //      http://bebo.minka.name/k2work/libs.js/jquery/2.1.0/highlightTextarea/
-        $('#rangesTextArea').highlightTextarea({
-            color: 'orange'
-        });
+        var rangesTextAreaObj = $('#rangesTextArea');
+        // Initialize the highlighter object
+        rangesTextAreaObj.highlightTextarea( { color: 'orange' } );
+        // Run the timeout on the text-area once immediately.
+        // This is to flush out the problem of the text-area losing focus after the first keypress
+        var thisObj = this;
+        this.highlightTimeout = window.setTimeout(function() {
+            thisObj.highlightBadRangeRows(null);
+        }, 0);
     },
 
     // This is called by RangeQueryController.js to show the regions that are created in the initialize() method above
@@ -239,7 +245,7 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
     },
 
     showRangeErrorMsg: function(errorMsg) {
-        // Cancel any previous event timing
+        // Cancel any previous event timing so that we don't get multiple overlapping timeouts
         clearTimeout(this.errorMsgTimeoutEventRanges);
 
         var errorMsgObj = $("#rangesErrorMsg");
@@ -277,7 +283,7 @@ RangeQueryFilterTabLayout = Backbone.Marionette.Layout.extend({
     },
 
     setHighlightTimeout : function(eventObj) {
-        // Cancel any previous event timing
+        // Cancel any previous event timing so we don't get multiple overlapping timeout events
         clearTimeout(this.highlightTimeout);
 
         // After 1000ms, highlight any bad text
