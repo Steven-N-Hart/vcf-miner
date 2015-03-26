@@ -55,7 +55,10 @@ var DatabaseIndexController = function () {
                 console.log("created index " + indexName + " with return status: " + json.status);
                 loadIndexNames();
             },
-            error: jqueryAJAXErrorHandler
+            error: function(jqXHR, textStatus, errorThrown) {
+                jqueryAJAXErrorHandler(jqXHR, textStatus, errorThrown);
+                MongoApp.dispatcher.trigger(MongoApp.events.INDEX_CREATE_FAILED, index);
+            }
         });
     }
 
@@ -72,7 +75,10 @@ var DatabaseIndexController = function () {
                 console.log("dropped index " + indexName + " with return status: " + json.status);
                 loadIndexNames();
             },
-            error: jqueryAJAXErrorHandler
+            error: function(jqXHR, textStatus, errorThrown) {
+                jqueryAJAXErrorHandler(jqXHR, textStatus, errorThrown);
+                MongoApp.dispatcher.trigger(MongoApp.events.INDEX_DROP_FAILED, index);
+            }
         });
     }
 

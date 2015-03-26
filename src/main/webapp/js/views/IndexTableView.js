@@ -26,6 +26,14 @@ var IndexTableView = Backbone.View.extend({
         this.listenTo(this.model, "reset",      this.clearRows);
 
         this.render();
+
+        var self = this;
+        MongoApp.dispatcher.on(MongoApp.events.INDEX_CREATE_FAILED, function(index){
+            self.handleIndexCreateFailed(index);
+        });
+        MongoApp.dispatcher.on(MongoApp.events.INDEX_DROP_FAILED, function(index){
+            self.handleIndexDropFailed(index);
+        });
     },
 
     /**
@@ -185,9 +193,29 @@ var IndexTableView = Backbone.View.extend({
                 // re-enable the radio buttons
                 $('#'+that.table_uid+' tbody tr[id="'+indexName+'"] input[type=radio]').removeAttr("disabled", "disabled");
 
-                onButton.click();
+                onButton.prop('checked', true);
             }
         );
         confirmDialog.show();
+    },
+
+    handleIndexCreateFailed: function(index) {
+        var indexName = index.get("name");
+        var offButton = $('input[type="radio"][data-field-id="'+indexName+'"][value="off"]');
+
+        // re-enable the radio buttons
+        $('#'+this.table_uid+' tbody tr[id="'+indexName+'"] input[type=radio]').removeAttr("disabled", "disabled");
+
+        offButton.prop('checked', true);
+    },
+
+    handleIndexDropFailed: function(index) {
+        var indexName = index.get("name");
+        var onButton = $('input[type="radio"][data-field-id="'+indexName+'"][value="on"]');
+
+        // re-enable the radio buttons
+        $('#'+this.table_uid+' tbody tr[id="'+indexName+'"] input[type=radio]').removeAttr("disabled", "disabled");
+
+        onButton.prop('checked', true);
     }
 });

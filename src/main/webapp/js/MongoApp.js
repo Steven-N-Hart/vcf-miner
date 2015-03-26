@@ -94,7 +94,11 @@ MongoApp.addInitializer(function () {
         SEARCH_IMPORT: 'importSearch',
 
         // signals that a dialog showing the search objects should be shown
-        SEARCH_SHOW_DIALOG: 'showSearchDialog'
+        SEARCH_SHOW_DIALOG: 'showSearchDialog',
+
+        INDEX_CREATE_FAILED: 'indexCreateFailed',
+
+        INDEX_DROP_FAILED: 'indexDropFailed'
     };
 
     // GLOBAL
