@@ -286,10 +286,15 @@ public class VCFParserITCase {
                 "FORMAT.min.GQ_1",
                 "FORMAT.max.GQ_1",
                 "FORMAT.HeterozygousList_1",
-                "FORMAT.HomozygousList_1"
+                "FORMAT.HomozygousList_1",
+                "CHROM_1",
+                "_minBP_1",
+                "_maxBP_1"
         ));
-        assertEquals(expectedKeys,actualKeys);
-
+        assertEquals(expectedKeys.size(), actualKeys.size());
+        for (String key: expectedKeys) {
+            assertTrue(actualKeys.contains(key));
+        }
 
         //other tests....
 
@@ -342,7 +347,7 @@ public class VCFParserITCase {
 
 
     @Test
-    public void testAddPoundSamples() throws IOException {
+    public void testAddPoundSamples() throws Exception {
         DBObject samps;
         SampleMeta smeta = new SampleMeta();
         String workspace = "wHASH";

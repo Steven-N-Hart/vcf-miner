@@ -27,7 +27,7 @@ import java.util.List;
 public class DownloadVCFTestITCase extends TestCase {
     MetaData meta = new MetaData();
 
-    private static String load(String vcf) throws IOException, ProcessTerminatedException {
+    private static String load(String vcf) throws Exception {
         ProblemVCFITCase pvcf = new ProblemVCFITCase();
         return pvcf.load(vcf, false);
     }

@@ -49,7 +49,7 @@ public class TypeAheadITCase {
     public String getWorkspaceID(){ return workspaceID; }
 
     @BeforeClass
-    public static void setUp() throws IOException, ProcessTerminatedException {
+    public static void setUp() throws Exception {
         System.out.println("Make sure to have MongoDB up and running on localhost (or wherever specified in your sys.properties file) before you try to run this functional test!");
         System.out.println("TypeAheadITCase.Provision a new workspace...");
         Provision prov = new Provision();
@@ -180,7 +180,7 @@ public class TypeAheadITCase {
     }
 
     @Test
-    public void testGetDistinctCount4Field() throws IOException, CacheMissException {
+    public void testGetDistinctCount4Field() throws Exception {
         System.out.println("testGetDistinctCount4Field");
 
         //field is not indexed but it is much less than threshold, so correct
@@ -216,7 +216,7 @@ public class TypeAheadITCase {
     }
 
     @Test
-    public void testTypeAheadOnArray() throws IOException, ProcessTerminatedException, CacheMissException {
+    public void testTypeAheadOnArray() throws Exception {
         ProblemVCFITCase p = new ProblemVCFITCase();
         String vcf = "src/test/resources/testData/CustomCapture.anno5000.vcf";
         String workspace = p.load(vcf, false);

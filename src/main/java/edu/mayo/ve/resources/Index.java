@@ -21,7 +21,7 @@ public class Index {
     @GET
     @Path("/createFieldIndex/{workspaceid}/f/{field}")
     @Produces("application/json")
-    public String createFieldIndex(@PathParam("workspaceid") String workspaceID, @PathParam("field") String field) {
+    public String createFieldIndex(@PathParam("workspaceid") String workspaceID, @PathParam("field") String field) throws Exception {
         DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspaceID);
         return index.indexField(field, col).toString();
@@ -30,7 +30,7 @@ public class Index {
     @GET
     @Path("/dropFieldIndex/{workspaceid}/f/{field}")
     @Produces("application/json")
-    public String dropFieldIndex(@PathParam("workspaceid") String workspaceID, @PathParam("field") String field) {
+    public String dropFieldIndex(@PathParam("workspaceid") String workspaceID, @PathParam("field") String field) throws Exception {
         DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(workspaceID);
         return index.dropIndexField(field,col).toString();

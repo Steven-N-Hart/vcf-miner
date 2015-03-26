@@ -1,12 +1,9 @@
 package edu.mayo.ve.resources;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.mongodb.*;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.util.Tokens;
-import edu.mayo.ve.index.*;
-import edu.mayo.ve.index.Index;
+import edu.mayo.index.Index;
 import edu.mayo.ve.util.SystemProperties;
 
 import javax.ws.rs.GET;
@@ -57,12 +54,12 @@ public class SampleMeta {
      * indexes the ##sample collection based on 'key' so we can get the documents for a given VCF file rapidly
      * @return
      */
-    public DBObject indexSampleDocuments() throws IOException {
+    public DBObject indexSampleDocuments() throws Exception {
         DB db = MongoConnection.getDB();
         SystemProperties sysprop = new SystemProperties();
         String samplemetacol = sysprop.get(sample_meta_collection);
         DBCollection col = db.getCollection(samplemetacol);
-        edu.mayo.ve.index.Index indexer = new Index();
+        Index indexer = new Index();
         return indexer.indexField(sample_meta_key, col);
     }
 

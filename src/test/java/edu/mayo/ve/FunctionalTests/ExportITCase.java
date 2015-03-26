@@ -41,7 +41,7 @@ public class ExportITCase {
     private static String workspace = "wee16c14d3c19a8e83388c491c395df4cac4db859";
 
     @BeforeClass
-    public static void init() throws IOException, ProcessTerminatedException {
+    public static void init() throws Exception {
         it = new ProblemVCFITCase();
         String workspace = load(vcf, false);
         //delete the file that this test creates, just to make sure everything is ok for the test.
@@ -111,7 +111,7 @@ public class ExportITCase {
         }
     }
 
-    private static String load(String inputVCF, boolean reporting) throws IOException, ProcessTerminatedException {
+    private static String load(String inputVCF, boolean reporting) throws Exception {
         workspace = it.load(vcf,reporting);
         System.out.println("workspace: " + workspace);
         return workspace;

@@ -143,7 +143,6 @@ public class MetaData {
 //        System.out.println("workspace");
 //        System.out.println(workspaceID);
 //        System.out.println(coll.find(query).next().toString());
-        updateErrorsAndWarningCounts(workspace);
     }
 
     /**
@@ -199,6 +198,9 @@ public class MetaData {
         for(String key : context.keySet()){
             stats.put(key, context.get(key));
         }
+        ErrorStats estats = VCFErrorFileUtils.calculateErrorStatistics(workspace);
+        stats.put("ERRORS",   (long) estats.getErrors());
+        stats.put("WARNINGS", (long) estats.getWarnings());
 
         return stats;
     }

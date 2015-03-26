@@ -11,7 +11,7 @@ import edu.mayo.ve.VCFParser.ErrorStats;
 import edu.mayo.ve.VCFParser.LoadWorker;
 import edu.mayo.ve.VCFParser.VCFErrorFileUtils;
 import edu.mayo.ve.VCFParser.VCFParser;
-import edu.mayo.ve.index.Index;
+import edu.mayo.index.Index;
 import edu.mayo.ve.message.Querry;
 import edu.mayo.ve.message.SampleNumberFilter;
 import edu.mayo.ve.resources.ExeQuery;
@@ -55,7 +55,7 @@ public class ProblemVCFITCase {
 //    }
 
     @Test
-    public void testAsif100G() throws IOException, ProcessTerminatedException {
+    public void testAsif100G() throws Exception {
         String vcf = "src/test/resources/testData/Asif1000G.vcf";
         //check to see if the type-ahead is indexed.
         DB database = MongoConnection.getDB();
@@ -86,7 +86,7 @@ public class ProblemVCFITCase {
     }
 
     @Test
-    public void testCaseControlSNPEFFHGVSAnnovar() throws IOException, ProcessTerminatedException {
+    public void testCaseControlSNPEFFHGVSAnnovar() throws Exception {
         String vcf = "src/test/resources/testData/Case.control.snpeff.hgvs.annovar.part.vcf";
         String workspace = load(vcf, false);
         //tests.... (note this problem should create an error if it surfaces again)
@@ -96,7 +96,7 @@ public class ProblemVCFITCase {
     //this test takes a LONG time to run, so commenting it out, run manually every now and then if you want to ensure functionality is still correct
     //it is more of a load test...
     //@Test
-    public void testCaseControlSNPEFFHGVSAnnovar10k() throws IOException, ProcessTerminatedException {
+    public void testCaseControlSNPEFFHGVSAnnovar10k() throws Exception {
         System.out.println("Loading 10k of a problem VCF");
         String vcf = "src/test/resources/testData/Case.control.snpeff.hgvs.annovar.10k.vcf.gz";
         String workspace = load(vcf, false);
@@ -108,7 +108,7 @@ public class ProblemVCFITCase {
     }
 
     @Test
-    public void testAll_SamplesQuerry() throws IOException, ProcessTerminatedException {
+    public void testAll_SamplesQuerry() throws Exception {
         System.out.println("Loading All_Samples.snpeff.annotation.fixed.vcf.gz");
         String vcf = "src/test/resources/testData/All_Samples.snpeff.annotation.fixed.vcf.gz";
         String workspace =  load(vcf, false); //"w3a49942530f0e1e57756b20bc075695f7fd10f90";
@@ -146,7 +146,7 @@ public class ProblemVCFITCase {
     //this tests loading two files that are the same file one that is compressed and on that is not
     //the contents of the workspaces should be the same.
     @Test
-    public void testCompressed() throws IOException, ProcessTerminatedException {
+    public void testCompressed() throws Exception {
         System.out.println("Testing compression");
         String vcf = "src/test/resources/testData/annotated.functional.vcf";
         String zvcf = "src/test/resources/testData/Annotated.functional.vcf.gz"; //compressed version of the same file
@@ -166,7 +166,7 @@ public class ProblemVCFITCase {
 
 
     @Test
-    public void testProblemDotMetadata() throws IOException, ProcessTerminatedException {
+    public void testProblemDotMetadata() throws Exception {
         String vcf = "src/test/resources/testData/Case.control.snpeff.hgvs.annovar.part300.vcf.gz";
         String workspace = load(vcf, false);
         //tests.... (note this problem should create an error if it surfaces again)
@@ -193,7 +193,7 @@ public class ProblemVCFITCase {
 
 
     @Test
-    public void testExcessiveWarningsNotPresent() throws IOException, ProcessTerminatedException {
+    public void testExcessiveWarningsNotPresent() throws Exception {
         //certain versions of pipes had excessive warnings when custom logic failed on a VCF, this tests that the version of pipes is correct
         String vcf = "src/test/resources/testData/failCustomLogic.vcf";
         String workspace = load(vcf, false);
@@ -203,7 +203,7 @@ public class ProblemVCFITCase {
     }
 
 
-    public String load(String inputVCF, boolean reporting) throws IOException, ProcessTerminatedException {
+    public String load(String inputVCF, boolean reporting) throws Exception {
         System.out.println("Make sure to have MongoDB up and running on localhost (or wherever specified in your sys.properties file) before you try to run this functional test!");
         System.out.println("ProblemVCFITCase.Provision a new workspace...");
         Provision prov = new Provision();

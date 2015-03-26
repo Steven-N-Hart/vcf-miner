@@ -14,6 +14,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import edu.mayo.concurrency.workerQueue.Task;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,7 +28,6 @@ import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
-import edu.mayo.concurrency.workerQueue.Task;
 import edu.mayo.ve.LoaderPool;
 import edu.mayo.ve.dbinterfaces.DatabaseImplMongo;
 import edu.mayo.ve.message.InfoFlagFilter;
@@ -224,7 +226,12 @@ public class RangeITCase {
         String intervalsDesc = "Some description here";
         RangeQueryInterface rangeQ = new RangeQueryInterface();
         RangeWorker worker = new RangeWorker();
-        Task<HashMap,HashMap> t = rangeQ.getTask(workspace, new File(rangeFile), intervalsName, intervalsDesc, 1);
+
+        // create a temp file because the original will be deleted by the RangeWorker class
+        File tempRangeFile = edu.mayo.ve.util.IOUtils.createTempFile();
+        FileUtils.copyFile(new File(rangeFile), tempRangeFile);
+
+        Task<HashMap,HashMap> t = rangeQ.getTask(workspace, tempRangeFile, intervalsName, intervalsDesc, 1);
         //update the metadata manually because it is not in the front end call
         new DatabaseImplMongo().addInfoField(workspace, intervalsName, 0, "Flag", "test on the background worker");
 

@@ -48,6 +48,7 @@ import edu.mayo.util.Tokens;
 import edu.mayo.ve.resources.MetaData;
 import edu.mayo.ve.resources.SampleMeta;
 import edu.mayo.ve.util.IOUtils;
+import org.apache.log4j.Logger;
 
 //import edu.mayo.cli.CommandPlugin; TO DO! get this to work :(
 
@@ -58,6 +59,12 @@ import edu.mayo.ve.util.IOUtils;
  */
 public class VCFParser implements ParserInterface {
 
+    private static final Logger logger = Logger.getLogger(VCFParser.class);
+
+    // the max number of automatically build indexes
+    // once this threshold is reached, no more automatic indexes are built
+    // this reserves 14 free indexes for the user
+    private int maxAutomaticIndexes = 50;
 
     private int cacheSize = 50000;
     private Mongo m = MongoConnection.getMongo();
@@ -228,7 +235,7 @@ public class VCFParser implements ParserInterface {
 
         try {
             addPoundSamples(vcf.getSampleDefinitions(), workspace);
-        }catch (IOException e){
+        }catch (Exception e){
             //this exception happens when the configuration file, sys.properties is not set up correctly.
             throw new ProcessTerminatedException();
         }
@@ -248,7 +255,11 @@ public class VCFParser implements ParserInterface {
             if(reporting){System.out.println("indexing...");}
             //change the status from queued to importing:
             meta.flagAsIndexing(workspace);
-            index(workspace, vcf, reporting);
+            try {
+                index(workspace, vcf, reporting);
+            } catch (Exception e) {
+                throw new ProcessTerminatedException();
+            }
             if(reporting){System.out.println("saving type-ahead results to the database");}
         }
         if(reporting){ System.out.println("done!");}
@@ -337,7 +348,7 @@ public class VCFParser implements ParserInterface {
      * ##SAMPLE LINES need to be added to their own collection so that later code can query it.
      *    DBObject metadata
      */
-    public void addPoundSamples(Iterator<SampleDefinition> iter, String workspace) throws IOException {
+    public void addPoundSamples(Iterator<SampleDefinition> iter, String workspace) throws Exception {
         SampleMeta sm = new SampleMeta();
         SystemProperties sysprop = new SystemProperties();
         String poundsamplecol = sysprop.get(SampleMeta.sample_meta_collection);
@@ -570,7 +581,7 @@ public class VCFParser implements ParserInterface {
     }
 
 
-    public void index(String workspace, VCF2VariantPipe vcf, boolean reporting){
+    public void index(String workspace, VCF2VariantPipe vcf, boolean reporting) throws Exception {
         JsonObject json = vcf.getJSONMetadata();
         if(json == null){
             return;
@@ -591,7 +602,7 @@ public class VCFParser implements ParserInterface {
      * @param col
      * @param reporting
      */
-    private void indexReserved(DBCollection col, boolean reporting){
+    private void indexReserved(DBCollection col, boolean reporting) throws Exception {
 
         // needed for range annotation
         indexField("CHROM", col, reporting);
@@ -606,7 +617,7 @@ public class VCFParser implements ParserInterface {
     }
 
 
-    private void indexSNPEFF(DBCollection col, JsonObject json, boolean reporting){
+    private void indexSNPEFF(DBCollection col, JsonObject json, boolean reporting) throws Exception {
         //indexField("INFO.SNPEFF_GENE_NAME", col);
         for(String key: getSNPEFFColsFromJsonObj(json)){
             indexField("INFO." + key, col, reporting);
@@ -642,7 +653,7 @@ public class VCFParser implements ParserInterface {
      * @param col       - the collection/workspace
      * @param reporting - if we want to show what is going on in the tomcat log
      */
-    private void indexFormat(Set<String> formatFields, DBCollection col, boolean reporting){
+    private void indexFormat(Set<String> formatFields, DBCollection col, boolean reporting) throws Exception {
         for(String field : formatFields){
             // FORMAT + . + . + field
             String ikey = "FORMAT." + "min." + field;
@@ -654,7 +665,7 @@ public class VCFParser implements ParserInterface {
         }
     }
 
-    private void indexFieldReplacingDot(String field, DBCollection col, boolean reporting){ //don't think this is ever used...
+    private void indexFieldReplacingDot(String field, DBCollection col, boolean reporting) throws Exception { //don't think this is ever used...
         if(field.contains(".")){
             field = field.replace(".","_");
         }
@@ -662,10 +673,17 @@ public class VCFParser implements ParserInterface {
     }
 
     private Index indexUtil = new Index(); //use the indexUtil instead of the raw interface to prevent duplicate indexes!
-    private void indexField(String field, DBCollection col, boolean reporting){
+    private void indexField(String field, DBCollection col, boolean reporting) throws Exception {
         if(reporting) System.out.println("index: " + field);
-        DBObject status = indexUtil.indexField(field,col);
-        if(reporting) System.out.println(status.toString());
+
+        if (indexUtil.countIndexes4Collection(col) <= maxAutomaticIndexes) {
+
+            DBObject status = indexUtil.indexField(field,col);
+            if(reporting) System.out.println(status.toString());
+
+        } else {
+            logger.warn(String.format("Number of indexes on collection %s has reached %s.  Will not auto-index field %s.", col.getName(), maxAutomaticIndexes, field));
+        }
     }
 
 

@@ -207,7 +207,7 @@ public class LoadWorker implements WorkerLogic {
      *
      * @param variantCollection The collection of variant data.
      */
-    public static void createTypeAheadCollection(DBCollection variantCollection) {
+    public static void createTypeAheadCollection(DBCollection variantCollection) throws Exception {
 
         // The MAP produces unique keys that will be counted in the REDUCE function.
         //

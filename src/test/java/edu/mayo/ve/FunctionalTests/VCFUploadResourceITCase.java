@@ -118,9 +118,11 @@ public class VCFUploadResourceITCase {
 
         while (true) {
             DBObject dbo = coll.findOne(query);
-            String status = (String) dbo.get("status");
-            if (status.equals(expectedStatus)) {
-                return;
+            if (dbo.containsField("status")) {
+                String status = (String) dbo.get("status");
+                if (status.equals(expectedStatus)) {
+                    return;
+                }
             }
             Thread.sleep(1000);
         }

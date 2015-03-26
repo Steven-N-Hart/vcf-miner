@@ -26,7 +26,7 @@ public class IndexITCase {
     private static String workspace = "wd5e9246fe1060d7fd0ca53628039ae006389a40a";
 
     @BeforeClass
-    public static void setup() throws IOException, ProcessTerminatedException {
+    public static void setup() throws Exception {
         theadit.setUp();
         workspace = theadit.getWorkspaceID();
     }
