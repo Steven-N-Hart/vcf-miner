@@ -27,6 +27,10 @@ Double_MIN_VALUE = 1.0e-307
 Double_NEGATIVE_INFINITY = -1.0e307
 NaN_KEY = NaN
 
+# Key lengths greater than this threshold will be reduced down to a 32 character
+# length via MD5 checksum.
+MAP_REDUCE_KEY_HASH_THRESHOLD=32
+
 # Run Range Query filter as background process if Variants in database > variant threshold AND base-pairs in user-specified range > base-pair threshold 
 # Set variant count threshold for Range Query Filter
 rangeThresholdVariants=20000
