@@ -7,6 +7,7 @@
     <packaging>war</packaging>
     <version>3.0.2-SNAPSHOT</version>
 
+
     <build>
         <finalName>vcf-miner</finalName>
     </build>
