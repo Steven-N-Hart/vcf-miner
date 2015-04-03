@@ -26,7 +26,36 @@ DataLayout = Backbone.Marionette.Layout.extend({
      * Delegated events
      */
     events: {
-        "click #show_add_filter_dialog_button" : "showAddFilterDialog"
+        "click #show_add_filter_dialog_button" : "showAddFilterDialog",
+        "mouseenter .ui-layout-west" : "handleWestPaneMouseEnter",
+        "mouseleave .ui-layout-west" : "handleWestPaneMouseLeave",
+        "mousedown .ui-layout-resizer-west" : "handleResizerMouseDown",
+        "mouseup .ui-layout-resizer-west" : "handleResizerMouseUp"
+    },
+
+    handleWestPaneMouseEnter: function() {
+        if (this.resizedWidth == undefined) {
+            this.resizedWidth = this.jqueryUiLayout.state.west.outerWidth;
+        }
+
+        // get width of content inside west pane that was not auto-sized
+        var ignoreAutosizeDivWidth = this.$el.find("#ignore_autosize_div").outerWidth(true);
+
+        if (ignoreAutosizeDivWidth > this.resizedWidth) {
+            this.jqueryUiLayout.sizePane("west", ignoreAutosizeDivWidth);
+        }
+    },
+
+    handleWestPaneMouseLeave: function() {
+        this.jqueryUiLayout.sizePane("west", this.resizedWidth);
+    },
+
+    handleResizerMouseDown: function() {
+        this.resizerDrag = true;
+    },
+
+    handleResizerMouseUp: function() {
+        this.resizerDrag = false;
     },
 
     onShow: function() {
@@ -79,7 +108,7 @@ DataLayout = Backbone.Marionette.Layout.extend({
 
             //	some pane-size settings
             ,	west__minSize:				200
-            ,	west__size: 				450
+            ,	west__size:                 400
             ,	west__spacing_closed:		5			// wider space when closed
             ,	west__togglerLength_closed:	-1			// -1 = full height
             ,	west__togglerAlign_closed:	"top"		// align to top of resizer
@@ -100,7 +129,19 @@ DataLayout = Backbone.Marionette.Layout.extend({
             {
                 self.$el.find("#west-opener").toggle(true);
             }
+            ,  west__onresize_end: function (paneName, paneEl, paneState, paneOptions, layoutName) {
 
+                // stretch to fill west pane
+                paneEl.find(".ui-layout-ignore").css("min-width", paneState.outerWidth);
+
+                // save away the "resized" width as the user drags the resizer widget
+                if (self.resizerDrag) {
+                    self.resizedWidth = paneState.outerWidth;
+                }
+            }
+
+            ,  west__onshow: function (paneName, paneEl, paneState, paneOptions, layoutName) {
+            }
             //        ,	east__size:					300
             //        ,	east__minSize:				200
             //        ,	east__maxSize:				.5 // 50% of layout width
@@ -113,8 +154,8 @@ DataLayout = Backbone.Marionette.Layout.extend({
             ,	west__fxSettings_open:		{ easing: "easeOutQuint" }
             ,	west__fxSettings_close:		{ easing: "easeInQuint" }
 
-            //	enable showOverflow on west-pane so CSS popups will overlap north pane
-            ,	west__showOverflowOnHover:	true
+            //	disable showOverflow on west-pane
+            ,	west__showOverflowOnHover:	false
 
             //	enable state management
             ,	stateManagement__enabled:	true // automatic cookie load & save enabled by default
