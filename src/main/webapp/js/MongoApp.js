@@ -96,6 +96,12 @@ MongoApp.addInitializer(function () {
         // signals that a dialog showing the search objects should be shown
         SEARCH_SHOW_DIALOG: 'showSearchDialog',
 
+        // variant data has been fetched from server
+        // event passes 2 parameters
+        // #1 how many variants fetched
+        // #2 how many variants total
+        SEARCH_COMPLETE: 'searchComplete',
+
         INDEX_CREATE_FAILED: 'indexCreateFailed',
 
         INDEX_DROP_FAILED: 'indexDropFailed'

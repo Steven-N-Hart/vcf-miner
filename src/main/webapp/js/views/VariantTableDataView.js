@@ -9,6 +9,30 @@ VariantTableDataView = Backbone.Marionette.Layout.extend({
      *      All options passed to the constructor.
      */
     initialize: function(options) {
+
+        var self = this;
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_COMPLETE, function (fetchedVariantCnt, totalVariantCnt) {
+            if (fetchedVariantCnt < totalVariantCnt) {
+                var m = 'Loaded only the first ' +  fetchedVariantCnt + ' out of ' + totalVariantCnt;
+
+                // Datatable's DIV with text "Showing X to Y of Z entries"
+                var showingXtoYofZDiv = self.$el.find('.dataTables_info');
+                showingXtoYofZDiv.prepend('<i class="fa fa-exclamation-triangle alert" style="padding:5px;display:inline"></i>');
+                var triangleIcon = showingXtoYofZDiv.find('i');
+                triangleIcon.popover('destroy');
+                triangleIcon.popover(
+                    {
+                        html: true,
+                        content: _.template($("#warning-popover-template").html(), {message: m}),
+                        trigger: 'hover',
+                        placement: 'bottom'
+                    }
+                );
+                triangleIcon.popover('show');
+                setTimeout(function(){ triangleIcon.popover('hide'); }, MongoApp.settings.popupDuration * 1000);
+            }
+        });
+
         // rebind so that options can be access in other functions
         this.options = options;
 

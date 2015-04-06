@@ -145,19 +145,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
                 var lastFilter = _.last(MongoApp.search.get("filterSteps").models);
                 lastFilter.set("numMatches", json.totalResults);
 
-                if (json.totalResults > MongoApp.settings.maxFilteredVariants) {
-                    var m = 'Loaded only ' +  MongoApp.settings.maxFilteredVariants;
-                    var numMatchesLabel = $('#' + lastFilter.get("id") + "_num_matches_label");
-                    numMatchesLabel.popover('destroy');
-                    numMatchesLabel.popover(
-                        {
-                            html: true,
-                            content: _.template($("#warning-popover-template").html(), {message: m})
-                        }
-                    );
-                    numMatchesLabel.popover('show');
-                    setTimeout(function(){ numMatchesLabel.popover('hide'); }, MongoApp.settings.popupDuration * 1000);
-                }
+                MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_COMPLETE, MongoApp.settings.maxFilteredVariants, json.totalResults);
             },
             error: jqueryAJAXErrorHandler,
             complete: function(jqXHR, textStatus) {
