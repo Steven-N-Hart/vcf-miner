@@ -137,7 +137,7 @@ SearchNameView = Backbone.Marionette.ItemView.extend({
     deleteSearch: function(e) {
         var self = this;
         var confirmDialog = new ConfirmDialog(
-            "Delete Search",
+            "Delete Analysis",
             "Delete " + self.model.get("name")  + "?",
             "Delete",
             function()

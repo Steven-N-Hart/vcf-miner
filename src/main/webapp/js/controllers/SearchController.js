@@ -184,12 +184,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
         $.ajax({
             type: "DELETE",
             url: "/mongo_svr/ve/filterHistory/delete/" + search.get('id'),
-            dataType: "json",
-            success: function(json)
-            {
-                console.log("delete successful!");
-                // TODO: give user feedback
-
+            success: function() {
                 // if the user deletes the current search, then reload the workspaceKey w/ default search
                 if (search.get('id') == MongoApp.search.get('id')) {
                     MongoApp.dispatcher.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspaceKey, new Search());
