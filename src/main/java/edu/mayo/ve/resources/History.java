@@ -147,14 +147,12 @@ public class History {
     //delete
     @DELETE
     @Path("/delete/{fileHistoryID}/")
-    @Produces("application/json")
-    public String delete(@PathParam("fileHistoryID") String fileHistoryID){
+    public void delete(@PathParam("fileHistoryID") String fileHistoryID){
         DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(Tokens.FILTER_HISTORY_COLLECTION);
         BasicDBObject del = new BasicDBObject();
         del.put("id",fileHistoryID);
         System.out.println(del.toString());
-        WriteResult remove = col.remove(del);
-        return "{\"fileHistoryID\" : \"" + fileHistoryID + "\", \"status\" : \"" + remove.toString() + "\"}";
+        col.remove(del);
     }
 }
