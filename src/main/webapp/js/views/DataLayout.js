@@ -1,5 +1,8 @@
 DataLayout = Backbone.Marionette.Layout.extend({
 
+    // defaults to pinned
+    analysis_pane_pinned: true,
+
     template: "#data-layout-template",
 
     regions: {
@@ -30,10 +33,29 @@ DataLayout = Backbone.Marionette.Layout.extend({
         "mouseenter .ui-layout-west" : "handleWestPaneMouseEnter",
         "mouseleave .ui-layout-west" : "handleWestPaneMouseLeave",
         "mousedown .ui-layout-resizer-west" : "handleResizerMouseDown",
-        "mouseup .ui-layout-resizer-west" : "handleResizerMouseUp"
+        "mouseup .ui-layout-resizer-west" : "handleResizerMouseUp",
+        "click #analysis_resize" : "maximizeAnalysisPane"
+    },
+
+    /**
+     * Maximizes the Analysis pane's width to eliminate the horizontal scrollbar
+     */
+    maximizeAnalysisPane: function() {
+        this.jqueryUiLayout.sizePane("west", this.$el.find("#ignore_autosize_div").outerWidth(true));
+    },
+
+    /**
+     * Determines whether the analysis pane is pinned or not.
+     *
+     * @return
+     *      TRUE if pinned, FALSE otherwise
+     */
+    isAnalysisPanePinned: function() {
+        return this.$el.find("#analysis_pin").hasClass("active");
     },
 
     handleWestPaneMouseEnter: function() {
+
         if (this.resizedWidth == undefined) {
             this.resizedWidth = this.jqueryUiLayout.state.west.outerWidth;
         }
@@ -41,13 +63,15 @@ DataLayout = Backbone.Marionette.Layout.extend({
         // get width of content inside west pane that was not auto-sized
         var ignoreAutosizeDivWidth = this.$el.find("#ignore_autosize_div").outerWidth(true);
 
-        if (ignoreAutosizeDivWidth > this.resizedWidth) {
+        if (!this.isAnalysisPanePinned() && (ignoreAutosizeDivWidth > this.resizedWidth)) {
             this.jqueryUiLayout.sizePane("west", ignoreAutosizeDivWidth);
         }
     },
 
     handleWestPaneMouseLeave: function() {
-        this.jqueryUiLayout.sizePane("west", this.resizedWidth);
+        if (!this.isAnalysisPanePinned()) {
+            this.jqueryUiLayout.sizePane("west", this.resizedWidth);
+        }
     },
 
     handleResizerMouseDown: function() {
@@ -65,6 +89,8 @@ DataLayout = Backbone.Marionette.Layout.extend({
         MongoApp.searchController.showSearchDescription({region: this.searchDescriptionRegion });
         MongoApp.searchController.showSearchFilterTable({region: this.searchFiltersRegion });
         MongoApp.searchController.showSearchSave({region: this.searchSaveRegion });
+
+        this.jqueryUiLayout.sizePane("west", this.$el.find("#ignore_autosize_div").outerWidth(true));
     },
 
     showAddFilterDialog: function() {
