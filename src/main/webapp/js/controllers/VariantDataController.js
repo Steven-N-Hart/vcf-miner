@@ -213,14 +213,17 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         query.displayFields = displayFields;
 
         var displayFiltersApplied = new Array();
-        _.each(search.get("filterSteps").models, function(filter)
+        _.each(search.get("filterSteps").models, function(filterStep)
         {
-            displayFiltersApplied.push(
-                {
-                    filterText: filter.getNameAsASCII() + " " + filter.getOperatorAsASCII() + " " + filter.getValueAsASCII(),
-                    numberVariantsRemaining: filter.get("numMatches")
-                }
-            );
+            _.each(filterStep.get("filters").models, function(filter)
+            {
+                displayFiltersApplied.push(
+                    {
+                        filterText: filter.getNameAsASCII() + " " + filter.getOperatorAsASCII() + " " + filter.getValueAsASCII(),
+                        numberVariantsRemaining: filterStep.get("numMatches")
+                    }
+                );
+            });
         });
         query.displayFiltersApplied = displayFiltersApplied;
 
