@@ -1611,16 +1611,29 @@
 </div>
 
 <!-- Modal -->
-<div id="error_modal" data-backdrop="static" class="modal wide-modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+<div id="server_error_modal" data-backdrop="static" class="modal wide-modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-header">
+        <h3>Server Error</h3>
+    </div>
+    <div class="modal-body">
+        <!-- scrollpane because Tomcat can return a lengthy error page -->
+        <div class="pre-scrollable">
+            <div id="server_error_message_container">
+                <!-- added by javascript -->
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>
+
+<div id="client_error_modal" data-backdrop="static" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-header">
         <h3>Error</h3>
     </div>
     <div class="modal-body">
-        <div class="pre-scrollable">
-            <div id="error_message_container">
-                <!-- added by javascript -->
-            </div>
-        </div>
+        <!-- added by javascript -->
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>

@@ -24,8 +24,11 @@ MongoApp.addInitializer(function () {
     this.dispatcher = _.clone(Backbone.Events);
 
     this.events = {
-        // system error has occurred
-        ERROR: 'error',
+        // system error on client has occurred
+        CLIENT_ERROR: 'client_error',
+
+        // system error on server has occurred
+        SERVER_ERROR: 'server_error',
 
         // user authenticating to the system
         LOGIN: 'login',
@@ -185,10 +188,17 @@ MongoApp.addInitializer(function () {
 
 
     // Wire Marionette events to function callbacks
-    this.listenTo(MongoApp.dispatcher, MongoApp.events.ERROR, function (errorMessage) {
+    this.listenTo(MongoApp.dispatcher, MongoApp.events.SERVER_ERROR, function (errorMessage) {
 
-        $('#error_message_container').html(errorMessage);
-        $('#error_modal').modal();
+        $('#server_error_message_container').html(errorMessage);
+        $('#server_error_modal').modal();
+
+        console.log(errorMessage);
+    });
+    this.listenTo(MongoApp.dispatcher, MongoApp.events.CLIENT_ERROR, function (errorMessage) {
+
+        $('#client_error_modal').find('.modal-body').html(errorMessage);
+        $('#client_error_modal').modal();
 
         console.log(errorMessage);
     });

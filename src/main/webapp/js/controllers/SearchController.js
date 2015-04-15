@@ -247,9 +247,14 @@ var SearchController = Backbone.Marionette.Controller.extend({
      * @param JSON text for filter history javascript object.
      */
     importSearch: function(filterHistoryJsonText) {
-        var filterHistory = JSON.parse(filterHistoryJsonText);
-        var search = this.filterHistoryToSearch(filterHistory);
-        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_LOAD, search);
+        try {
+            var filterHistory = JSON.parse(filterHistoryJsonText);
+            var search = this.filterHistoryToSearch(filterHistory);
+            MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_LOAD, search);
+        } catch (exception) {
+            MongoApp.dispatcher.trigger(MongoApp.events.CLIENT_ERROR, "Invalid Analysis file.");
+            console.log(exception);
+        }
     },
 
     /**
@@ -345,6 +350,9 @@ var SearchController = Backbone.Marionette.Controller.extend({
     /**
      * Translates a edu.mayo.ve.message.FilterHistory object into a Search model.
      * @param filterHistory
+     *
+     * @throws Exception
+     *
      */
     filterHistoryToSearch: function(filterHistory) {
         var search = new Search();
@@ -372,6 +380,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
     /**
      * Translates a edu.mayo.ve.message.Querry object into a Filter model.
      * @param querry
+     * @throws Error message if the querry contains no constraints.
      */
     querryToFilter: function(querry) {
         var filter;
@@ -405,6 +414,8 @@ var SearchController = Backbone.Marionette.Controller.extend({
         else if (querry.customNumberFilters.length == 1) {
             filter = new AltAlleleDepthFilter();
             filter.set("value", querry.customNumberFilters[0].value);
+        } else {
+            throw "0 constraints found in: " + JSON.stringify(querry);
         }
 
         if (filter != undefined)

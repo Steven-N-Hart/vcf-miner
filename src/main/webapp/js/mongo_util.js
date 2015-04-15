@@ -203,7 +203,7 @@ function genericAJAXErrorHandler(xmlHttpRequest) {
             errorText = errorText.replace('</H1>', '</strong>');
         }
 
-        MongoApp.dispatcher.trigger(MongoApp.events.ERROR, errorText);
+        MongoApp.dispatcher.trigger(MongoApp.events.SERVER_ERROR, errorText);
     }
 }
 
