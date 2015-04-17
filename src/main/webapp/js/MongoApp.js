@@ -72,6 +72,8 @@ MongoApp.addInitializer(function () {
         // download the current search results of the workspaceKey
         WKSP_DOWNLOAD: 'workspaceDownload',
 
+        WKSP_CONFIG_COLS: 'workspaceConfigColumns',
+
         // User is choosing a different search
         SEARCH_LOAD: 'searchLoad',
 

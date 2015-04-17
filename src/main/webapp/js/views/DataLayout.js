@@ -34,7 +34,16 @@ DataLayout = Backbone.Marionette.Layout.extend({
         "mouseleave .ui-layout-west" : "handleWestPaneMouseLeave",
         "mousedown .ui-layout-resizer-west" : "handleResizerMouseDown",
         "mouseup .ui-layout-resizer-west" : "handleResizerMouseUp",
-        "click #analysis_resize" : "maximizeAnalysisPane"
+        "click #analysis_resize" : "maximizeAnalysisPane",
+        "click #analysis_pin" : "analysisPinClicked",
+        "click .searchNew" : "newSearch",
+        "click .searchSave" : "saveSearch",
+        "click .searchDelete" : "deleteSearch",
+        "click .showSearchDialog" : "showSearchDialog",
+        "click .searchExport" : "exportSearch",
+        "click .searchImport" : "importSearch",
+        "click #export_button" :  "download",
+        "click #columns_button":  "configColumns"
     },
 
     /**
@@ -51,7 +60,24 @@ DataLayout = Backbone.Marionette.Layout.extend({
      *      TRUE if pinned, FALSE otherwise
      */
     isAnalysisPanePinned: function() {
-        return this.$el.find("#analysis_pin").hasClass("active");
+//        return this.$el.find("#analysis_pin").hasClass("active");
+        // disabled feature
+        return true;
+    },
+
+    /**
+     * Toggle the color of the thumbtack icon
+     */
+    analysisPinClicked: function() {
+        var button = this.$el.find("#analysis_pin");
+        var icon = this.$el.find("#analysis_pin > i");
+        if (this.isAnalysisPanePinned()) {
+            icon.addClass("fa-unlock");
+            icon.removeClass("fa-lock");
+        } else {
+            icon.addClass("fa-lock");
+            icon.removeClass("fa-unlock");
+        }
     },
 
     handleWestPaneMouseEnter: function() {
@@ -133,13 +159,13 @@ DataLayout = Backbone.Marionette.Layout.extend({
             //        ,	south__spacing_closed:		20		// big resizer-bar when open (zero height)
 
             //	some pane-size settings
-            ,	west__minSize:				200
-            ,	west__size:                 400
+            ,	west__minSize:				425
+            ,	west__size:                 425
             ,	west__spacing_closed:		5			// wider space when closed
             ,	west__togglerLength_closed:	-1			// -1 = full height
             ,	west__togglerAlign_closed:	"top"		// align to top of resizer
             ,	west__togglerLength_open:	0			// NONE - using custom togglers INSIDE west-pane
-            ,	west__togglerTip_open:		"Hide Analysis"
+            ,	west__togglerTip_open:		"Hide"
             ,	west__togglerTip_closed:	"Show Analysis"
             ,	west__resizerTip_open:		"Resize Filter Pane"
             ,   west__togglerContent_closed: '<i class="fa fa-arrow-right"></i>'
@@ -158,7 +184,17 @@ DataLayout = Backbone.Marionette.Layout.extend({
             ,  west__onresize_end: function (paneName, paneEl, paneState, paneOptions, layoutName) {
 
                 // stretch to fill west pane
-                paneEl.find(".ui-layout-ignore").css("min-width", paneState.outerWidth);
+//                paneEl.find(".ui-layout-ignore").css("min-width", paneState.outerWidth);
+//                paneEl.find(".nav-header > div").css("min-width", paneState.layoutWidth);
+
+//                var resizerToolbar = paneEl.find("#resizer_toolbar");
+//                resizerToolbar.css("left", paneState.layoutWidth - resizerToolbar.width());
+//                // make sure buttons fill width of vertical toolbar
+//                resizerToolbar.find("button").each(function() {
+//                    $( this).css("width", resizerToolbar.width());
+//                });
+
+
 
                 // save away the "resized" width as the user drags the resizer widget
                 if (self.resizerDrag) {
@@ -196,6 +232,75 @@ DataLayout = Backbone.Marionette.Layout.extend({
 ////        // always make sure west pane is open
 //        this.jqueryUiLayout.open("west");
 //        this.jqueryUiLayout.resizeAll();
+    },
+
+    /**
+     * Fire event to be handled by controller
+     * @param e
+     */
+    saveSearch: function(e) {
+        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_SAVE, MongoApp.search);
+    },
+
+    /**
+     * Fire event to be handled by controller
+     * @param e
+     */
+    deleteSearch: function(e) {
+        var confirmDialog = new ConfirmDialog(
+            "Delete Analysis",
+            "Delete " + MongoApp.search.get("name")  + "?",
+            "Delete",
+            function()
+            {
+                // confirm
+                MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_DELETE, MongoApp.search);
+            }
+        );
+        confirmDialog.show();
+    },
+
+    /**
+     * Fire event to be handled by controller
+     * @param e
+     */
+    showSearchDialog: function(e) {
+        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_SHOW_DIALOG);
+    },
+
+    /**
+     * Fire event to be handled by controller
+     * @param e
+     */
+    exportSearch: function(e) {
+        MongoApp.dispatcher.trigger(MongoApp.events.SEARCH_EXPORT, MongoApp.search);
+    },
+
+    /**
+     * Fire event to be handled by controller
+     * @param e
+     */
+    importSearch: function(e) {
+        $('#import_search_modal').modal();
+    },
+
+    /**
+     * Fire event to be handled by controller
+     * @param e
+     */
+    newSearch: function(e) {
+        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_LOAD, MongoApp.workspaceKey, new Search());
+    },
+
+    /**
+     * Configure table columns by showing dialog box.
+     */
+    configColumns: function() {
+        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_CONFIG_COLS);
+    },
+
+    download: function() {
+        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_DOWNLOAD, MongoApp.workspaceKey, MongoApp.search);
     }
 
 });

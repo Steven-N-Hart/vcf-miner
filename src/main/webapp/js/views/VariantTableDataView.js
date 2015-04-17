@@ -45,8 +45,6 @@ VariantTableDataView = Backbone.Marionette.Layout.extend({
      * Delegated events
      */
     events: {
-        "click #export_button" :  "download",
-        "click #columns_button":  "configColumns"
     },
 
     ui: {
@@ -95,13 +93,6 @@ VariantTableDataView = Backbone.Marionette.Layout.extend({
         });
 
         this.dataTableReorder = new $.fn.dataTable.ColReorder( this.dataTable );
-
-        // dynamically add 'show' button to the <div> with class '.show'
-        var showButton = $('<button id="west-opener" title="Show Search" type="button" class="hide btn btn-mini"><i class="fa fa-arrow-right"></i> Show</button>');
-        this.$('.show').append(showButton);
-
-        var toolbar = $("#table_toolbar").clone();
-        this.$('.toolbar').append(toolbar);
     },
 
     /**
@@ -195,22 +186,5 @@ VariantTableDataView = Backbone.Marionette.Layout.extend({
         }
 
         return displayValue;
-    },
-
-    /**
-     * Configure table columns by showing dialog box.
-     */
-    configColumns: function() {
-        var dialog = new VariantTableConfigColumnsView( {
-                "el"    : $('#config_columns_table'),
-                "model" : this.options.columns
-            }
-        );
-
-        dialog.render();
-    },
-
-    download: function() {
-        MongoApp.dispatcher.trigger(MongoApp.events.WKSP_DOWNLOAD, MongoApp.workspaceKey, MongoApp.search);
     }
 });

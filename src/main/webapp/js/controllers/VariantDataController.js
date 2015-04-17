@@ -28,6 +28,9 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_DOWNLOAD, function (workspaceKey, search) {
             self.download(workspaceKey, search);
         });
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.WKSP_CONFIG_COLS, function () {
+            self.showVariantTableColumnConfigDialog();
+        });
     },
 
     showVariantTable: function (options) {
@@ -41,6 +44,16 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
         new VariantTableColumnView({model: this.varTableCols});
 
         options.region.show(this.variantTableView);
+    },
+
+    showVariantTableColumnConfigDialog: function() {
+        var dialog = new VariantTableConfigColumnsView( {
+                "el"    : $('#config_columns_table'),
+                "model" : this.varTableCols
+            }
+        );
+
+        dialog.render();
     },
 
     changedSearch: function (search, async) {

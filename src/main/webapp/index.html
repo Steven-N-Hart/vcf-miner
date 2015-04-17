@@ -65,35 +65,6 @@
             overflow: hidden;
         }
 
-        .border-frame {
-            position: relative;
-            margin: 15px 0;
-            padding: 39px 19px 14px;
-            *padding-top: 19px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            -webkit-border-radius: 4px;
-            -moz-border-radius: 4px;
-            border-radius: 4px;
-        }
-
-            /* Echo out a label for the example */
-        .border-frame:after {
-            content: "Analysis";
-            position: absolute;
-            top: -1px;
-            left: -1px;
-            padding: 3px 7px;
-            font-size: 12px;
-            font-weight: bold;
-            background-color: #f5f5f5;
-            border: 1px solid #ddd;
-            color: #9da0a4;
-            -webkit-border-radius: 4px 0 4px 0;
-            -moz-border-radius: 4px 0 4px 0;
-            border-radius: 4px 0 4px 0;
-        }
-
         .sample_filter_region {
             margin-left: 10px;
             display: inline-block;
@@ -372,31 +343,70 @@
         <div id="jquery-ui-container" style="width:  100%; height: 100%; overflow: hidden; position:absolute;">
 
             <!-- WEST -->
+            <!--<div class="ui-layout-west" style="margin:0px;padding:0px;">-->
             <div class="ui-layout-west">
 
+                <!--<div style="background:Gray;padding:5px">-->
+                    <!--<strong style="color:White">Analysis</strong>-->
+                    <!--<div class="btn-group btn-mini">-->
+                        <!--<a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#" title="Analysis Actions">-->
+                            <!--<i class="fa fa-gear"></i>-->
+                            <!--<span class="caret"></span>-->
+                        <!--</a>-->
+                        <!--<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">-->
+                            <!--<li title="Start over with a new Analysis" role="presentation"><a class="searchNew" role="menuitem" tabindex="-1"><i class="fa fa-refresh"></i> Reset</a></li>-->
+                            <!--&lt;!&ndash;<li title="Change the Search name" role="presentation"><a class="searchNameChange" role="menuitem" tabindex="-1"><i class="fa fa-pencil"></i> Rename</a></li>&ndash;&gt;-->
+                            <!--<li title="Save this Analysis" role="presentation"><a class="searchSave" role="menuitem" tabindex="-1"><i class="fa fa-save"></i> Save</a></li>-->
+                            <!--<li title="Delete this Analysis" role="presentation"><a class="searchDelete" role="menuitem" tabindex="-1"><i class="icon-remove"></i> Delete</a></li>-->
+                            <!--<li title="Run a previously saved Analysis" role="presentation"><a class="showSearchDialog" role="menuitem" tabindex="-1"><i class="fa fa-play"></i> Run a different Analysis</a></li>-->
+                            <!--<li role="presentation" class="divider"></li>-->
+                            <!--<li title="Export this Analysis to a file" role="presentation"><a class="searchExport" role="menuitem" tabindex="-1"><i class="icon-download"></i> Export to a file</a></li>-->
+                            <!--<li title="Import a previously exported Analysis file" role="presentation"><a class="searchImport" role="menuitem" tabindex="-1"><i class="icon-upload"></i> Import from a file</a></li>-->
+                        <!--</ul>-->
+                    <!--</div>-->
+                    <!--&lt;!&ndash;<span style="color:White">Analysis</span>&ndash;&gt;-->
+
+                    <!--<div id="resizer_toolbar" class="pull-right">-->
+                        <!--<div class="btn-group">-->
+                            <!--<button id="west-closer" title="Hide" class="btn btn-mini"><i class="fa fa-arrow-left"></i></button>-->
+                            <!--<button id="analysis_resize" title="Expand to fit" class="btn btn-mini"><i class="icon-resize-full"></i></button>-->
+                            <!--&lt;!&ndash; single toggle, defaults to being "locked" aka active class &ndash;&gt;-->
+                            <!--&lt;!&ndash;<button id="analysis_pin" class="btn btn-mini active" data-toggle="button"><i class="fa fa-lock"></i></button>&ndash;&gt;-->
+                        <!--</div>-->
+                    <!--</div>-->
+
+                <!--</div>-->
+
+                <div class="navbar" style="width:100%">
+                    <div class="navbar-inner">
+                        <span class="brand">Analysis</span>
+                        <ul class="nav">
+                            <li>
+                                <a id="drop1" title="Analysis Actions" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-gear"></i> Actions <i class="fa fa-caret-down"></i></a>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+                                    <li title="Open a saved Analysis" role="presentation"><a class="showSearchDialog" role="menuitem" tabindex="-1"><i class="fa fa-folder-open-o"></i> Open</a></li>
+                                    <!--<li role="presentation" title="Start over with a new Analysis" role="presentation"><a class="searchNew" role="menuitem" tabindex="-1"><i class="fa fa-refresh"></i> Reset</a></li>-->
+                                    <!--<li title="Change the Search name" role="presentation"><a class="searchNameChange" role="menuitem" tabindex="-1"><i class="fa fa-pencil"></i> Rename</a></li>-->
+                                    <li title="Save this Analysis" role="presentation"><a class="searchSave" role="menuitem" tabindex="-1"><i class="fa fa-save"></i> Save</a></li>
+                                    <li title="Delete this Analysis" role="presentation"><a class="searchDelete" role="menuitem" tabindex="-1"><i class="fa fa-times"></i> Delete</a></li>
+                                    <li role="presentation" class="divider"></li>
+                                    <li title="Export this Analysis to a file" role="presentation"><a class="searchExport" role="menuitem" tabindex="-1"><i class="fa fa-download"></i> Export to a file</a></li>
+                                    <li title="Import a previously exported Analysis file" role="presentation"><a class="searchImport" role="menuitem" tabindex="-1"><i class="fa fa-upload"></i> Import from a file</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="nav pull-right">
+                            <li><a id="analysis_resize" title="Expand to fit"><i class="fa fa-expand"></i> Fit</a></li>
+                            <li><a id="west-closer" title="Hide"><i class="fa fa-arrow-left"></i> Hide</a></li>
+                        </ul>
+                    </div>
+                </div>
+
                 <!-- NOTE: the following <div> uses ui-layout-ignore to avoid being auto-sized by the jQuery UI layout plugin -->
-                <div id="ignore_autosize_div" class="ui-layout-ignore sidebar-nav" style="float:left">
-
+                <div id="ignore_autosize_div" class="ui-layout-ignore" style="float:left;margin:0px;padding:0px;">
                     <ul class="nav nav-list">
-                        <div class="nav-header">
-                            <div class="row-fluid">
-                                <div class="pull-left">
-                                    <button id="west-closer" title="Hide Analysis" type="button" class="btn btn-mini"><i
-                                            class="fa fa-arrow-left"></i>
-                                    </button>
-                                    <button id="analysis_resize" title="Expand Analysis to Fit" type="button" class="btn btn-mini"><i
-                                            class="icon-resize-full"></i>
-                                    </button>
-                                    <!-- single toggle, defaults to being "pushed in" aka active class -->
-                                    <button id="analysis_pin" title="Pin Analysis" type="button" class="btn btn-mini active" data-toggle="button">
-                                        <i class="fa fa-thumb-tack"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
                         <div>
-                            <div class="border-frame">
+                                <br>
                                 <div id="searchNameRegion"></div>
                                 <br>
 
@@ -413,7 +423,6 @@
                                 </div>
 
                                 <div id="searchSaveRegion"></div>
-                            </div>
                         </div>
                     </ul>
                 </div>
@@ -421,7 +430,26 @@
 
             <!-- CENTER -->
             <div class="ui-layout-center">
+
+                <div class="navbar">
+                    <div class="navbar-inner">
+                        <span class="brand">Variants</span>
+                        <ul class="nav">
+                            <li class="divider-vertical"></li>
+                            <!--<li><a id="west-opener" class="hide" title="Show Analysis Pane"><i class="fa fa-arrow-right"></i> Show Analysis</a></li>-->
+                            <!--<li class="divider-vertical"></li>-->
+                        </ul>
+                        <ul class="nav pull-right">
+                            <li><a id="columns_button" title="Show/Hide Table Columns"><i class="fa fa-columns"></i> Columns</a></li>
+                            <li><a id="export_button" title="Export Table as Tab-Delimited file"><i class="fa fa-download"></i> Export</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <button id="west-opener" title="Show Analysis" type="button" class="hide btn btn-mini"><i class="fa fa-arrow-right"></i> Show Analysis</button>
+
                 <div id="variantDataRegion" style="padding-left: 35px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;"></div>
+
             </div>
         </div>
     </script>
@@ -1007,7 +1035,7 @@
 
     <script id="search-name-template" type="text/template">
         <div class="row-fluid">
-            <div class="span10">
+            <div class="span12">
                 <div id="search_rename_div" class="hide">
                     <input type="text" class="input-large">
                 </div>
@@ -1017,24 +1045,6 @@
                     <!--<a class="searchNameChange lead" title="Click to edit the name"><%=name%></a>-->
                 </div>
             </div>
-            <div class="span2">
-                <div class="btn-group btn-mini pull-right">
-                    <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#" title="Analysis Actions">
-                        <i class="fa fa-gear"></i>
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                        <li title="Start over with a new Analysis" role="presentation"><a class="searchNew" role="menuitem" tabindex="-1"><i class="fa fa-refresh"></i> Reset</a></li>
-                        <!--<li title="Change the Search name" role="presentation"><a class="searchNameChange" role="menuitem" tabindex="-1"><i class="fa fa-pencil"></i> Rename</a></li>-->
-                        <li title="Save this Analysis" role="presentation"><a class="searchSave" role="menuitem" tabindex="-1"><i class="fa fa-save"></i> Save</a></li>
-                        <li title="Delete this Analysis" role="presentation"><a class="searchDelete" role="menuitem" tabindex="-1"><i class="icon-remove"></i> Delete</a></li>
-                        <li title="Run a previously saved Analysis" role="presentation"><a class="showSearchDialog" role="menuitem" tabindex="-1"><i class="fa fa-play"></i> Run a different Analysis</a></li>
-                        <li role="presentation" class="divider"></li>
-                        <li title="Export this Analysis to a file" role="presentation"><a class="searchExport" role="menuitem" tabindex="-1"><i class="icon-download"></i> Export to a file</a></li>
-                        <li title="Import a previously exported Analysis file" role="presentation"><a class="searchImport" role="menuitem" tabindex="-1"><i class="icon-upload"></i> Import from a file</a></li>
-                    </ul>
-                </div>
-            </div>
         </div>
     </script>
 
@@ -1042,8 +1052,7 @@
          <div class="row-fluid">
             <div class="span12">
                 <div id="search_desc_div">
-                    <small title="Analysis Description"><%=description%> </small>
-                    <small><a class="searchDescriptionChange" href="#" title="Edit Description">Edit</a></small>
+                    <small title="Analysis Description"><%=description%> </small> <small><a class="searchDescriptionChange" href="#" title="Edit Description">Edit</a></small>
                 </div>
             </div>
         </div>
@@ -1051,10 +1060,8 @@
 
     <script id="search-save-template" type="text/template">
         <div class="row-fluid">
-            <i class="pull-right">
-                <% if(saved && (timestamp != undefined)){%><small>Last saved <%=getDateString(timestamp)%></small><%}%>
-                <% if(!saved){%><button class="btn btn-success searchSave"><i class="fa fa-save"></i> Save Changes</button></p><%}%>
-            </i>
+            <% if(saved && (timestamp != undefined)){%><small>Last saved <%=getDateString(timestamp)%></small><%}%>
+            <% if(!saved){%><button class="btn btn-success searchSave"><i class="fa fa-save"></i> Save Changes</button></p><%}%>
         </div>
     </script>
 
@@ -1460,15 +1467,6 @@
     <div id="mainRegion"></div>
 
 </body>
-
-<!-- Table Toolbar -->
-<div id="table_toolbar" class="btn-group hide">
-    <button class="btn" title="Show/Hide Table Columns" id="columns_button"><i class="icon-list-alt"></i> Columns
-    </button>
-    <button class="btn" title="Export Table as Tab-Delimited file" id="export_button"><i class="icon-download"></i>
-        Export
-    </button>
-</div>
 
 <!-- Modal -->
 <div id="confirm_modal" data-backdrop="static" class="modal hide fade" tabindex="-1" role="dialog"
