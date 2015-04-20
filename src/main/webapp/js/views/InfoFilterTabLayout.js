@@ -350,6 +350,14 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
                         limit: maxTypeaheadValues
                     });
 
+                    // restrict the typeahead dropdown's width and height
+                    // necessary as there's a chance it will overflow the div and cause weird scrollbar behavior
+                    var textarea = $('#info_str_value_area');
+                    var dropdownMenu = $('#info_str_typeahead').parent().find('.tt-dropdown-menu');
+                    dropdownMenu.css("max-width",  textarea.outerWidth());
+                    dropdownMenu.css("max-height", textarea.outerHeight());
+                    dropdownMenu.css("overflow", "scroll");
+
                     // append typeahead value to the textarea
                     this.$el.find('#info_str_typeahead').on('typeahead:selected', function (object, datum) {
                         var area = self.$el.find('#info_str_value_area');
