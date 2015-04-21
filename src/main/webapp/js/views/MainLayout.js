@@ -39,8 +39,40 @@ MainLayout = Backbone.Marionette.Layout.extend({
             self.dataRegion.$el.toggle(true);
         });
 
+        this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_COMPLETE, function () {
+            $(window).trigger('resize');
+//            // manually invoke jQUery UI layout resizeAll to get the overflow scrollbars working
+//            self.jqueryUiLayout.resizeAll();
+        });
+
+        this.initJqueryUI();
+
         // have the HOME tab shown by default
         mainHeaderLayout.switchHomeTab();
+    },
+
+    /**
+     * Setup the jquery ui layout
+     */
+    initJqueryUI: function() {
+
+        var self = this;
+
+        var container = this.$el.find('.jquery-ui-container-div');
+//        this.jqueryUiLayout = container.layout({});
+        this.jqueryUiLayout = container.layout({
+            //	reference only - these options are NOT required because 'true' is the default
+            closable: true
+            ,	resizable: false
+            ,	slidable: false
+            ,	livePaneResizing: false
+        });
+
+        // listen for browser window resize events
+        // this is a fix for Firefox not working correctly with the jQuery UI Layout auto-resizing.
+        $( window ).resize(function() {
+            self.jqueryUiLayout.resizeAll();
+        });
     }
 
 });
