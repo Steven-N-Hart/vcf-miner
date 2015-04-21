@@ -50,7 +50,10 @@ DataLayout = Backbone.Marionette.Layout.extend({
      * Maximizes the Analysis pane's width to eliminate the horizontal scrollbar
      */
     maximizeAnalysisPane: function() {
-        this.jqueryUiLayout.sizePane("west", this.$el.find("#ignore_autosize_div").outerWidth(true));
+        var westPane = this.$el.find(".ui-layout-west");
+        var westPaneLeftPadding = westPane.outerWidth() - westPane.width();
+
+        this.jqueryUiLayout.sizePane("west", this.$el.find("#ignore_autosize_div").outerWidth(true) + westPaneLeftPadding);
     },
 
     /**
@@ -165,9 +168,9 @@ DataLayout = Backbone.Marionette.Layout.extend({
             ,	west__togglerLength_closed:	-1			// -1 = full height
             ,	west__togglerAlign_closed:	"top"		// align to top of resizer
             ,	west__togglerLength_open:	0			// NONE - using custom togglers INSIDE west-pane
-            ,	west__togglerTip_open:		"Hide"
+            ,	west__togglerTip_open:		"Hide Analysis"
             ,	west__togglerTip_closed:	"Show Analysis"
-            ,	west__resizerTip_open:		"Resize Filter Pane"
+            ,	west__resizerTip_open:		"Resize Analysis"
             ,   west__togglerContent_closed: '<i class="fa fa-arrow-right"></i>'
             ,	west__slideTrigger_open:	"click" 	// default
             ,	west__slideTrigger_close:	"click" 	// default
