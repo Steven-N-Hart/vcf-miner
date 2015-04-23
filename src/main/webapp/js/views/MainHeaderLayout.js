@@ -6,6 +6,7 @@ MainHeaderLayout = Backbone.Marionette.Layout.extend({
     EVENT_HOME_TAB_SELECTED:     'home_tab_selected',
     EVENT_SETTINGS_TAB_SELECTED: 'settings_tab_selected',
     EVENT_DATA_TAB_SELECTED:     'data_tab_selected',
+    EVENT_USER_TAB_SELECTED:     'user_tab_selected',
 
     template: "#main-header-layout-template",
 
@@ -13,7 +14,7 @@ MainHeaderLayout = Backbone.Marionette.Layout.extend({
      * Delegated events
      */
     events: {
-        "click #navbar_tabs a" : "switchTab",
+        "click .navbar a" : "switchTab",
 
         // clicking on brand is redirected to a click on home tab
         "click .navbar .brand" : "switchHomeTab",
@@ -79,11 +80,14 @@ MainHeaderLayout = Backbone.Marionette.Layout.extend({
             case 'table_tab':
                 this.trigger(this.EVENT_DATA_TAB_SELECTED);
                 break;
+            case 'user_tab':
+                this.trigger(this.EVENT_USER_TAB_SELECTED);
+                break;
         }
 
         // switch active tab
         var listItem = $(e.target).parent();
-        listItem.siblings('li').removeClass('active');
+        this.$el.find('li').removeClass('active');
         listItem.addClass('active');
     }
 });

@@ -6,7 +6,8 @@ MainLayout = Backbone.Marionette.Layout.extend({
         mainHeaderRegion:  '#mainHeaderRegion',
         homeRegion:        '#homeRegion',
         settingsRegion:    '#settingsRegion',
-        dataRegion:        '#dataRegion'
+        dataRegion:        '#dataRegion',
+        userRegion:        '#userRegion'
     },
 
     initialize: function() {
@@ -19,24 +20,35 @@ MainLayout = Backbone.Marionette.Layout.extend({
         this.homeRegion.show(new HomeLayout());
         this.settingsRegion.show(new SettingsLayout());
         this.dataRegion.show(new DataLayout());
+        this.userRegion.show(new UserInformationLayout({model: MongoApp.securityController.user}));
 
         var self = this;
         this.listenTo(mainHeaderLayout, mainHeaderLayout.EVENT_HOME_TAB_SELECTED, function () {
             self.homeRegion.$el.toggle(true);
             self.settingsRegion.$el.toggle(false);
             self.dataRegion.$el.toggle(false);
+            self.userRegion.$el.toggle(false);
         });
 
         this.listenTo(mainHeaderLayout, mainHeaderLayout.EVENT_SETTINGS_TAB_SELECTED, function () {
             self.homeRegion.$el.toggle(false);
             self.settingsRegion.$el.toggle(true);
             self.dataRegion.$el.toggle(false);
+            self.userRegion.$el.toggle(false);
         });
 
         this.listenTo(mainHeaderLayout, mainHeaderLayout.EVENT_DATA_TAB_SELECTED, function () {
             self.homeRegion.$el.toggle(false);
             self.settingsRegion.$el.toggle(false);
             self.dataRegion.$el.toggle(true);
+            self.userRegion.$el.toggle(false);
+        });
+
+        this.listenTo(mainHeaderLayout, mainHeaderLayout.EVENT_USER_TAB_SELECTED, function () {
+            self.homeRegion.$el.toggle(false);
+            self.settingsRegion.$el.toggle(false);
+            self.dataRegion.$el.toggle(false);
+            self.userRegion.$el.toggle(true);
         });
 
         this.listenTo(MongoApp.dispatcher, MongoApp.events.SEARCH_COMPLETE, function () {
@@ -59,13 +71,13 @@ MainLayout = Backbone.Marionette.Layout.extend({
         var self = this;
 
         var container = this.$el.find('.jquery-ui-container-div');
-//        this.jqueryUiLayout = container.layout({});
         this.jqueryUiLayout = container.layout({
             //	reference only - these options are NOT required because 'true' is the default
             closable: true
             ,	resizable: false
             ,	slidable: false
             ,	livePaneResizing: false
+            ,	north__showOverflowOnHover:	true
         });
 
         // listen for browser window resize events

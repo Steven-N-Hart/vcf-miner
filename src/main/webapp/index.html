@@ -157,6 +157,7 @@
                 <div id="homeRegion"></div>
                 <div id="settingsRegion"></div>
                 <div id="dataRegion"></div>
+                <div id="userRegion"></div>
             </div>
         </div>
 
@@ -169,7 +170,7 @@
             <div class="navbar-inner">
                 <div class="nav-collapse collapse">
                     <div class="pull-left"><a class="brand">VCF-Miner</a></div>
-                    <ul id="navbar_tabs" class="nav">
+                    <ul class="nav">
                         <li class="active"><a id="home_tab"><i class="fa fa-home"></i> Home</a></li>
                         <li id="navbar_tab_advanced" class="hide"><a id="settings_tab"><i class="fa fa-gears"></i> Advanced</a></li>
 
@@ -184,28 +185,41 @@
 
     <script id="main-header-user-layout-template" type="text/template">
         <ul class="nav pull-right">
-            <li><a class="user-info"><i class="fa fa-user"></i> <%=nameFirst%> <%=nameLast%></a></li>
+            <li><a id="user_tab"><i class="fa fa-user"></i> <%=nameFirst%> <%=nameLast%></a></li>
             <li><a class="logout"><i class="fa fa-sign-out"></i> Logout</a></li>
         </ul>
     </script>
 
-    <script id="main-header-user-popover-template" type="text/template">
-        <div class="container-fluid">
-            <div class="row-fluid">
-                <div class="span3"><strong>First</strong></div>
-                <div class="span9"><%=nameFirst%></div>
-            </div>
-            <div class="row-fluid">
-                <div class="span3"><strong>Last</strong></div>
-                <div class="span9"><%=nameLast%></div>
-            </div>
-            <div class="row-fluid">
-                <div class="span3"><strong>User</strong></div>
-                <div class="span9"><%=username%></div>
-            </div>
-            <div class="row-fluid">
-                <div class="span3"><strong>E-mail</strong></div>
-                <div class="span9"><a href= "mailto:<%=email%>" ><%=email%></a></div>
+    <script id="user-info-layout-template" type="text/template">
+        <div class="hero-unit">
+            <div class="well">
+                <h2>User Information</h2>
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label"><strong>First</strong></label>
+                        <div class="controls">
+                            <span><%=nameFirst%></span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label"><strong>Last</strong></label>
+                        <div class="controls">
+                            <span><%=nameLast%></span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label"><strong>User</strong></label>
+                        <div class="controls">
+                            <span><%=username%></span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label"><strong>E-mail</strong></label>
+                        <div class="controls">
+                            <a href= "mailto:<%=email%>" ><%=email%></a>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </script>
@@ -1375,6 +1389,7 @@
     <script src="js/views/LoginLayout.js"></script>
     <script src="js/views/MainLayout.js"></script>
     <script src="js/views/HomeLayout.js"></script>
+    <script src="js/views/UserInformationLayout.js"></script>
     <script src="js/views/WorkspaceDropdownView.js"></script>
     <script src="js/views/SettingsLayout.js"></script>
     <script src="js/views/DataLayout.js"></script>
