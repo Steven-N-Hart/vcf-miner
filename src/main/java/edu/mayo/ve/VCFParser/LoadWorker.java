@@ -209,6 +209,7 @@ public class LoadWorker implements WorkerLogic {
      */
     public static void createTypeAheadCollection(DBCollection variantCollection) throws Exception {
 
+        System.err.println("calling map-reduce!");
         // The MAP produces unique keys that will be counted in the REDUCE function.
         //
         // The format of the key is:
@@ -239,6 +240,22 @@ public class LoadWorker implements WorkerLogic {
                             "}" +
                         "};"+
 
+                        "var staticHeaders = [\"CHROM\", \"ID\", \"REF\", \"ALT\", \"FILTER\"];" +
+
+                        "for (i = 0; i < 5; i++) {" +
+                            "var name = staticHeaders[i];" +
+                            "var value = this[name];" +
+
+                            "var payload = new Object();" +
+                            "payload.field = name;" +
+                            "payload.count = 1;" +
+
+                             "if ((typeof value == 'string') && (value != '.')) {" +
+                                 "payload.value = value;" +
+                                 "emitHelper(name + value, payload);" +
+                             "}" +
+                        "}" +
+
                         "for (var name in this.INFO) {" +
 
                             "var value = this.INFO[name];" +
@@ -258,6 +275,7 @@ public class LoadWorker implements WorkerLogic {
                                 "}" +
                             "}" +
                         "}" +
+
                  "}";
 
         // The REDUCE simply sums the instances together into a single total (e.g. count).

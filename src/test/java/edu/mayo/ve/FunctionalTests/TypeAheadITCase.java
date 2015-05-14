@@ -72,7 +72,7 @@ public class TypeAheadITCase {
         tar = new TypeAheadResource();
     }
 
-    @AfterClass
+    //@AfterClass
     public static void tearDown()
     {
         //delete the workspace
@@ -242,6 +242,62 @@ public class TypeAheadITCase {
         }
 
         p.deleteCheck(workspace, 0, 0);
+    }
+
+    @Test
+    public void typeAheadOn1stColumns(){
+        System.out.println("typeAheadOn1stColumns");
+        String field;
+        String json;
+        String expectedj;
+        DBObject expected;
+        DBObject result;
+        int count = 2;
+        //CHROM:
+        field = "CHROM";
+        json = tar.getTypeAhead4Value(workspaceID, field);
+        System.out.println(json);
+        expectedj = "{ \"CHROM\" : [ \"chr1\" ] }";
+        expected = (DBObject) JSON.parse(expectedj);
+        result = (DBObject) JSON.parse(json);
+        for(int i=0;i<1;i++){
+            assertEquals(((BasicDBList)expected.get(field) ).get(i), ((BasicDBList)result.get(field) ).get(i));
+        }
+        //ID:
+        field = "ID";
+        json = tar.getTypeAhead4Value(workspaceID, field,count);
+        System.out.println(json);
+        expectedj = "{ \"ID\" : [ \"rs1\" , \"rs2\"] }";
+        expected = (DBObject) JSON.parse(expectedj);
+        result = (DBObject) JSON.parse(json);
+        for(int i=0;i<count;i++){
+            assertEquals(((BasicDBList)expected.get(field) ).get(i), ((BasicDBList)result.get(field) ).get(i));
+        }
+        //REF:
+        field = "REF";
+        json = tar.getTypeAhead4Value(workspaceID, field,count);
+        System.out.println(json);
+        expectedj = "{ \"REF\" : [ \"A\" , \"AA\"] }";
+        expected = (DBObject) JSON.parse(expectedj);
+        result = (DBObject) JSON.parse(json);
+        for(int i=0;i<count;i++){
+            assertEquals(((BasicDBList)expected.get(field) ).get(i), ((BasicDBList)result.get(field) ).get(i));
+        }
+        //ALT:
+        field = "ALT";
+        json = tar.getTypeAhead4Value(workspaceID, field);
+        expectedj = "{ \"ALT\" : [ \"TCCAGCTGAAAGCATGCGTGTGTCACAGACCATTCAGAAGGGCTATAGAGAGAGTCACTCTAGCTGAAAGCGTGCGTGTGTCACAGACCATTCAGAATGGCTAGTCCATTTTTCCTCTGGG\" , \"CTCTCCTTTCTCCTCTCCATCCCCC,C,CTCTCCTTTCTCCCTCTCCATCCCCC,CTATCCTTTCTCCTCTCCATCCCCC,CTCTCCATCCCCCCTCCATCCCCCTCTTTCTCCTCTCCATCCCCC\" , \"GGATTACAGGCACGCGCCACCACGCCTGGCTAATGTTGTATTTTAGTAGAGACGGGGTTTCTCCATGTTGGTCAGGCTGGTCTCTAACTCCCGACCTCAGGTGATCCACCCGCCTCGGCCTCTCAAACTGCTGG\" , \"A\" , \"A,ATT\" , \"A,C\" , \"AA\" , \"AAA\" , \"AAAAC\" , \"AAAAG\" , \"AAAGAAGCATCAGGCTATTATAAGGTTTC\" , \"AAAGACAGCA\" , \"AAC\" , \"AACAAAACAACATATTTCACAG\" , \"AACAGCAAAG\" , \"AAGAC\" , \"AAGCAATTCTCCTGCCTCAGCCTCCCAAGTAGCTGGGACTACAGGTGCCTGCCACCATACCTGGCTAG\" , \"AATATATAT\" , \"AATGAGTAAAGAATGAG\" , \"AC\" , \"ACACAGGACACCCAGCCGTGGACAGACACGGGGACACGCAGGACACCCAGCCGTGGACAGACACGGTGACA\" , \"ACAGAGAGAGAGAGAGAGACAGACAGACACAGAGAGAGCAGAACAGGGAGAGACAGAGAGACAGAGAGAGAGAGTGACAGAGAGAGG\" , \"ACCCTG\" , \"ACG\" , \"ACGGAGTTTTTATGGGTTTTTTGTTGA\" , \"ACT\" , \"AG\" , \"AGAATG\" , \"AGAGAGGCAGACAGAGACAGAGAGAGAGACAGACAGACACAGAGCAGAACAGGGAGAGACAGAGAGAGAGAGACAGA\" , \"AGATAAAGGCCCTTCTCTCAGGGGCTCTGCT\" , \"AGC\" , \"AGCACATCATT\" , \"AGGAATGGAATGGAAT\" , \"AGGGAGGGCAG\" , \"AGGTACACACGTGTGTATGTGGGTGTTACGTTGTAGGTACGTGTGTACGTGGGTGTTAGGTTGTA\" , \"AGT\" , \"AGTTTT\" , \"AGTTTTATTTGTTGTAAGTTTTTATTTCAGAATTAAATGTGCA\" , \"AT\" , \"ATCC\" , \"ATCCACACTCACGCATGCACGTATT\" , \"ATG\" , \"ATGGGGAG\" , \"ATT\" , \"C\" , \"C,A\" , \"C,CAGAGAGAG\" , \"CA\" , \"CAAAATAAAATAAAAT\" , \"CAC\" , \"CAG\" , \"CAGAG\" , \"CAGAGAC\" , \"CAGAGACAGAGAGAGGCAGACAGAGACAGAGAGAGAGACAGACAGACACAGAGCAGAACAGGGAGAGACAGAGAGAG\" , \"CAGAGAGAGGCAGACAGAGACAGAGAGAGAGACAGACAGACACAGAGCAGAACAGGGAGAGACAGAGAGAGAGAGAC\" , \"CAGCCCCCTGTGTACCCCAGGAGGCCAGA\" , \"CAGGGGG\" , \"CAT\" , \"CATC\" , \"CATGGCCGACCCCACCTGACCTA\" , \"CATTTT\" , \"CC\" , \"CCA\" , \"CCAGCCGAGAGAGTACTGCCCGGTCCTTCTGAC\" , \"CCCCGCCCACCCTGGCTTGG\" , \"CCCT\" , \"CCCTCAGCTGGACT\" , \"CCCTCCT,C\" , \"CCCTGGCTGCACCCTGGTCCCCCTGGTCCCTTTGGCCCTGCA\" , \"CCCTTTGGCAGAGCAGGTGTGCTGTGCTGGC\" , \"CCGACCCCACCTGACCTCATGGC\" , \"CCT\" , \"CCTGACCTCATGGCCAACCCGAT\" , \"CCTGCCCGGTCCTTCTGACCAGCCGAGAGAGTA\" , \"CG\" , \"CGAGGCGGGCGGATCACGAGGTCAGGAGATCGAGACCATCCTGGCTAACACGGTGAAACCCTG\" , \"CGGGCCG\" , \"CGT\" , \"CT\" , \"CTA\" , \"CTAA\" , \"CTG\" , \"CTGACCTCATGGCCGACCCCACC\" , \"CTGTC\" , \"CTTA\" , \"CTTAAGGTCTGGGG\" , \"CTTTCAG\" , \"CTTTCTT\" , \"G\" , \"G,T\" , \"GA\" , \"GAAAGGAAGAAAGGAAGAAAGGAAG\" , \"GAC\" , \"GACAC\" , \"GACTGCCCAGCTC\" , \"GAGAGAGGCAGACAGAGACAGAGAGAGAGACAGACAGACACAGAGCAGAACAGGGAGAGACAGAGAGAGAGAGACAG\" , \"GC\" , \"GCACACACACACACA\" , \"GCAGAATTGTAATATTCG\" , \"GCCGAGACAGGCAG\" , \"GCCGC\" , \"GCGC\" , \"GCTCCACGGCCTGTTGCCCCCTCCTCTTTCTCAGCCCATGTGGGGCTCATGGACACGGCTCCCCT\" , \"GCTGGGTGAGGATCTAT\" , \"GG\" , \"GGCCGAG\" , \"GGGCCGA\" , \"GGT\" , \"GGTGA\" , \"GGTGTGAATTGGTGTAGTGTGAAAGT\" , \"GGTTT\" , \"GT\" , \"GTA\" , \"GTC\" , \"GTCCTCTGCC\" , \"GTG\" , \"GTGAA\" , \"GTGCTGGCCCTTTGGCAGAGCAGGTGTGCTG\" , \"GTGGCAGCTTTGATA\" , \"GTGTA,GTA\" , \"GTGTACCCCAGGAGGCCAGAAGCCCCCTGCATGGGAG\" , \"GTTTCAGTCTATTGCCTCCCAGTTC\" , \"T\" , \"T,C,A\" , \"T,TA\" , \"TA\" , \"TAA\" , \"TAATGGAATGG\" , \"TAC\" , \"TACGAGCATATGTGTACATGAATTTGTATTGCACATGTGTTTAATGCGAACACGTGTCA\" , \"TACGTGTGGGTGCATGTGCGTGTGGGTGCGTGTGCCTGCTCTCTGGCGTGCACGTGTGGGTACGTGTGGGTGTGGGT\" , \"TAG\" , \"TATCG\" , \"TATTA\" , \"TC\" , \"TCA\" , \"TCAAAAAAA\" , \"TCAT\" , \"TCCAGGTC\" , \"TCCCCTCCATCCCCCTCTCCTTTCTCCTCTCCATCCCCCTCTCCATCCC,T\" , \"TCCCTGGAGGACC\" , \"TCGAA\" , \"TCTC\" , \"TCTCTCCATCCCC\" , \"TCTGA\" , \"TCTGACCTCATGGCCGACCCCAC,TCTGACCTCATGGCCGACCCAAC\" , \"TCTTC\" , \"TG\" , \"TGA\" , \"TGAGACA\" , \"TGAGGATTGGTGAGTGTGAATGTGGGTGA,TGAGGATTGGGGAGTGTGAATGTGGGTGA\" , \"TGCCCTTTGGCAGAGCAGGTGTGCTGTGCTG\" , \"TGG\" , \"TGGG\" , \"TGT\" , \"TT\" , \"TTAAAAGATTTTTAATATATGAGGTTAGGTCG\" , \"TTCCCTCCTCTTTCCCTCCCTTCTTTCCTTCCCTTTCCCTCCCTCCCT\" , \"TTGTAGTCTGACCTGTGGTCTGAC\" , \"TTGTATTTTTAGCAGAGATGGGGTTTCACCATGTTAGCCAGGATGGTCTCAATCTCCTGACCTTGTGATCCA\" , \"TTTATTTGTTATAAGTTTTTATTTCAGAATTAATG\" , \"TTTTA\" , \"TTTTTTTTGTTTTG\"]}";
+        System.out.println(json);
+        expected = (DBObject) JSON.parse(expectedj);
+        result = (DBObject) JSON.parse(json);
+        CompareJSON.equals((BasicDBList) expected.get(field),(BasicDBList) result.get(field) );
+        //FILTER:
+        field = "FILTER";
+        json = tar.getTypeAhead4Value(workspaceID, field);
+        System.out.println(json);
+        result = (DBObject) JSON.parse(json);
+        assertEquals("PASS", ((BasicDBList) result.get(field)).get(0));
+        assertEquals(1, ((BasicDBList) result.get(field)).size());
     }
 
 
