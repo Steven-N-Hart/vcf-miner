@@ -8,9 +8,9 @@ package edu.mayo.ve.message;
  * To change this template use File | Settings | File Templates.
  */
 public class InfoNumberFilter {
-    String key = "";    //e.g. "INFO.AC"
-    Double value = 0.0;  //the value that we want to see at the key e.g. 1.2
-    String comparator = ""; //use the following values:  http://docs.mongodb.org/manual/reference/operator/
+    String key = "";              //e.g. "INFO.AC"
+    Double value = 0.0;           //the value that we want to see at the key e.g. 1.2
+    String comparator = "";       //use the following values:  http://docs.mongodb.org/manual/reference/operator/
     boolean includeNulls = false; //documents that don't have the field are not returned by default
     //$gt 	Matches values that are greater than the value specified in the query.
     //$gte 	Matches values that are equal to or greater than the value specified in the query.

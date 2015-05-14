@@ -28,6 +28,7 @@ public class Querry {
     ArrayList<InfoNumberFilter> infoNumberFilters = new ArrayList<InfoNumberFilter>();
     ArrayList<InfoStringFilter> infoStringFilters = new ArrayList<InfoStringFilter>();
     ArrayList<InfoFlagFilter> infoFlagFilters = new ArrayList<InfoFlagFilter>();
+    ArrayList<FixedFieldFilter> fixedFlagFilter = new ArrayList<FixedFieldFilter>();
 
     public DBObject createQuery(){
         ArrayList<String> filters = whatFilters();
