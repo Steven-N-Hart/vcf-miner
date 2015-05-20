@@ -20,6 +20,95 @@ import java.util.List;
  */
 public class QuerryTest {
 
+    /**
+     * Test the first 7 columns before info, make sure queries are made correctly for them
+     * 1. CHROM
+     * 2. POS
+     * 3. ID
+     * 4. REF
+     * 5. ALT
+     * 6. QUAL
+     * 7. FILTER
+     */
+
+    @Test
+    public void testFixedFieldFilter(){
+        Querry q = new Querry();
+
+    }
+
+    //quick util
+    public Querry stringCol( String field, String operator, boolean includeNulls, String ... values){
+        Querry q = new Querry();
+        ArrayList<String> a = new ArrayList<String>();
+        for (String value : values){
+            a.add(value);
+        }
+        FixedFieldStringFilter fff = new FixedFieldStringFilter(field, operator, a, includeNulls);
+        ArrayList<FixedFieldStringFilter> l = new ArrayList<FixedFieldStringFilter>();
+        l.add(fff);
+        q.setFixedFieldStringFilters(l);
+        return q;
+    }
+
+
+    @Test
+    public void testSINGLEStringFilters(){
+        //CHROM
+        DBObject q = stringCol("CHROM", "$in", false, "chr1").createQuery();
+        assertEquals("{ \"CHROM\" : { \"$in\" : [ \"chr1\"]}}", q.toString());
+        q = stringCol("CHROM", "$in", false, "chr1", "chr2").createQuery();
+        assertEquals("{ \"CHROM\" : { \"$in\" : [ \"chr1\" , \"chr2\"]}}", q.toString());
+        //ID
+        q = stringCol("ID", "$in", true, "rs012345").createQuery();
+        assertEquals("{ \"ID\" : { \"$in\" : [ \"rs012345\" , \".\"]}}", q.toString()); //example of how to handle nulls
+        //FILTER
+        q = stringCol("FILTER", "$in", false, "PASS").createQuery();
+        assertEquals("{ \"FILTER\" : { \"$in\" : [ \"PASS\"]}}", q.toString());
+    }
+
+    @Test
+    public void testNumberFilters(){
+        //test single
+        Querry q = new Querry();
+        ArrayList<FixedFieldNumberFilter> x = q.getFixedFieldNumberFilters();
+        FixedFieldNumberFilter ffn = new FixedFieldNumberFilter("QUAL",50.0,"$gt",false);
+        x.add(ffn);
+        assertEquals("{ \"QUAL\" : { \"$gt\" : 50.0}}", q.createQuery().toString());
+
+        //test two
+        q = new Querry();
+        x = q.getFixedFieldNumberFilters();
+        ffn = new FixedFieldNumberFilter("QUAL",50.0,"$gt",true);
+        x.add(ffn);
+        ffn = new FixedFieldNumberFilter("POS",50000.0,"$gt",false);
+        x.add(ffn);
+        assertEquals("{ \"$and\" : [ { \"$or\" : [ { \"QUAL\" : { \"$gt\" : 50.0}} , { \"QUAL\" :  null }]} , { \"POS\" : { \"$gt\" : 50000.0}}]}", q.createQuery().toString());
+    }
+
+    //combine (two strings)
+    @Test
+    public void twoStringTest(){
+        //lets do ref + alt
+        // REF = T / ALT = C
+        Querry q = stringCol("REF", "$in", false, "T");
+        ArrayList<String> values = new ArrayList<String>();
+        values.add("C");
+        q.getFixedFieldStringFilters().add(new FixedFieldStringFilter("ALT","$in",values,false));
+        DBObject query = q.createQuery();
+        assertEquals("{ \"$and\" : [ { \"REF\" : { \"$in\" : [ \"T\"]}} , { \"ALT\" : { \"$in\" : [ \"C\"]}}]}", query.toString());
+
+    }
+
+    //combine CHROM (String) and QUAL(number), make sure two different types of fixed filters work!
+    @Test
+    public void stringNumberTest(){
+        Querry q = stringCol("CHROM", "$in", false, "chr1");
+        FixedFieldNumberFilter ffn = new FixedFieldNumberFilter("QUAL",50.0,"$gt",false);
+        q.getFixedFieldNumberFilters().add(ffn);
+        assertEquals("{ \"$and\" : [ { \"QUAL\" : { \"$gt\" : 50.0}} , { \"CHROM\" : { \"$in\" : [ \"chr1\"]}}]}", q.createQuery().toString());
+    }
+
 
     @Test
     public void testWhatFilters() throws Exception {

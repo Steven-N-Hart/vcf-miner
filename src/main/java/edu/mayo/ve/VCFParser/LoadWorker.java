@@ -209,7 +209,7 @@ public class LoadWorker implements WorkerLogic {
      */
     public static void createTypeAheadCollection(DBCollection variantCollection) throws Exception {
 
-        System.err.println("calling map-reduce!");
+        //System.err.println("calling map-reduce!");
         // The MAP produces unique keys that will be counted in the REDUCE function.
         //
         // The format of the key is:

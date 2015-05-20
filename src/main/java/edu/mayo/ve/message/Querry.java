@@ -28,7 +28,9 @@ public class Querry {
     ArrayList<InfoNumberFilter> infoNumberFilters = new ArrayList<InfoNumberFilter>();
     ArrayList<InfoStringFilter> infoStringFilters = new ArrayList<InfoStringFilter>();
     ArrayList<InfoFlagFilter> infoFlagFilters = new ArrayList<InfoFlagFilter>();
-    ArrayList<FixedFieldFilter> fixedFlagFilter = new ArrayList<FixedFieldFilter>();
+    ArrayList<FixedFieldStringFilter> fixedFieldStringFilters = new ArrayList<FixedFieldStringFilter>();
+    ArrayList<FixedFieldNumberFilter> fixedFieldNumberFilters = new ArrayList<FixedFieldNumberFilter>();
+
 
     public DBObject createQuery(){
         ArrayList<String> filters = whatFilters();
@@ -69,7 +71,9 @@ public class Querry {
               INFOSTRINGFILTER,
               INFOFLAGFILTER,
               SAMPLENUMBERFILTER,
-              CUSTOMNUMBERFILTER
+              CUSTOMNUMBERFILTER,
+              FIXEDFIELDNUMBERFILTER,
+              FIXEDFIELDSTRINGFILTER
     }
     /**
      * A query has a collection of filters based on the status of the Querry object.  For example if:
@@ -126,6 +130,12 @@ public class Querry {
         if(this.infoFlagFilters.size() > 0){
             l.add(filters.INFOFLAGFILTER.toString());
         }
+        if(this.fixedFieldNumberFilters.size() > 0){
+            l.add(filters.FIXEDFIELDNUMBERFILTER.toString());
+        }
+        if(this.fixedFieldStringFilters.size() > 0){
+            l.add(filters.FIXEDFIELDSTRINGFILTER.toString());
+        }
         return l;
     }
 
@@ -157,8 +167,60 @@ public class Querry {
         if(f.equalsIgnoreCase(filters.CUSTOMNUMBERFILTER.toString())){
             return this.constructSampleNumberFilters("CUSTOM", this.customNumberFilters);
         }
+        if(f.equalsIgnoreCase(filters.FIXEDFIELDNUMBERFILTER.toString())){
+            return this.constructFixedFieldNumberFilters();
+        }
+        if(f.equalsIgnoreCase(filters.FIXEDFIELDSTRINGFILTER.toString())){
+            return this.constructFixedFieldStringFilters();
+        }
         return null;
     }
+
+    /**
+     * if the fixed filter is POS/QUAL, then we need to build the query based on this
+     * @return
+     */
+    public DBObject constructFixedFieldNumberFilters(){
+        if(this.fixedFieldNumberFilters.size() == 1){
+            FixedFieldNumberFilter fff = fixedFieldNumberFilters.get(0);
+            return constructBasicFilterWithNulls(fff.getKey(), fff.getComparator(), fff.getValue(), fff.isIncludeNulls());
+        }else {
+            BasicDBObject composite = new BasicDBObject();
+            BasicDBList lcomposite = new BasicDBList();
+            for(FixedFieldNumberFilter fff : fixedFieldNumberFilters){
+                lcomposite.add(constructBasicFilterWithNulls(fff.getKey(), fff.getComparator(), fff.getValue(), fff.includeNulls));
+            }
+            composite.put("$and", lcomposite);
+            return composite;
+        }
+    }
+
+    /**
+     * if the fixed filter is CHROM,ID,REF,ALT,FILTER
+     */
+    public DBObject constructFixedFieldStringFilters(){
+        if(this.fixedFieldStringFilters.size() == 1){
+            FixedFieldStringFilter fff = fixedFieldStringFilters.get(0);
+            ArrayList<String> values = fff.getValues();
+            if(fff.includeNulls){
+                values.add(".");
+            }
+            return constructStringFilter(fff.getName(), fff.getOperator(), values, false); //here we never include nulls in the same way as in a INFO field, because missing values are required by the spec to be deonoted '.'
+        }else {
+            BasicDBObject composite = new BasicDBObject();
+            BasicDBList lcomposite = new BasicDBList();
+            for(FixedFieldStringFilter fff : fixedFieldStringFilters){
+                ArrayList<String> values = fff.getValues();
+                if(fff.includeNulls){
+                    values.add(".");
+                }
+                lcomposite.add(constructStringFilter(fff.getName(), fff.getOperator(), fff.getValues(), false));
+            }
+            composite.put("$and", lcomposite);
+            return composite;
+        }
+    }
+
 
     /**
      * Method for constructing basic query objects based on booleans
@@ -386,6 +448,11 @@ public class Querry {
         return key.toString();
     }
 
+    public DBObject constructSingleFixedFlagFilter(String name, String operator, List<String> values, boolean includeNulls){
+        BasicDBObject query = new BasicDBObject();
+        return query;
+    }
+
     private DBObject constructInfoNumberFilters(){
         if(this.infoNumberFilters.size() == 1){
             InfoNumberFilter inf = infoNumberFilters.get(0);
@@ -442,26 +509,30 @@ public class Querry {
 
     private DBObject constructInfoStringFilter(String key, String comparitor, ArrayList<String> values, boolean includeNulls){
             key = formatInfoKey(key);
-            BasicDBObject q = new BasicDBObject();
-            BasicDBObject compare = new BasicDBObject();
-            BasicDBList l = new BasicDBList();
-            for(String s: values){
-                 l.add(s);
-            }
-            compare.append(comparitor, l);
-            q.append(key, compare);
-            if(includeNulls){
-                BasicDBList orList = new BasicDBList();
-                orList.add(q);
-                BasicDBObject getNulls = new BasicDBObject();
-                getNulls.put(key, null);
-                orList.add(getNulls);
-                BasicDBObject ret = new BasicDBObject();
-                ret.put("$or", orList);
-                return ret;
-            }else {
-                return q;
-            }
+            return constructStringFilter(key, comparitor, values, includeNulls);
+    }
+
+    public DBObject constructStringFilter(String key, String comparitor, ArrayList<String> values, boolean includeNulls){
+        BasicDBObject q = new BasicDBObject();
+        BasicDBObject compare = new BasicDBObject();
+        BasicDBList l = new BasicDBList();
+        for(String s: values){
+            l.add(s);
+        }
+        compare.append(comparitor, l);
+        q.append(key, compare);
+        if(includeNulls){
+            BasicDBList orList = new BasicDBList();
+            orList.add(q);
+            BasicDBObject getNulls = new BasicDBObject();
+            getNulls.put(key, null);
+            orList.add(getNulls);
+            BasicDBObject ret = new BasicDBObject();
+            ret.put("$or", orList);
+            return ret;
+        }else {
+            return q;
+        }
     }
 
 
@@ -675,5 +746,21 @@ public class Querry {
 
     public void setCustomNumberFilters(ArrayList<SampleNumberFilter> customNumberFilters) {
         this.customNumberFilters = customNumberFilters;
+    }
+
+    public ArrayList<FixedFieldNumberFilter> getFixedFieldNumberFilters() {
+        return fixedFieldNumberFilters;
+    }
+
+    public void setFixedFieldNumberFilters(ArrayList<FixedFieldNumberFilter> fixedFieldNumberFilter) {
+        this.fixedFieldNumberFilters = fixedFieldNumberFilter;
+    }
+
+    public ArrayList<FixedFieldStringFilter> getFixedFieldStringFilters() {
+        return fixedFieldStringFilters;
+    }
+
+    public void setFixedFieldStringFilters(ArrayList<FixedFieldStringFilter> fixedFieldStringFilters) {
+        this.fixedFieldStringFilters = fixedFieldStringFilters;
     }
 }

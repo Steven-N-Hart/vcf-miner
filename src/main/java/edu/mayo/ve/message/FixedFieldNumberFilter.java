@@ -1,19 +1,17 @@
 package edu.mayo.ve.message;
 
 /**
- * Created with IntelliJ IDEA.
- * User: m102417
- * Date: 7/18/13
- * Time: 9:29 AM
- * To change this template use File | Settings | File Templates.
+ * Created by m102417 on 5/15/15.
+ *
+ * This is for POS and QUAL
  */
-public class InfoNumberFilter {
+public class FixedFieldNumberFilter {
 
-    public InfoNumberFilter(){
+    public FixedFieldNumberFilter(){
 
     }
 
-    public InfoNumberFilter(String key, Double value, String comparator, boolean includeNulls) {
+    public FixedFieldNumberFilter(String key, Double value, String comparator, boolean includeNulls){
         this.key = key;
         this.value = value;
         this.comparator = comparator;

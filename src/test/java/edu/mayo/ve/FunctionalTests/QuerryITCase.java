@@ -6,10 +6,7 @@ import com.mongodb.util.JSON;
 import edu.mayo.concurrency.exceptions.ProcessTerminatedException;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.VCFParser.VCFParser;
-import edu.mayo.ve.message.InfoStringFilter;
-import edu.mayo.ve.message.Querry;
-import edu.mayo.ve.message.SampleGroup;
-import edu.mayo.ve.message.SampleNumberFilter;
+import edu.mayo.ve.message.*;
 import edu.mayo.ve.resources.ExeQuery;
 import edu.mayo.ve.resources.Provision;
 import edu.mayo.ve.resources.TypeAheadResource;
@@ -74,7 +71,7 @@ public class QuerryITCase {
 
     }
 
-    @AfterClass
+    //@AfterClass
     public static void tearDown()
     {
         //delete the workspace
@@ -85,6 +82,30 @@ public class QuerryITCase {
         System.out.println("Deleting Workspace: " + kgenomeworkspace);
         w.deleteWorkspace(kgenomeworkspace);
 
+    }
+
+
+    /**
+     * functonal test that ensures that the queries on the first 7 'fixed' fields work in concert with INFO queries and others.
+     */
+    @Test
+    public void testFixedFieldQueries(){
+        Querry q = new Querry();
+        q.setWorkspace(workspaceID);
+        q.setNumberResults(1000);
+        //lets add a POS filter
+        q.getFixedFieldNumberFilters().add(new FixedFieldNumberFilter("POS", 1000000.0,"$gt",false));
+        //also, lets add filters for the value of ref
+        q.getFixedFieldStringFilters().add(new FixedFieldStringFilter("REF", "$in", new ArrayList<String>(Arrays.asList("G")), false));
+        //and add INFO filter
+        q.getInfoNumberFilters().add(new InfoNumberFilter("ISIZE", 20.0, "$lt", false));
+
+        System.out.println(q.createQuery().toString());
+
+        DBObject r = runQueryAndExtractResults(q, 6);
+        BasicDBList results = (BasicDBList) r.get("results");
+        DBObject firstResult = (DBObject) results.get(0);
+        System.out.println(firstResult.toString());
     }
 
     @Test
@@ -99,7 +120,7 @@ public class QuerryITCase {
         BasicDBList results = (BasicDBList) r.get("results");
         assertEquals(10, results.size());
         DBObject firstResult = (DBObject) results.get(0);
-        assertEquals("756258", firstResult.get("POS"));
+        assertEquals(756258, firstResult.get("POS"));
         assertEquals("chr1", firstResult.get("CHROM"));
 
         //add a sample filter
@@ -110,7 +131,7 @@ public class QuerryITCase {
         r = runQueryAndExtractResults(q, 3);
         results = (BasicDBList) r.get("results");
         firstResult = (DBObject) results.get(0);
-        assertEquals("11031153", firstResult.get("POS"));
+        assertEquals(11031153, firstResult.get("POS"));
         assertEquals("chr1", firstResult.get("CHROM"));
 
         //check a compound query

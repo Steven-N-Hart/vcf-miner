@@ -119,6 +119,33 @@ public class VCFParser implements ParserInterface {
     }
 
     /**
+     * Format VCF-Fixed Fields, QUAL and POS into numbers, so they can be queried
+     */
+    public BasicDBObject fixNumericalFixedFields(BasicDBObject in){
+        String posStr = (String) in.get("POS");
+        if(posStr != null){
+            if (posStr.equalsIgnoreCase(".")){
+                //null
+                in.removeField("POS");
+            }else {
+                int position = new Integer(posStr);
+                in.put("POS",position);
+            }
+        }
+        String qualStr = (String) in.get("QUAL");
+        if(qualStr != null){
+            if (qualStr.equalsIgnoreCase(".")){
+                //null
+                in.removeField("QUAL");
+            }else {
+                double quality = new Double(qualStr);
+                in.put("QUAL",quality);
+            }
+        }
+        return in;
+    }
+
+    /**
      * This method makes it easier to test the logic in the VCF file by enabling testing methods
      * to directly get the parsing pipeline.
      * @return
@@ -197,6 +224,7 @@ public class VCFParser implements ParserInterface {
                 s = INFINITY_PATTERN.matcher(s).replaceAll("2147483648");
 
                 BasicDBObject bo = (BasicDBObject) JSON.parse(s);
+                bo = fixNumericalFixedFields(bo);
 
                 //for type-ahead, we need access to the metadata inside the loop, try to force that here
                 if(jsonmeta == null){

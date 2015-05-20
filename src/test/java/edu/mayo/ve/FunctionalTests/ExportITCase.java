@@ -101,8 +101,8 @@ public class ExportITCase {
     List<String> first5RowsExported = Arrays.asList("##Filter\t#Variants",
                   "##none \t825",
                   "#CHROM\tPOS\tID\tREF\tALT\t#_Samples\tSamples",
-                  "chr1\t13656\t.\tCAG\tC\t2\ts_Mayo_TN_CC_175;s_Mayo_TN_CC_365",
-                  "chr1\t14930\t.\tA\tG\t1\ts_Mayo_TN_CC_664");
+                  "chr1\t13656\trs1\tCAG\tC\t2\ts_Mayo_TN_CC_175;s_Mayo_TN_CC_365",
+                  "chr1\t14930\trs2\tA\tG\t1\ts_Mayo_TN_CC_664");
 
     private static void checkAndDelete(String filename){
         File f = new File(filename);

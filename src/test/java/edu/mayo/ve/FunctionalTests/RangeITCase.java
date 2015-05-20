@@ -98,7 +98,7 @@ public class RangeITCase {
         Cursor c = dbImplMongo.queryRange(workspace, new Range(updateRange));
         for(int i=0;c.hasNext();i++){
             DBObject next = c.next();
-            BasicDBObject db = ((BasicDBObject) getBefore((String)next.get("CHROM"), (String)next.get("POS"), before));
+            BasicDBObject db = ((BasicDBObject) getBefore((String)next.get("CHROM"), (Integer)next.get("POS"), before));
             BasicDBObject info = (BasicDBObject) db.get("INFO");
             info = info.append(rangeSetName,true);
             db.put("INFO",info); //update the info so it matches what should be in the database
@@ -278,11 +278,11 @@ public class RangeITCase {
      * @param pos
      * @param dbObjects
      */
-    public DBObject getBefore(String chr, String pos, List<DBObject> dbObjects) throws Exception {
+    public DBObject getBefore(String chr, int pos, List<DBObject> dbObjects) throws Exception {
         for(DBObject o : dbObjects){
             String c = (String) o.get("CHROM");
-            String p = (String) o.get("POS");
-            if(c.equalsIgnoreCase(chr) && p.equalsIgnoreCase(pos)){
+            int p = (Integer) o.get("POS");
+            if(c.equalsIgnoreCase(chr) && p == pos ){
                 o.removeField("_id");
                 return o;
             }
