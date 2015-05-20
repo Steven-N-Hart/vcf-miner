@@ -18,6 +18,7 @@
 ##FORMAT=<ID=sDEL,Number=1,Type=Integer,Description="Number of reads supporting novel sequence insertion">
 ##INFO=<ID=NO_MATE_SC,Number=1,Type=Flag,Description="When there is no softclipping of the mate read location, an appromiate position is used">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Dummy value for maintaining VCF-Spec">
+##INFO=<ID=ISIZE,Number=1,Type=Integer,Description="ISIZE">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA12878.chr1.vcf	NA12891.chr1.vcf	NA12892.chr1.vcf
 chr1	756258	BND_qdnezqbk	T	]chr1:756327]T	2.38	PASS	SVTYPE=BND;EVENT=NOV_INS;ISIZE=69;MATE_ID=BND_whmomhxb	GT:CTX:DEL:INS:INV:NOV_INS:TDUP:lSC:nSC:uRP:distl_levD	0/1:0:0:1:0:15:2:52:9:15:0.42	0/0:.:.:.:.:.:.:.:.:.:.	0/0:.:.:.:.:.:.:.:.:.:.
 chr1	756309	BND_nalleboo	T	]chr1:755921]T	2.38	PASS	SVTYPE=BND;EVENT=NOV_INS;ISIZE=388;MATE_ID=BND_awgnjhll	GT:CTX:DEL:INS:INV:NOV_INS:TDUP:lSC:nSC:uRP:distl_levD	0/1:0:0:1:0:19:1:31:6:19:0.42	0/1:0:3:0:0:13:0:31:6:19:0.45	0/1:0:1:0:0:14:0:31:6:19:0.45
