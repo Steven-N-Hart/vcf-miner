@@ -25,6 +25,7 @@ public class SampleGroup {
     ArrayList<String> samples = new ArrayList<String>(); //in/out group of samples
     boolean inSample = true;     //inSample == true means all of the samples must have the variant, inSample = false means that all samples must NOT have the variant
     String zygosity = "either";  // homozygous/heterozygous/either
+    int minMatchingSamplesInVariant = 0;
     String allAnySample = "any";     // all/any -- for homo,hetro queries we want to be able to say A) are ALL samples represented in the variant or B) are ANY samples represented in the variant
 
     public BasicDBObject getBasicDBObject(){
@@ -38,6 +39,10 @@ public class SampleGroup {
         }
         b.put("samples", l);
         return b;
+    }
+
+    public int getMinMatchingSamplesInVariant() {
+        return minMatchingSamplesInVariant;
     }
 
     public String getWorkspace() {

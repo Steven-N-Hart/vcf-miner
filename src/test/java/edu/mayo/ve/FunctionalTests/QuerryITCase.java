@@ -11,10 +11,7 @@ import edu.mayo.ve.resources.ExeQuery;
 import edu.mayo.ve.resources.Provision;
 import edu.mayo.ve.resources.TypeAheadResource;
 import edu.mayo.ve.resources.Workspace;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -169,6 +166,7 @@ public class QuerryITCase {
 
     }
 
+    @Ignore("May 21, 2015 PHD - This functionality has been moved to aggregation pipeline.  Re-implement the test.")
     @Test
     public void testSampleGroups(){
         testSampleGroup("heterozygous",79);
@@ -212,6 +210,7 @@ public class QuerryITCase {
         return r;
     }
 
+    @Ignore("May 21, 2015 PHD - This functionality has been moved to aggregation pipeline.  Re-implement the test.")
     @Test
     public void testSampleGroupsWithZygocityAndAnyVSAll() throws ProcessTerminatedException {
         //this test needs to use its own vcf file and workspace...

@@ -118,9 +118,6 @@ public class Querry {
         if(this.getGenes().size() > 0){
             l.add(filters.GENESFILTER.toString());
         }
-        if(this.getSampleGroups().size() > 0){
-            l.add(filters.GROUPFILTER.toString());
-        }
         if(this.infoNumberFilters.size() > 0){
             l.add(filters.INFONUMBERFILTER.toString());
         }
@@ -148,9 +145,6 @@ public class Querry {
     public DBObject getQuery4Filter(String f){
         if(f.equalsIgnoreCase(filters.GENESFILTER.toString())){
             return constructGeneQuery();
-        }
-        if(f.equalsIgnoreCase(filters.GROUPFILTER.toString())){
-            return this.constructGroupFilters();
         }
         if(f.equalsIgnoreCase(filters.INFONUMBERFILTER.toString())){
             return this.constructInfoNumberFilters();

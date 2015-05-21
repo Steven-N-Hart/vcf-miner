@@ -3,6 +3,7 @@ package edu.mayo.ve;
 import com.mongodb.DBObject;
 import edu.mayo.ve.message.*;
 import edu.mayo.ve.resources.Samples;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -186,6 +187,7 @@ public class QuerryTest {
     //This one actually worked:
     //> db.w367c39e529255ef0eb634f9949b9982bd45666cb.find({ "$and" : [ { "samples" : { "$elemMatch" : { "sampleID" : "s_Mayo_TN_CC_371" , "GenotypePositive" : 1}}} , { "samples" : { "$elemMatch" : { "sampleID" : "s_Mayo_TN_CC_372" , "GenotypePositive" : 1}}}]}).count()
     //313
+    @Ignore("May 21, 2015 PHD - This functionality has been moved to aggregation pipeline.  Re-implement the test.")
     @Test
     public void testSimpleSampleGroupQuery(){
         Querry q = new Querry();
@@ -349,6 +351,7 @@ public class QuerryTest {
     /**
      * this test is similar to the sample group query, but it is based on the homo/hetro arrays instead of genotype positivie array
      */
+    @Ignore("May 21, 2015 PHD - This functionality has been moved to aggregation pipeline.  Re-implement the test.")
     @Test
     public void testZygosity(){
         Querry q = new Querry();
@@ -381,6 +384,7 @@ public class QuerryTest {
         assertEquals(f, c.toString());
     }
 
+    @Ignore("May 21, 2015 PHD - This functionality has been moved to aggregation pipeline.  Re-implement the test.")
     @Test
     public void testZygosityWithAnyOrAllSamples(){
         //VCF
