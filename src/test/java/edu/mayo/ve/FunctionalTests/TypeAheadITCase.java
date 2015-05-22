@@ -72,7 +72,7 @@ public class TypeAheadITCase {
         tar = new TypeAheadResource();
     }
 
-    //@AfterClass
+    @AfterClass
     public static void tearDown()
     {
         //delete the workspace
@@ -280,9 +280,8 @@ public class TypeAheadITCase {
         expectedj = "{ \"REF\" : [ \"A\" , \"AA\"] }";
         expected = (DBObject) JSON.parse(expectedj);
         result = (DBObject) JSON.parse(json);
-        for(int i=0;i<count;i++){
-            assertEquals(((BasicDBList)expected.get(field) ).get(i), ((BasicDBList)result.get(field) ).get(i));
-        }
+        CompareJSON.equals((BasicDBList) expected.get(field), (BasicDBList) result.get(field));
+
         //ALT:
         field = "ALT";
         json = tar.getTypeAhead4Value(workspaceID, field);
@@ -290,7 +289,11 @@ public class TypeAheadITCase {
         System.out.println(json);
         expected = (DBObject) JSON.parse(expectedj);
         result = (DBObject) JSON.parse(json);
-        CompareJSON.equals((BasicDBList) expected.get(field),(BasicDBList) result.get(field) );
+        System.out.println("***********************typeAheadON1stColumns*********************");
+        System.out.println(expectedj);
+        System.out.println(json);
+        assertEquals(   ((BasicDBList)expected.get("ALT")).size(),   ((BasicDBList)result.get("ALT")).size() );
+        CompareJSON.equals((BasicDBList) expected.get(field), (BasicDBList) result.get(field));
         //FILTER:
         field = "FILTER";
         json = tar.getTypeAhead4Value(workspaceID, field);
