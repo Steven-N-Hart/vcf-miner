@@ -764,40 +764,39 @@
                             </div>
                             <div class="span10">
                                 <div class="row-fluid">
-                                    <div class="span8"> <!-- group column -->
+                                    <div class="span12"> <!-- group column -->
                                         <div class="row-fluid">
-                                            <div class="span12">
-                                                <div class="row-fluid">
-                                                    <div class="input-append">
-                                                        <button id="new_group_button" title="Create a new group of samples"
-                                                                type="button" class="btn"><i class="icon-plus"></i></button>
-                                                        <select class="input-medium" id="group_list"
-                                                                name="group_list"></select>
-                                                    </div>
-                                                </div>
+                                            <div class="span7">
+                                                <!--<div class="input-append">-->
+                                                    <select class="input-large" id="group_list" name="group_list"></select>
+                                                <!--</div>-->
                                                 <div class="row-fluid" id="group_sample_count"></div>
                                                 <div class="row-fluid">
-                                                    <select class="input-large" id="group_sample_names_list" size="8">
+                                                    <select class="input-large" id="group_sample_names_list" size="5">
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="span5">
+                                                <button id="new_group_button" title="Create a new group of samples" type="button" class="btn">Create Group</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="span4"> <!-- genotype and status column -->
                                         <h5>Genotype</h5>
+                                        <div class="row-fluid">
 
-                                        <div>
-                                            <label class="radio"><input type="radio" name="genotype" value="either" checked>Either</label>
-                                            <label class="radio"><input type="radio" name="genotype" value="het">Heterozygous</label>
-                                            <label class="radio"><input type="radio" name="genotype" value="hom">Homozygous</label>
+                                            <div>
+                                                <label class="radio"><input type="radio" name="genotype" value="either" checked>Either</label>
+                                                <label class="radio"><input type="radio" name="genotype" value="het">Heterozygous</label>
+                                                <label class="radio"><input type="radio" name="genotype" value="hom">Homozygous</label>
+                                            </div>
                                         </div>
-                                        <h5>Sample Status</h5>
-
-                                        <div>
-                                            <label class="radio"><input type="radio" name="sample_status" value="any"
-                                                                        checked>In any sample</label>
-                                            <label class="radio"><input type="radio" name="sample_status" value="all">In all
-                                                samples</label>
+                                        <h5>Sample Matches</h5>
+                                        <div class="row-fluid">
+                                            <div class="span5">
+                                                <span style="float:left; display:inline; margin-right:5px; line-height:--px;"> Minimum # of matches </span>
+                                            </div>
+                                            <div class="span7">
+                                                <input name="at_least_x_samples" class="input-mini">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
