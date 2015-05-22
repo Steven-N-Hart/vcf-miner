@@ -164,6 +164,10 @@ CustomFilterTabLayout = Backbone.Marionette.Layout.extend({
                         required: true,
                         number: true,
                         min: 0
+                    },
+                    at_least_x_samples: {
+                        required: true,
+                        number: true
                     }
                 },
                 highlight: function(element) {
@@ -172,6 +176,29 @@ CustomFilterTabLayout = Backbone.Marionette.Layout.extend({
                 success: function(element) {
                     $(element).parent().removeClass('control-group error');
                 }
+//                errorPlacement: function(error, element) {
+//
+//                    if (error.text().trim().length == 0) {
+//                        element.popover('destroy');
+////                        element.removeClass('control-group error');
+//                        return;
+//                    }
+//
+////                    element.parent().addClass('control-group error');
+//
+//                    element.popover('destroy');
+//                    element.popover(
+//                        {
+//                            html: true,
+//                            content: error,
+//                            trigger: 'hover',
+//                            placement: 'right'
+//                        }
+//                    );
+//                    element.popover('show');
+//                    setTimeout(function(){ element.popover('hide'); }, 3000);
+//
+//                }
             }
         );
 
@@ -231,16 +258,7 @@ CustomFilterTabLayout = Backbone.Marionette.Layout.extend({
                 }
                 filter.set("genotype", genotype);
 
-                var status = GroupFilterSampleStatus.UNKNOWN;
-                switch(this.$el.find('form input[name=sample_status]:radio:checked').val()) {
-                    case 'any':
-                        status = GroupFilterSampleStatus.ANY;
-                        break;
-                    case 'all':
-                        status = GroupFilterSampleStatus.ALL;
-                        break;
-                }
-                filter.set("sampleStatus", status);
+                filter.set("atLeastXSamples", this.$el.find('form input[name=at_least_x_samples]').val());
 
                 filter.set("value", this.groupListView.getSelectedGroup());
                 break;
@@ -257,14 +275,26 @@ CustomFilterTabLayout = Backbone.Marionette.Layout.extend({
      * @param group
      */
     groupChanged: function(group) {
+
+        var numSamples = group.get("sampleNames").length;
+
         this.ui.count.empty();
-        this.ui.count.append('Number of samples: <b>' + group.get("sampleNames").length + '</b>');
+        this.ui.count.append('Number of samples: <b>' + numSamples + '</b>');
 
         this.ui.sampleNameList.empty();
         for (var i=0; i < group.get("sampleNames").length; i++)
         {
             this.ui.sampleNameList.append("<option>" + group.get("sampleNames")[i] + "</option>");
         }
+
+        var minSamplesInput = this.$el.find('form input[name=at_least_x_samples]');
+        minSamplesInput.val(numSamples);
+        minSamplesInput.rules( "add", {
+            required: true,
+            number: true,
+            min: 0,
+            max: numSamples
+        });
 
         this.validate();
     },

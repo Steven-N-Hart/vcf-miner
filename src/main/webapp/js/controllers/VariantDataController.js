@@ -99,7 +99,7 @@ var VariantDataController = Backbone.Marionette.Controller.extend({
 
         $.ajax({
             type: "POST",
-            url: "/mongo_svr/ve/eq",
+            url: "/mongo_svr/ExeQuery/aggregate",
             contentType: "application/json",
             data: JSON.stringify(query),
             dataType: "json",

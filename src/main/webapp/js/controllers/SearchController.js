@@ -396,7 +396,7 @@ var SearchController = Backbone.Marionette.Controller.extend({
                 filter = MongoApp.FILTER_NOT_IN_GROUP.clone();
             }
             filter.set("genotype", filter.toGenotype(sampleGroupPojo.zygosity));
-            filter.set("sampleStatus", filter.toSampleStatus(sampleGroupPojo.allAnySample));
+            filter.set("atLeastXSamples", sampleGroupPojo.minMatchingSamplesInVariant);
             filter.set("value", new SampleGroup().fromPojo(sampleGroupPojo));
         }
         else if (querry.infoFlagFilters.length == 1) {

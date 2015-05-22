@@ -6,13 +6,6 @@ var GroupFilterGenotype =
     HOMOZYGOUS:   3
 }
 
-var GroupFilterSampleStatus =
-{
-    UNKNOWN:  0,
-    ANY:      1,
-    ALL:      2
-}
-
 // MODEL
 var GroupFilter = Filter.extend({
 
@@ -34,7 +27,7 @@ var GroupFilter = Filter.extend({
 
         var html = '<div class="text-left" title="'+tooltipStr+'">' + sampleGroup.get("name") + '</div>';
         html += '<div class="text-left"><i>genotype:'+this.toGenotypeString(this.get("genotype"))+'</i></div>';
-        html += '<div class="text-left"><i>samples:'+this.toSampleStatusString(this.get("sampleStatus"))+'</i></div>';
+        html += '<div class="text-left"><span style="white-space:nowrap;"><i>min # samples:'+this.get("atLeastXSamples")+'</i></span></div>';
 
         return html;
     },
@@ -44,7 +37,7 @@ var GroupFilter = Filter.extend({
 
         var ascii = sampleGroup.get("name");
         ascii += ' genotype:' + this.toGenotypeString(this.get("genotype"));
-        ascii += ' samples:' + this.toSampleStatusString(this.get("sampleStatus"));
+        ascii += ' min # samples:' + this.get("atLeastXSamples");
 
         return ascii;
     },
@@ -66,22 +59,6 @@ var GroupFilter = Filter.extend({
                 break;
         }
         return genotypeStr;
-    },
-
-    toSampleStatusString: function(sampleStatus) {
-        var statusStr;
-        switch (sampleStatus) {
-            case GroupFilterSampleStatus.UNKNOWN:
-                statusStr='?';
-                break;
-            case GroupFilterSampleStatus.ANY:
-                statusStr='any';
-                break;
-            case GroupFilterSampleStatus.ALL:
-                statusStr='all';
-                break;
-        }
-        return statusStr;
     },
 
     toSampleGroupPOJO: function(workspaceKey, inSample)
@@ -109,16 +86,7 @@ var GroupFilter = Filter.extend({
         }
         pojo.zygosity = zygosity;
 
-        var allAnySample;
-        switch(this.get("sampleStatus")) {
-            case GroupFilterSampleStatus.ANY:
-                allAnySample = 'any';
-                break;
-            case GroupFilterSampleStatus.ALL:
-                allAnySample = 'all';
-                break;
-        }
-        pojo.allAnySample = allAnySample;
+        pojo.minMatchingSamplesInVariant = this.get("atLeastXSamples");
 
         return pojo;
     },
@@ -145,25 +113,6 @@ var GroupFilter = Filter.extend({
         return genotype;
     },
 
-    /**
-     * Translates server-side allAnySample value into a GroupFilterSampleStatus.
-     */
-    toSampleStatus: function(allAnySample)
-    {
-        var sampleStatus = GroupFilterSampleStatus.UNKNOWN;
-
-        switch (allAnySample) {
-            case 'all':
-                sampleStatus = GroupFilterSampleStatus.ALL;
-                break;
-            case 'any':
-                sampleStatus = GroupFilterSampleStatus.ANY;
-                break;
-        }
-
-        return sampleStatus;
-    },
-
     defaults: function()
     {
         return {
@@ -181,7 +130,7 @@ var GroupFilter = Filter.extend({
             includeNulls:    false,
             removable:       false,
             genotype:        GroupFilterGenotype.UNKNOWN,
-            sampleStatus:    GroupFilterSampleStatus.UNKNOWN
+            atLeastXSamples: 0
         };
     }
 });
