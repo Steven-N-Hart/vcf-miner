@@ -9,7 +9,9 @@ var FilterCategory =
     INFO_FLOAT:             5,
     INFO_FLAG:              6,
     INFO_STR:               7,
-    ALT_ALLELE_DEPTH:       8
+    ALT_ALLELE_DEPTH:       8,
+    GENERAL_FLOAT:          9,
+    GENERAL_STRING:         10
 }
 
 // ENUM
@@ -125,14 +127,24 @@ var Filter = Backbone.Model.extend({
     },
 
     /**
-     * Translates this model into a InfoNumberFilter server-side object.
+     * Translates this model into a InfoNumberFilter/FixedFieldNumberFilter server-side object.
+     *
+     * If the filter's category is {@link FilterCategory.INFO_INT} or {@link FilterCategory.INFO_FLOAT},
+     * an InfoNumberFilter server-side object is built.
+     *
+     * If the filter's category is {@link FilterCategory.GENERAL_FLOAT}, an FixedFieldNumberFilter
+     * server-side object is built.
      */
-    toInfoNumberFilterPojo: function() {
+    toNumberFilterPojo: function() {
         var pojo = new Object();
 
-        pojo.key = "INFO." + this.get("name");
-        pojo.value = parseFloat(this.get("value"));
+        if ((this.get("category") == FilterCategory.INFO_INT) || (this.get("category") == FilterCategory.INFO_FLOAT)) {
+            pojo.key = "INFO." + this.get("name");
+        } else if (this.get("category") == FilterCategory.GENERAL_FLOAT) {
+            pojo.key = this.get("name");
+        }
 
+        pojo.value = parseFloat(this.get("value"));
         pojo.comparator = this.toMongoNumberComparator(this.get("operator"));
         pojo.includeNulls = this.get("includeNulls");
 
@@ -156,16 +168,38 @@ var Filter = Backbone.Model.extend({
     },
 
     /**
-     * Translates the given Filter model into a InfoStringFilter server-side object.
+     * Translates the given Filter model into a InfoStringFilter/FixedFieldStringFilter server-side object.
+     *
+     * If the filter's category is {@link FilterCategory.INFO_STR}, an InfoStringFilter server-side object is built.
+     * If the filter's category is {@link FilterCategory.GENERAL_STRING}, an FixedFieldStringFilter server-side object is built.
      */
-    toInfoStringFilterPojo: function()
+    toStringFilterPojo: function()
     {
         var pojo = new Object();
 
-        pojo.key = "INFO." + this.get("name");
+        var comparator;
+        switch(this.get("operator"))
+        {
+            case FilterOperator.EQ:
+                comparator='$in';
+                break;
+            case FilterOperator.NE:
+                comparator = '$nin';
+                break;
+        }
+
+        if (this.get("category") == FilterCategory.INFO_STR) {
+            pojo.key = "INFO." + this.get("name");
+
+            pojo.comparator = comparator;
+
+        } else if (this.get("category") == FilterCategory.GENERAL_STRING) {
+            pojo.name = this.get("name");
+
+            pojo.operator = comparator;
+        }
 
         var value = this.get("value");
-        var displayValue = '';
 
         if (value instanceof Array)
         {
@@ -178,17 +212,6 @@ var Filter = Backbone.Model.extend({
             pojo.values = values;
         }
 
-        var comparator;
-        switch(this.get("operator"))
-        {
-            case FilterOperator.EQ:
-                comparator='$in';
-                break;
-            case FilterOperator.NE:
-                comparator = '$nin';
-                break;
-        }
-        pojo.comparator = comparator;
         pojo.includeNulls = this.get("includeNulls");
 
         return pojo;

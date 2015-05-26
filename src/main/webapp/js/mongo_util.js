@@ -101,7 +101,7 @@ function getDateString(timestamp)
 }
 
 /**
- * Builds a query object.
+ * Builds a Querry server-side object.
  *
  * @param filterStepList Backbone collection of filter models.
  * @param workspaceKey
@@ -118,13 +118,16 @@ function buildQuery(filterStepList, workspaceKey) {
     var infoFlagFilters     = new Array();
     var infoNumberFilters   = new Array();
     var infoStringFilters   = new Array();
+    var fixedFieldStringFilters = new Array();
+    var fixedFieldNumberFilters = new Array();
     var sampleNumberFilters = new Array();
     var customNumberFilters = new Array();
 
-    // loop through filter collection
     _.each(filterStepList.models, function(filterStep) {
 
+        // loop through filter collections
         _.each(filterStep.get("filters").models, function(filter) {
+
             // assign filter value to correct query object attribute
             switch (filter.get("category"))
             {
@@ -133,10 +136,16 @@ function buildQuery(filterStepList, workspaceKey) {
                     break;
                 case FilterCategory.INFO_INT:
                 case FilterCategory.INFO_FLOAT:
-                    infoNumberFilters.push(filter.toInfoNumberFilterPojo());
+                    infoNumberFilters.push(filter.toNumberFilterPojo());
                     break;
                 case FilterCategory.INFO_STR:
-                    infoStringFilters.push(filter.toInfoStringFilterPojo());
+                    infoStringFilters.push(filter.toStringFilterPojo());
+                    break;
+                case FilterCategory.GENERAL_STRING:
+                    fixedFieldStringFilters.push(filter.toStringFilterPojo());
+                    break;
+                case FilterCategory.GENERAL_FLOAT:
+                    fixedFieldNumberFilters.push(filter.toNumberFilterPojo());
                     break;
                 case FilterCategory.IN_GROUP:
                 case FilterCategory.NOT_IN_GROUP:
@@ -162,6 +171,8 @@ function buildQuery(filterStepList, workspaceKey) {
     query.infoFlagFilters     = infoFlagFilters;
     query.infoNumberFilters   = infoNumberFilters;
     query.infoStringFilters   = infoStringFilters;
+    query.fixedFieldStringFilters = fixedFieldStringFilters;
+    query.fixedFieldNumberFilters = fixedFieldNumberFilters;
     query.sampleNumberFilters = sampleNumberFilters;
     query.customNumberFilters = customNumberFilters;
 

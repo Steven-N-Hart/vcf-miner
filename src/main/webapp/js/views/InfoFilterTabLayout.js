@@ -1,6 +1,6 @@
 InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
 
-    infoFields: new VCFDataFieldList(),
+    dataFields: new VCFDataFieldList(),
 
     workspaceKey: null,
 
@@ -29,16 +29,22 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
         this.workspaceKey = workspaceKey;
         var workspace = MongoApp.workspaceController.getWorkspace(workspaceKey);
 
-        // pick out the INFO data fields
-        this.infoFields.reset();
+        // pick out the GENERAL and INFO data fields
+        var infoFieldCount = 0;
+        this.dataFields.reset();
         _.each(workspace.get("dataFields").models, function(vcfDataField) {
             if (vcfDataField.get("category") == VCFDataCategory.INFO) {
-                self.infoFields.add(vcfDataField);
+                infoFieldCount++;
+            }
+
+            if ((vcfDataField.get("category") == VCFDataCategory.GENERAL) ||
+                (vcfDataField.get("category") == VCFDataCategory.INFO)) {
+                self.dataFields.add(vcfDataField);
             }
         });
 
         // check to see whether we have any INFO annotation
-        if (this.infoFields.length > 0)
+        if (infoFieldCount > 0)
             this.$el.find('#no_info_annotation_warning').toggle(false);
         else
             this.$el.find('#no_info_annotation_warning').toggle(true);
@@ -114,17 +120,17 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
 
         this.view = new ListView({
             "el": this.$el.find('#info_field_list'),
-            "model": this.infoFields
+            "model": this.dataFields
         });
 
-        if (this.infoFields.length > 0) {
+        if (this.dataFields.length > 0) {
             // simulate user choosing the 1st INFO field
             this.infoFieldChanged();
         }
     },
 
     validate: function() {
-        var infoField = this.getSelectedInfoField();
+        var infoField = this.getSelectedDataField();
 
         switch (infoField.get("type")) {
             case VCFDataType.STRING:
@@ -226,9 +232,9 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
      *
      * @returns {*}
      */
-    getSelectedInfoField: function() {
+    getSelectedDataField: function() {
         var fieldID = this.$el.find('#info_field_list').val();
-        return this.infoFields.findWhere({name: fieldID});
+        return this.dataFields.findWhere({name: fieldID});
     },
 
     /**
@@ -248,8 +254,12 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
         var self = this;
 
         // get selected VCFDataField model
-        var infoField = this.getSelectedInfoField();
+        var infoField = this.getSelectedDataField();
         var fieldID = infoField.get("name");
+        if (infoField.get("category") == VCFDataCategory.INFO) {
+            // re-attach the INFO. prefix
+            fieldID = "INFO." + fieldID;
+        }
 
         // value DIV area
         var valueDiv = this.$el.find("#info_value_div");
@@ -334,10 +344,10 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
                     valueDiv.append('<textarea id="info_str_value_area" rows="7" wrap="off" placeholder="" autocomplete="off" spellcheck="false"/>');
                     $('#info_str_typeahead').typeahead({
                         remote: {
-                            url: '/mongo_svr/ve/typeahead/w/'+this.workspaceKey+'/f/INFO.'+fieldID+'/p/%QUERY/x/'+maxTypeaheadValues,
+                            url: '/mongo_svr/ve/typeahead/w/'+this.workspaceKey+'/f/'+fieldID+'/p/%QUERY/x/'+maxTypeaheadValues,
                             filter: function(parsedResponse) {
                                 var dataset = new Array();
-                                var typeaheadValues = parsedResponse['INFO.'+fieldID];
+                                var typeaheadValues = parsedResponse[fieldID];
                                 for (var i = 0; i < typeaheadValues.length; i++) {
                                     var datum = {
                                         value: typeaheadValues[i]
@@ -411,8 +421,7 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
     /**
      * Fetches values for the given field, up to the specified max cutoff.
      * @param fieldID
-     *      The field id that values will be retrieved for.  The id should not
-     *      have the 'INFO.' prefix.
+     *      The field id that values will be retrieved for.
      * @param maxCutoff
      *      The max number of values to return
      * @returns {Array}
@@ -425,10 +434,10 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
         // perform synchronous AJAX call
         $.ajax({
             async: false,
-            url: "/mongo_svr/ve/typeahead/w/"+this.workspaceKey+"/f/INFO."+fieldID+"/x/"+maxCutoff,
+            url: "/mongo_svr/ve/typeahead/w/"+this.workspaceKey+"/f/"+fieldID+"/x/"+maxCutoff,
             dataType: "json",
             success: function(json) {
-                values = json["INFO."+fieldID];
+                values = json[fieldID];
             },
             error: jqueryAJAXErrorHandler
         });
@@ -443,16 +452,22 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
      */
     getFilter: function() {
         // get selected VCFDataField
-        var infoField = this.getSelectedInfoField();
-        var fieldID = infoField.get("name");
+        var dataField = this.getSelectedDataField();
+        var fieldID = dataField.get("name");
 
         var filter = new Filter();
         filter.set("name", fieldID);
-        filter.set("description", infoField.get("description"));
+        filter.set("description", dataField.get("description"));
 
-        switch (infoField.get("type")) {
+        var isInfo = false;
+        if (dataField.get("category") == VCFDataCategory.INFO) {
+            isInfo = true;
+        }
+
+        switch (dataField.get("type")) {
             case VCFDataType.FLAG:
                 filter.set("category", FilterCategory.INFO_FLAG);
+
                 var radioId =  this.$el.find('#info_flag_radio_group input[type=radio]:checked').attr('id');
                 if (radioId == 'true') {
                     filter.set("value", true);
@@ -464,12 +479,21 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
             case VCFDataType.INTEGER:
                 filter.set("category", FilterCategory.INFO_INT);
             case VCFDataType.FLOAT:
-                filter.set("category", FilterCategory.INFO_FLOAT);
+                if (isInfo) {
+                    filter.set("category", FilterCategory.INFO_FLOAT);
+                } else {
+                    filter.set("category", FilterCategory.GENERAL_FLOAT);
+                }
+
                 filter.set("value", this.$el.find("#info_value_div input").val());
                 filter.set("includeNulls", (this.$el.find("#include_nulls:checked").length > 0) ? true:false);
                 break;
             case VCFDataType.STRING:
-                filter.set("category", FilterCategory.INFO_STR);
+                if (isInfo) {
+                    filter.set("category", FilterCategory.INFO_STR);
+                } else {
+                    filter.set("category", FilterCategory.GENERAL_STRING);
+                }
 
                 var valueArr;
 
@@ -518,14 +542,14 @@ InfoFilterTabLayout = Backbone.Marionette.Layout.extend({
         }
         filter.set("operator", operator);
 
-        if (MongoApp.settings.showMissingIndexWarning && !MongoApp.indexController.isDataFieldIndexed(infoField)) {
+        if (MongoApp.settings.showMissingIndexWarning && !MongoApp.indexController.isDataFieldIndexed(dataField)) {
             var confirmDialog = new ConfirmDialog(
                 "",
                 fieldID + " does not have an index.  Would you like to create a new index to boost filtering performance?",
                 "Create Index",
                 function() {
                     // confirm
-                    MongoApp.indexController.createIndex(MongoApp.indexController.getIndexByDataField(infoField));
+                    MongoApp.indexController.createIndex(MongoApp.indexController.getIndexByDataField(dataField));
                 }
             );
             confirmDialog.show();
