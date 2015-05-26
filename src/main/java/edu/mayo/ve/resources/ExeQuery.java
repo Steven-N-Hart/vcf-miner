@@ -29,11 +29,38 @@ public class ExeQuery {
     Mongo m = MongoConnection.getMongo();
     Gson gson = new Gson();
 
-
+    //canidate function to replace handleBasicQuerry and handleBasicQuerry2 below (makes them a lot more simple!)
     @POST
-    @Path("/aggregate")
+    @Path("/ve/eq")
     @Produces("application/json")
     @Consumes(MediaType.APPLICATION_JSON)
+    public String handleBasicQuery(Querry q) throws Exception {
+        DB db = MongoConnection.getDB();
+        DBCollection col = db.getCollection(q.getWorkspace());
+        Rresults results = new Rresults();
+
+        //setup the cursor
+        QueryFactory qfact = new QueryFactory();
+        QueryCursorInterface cursor = qfact.makeCursor(col,q);
+
+        //count the number of results and put them in the response message... (do we want to do this async? - for some queries this takes time)
+        results.setNumberOfResults(cursor.countResults());
+
+        //string-ify the query that was used to generate the results, and put that in the response message (mostly for debugging)
+        results.setMongoQuery(cursor.getQuery());
+
+        for(int i = 0; i< q.getNumberResults() && cursor.hasNext();i++){
+            DBObject next = cursor.next();
+            results.addResult(next);
+        }
+
+        return results.asJson();
+    }
+
+    //@POST
+    //@Path("/aggregate")
+    //@Produces("application/json")
+    //@Consumes(MediaType.APPLICATION_JSON)
     public String handleBasicQuerry2(Querry q) throws Exception {
 
         DB db = MongoConnection.getDB();
@@ -76,11 +103,11 @@ public class ExeQuery {
         }
     }
 
-    @POST
-    @Path("/ve/eq")
-    @Produces("application/json")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public String handleBasicQuerry(Querry q){
+    //@POST
+    //@Path("/ve/eq")
+    //@Produces("application/json")
+    //@Consumes(MediaType.APPLICATION_JSON)
+    private String handleBasicQuerry(Querry q){
         DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(q.getWorkspace());
         DBObject query = q.createQuery();

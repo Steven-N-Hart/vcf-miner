@@ -2,6 +2,8 @@ package edu.mayo.ve.resources;
 
 import com.google.gson.Gson;
 import com.mongodb.*;
+import edu.mayo.query.QueryCursorInterface;
+import edu.mayo.query.QueryFactory;
 import edu.mayo.security.CWEUtils;
 import edu.mayo.util.Tokens;
 import edu.mayo.ve.message.DisplayedFilterVariants;
@@ -129,9 +131,11 @@ public class DownloadFile {
         int i = 0;
         DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(q.getWorkspace());
-        DBObject query = q.createQuery();
+        //DBObject query = q.createQuery();
         //System.out.println(q.getCustomReturnSelect().toString());
-        DBCursor documents = col.find(query, q.getCustomReturnSelect());
+        //DBCursor documents = col.find(query, q.getCustomReturnSelect());
+        QueryFactory qfact = new QueryFactory();
+        QueryCursorInterface documents = qfact.makeCursor(col,q);
         for( i = 0; documents.hasNext(); i++){
             DBObject next = documents.next();
             int j=0;
