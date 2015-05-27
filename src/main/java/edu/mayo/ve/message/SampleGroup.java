@@ -45,6 +45,10 @@ public class SampleGroup {
         return minMatchingSamplesInVariant;
     }
 
+    public void setMinMatchingSamplesInVariant(int minMatchingSamples) {
+        minMatchingSamplesInVariant = minMatchingSamples;
+    }
+
     public String getWorkspace() {
         return workspace;
     }
