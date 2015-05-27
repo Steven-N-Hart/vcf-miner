@@ -140,7 +140,7 @@ var Filter = Backbone.Model.extend({
 
         if ((this.get("category") == FilterCategory.INFO_INT) || (this.get("category") == FilterCategory.INFO_FLOAT)) {
             pojo.key = "INFO." + this.get("name");
-        } else if (this.get("category") == FilterCategory.GENERAL_FLOAT) {
+        } else {
             pojo.key = this.get("name");
         }
 
@@ -173,13 +173,27 @@ var Filter = Backbone.Model.extend({
      * If the filter's category is {@link FilterCategory.INFO_STR}, an InfoStringFilter server-side object is built.
      * If the filter's category is {@link FilterCategory.GENERAL_STRING}, an FixedFieldStringFilter server-side object is built.
      */
-    toStringFilterPojo: function()
-    {
+    toStringFilterPojo: function() {
         var pojo = new Object();
 
+        if (this.get("category") == FilterCategory.INFO_STR) {
+            pojo.key = "INFO." + this.get("name");
+        } else {
+            pojo.key = this.get("name");
+        }
+
+        var value = this.get("value");
+        if (value instanceof Array) {
+            pojo.values = value;
+        }
+        else {
+            var values = new Array();
+            values.push(this.get("value"));
+            pojo.values = values;
+        }
+
         var comparator;
-        switch(this.get("operator"))
-        {
+        switch(this.get("operator")) {
             case FilterOperator.EQ:
                 comparator='$in';
                 break;
@@ -187,30 +201,7 @@ var Filter = Backbone.Model.extend({
                 comparator = '$nin';
                 break;
         }
-
-        if (this.get("category") == FilterCategory.INFO_STR) {
-            pojo.key = "INFO." + this.get("name");
-
-            pojo.comparator = comparator;
-
-        } else if (this.get("category") == FilterCategory.GENERAL_STRING) {
-            pojo.name = this.get("name");
-
-            pojo.operator = comparator;
-        }
-
-        var value = this.get("value");
-
-        if (value instanceof Array)
-        {
-            pojo.values = value;
-        }
-        else
-        {
-            var values = new Array();
-            values.push(this.get("value"));
-            pojo.values = values;
-        }
+        pojo.comparator = comparator;
 
         pojo.includeNulls = this.get("includeNulls");
 
