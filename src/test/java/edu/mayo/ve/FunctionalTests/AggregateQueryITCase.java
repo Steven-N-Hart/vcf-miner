@@ -72,7 +72,7 @@ public class AggregateQueryITCase {
 		"##INFO=<ID=AlleleFreq,Type=Float,Number=1,Description=\"Allele frequency in fraction of total alleles\">",
 		"##INFO=<ID=RefAllele,Type=Character,Number=1,Description=\"Single character REF alleles only\">",
 		"##INFO=<ID=Alts,Type=String,Number=.,Description=\"List of alt alleles\">",
-		"##INFO=<ID=SomeInt,Type=Number,Number=1,Description=\"Some integer\">",
+		"##INFO=<ID=SomeInt,Type=Integer,Number=1,Description=\"Some integer\">",
 		"##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
 		concat("#CHROM","POS",	"ID",	"REF",	"ALT",	"QUAL",	"FILTER",	"INFO",	"FORMAT", "A",	"B",	"C",	"D",	"E",	"F",	"G"),
 		concat("12",	"100",	"rs12",	"A",	"C",	".",	".",		"IsInDbSnp",
@@ -177,9 +177,9 @@ public class AggregateQueryITCase {
 	public void testSamplesInGroup10() throws Exception
 	{	testAggregate(Zygosity.homozygous, 		"Z",			(minMatch=1),	VariantSelect.Normal,	""); }
 	
-	@Test	// Match at least 1 of 5 sample groups, where the sample name is not same case
+	@Test	// Match at least 1 of 5 sample groups, where the sample name is not same case - MISS (MongoDB stores strings as case sensitive)
 	public void testSamplesInGroup11() throws Exception
-	{	testAggregate(Zygosity.homozygous, 		"e",			(minMatch=1),	VariantSelect.Normal,	"rs11"); }
+	{	testAggregate(Zygosity.homozygous, 		"e",			(minMatch=1),	VariantSelect.Normal, ""); }
 	
 	
 	
@@ -191,7 +191,7 @@ public class AggregateQueryITCase {
 	public void testSamplesNotInGroup1() throws Exception
 	{	testAggregate(Zygosity.either, 			"Z",			(minMatch=1),	VariantSelect.Inverse,	"rs01,rs02,rs03,rs04,rs05,rs06,rs07,rs08,rs09,rs10,rs11"); }
 
-	@Test	// Match at least one, but not in the group we specify  (rs09,rs10,rs11 are normal match, so all others are reverse)
+	@Test	// Match at least three, but not in the group we specify  (rs09,rs10,rs11 are normal match, so all others are reverse)
 	public void testSamplesNotInGroup2() throws Exception
 	{	testAggregate(Zygosity.homozygous, 		"A,B,C,D,E",	(minMatch=3),	VariantSelect.Inverse,	"rs01,rs02,rs03,rs04,rs05,rs06,rs07,rs08"); }
 		
@@ -297,23 +297,27 @@ public class AggregateQueryITCase {
 	// INFO-only  (use the old code to test this first, before we update it to a shared method)
 	//------------------------------------------------------------------------------------------------------------------------
 
-	@Test	/** Test flag of different case (IsInDbSnp vs isInDbSNP) - MISS */
+    @Test	/** Test flag - MATCH */
+    public void testInfo0() throws Exception {
+        addInfoFields( new InfoFlagFilter("IsInDbSnp", true) );
+        verifyQueryResults(mQuery, "rs12,rs17");
+    }
+
+	@Test	/** Test flag of different case (IsInDbSnp vs isInDbSNP) - MISS (INFO field names are case sensitive) */
 	public void testInfo1() throws Exception {
 		addInfoFields( new InfoFlagFilter("isInDbSNP", true) );
 		verifyQueryResults(mQuery, "");
-		fail("Should we match even if case not correct????");
 	}
 	
-	@Test	/** Test String value where the value is a different case - MISS */
+	@Test	/** Test String value where the value is a different case - MISS (INFO field values are case sensitive) */
 	public void testInfo2() throws Exception {
 		addInfoFields( new InfoStringFilter("RefAllele", toList("a"), "=", false) );
 		verifyQueryResults(mQuery, "");
-		fail("Should we match even if case not correct????");
 	}
 
-	@Test	/** Test Number where 102 should equal 102.0 - MATCH */
+	@Test	/** Test Number where 3942 should equal 3942.0 - MATCH */
 	public void testInfo3() throws Exception {
-		addInfoFields( new InfoNumberFilter("SomeInt", 3942.0, "=", false) );
+		addInfoFields( new InfoNumberFilter("SomeInt", 3942.0, "", false) );
 		verifyQueryResults(mQuery, "rs16");
 	}
 
