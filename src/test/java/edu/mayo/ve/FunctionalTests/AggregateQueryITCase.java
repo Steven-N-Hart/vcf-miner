@@ -67,12 +67,12 @@ public class AggregateQueryITCase {
 	
 	
 	protected static String[] VCF2 = {
-		"##INFO=<ID=IsInDbSnp,Type=Flag,Number=0,Description=\"Is the variant in dbSNP\">",
-		"##INFO=<ID=AlleleCount,Type=Integer,Number=3,Description=\"Number of alleles counted\">",
-		"##INFO=<ID=AlleleFreq,Type=Float,Number=1,Description=\"Allele frequency in fraction of total alleles\">",
-		"##INFO=<ID=RefAllele,Type=Character,Number=1,Description=\"Single character REF alleles only\">",
-		"##INFO=<ID=Alts,Type=String,Number=.,Description=\"List of alt alleles\">",
-		"##INFO=<ID=SomeInt,Type=Integer,Number=1,Description=\"Some integer\">",
+		"##INFO=<ID=IsInDbSnp,Number=0,Type=Flag,Description=\"Is the variant in dbSNP\">",
+		"##INFO=<ID=AlleleCount,Number=3,Type=Integer,Description=\"Number of alleles counted\">",
+		"##INFO=<ID=AlleleFreq,Number=1,Type=Float,Description=\"Allele frequency in fraction of total alleles\">",
+		"##INFO=<ID=RefAllele,Number=1,Type=Character,Description=\"Single character REF alleles only\">",
+		"##INFO=<ID=Alts,Number=.,Type=String,Description=\"List of alt alleles\">",
+		"##INFO=<ID=SomeInt,Number=1,Type=Integer,Description=\"Some integer\">",
 		"##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
 		concat("#CHROM","POS",	"ID",	"REF",	"ALT",	"QUAL",	"FILTER",	"INFO",	"FORMAT", "A",	"B",	"C",	"D",	"E",	"F",	"G"),
 		concat("12",	"100",	"rs12",	"A",	"C",	".",	".",		"IsInDbSnp",
@@ -323,27 +323,27 @@ public class AggregateQueryITCase {
 
 	@Test	/** INFO string field match on 1 of 3 values - MATCH 2 */
 	public void testInfo4() throws Exception {
-		addInfoFields( new InfoStringFilter("Alts", toList("A"), "=", false) );
+		addInfoFields( new InfoStringFilter("INFO.Alts", toList("A"), "$in", false) );
 		verifyQueryResults(mQuery, "rs16,rs17");
 	}
 
 	@Test	/** INFO string field match on 2 of 3 values in one filter - MATCH 1 */
 	public void testInfo5() throws Exception {
-		addInfoFields( new InfoStringFilter("Alts", toList("A","G"), "=", false) );
+		addInfoFields( new InfoStringFilter("INFO.Alts", toList("A","G"), "$in", false) );
 		verifyQueryResults(mQuery, "rs16");
 	}
 
 	@Test	/** INFO Number field match on 2 of 3 values in two filters - MATCH 1 */
 	public void testInfo6() throws Exception {
-		addInfoFields( new InfoNumberFilter("AlleleCount", 100.0, "=", false),
-					   new InfoNumberFilter("AlleleCount", 102.0, "=", false)  );
+		addInfoFields( new InfoNumberFilter("AlleleCount", 100.0, "", false),
+					   new InfoNumberFilter("AlleleCount", 102.0, "", false)  );
 		verifyQueryResults(mQuery, "rs13");
 	}
 
 
 	@Test 	/** INFO Number field match on 1 of 3 values in same field  - Ex: AlleleCount = 100 - MATCH 1 */
 	public void testInfo7() throws Exception {
-		addInfoFields( new InfoNumberFilter("AlleleCount", 300.0, "=", false) );
+		addInfoFields( new InfoNumberFilter("AlleleCount", 300.0, "", false) );
 		verifyQueryResults(mQuery, "rs17");
 	}
 
@@ -361,13 +361,13 @@ public class AggregateQueryITCase {
 
 	@Test  	/** INFO String field - match all in array - MATCH 1 */
 	public void testInfo10() throws Exception {
-		addInfoFields( new InfoStringFilter("Alts", toList("A","G","T","C"), "=", true) );
+		addInfoFields( new InfoStringFilter("Alts", toList("A","G","T","C"), "$in", true) );
 		verifyQueryResults(mQuery, "rs16");
 	}
 
 	@Test  	/** INFO String field - match all in array, but in different order  - MATCH 1*/
 	public void testInfo11() throws Exception {
-		addInfoFields( new InfoStringFilter("Alts", toList("C","A","T","G"), "=", true) );
+		addInfoFields( new InfoStringFilter("Alts", toList("C","A","T","G"), "$in", true) );
 		verifyQueryResults(mQuery, "rs16");
 	}
 
@@ -409,6 +409,7 @@ public class AggregateQueryITCase {
 		boolean isOutputTruncated = (mQuery.getNumberResults() < rsIdsExpected.size());
 		int expectedResultCount = isOutputTruncated  ?  mQuery.getNumberResults()  :  rsIdsExpected.size();
 		String errorMsg = "Expected rsIds do not match actual:\nExpected: " + rsIdsExpected + "\nActual:     " + rsIdsResults + "\n";
+        errorMsg += "Query:     " +query.createQuery().toString()+ "\n";
 		Assert.assertEquals(errorMsg + "Sizes different: ", expectedResultCount,  rsIdsResults.size());
 		
 		// If the output was truncated, then verify that truncated actual results are a subset of the full expected results
