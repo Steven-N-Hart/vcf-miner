@@ -49,7 +49,7 @@ public class StandardQueryCursor implements QueryCursorInterface{
     }
 
     public String getQuery() {
-        return query.toString();
+        return query.createQuery().toString();
     }
 
     public void setQuery(Querry query) {
