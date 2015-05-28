@@ -35,10 +35,10 @@ public class QueryBuilder {
         for (SampleGroup grp: q.getSampleGroups()) {
 
             Zygosity zygosity;
-            if (grp.getZygosity().equals("heterozygous")) {
+            if (grp.getZygosity().equalsIgnoreCase("heterozygous")) {
                 zygosity = Zygosity.HETEROZYGOUS;
             }
-            if (grp.getZygosity().equals("homozygous")) {
+            else if (grp.getZygosity().equalsIgnoreCase("homozygous")) {
                 zygosity = Zygosity.HOMOZYGOUS;
             }
             else {
