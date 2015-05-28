@@ -7,6 +7,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+
 import edu.mayo.concurrency.workerQueue.WorkerPool;
 import edu.mayo.util.MongoConnection;
 import edu.mayo.ve.SecurityUserAppHelper;
@@ -17,14 +18,17 @@ import edu.mayo.ve.resources.ExeQuery;
 import edu.mayo.ve.resources.VCFUploadResource;
 import edu.mayo.ve.resources.WorkerPoolManager;
 import edu.mayo.ve.util.Tokens;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.ws.rs.core.Response;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
 
@@ -68,14 +72,19 @@ public class VCFUploadResourceITCase {
 
     @Test
     public void uploadFile() throws Exception {
-
+    	String workspaceKey = uploadFile(new File("src/test/resources/testData/VCFUploadResourceITCase.vcf"));
+        System.out.println("Key: " + workspaceKey);
+        assertEquals(1, count(workspaceKey));
+    }
+    
+    public String uploadFile(File vcfFile) throws Exception {
+    	
         VCFUploadResource uploadResource = new VCFUploadResource(mockHelper);
 
-        File vcf = new File("src/test/resources/testData/VCFUploadResourceITCase.vcf");
-        InputStream inStream = new FileInputStream(vcf);
+        InputStream inStream = new FileInputStream(vcfFile);
 
         String reporting = "FALSE";
-        String compression = vcf.getName();
+        String compression = vcfFile.getName();
         Response r = uploadResource.uploadFile(DUMMY_USER_ID, DUMMY_ALIAS, reporting, compression, DUMMY_USER_TOKEN, inStream);
 
         verify(mockHelper).registerWorkspace(eq(DUMMY_USER_ID), eq(DUMMY_USER_TOKEN), anyString(), eq(DUMMY_ALIAS));
@@ -90,11 +99,7 @@ public class VCFUploadResourceITCase {
         // returns before the import completes, it's necessary to check the status
         // until the import completes before doing any JUNIT assert statements
         waitForImportStatus(key, "workspace is ready");
-
-        assertEquals(1, count(key));
-
-        System.out.println(key);
-
+        return key;
     }
 
     /**
