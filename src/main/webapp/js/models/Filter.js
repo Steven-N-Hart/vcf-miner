@@ -152,18 +152,40 @@ var Filter = Backbone.Model.extend({
     },
 
     /**
-     * Transflates InfoNumberFilter server-side object into a Filter model.
+     * Translates InfoNumberFilter server-side object into a Filter model.
      * @param pojo
      */
     fromInfoNumberFilterPojo: function(pojo) {
-        var filter = new Filter();
+        // chomp off leading "INFO." prefix
+        var name = pojo.key.substring(5);
 
-        filter.set("name", pojo.key.substring(5));
+        var category = FilterCategory.INFO_FLOAT; // TODO: tell if INT or FLOAT?
+
+        return this.fromNumberFilterPojo(pojo, name, category);
+    },
+
+    /**
+     * Translates FixedField NumberFilter server-side object into a Filter model.
+     * @param pojo
+     */
+    fromFixedFieldNumberFilterPojo: function(pojo) {
+        return this.fromNumberFilterPojo(pojo, pojo.key, FilterCategory.GENERAL_FLOAT);
+    },
+
+    /**
+     * Helper function that translates a server-side object into a Filter model.
+     * @param pojo
+     * @param name
+     *
+     * @returns A {@link Filter} model.
+     */
+    fromNumberFilterPojo: function(pojo, name, category) {
+        var filter = new Filter();
+        filter.set("name", name);
+        filter.set("category", category);
         filter.set("value", pojo.value);
         filter.set("operator", this.toFilterOperator(pojo.comparator));
         filter.set("includeNulls", pojo.includeNulls);
-        filter.set("category", FilterCategory.INFO_FLOAT); // TODO: tell if INT or FLOAT?
-
         return filter;
     },
 
@@ -212,11 +234,30 @@ var Filter = Backbone.Model.extend({
      * Translates InfoStringFilter server-side object into a Filter model.
      * @returns {Filter}
      */
-    fromInfoStringFilterPojo: function(pojo)
-    {
+    fromInfoStringFilterPojo: function(pojo) {
+        // chomp off leading "INFO." prefix
+        var name = pojo.key.substring(5);
+        var category = FilterCategory.INFO_STR;
+        return this.fromStringFilterPojo(pojo, name, category);
+    },
+
+    /**
+     * Translates FixedFieldStringFilter server-side object into a Filter model.
+     * @returns {Filter}
+     */
+    fromFixedFieldStringFilterPojo: function(pojo) {
+        return this.fromStringFilterPojo(pojo, pojo.key, FilterCategory.GENERAL_STRING);
+    },
+
+    /**
+     * Helper function.
+     * @returns {Filter}
+     */
+    fromStringFilterPojo: function(pojo, name, category) {
         var filter = new Filter();
 
-        filter.set("name", pojo.key.substring(5));
+        filter.set("name", name);
+        filter.set("category", category);
         filter.set("value", pojo.values);
         filter.set("includeNulls", pojo.includeNulls);
 
@@ -226,7 +267,6 @@ var Filter = Backbone.Model.extend({
         else if (pojo.comparator == '$nin') {
             filter.set("operator", FilterOperator.NE);
         }
-        filter.set("category", FilterCategory.INFO_STR);
         return filter;
     },
 

@@ -414,6 +414,12 @@ var SearchController = Backbone.Marionette.Controller.extend({
         else if (querry.customNumberFilters.length == 1) {
             filter = new AltAlleleDepthFilter();
             filter.set("value", querry.customNumberFilters[0].value);
+        }
+        else if (querry.fixedFieldNumberFilters.length == 1) {
+            filter = new Filter().fromFixedFieldNumberFilterPojo(querry.fixedFieldNumberFilters[0]);
+        }
+        else if (querry.fixedFieldStringFilters.length == 1) {
+            filter = new Filter().fromFixedFieldStringFilterPojo(querry.fixedFieldStringFilters[0]);
         } else {
             throw "0 constraints found in: " + JSON.stringify(querry);
         }
