@@ -178,7 +178,7 @@ public class QueryBuilder {
      *     $redact: {
      *         $cond: {
      *             if: {
-     *                 $gte: [{$size: {$setDifference: [["A","B","C","D","E","F"], "$FORMAT.HomozygousList"]}}, 4]
+     *                 $lt: [{$size: {$setDifference: [["A","B","C","D","E","F"], "$FORMAT.HomozygousList"]}}, 4]
      *             },
      *             then: "$$KEEP",
      *             else: "$$PRUNE"
@@ -234,8 +234,10 @@ public class QueryBuilder {
             // IF (# of missing samples) >= (minimum # of matches between group and variant)
             BasicDBList ifCheckArgs = new BasicDBList();
             ifCheckArgs.add(missingSampleCount);
-            ifCheckArgs.add(minMatches);
-            conditionalCheck = new BasicDBObject("$gte", ifCheckArgs);
+            ifCheckArgs.add(maxMisses);
+            conditionalCheck = new BasicDBObject("$gt", ifCheckArgs);
+//            ifCheckArgs.add(minMatches);
+//            conditionalCheck = new BasicDBObject("$lte", ifCheckArgs);
         }
 
         BasicDBObject conditionVal = new BasicDBObject();
