@@ -32,13 +32,13 @@ import edu.mayo.ve.resources.ExeQuery;
 public class AggregateQueryITCase {
 
 	protected enum Zygosity { homozygous, heterozygous, either };
-	protected enum SampleSelect { Any, None };
+	protected enum VariantSelect { Normal, Inverse };
 	
 	protected Querry mQuery = null;
-	protected static String sWorkspaceKey = null;
 	private int minMatch = 0;
-	private int numResults = 10;
 
+	protected static String sWorkspaceKey1 = null;
+	protected static String sWorkspaceKey2 = null;
 	
 	// TODO: Test "downloadFile" as well to test results file.  Verify that we can get > 1000 rows back (to test that it does NOT truncate like the UI does)
 	//		- test both the original query + aggregation
@@ -48,25 +48,41 @@ public class AggregateQueryITCase {
 	// Or call:			return new ExeQuery().handleBasicQuerry2(query); -- OLD - will be removed later
 	
 	
-	protected static String[] ALL_VCF_LINES = {
-			"##INFO=<ID=IsInDbSnp,Type=Flag,Number=0,Description=\"Is the variant in dbSNP\">",
-			"##INFO=<ID=AlleleCount,Type=Integer,Number=3,Description=\"Number of alleles counted\">",
-			"##INFO=<ID=AlleleFreq,Type=Float,Number=1,Description=\"Allele frequency in fraction of total alleles\">",
-			"##INFO=<ID=RefAllele,Type=Character,Number=1,Description=\"Single character REF alleles only\">",
-			"##INFO=<ID=Alts,Type=String,Number=.,Description=\"List of alt alleles\">",
-			"##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
-			concat("#CHROM",	"POS",	"ID",	"REF",	"ALT",	"QUAL",	"FILTER",	"INFO",		"FORMAT",	"A",	"B",	"C",	"D",	"E",	"F",	"G"),
-			concat("1",			"100",	"rs01",	"A",	"C",	".",	".",		".",		"GT",		"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
-			concat("2",			"100",	"rs02",	"A",	"C",	".",	".",		".",		"GT",		"1|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
-			concat("3",			"100",	"rs03",	"A",	"C",	".",	".",		".",		"GT",		"1|0",	"1|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
-			concat("4",			"100",	"rs04",	"A",	"C",	".",	".",		".",		"GT",		"0|1",	"0|1",	"0|1",	"0|0",	"0|0",	"0|0",	"0|0"),
-			concat("5",			"100",	"rs05",	"A",	"C",	".",	".",		".",		"GT",		"0|1",	"0|1",	"0|1",	"0|1",	"0|0",	"0|0",	"0|0"),
-			concat("6",			"100",	"rs06",	"A",	"C",	".",	".",		".",		"GT",		"0|1",	"0|1",	"0|1",	"0|1",	"0|1",	"0|0",	"0|0"),
-			concat("7",			"100",	"rs07",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
-			concat("8",			"100",	"rs08",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"1|1",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
-			concat("9",			"100",	"rs09",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"1|1",	"0|0"),
-			concat("10",		"100",	"rs10",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"1|1"),
-			concat("11",		"100",	"rs11",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0"),
+	protected static String[] VCF1 = {
+		"##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
+		concat("#CHROM",	"POS",	"ID",	"REF",	"ALT",	"QUAL",	"FILTER",	"INFO",		"FORMAT",	"A",	"B",	"C",	"D",	"E",	"F",	"G"),
+		concat("1",			"100",	"rs01",	"A",	"C",	".",	".",		".",		"GT",		"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("2",			"100",	"rs02",	"A",	"C",	".",	".",		".",		"GT",		"1|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("3",			"100",	"rs03",	"A",	"C",	".",	".",		".",		"GT",		"1|0",	"1|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("4",			"100",	"rs04",	"A",	"C",	".",	".",		".",		"GT",		"0|1",	"0|1",	"0|1",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("5",			"100",	"rs05",	"A",	"C",	".",	".",		".",		"GT",		"0|1",	"0|1",	"0|1",	"0|1",	"0|0",	"0|0",	"0|0"),
+		concat("6",			"100",	"rs06",	"A",	"C",	".",	".",		".",		"GT",		"0|1",	"0|1",	"0|1",	"0|1",	"0|1",	"0|0",	"0|0"),
+		concat("7",			"100",	"rs07",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("8",			"100",	"rs08",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"1|1",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("9",			"100",	"rs09",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"1|1",	"0|0"),
+		concat("10",		"100",	"rs10",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"1|1"),
+		concat("11",		"100",	"rs11",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0"),
+	};
+	
+	
+	protected static String[] VCF2 = {
+		"##INFO=<ID=IsInDbSnp,Type=Flag,Number=0,Description=\"Is the variant in dbSNP\">",
+		"##INFO=<ID=AlleleCount,Type=Integer,Number=3,Description=\"Number of alleles counted\">",
+		"##INFO=<ID=AlleleFreq,Type=Float,Number=1,Description=\"Allele frequency in fraction of total alleles\">",
+		"##INFO=<ID=RefAllele,Type=Character,Number=1,Description=\"Single character REF alleles only\">",
+		"##INFO=<ID=Alts,Type=String,Number=.,Description=\"List of alt alleles\">",
+		"##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
+		concat("12",		"100",	"rs12",	"A",	"C",	".",	".",		"IsInDbSnp","GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0"),
+		concat("13",		"100",	"rs13",	"A",	"C",	".",	".",		"AlleleCount=100,101,102",
+																							"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0"),
+		concat("14",		"100",	"rs14",	"A",	"C",	".",	".",		"AlleleFreq=0.05",
+																							"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0"),
+		concat("15",		"100",	"rs15",	"A",	"C",	".",	".",		"RefAllele=A",
+																							"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0"),
+		concat("16",		"100",	"rs16",	"A",	"C",	".",	".",		"Alts=A,G,T,C",
+																							"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0"),
+		concat("15",		"100",	"rs15",	"A",	"C",	".",	".",		"IsInDbSnp;AlleleCount=100,200,300,AlleleFreq=0.23,RefAllele=A,Alts=A,ACCCC,GTTTCACG",
+																							"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0")
 	};
 	
 	
@@ -76,16 +92,21 @@ public class AggregateQueryITCase {
 		// Store the vcf text to a temporary file
 		TemporaryFolder tempFolder = new TemporaryFolder();
 		tempFolder.create();
-		File vcfFile = tempFolder.newFile();
-		FileUtils.writeLines(vcfFile, Arrays.asList(ALL_VCF_LINES));
 		
+		File vcfFile1 = tempFolder.newFile();
+		FileUtils.writeLines(vcfFile1, Arrays.asList(VCF1));
+
+		File vcfFile2 = tempFolder.newFile();
+		FileUtils.writeLines(vcfFile2, Arrays.asList(VCF1));
+
 		// Setup securityUserApp mock-up
 		VCFUploadResourceITCase.setupLoaderPool();
 		VCFUploadResourceITCase uploader = new VCFUploadResourceITCase();
 		uploader.setupMocks();
 		
 		// Upload the VCF file to the Mongo database
-		sWorkspaceKey = uploader.uploadFile(vcfFile);
+		sWorkspaceKey1 = uploader.uploadFile(vcfFile1);
+		//sWorkspaceKey2 = uploader.uploadFile(vcfFile2);
 	}
 	
 	@AfterClass
@@ -96,79 +117,115 @@ public class AggregateQueryITCase {
 	@Before
 	public void buildQuerry() {
 		mQuery = new Querry();
-		mQuery.setNumberResults(numResults);
-		mQuery.setWorkspace(sWorkspaceKey);
+		mQuery.setNumberResults(1000);
+		mQuery.setWorkspace(sWorkspaceKey1);
 	}
 	
 	// Example call:
 	// testAggregate(   Zygosity,				SampleNames, 	minToMatch,		Samples - Any vs None,	rsIdsExpected )	
 	@Test	// Match at least 1 of 5 sample groups - Heterozygous  (1 sample matches, 1 row)
 	public void testSamplesInGroup1() throws Exception
-	{	testAggregate(Zygosity.heterozygous, 	"E",			(minMatch=1),	SampleSelect.Any,		"rs06");  }
-	
+	{	testAggregate(Zygosity.heterozygous, 	"E",			(minMatch=1),	VariantSelect.Normal,	"rs06");  }
+
+	@Test	// Match at least 1 of 5 sample groups - Heterozygous  (1 sample matches, 5 rows)
+	public void testSamplesInGroup1b() throws Exception
+	{	testAggregate(Zygosity.heterozygous, 	"A",			(minMatch=1),	VariantSelect.Normal,	"rs02,rs03,rs04,rs05,rs06");  }
+
 	@Test	// Match at least 1 of 5 sample groups - Homozygous	   (2 samples match,  2 rows)
 	public void testSamplesInGroup2() throws Exception
-	{ 	testAggregate(Zygosity.homozygous, 		"D,E",			(minMatch=1),	SampleSelect.Any,		"rs10,rs11"); }
+	{ 	testAggregate(Zygosity.homozygous, 		"D,E",			(minMatch=1),	VariantSelect.Normal,	"rs10,rs11"); }
 		
 	@Test	// Match at least 1 of 5 sample groups - Either Hetero or Homo  (5 samples match, 10 rows)
 	public void testSamplesInGroup3() throws Exception
-	{	testAggregate(Zygosity.either, 			"A,B,C,D,E",	(minMatch=1),	SampleSelect.Any,		"rs02,rs03,rs04,rs05,rs06,rs07,rs08,rs09,rs10,rs11"); }
+	{	testAggregate(Zygosity.either, 			"A,B,C,D,E",	(minMatch=1),	VariantSelect.Normal,	"rs02,rs03,rs04,rs05,rs06,rs07,rs08,rs09,rs10,rs11"); }
 		
 	@Test	// Match at least 1 of 5 sample groups - Either Hetero or Homo  (5 samples match, 10 rows, but only return first 3 in batch)
 	// 		   NOTE: There is no guarantee that the first 3 results will be returned - it could be any.
 	public void testSamplesInGroup4() throws Exception
 	{	mQuery.setNumberResults(3);
-		testAggregate(Zygosity.either, 			"A,B,C,D,E",	(minMatch=1),	SampleSelect.Any,		"rs02,rs03,rs04,rs05,rs06,rs07,rs08,rs09,rs10,rs11"); }
+		testAggregate(Zygosity.either, 			"A,B,C,D,E",	(minMatch=1),	VariantSelect.Normal,	"rs02,rs03,rs04,rs05,rs06,rs07,rs08,rs09,rs10,rs11"); }
 
 	@Test	// Match at least 3 of 5 sample groups - Homozygous    (3 samples match, 1 row)
 			// This tests the inversion approach where it tries to find 2 that don't match
 	public void testSamplesInGroup5() throws Exception
-	{	testAggregate(Zygosity.homozygous, 		"C,D,E,F",		(minMatch=3),	SampleSelect.Any,		"rs11"); }
+	{	testAggregate(Zygosity.homozygous, 		"C,D,E,F",		(minMatch=3),	VariantSelect.Normal,	"rs11"); }
 
 	@Test	// Match at least 3 of 4 sample groups - Homozygous	   (but cannot find any results)
 	public void testSamplesInGroup6() throws Exception
-	{	testAggregate(Zygosity.homozygous, 		"D,E,F",		(minMatch=3),	SampleSelect.Any,		""); }
+	{	testAggregate(Zygosity.homozygous, 		"D,E,F",		(minMatch=3),	VariantSelect.Normal,	""); }
 
 	@Test 	// Match at least 5 of 5 sample groups - Homozygous    (1 row)
 	public void testSamplesInGroup7() throws Exception
-	{	testAggregate(Zygosity.homozygous, 		"A,B,C,D,E",	(minMatch=5),	SampleSelect.Any,		"rs11"); }
+	{	testAggregate(Zygosity.homozygous, 		"A,B,C,D,E",	(minMatch=5),	VariantSelect.Normal,	"rs11"); }
 
 	@Test	// Match at least 5 of 5 sample groups - Homozygous    (but cannot find any results)
 	public void testSamplesInGroup8() throws Exception
-	{	testAggregate(Zygosity.homozygous, 		"C,D,E,F,G",	(minMatch=5),	SampleSelect.Any,		""); }
+	{	testAggregate(Zygosity.homozygous, 		"C,D,E,F,G",	(minMatch=5),	VariantSelect.Normal,	""); }
 
 	@Test	// FAIL: Match at least 6 of 5 - should fail immediately since the requested number of samples is > actual # of samples 
 	public void testSamplesInGroup9() throws Exception
-	{	testAggregate(Zygosity.homozygous, 		"A,B,C,D,E",	(minMatch=6),	SampleSelect.Any,		""); }
+	{	testAggregate(Zygosity.homozygous, 		"A,B,C,D,E",	(minMatch=6),	VariantSelect.Normal,	""); }
 	
 	@Test	// FAIL: sample not in VCF
 	public void testSamplesInGroup10() throws Exception
-	{	testAggregate(Zygosity.homozygous, 		"Z",			(minMatch=1),	SampleSelect.Any,		""); }
+	{	testAggregate(Zygosity.homozygous, 		"Z",			(minMatch=1),	VariantSelect.Normal,	""); }
 	
 	//------------------------------------------------------------------------------------------------------------------------
 	// Test samples not in group
 	//------------------------------------------------------------------------------------------------------------------------
 	
-	@Test	// FAIL: sample not in VCF - should still fail even though we said NOT this one
-			// TODO: Should this still fail if the user doesn't want this sample anyway?
+	@Test	// Sample not in VCF - should return ALL variants
 	public void testSamplesNotInGroup1() throws Exception
-	{	testAggregate(Zygosity.either, 			"Z",			(minMatch=1),	SampleSelect.None,		""); }
+	{	testAggregate(Zygosity.either, 			"Z",			(minMatch=1),	VariantSelect.Inverse,	"rs01,rs02,rs03,rs04,rs05,rs06,rs07,rs08,rs09,rs10,rs11"); }
 
-	@Test	// Match at least one, but not in the group we specify
+	@Test	// Match at least one, but not in the group we specify  (rs09,rs10,rs11 are normal match, so all others are reverse)
 	public void testSamplesNotInGroup2() throws Exception
-	{	testAggregate(Zygosity.homozygous, 		"A,B,C,D,E",	(minMatch=1),	SampleSelect.None,		"rs09,rs10"); }
+	{	testAggregate(Zygosity.homozygous, 		"A,B,C,D,E",	(minMatch=3),	VariantSelect.Inverse,	"rs01,rs02,rs03,rs04,rs05,rs06,rs07,rs08"); }
 		
-	@Test	// Match at least 5, but not in the group we specify (try to use reverse selection logic)
+	@Test	// Match at least 5, but not in the group we specify (try to use reverse selection logic) - NONE match criteria, so inverse should return ALL variants
 	public void testSamplesNotInGroup3() throws Exception
-	{	testAggregate(Zygosity.homozygous, 		"F,G",			(minMatch=1),	SampleSelect.None,		"rs11"); }
+	{	testAggregate(Zygosity.homozygous, 		"C,D,E,F,G",	(minMatch=5),	VariantSelect.Inverse,	"rs01,rs02,rs03,rs04,rs05,rs06,rs07,rs08,rs09,rs10,rs11"); }
+
+	@Test	// Match at least 5, but not in the group we specify (try to use reverse selection logic) - ONE matches (rs11), so inverse should return all variants except that one
+	public void testSamplesNotInGroup4() throws Exception
+	{	testAggregate(Zygosity.homozygous, 		"A,B,C,D,E",	(minMatch=5),	VariantSelect.Inverse,	"rs01,rs02,rs03,rs04,rs05,rs06,rs07,rs08,rs09,rs10"); }
+
+	@Test	// Match at least 1, but not in the group we specify (try to use reverse selection logic) - All but one match, so inverse should return just the one that did not match
+	public void testSamplesNotInGroup5() throws Exception
+	{	testAggregate(Zygosity.either, 			"A",			(minMatch=1),	VariantSelect.Inverse,	"rs01"); }
+
+	@Test	// Match at least 1 hetero, but not in the group we specify (try to use reverse selection logic) - Normal = 3,4,5,6; so reverse should be 1,2,7,8,9,10,11
+	public void testSamplesNotInGroup6() throws Exception
+	{	testAggregate(Zygosity.heterozygous,	"B",			(minMatch=1),	VariantSelect.Inverse,	"rs01,rs02,rs07,rs08,rs09,rs10,rs11"); }
 
 	//------------------------------------------------------------------------------------------------------------------------
 	// Test both INFO and sample-in-group fields
 	//------------------------------------------------------------------------------------------------------------------------
 	
+	// Test: try a field even tho INFO only has "."  (MISS)
+	
+	// Test: try a flag when the flag is not set on the line  (MISS)
+	
+	// Test: try one of 3 values in same field  - Ex: AlleleCount = 100  (MATCH)
+	
+	// Test: try 1 row match via INFO, but none via sample group  (MISS)
+	
+	// Test: try 1 row match via sample group, but none via INFO field  (MISS)
+	
+	// Test: try matching 3 INFO fields (+ one sample group)  (MATCH)  
+	
+	// Test: try matching 3 INFO fields (+ one sample group), but only 1 INFO field matches query  (MISS)
+	
+	// Test: Apply 2 different filters to same INFO field (along with one sample group) - Ex: AlleleFreq > 0.1 and AlleleFreq <= 0.2  (MATCH)
+
+	// Test: Apply 2 different filters to same INFO field (along with one sample group) - Ex: AlleleFreq > 0.1 and AlleleFreq <= 0.2  (MISS)
+	
+	// Test: Apply 2 filters - 1 to each of two different INFO fields (+ one sample group) - Ex: AlleleFreq > 0.3 and RefAllele = C   (MATCH)
+	
 	@Test
-	/** Test "Samples in group" and match on INFO fields */
-	public void samplesInGroupAndInfoFields() {
+	/** Test "Samples in group" and match on INFO field - one flag and one sample */
+	public void testSampleGroupsAndInfoFields1() {
+		//addInfoFields( )
 		// TODO: Add all other tests here..........................
 		
 		/** Match - on 2 INFO fields and at least 2 of 5 sample groups */
@@ -204,9 +261,9 @@ public class AggregateQueryITCase {
 	
 	//===========================================================================================================================================
 	
-	protected void testAggregate(Zygosity zygosity, String sampleNamesStr, int atLeastMatch, SampleSelect selection, String rsIdsExpectedStr) throws Exception
+	protected void testAggregate(Zygosity zygosity, String sampleNamesStr, int atLeastMatch, VariantSelect selection, String rsIdsExpectedStr) throws Exception
 	{
-		addSampleGroups(mQuery, Arrays.asList(sampleNamesStr.split(",")), zygosity, selection.equals(SampleSelect.Any), atLeastMatch, numResults);
+		addSampleGroups(mQuery, Arrays.asList(sampleNamesStr.split(",")), zygosity, selection.equals(VariantSelect.Normal), atLeastMatch);
 		String resultsJson = execQuery(mQuery);
 		
 		List<String> rsIdsResults = getRsIdsFromResults(resultsJson);
@@ -218,8 +275,8 @@ public class AggregateQueryITCase {
 		Collections.sort(rsIdsResults);
 		Collections.sort(rsIdsExpected);
 		
-		boolean isOutputTruncated = (numResults < rsIdsExpected.size());
-		int expectedResultCount = isOutputTruncated  ?  numResults  :  rsIdsExpected.size();
+		boolean isOutputTruncated = (mQuery.getNumberResults() < rsIdsExpected.size());
+		int expectedResultCount = isOutputTruncated  ?  mQuery.getNumberResults()  :  rsIdsExpected.size();
 		String errorMsg = "Expected rsIds do not match actual:\nExpected: " + rsIdsExpected + "\nActual:     " + rsIdsResults + "\n";
 		Assert.assertEquals(errorMsg + "Sizes different: ", expectedResultCount,  rsIdsResults.size());
 		
@@ -261,7 +318,7 @@ public class AggregateQueryITCase {
 	 * @param minSamplesToMatch  The minimum number of samples that must match before the variant is returned
 	 * @return
 	 */
-	protected Querry addSampleGroups(Querry query, List<String> sampleNames, Zygosity zygosity, boolean isMatchSamplesInGroup, int minSamplesToMatch, int numResults) {
+	protected Querry addSampleGroups(Querry query, List<String> sampleNames, Zygosity zygosity, boolean isMatchSamplesInGroup, int minSamplesToMatch) {
 		// Build the sample group
 		SampleGroup sampleGroup = new SampleGroup();
 		sampleGroup.setSamples(sampleNames);
