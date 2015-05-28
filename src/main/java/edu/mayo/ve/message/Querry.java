@@ -199,7 +199,7 @@ public class Querry {
             if(fff.includeNulls){
                 values.add(".");
             }
-            return constructStringFilter(fff.getName(), fff.getOperator(), values, false); //here we never include nulls in the same way as in a INFO field, because missing values are required by the spec to be deonoted '.'
+            return constructStringFilter(fff.getKey(), fff.getComparator(), values, false); //here we never include nulls in the same way as in a INFO field, because missing values are required by the spec to be deonoted '.'
         }else {
             BasicDBObject composite = new BasicDBObject();
             BasicDBList lcomposite = new BasicDBList();
@@ -208,7 +208,7 @@ public class Querry {
                 if(fff.includeNulls){
                     values.add(".");
                 }
-                lcomposite.add(constructStringFilter(fff.getName(), fff.getOperator(), fff.getValues(), false));
+                lcomposite.add(constructStringFilter(fff.getKey(), fff.getComparator(), fff.getValues(), false));
             }
             composite.put("$and", lcomposite);
             return composite;

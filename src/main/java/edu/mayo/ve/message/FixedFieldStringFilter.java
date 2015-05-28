@@ -15,8 +15,8 @@ import java.util.ArrayList;
  */
 public class FixedFieldStringFilter {
     ArrayList<String> values = new ArrayList<String>();      //the value you want to compare to (currently everything in mongodb is stored as a string... is this a problem for these queries?)
-    private String name;                                //the name of the field we wish to query e.g. CHROM, POS, ID, REF, ALT, QUAL, FILTER
-    private String operator;                            //the operator we wish to use on this field use: http://docs.mongodb.org/manual/reference/operator/
+    private String key;                                 //the name of the field we wish to query e.g. CHROM, POS, ID, REF, ALT, QUAL, FILTER
+    private String comparator;                          //the operator we wish to use on this field use: http://docs.mongodb.org/manual/reference/operator/
     boolean includeNulls = false;                       //documents that don't have the field are not returned by default
 
 
@@ -25,8 +25,8 @@ public class FixedFieldStringFilter {
     }
 
     public FixedFieldStringFilter(String name, String operator, ArrayList<String> values, boolean includeNulls){
-        this.name = name;
-        this.operator = operator;
+        this.key = name;
+        this.comparator = operator;
         this.values = values;
         this.includeNulls = includeNulls;
     }
@@ -39,20 +39,20 @@ public class FixedFieldStringFilter {
         this.values = values;
     }
 
-    public String getName() {
-        return name;
+    public String getKey() {
+        return key;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setKey(String key) {
+        this.key = key;
     }
 
-    public String getOperator() {
-        return operator;
+    public String getComparator() {
+        return comparator;
     }
 
-    public void setOperator(String operator) {
-        this.operator = operator;
+    public void setComparator(String comparator) {
+        this.comparator = comparator;
     }
 
     public boolean isIncludeNulls() {
