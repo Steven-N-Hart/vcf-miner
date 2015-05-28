@@ -3,6 +3,7 @@ package edu.mayo.ve.FunctionalTests;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,18 +51,18 @@ public class AggregateQueryITCase {
 	
 	protected static String[] VCF1 = {
 		"##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
-		concat("#CHROM",	"POS",	"ID",	"REF",	"ALT",	"QUAL",	"FILTER",	"INFO",		"FORMAT",	"A",	"B",	"C",	"D",	"E",	"F",	"G"),
-		concat("1",			"100",	"rs01",	"A",	"C",	".",	".",		".",		"GT",		"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
-		concat("2",			"100",	"rs02",	"A",	"C",	".",	".",		".",		"GT",		"1|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
-		concat("3",			"100",	"rs03",	"A",	"C",	".",	".",		".",		"GT",		"1|0",	"1|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
-		concat("4",			"100",	"rs04",	"A",	"C",	".",	".",		".",		"GT",		"0|1",	"0|1",	"0|1",	"0|0",	"0|0",	"0|0",	"0|0"),
-		concat("5",			"100",	"rs05",	"A",	"C",	".",	".",		".",		"GT",		"0|1",	"0|1",	"0|1",	"0|1",	"0|0",	"0|0",	"0|0"),
-		concat("6",			"100",	"rs06",	"A",	"C",	".",	".",		".",		"GT",		"0|1",	"0|1",	"0|1",	"0|1",	"0|1",	"0|0",	"0|0"),
-		concat("7",			"100",	"rs07",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
-		concat("8",			"100",	"rs08",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"1|1",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
-		concat("9",			"100",	"rs09",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"1|1",	"0|0"),
-		concat("10",		"100",	"rs10",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"1|1"),
-		concat("11",		"100",	"rs11",	"A",	"C",	".",	".",		".",		"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0"),
+		concat("#CHROM","POS",	"ID",	"REF",	"ALT",	"QUAL",	"FILTER",	"INFO",	"FORMAT", "A",	"B",	"C",	"D",	"E",	"F",	"G"),
+		concat("1",		"100",	"rs01",	"A",	"C",	".",	".",		".",	"GT",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("2",		"100",	"rs02",	"A",	"C",	".",	".",		".",	"GT",	"1|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("3",		"100",	"rs03",	"A",	"C",	".",	".",		".",	"GT",	"1|0",	"1|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("4",		"100",	"rs04",	"A",	"C",	".",	".",		".",	"GT",	"0|1",	"0|1",	"0|1",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("5",		"100",	"rs05",	"A",	"C",	".",	".",		".",	"GT",	"0|1",	"0|1",	"0|1",	"0|1",	"0|0",	"0|0",	"0|0"),
+		concat("6",		"100",	"rs06",	"A",	"C",	".",	".",		".",	"GT",	"0|1",	"0|1",	"0|1",	"0|1",	"0|1",	"0|0",	"0|0"),
+		concat("7",		"100",	"rs07",	"A",	"C",	".",	".",		".",	"GT",	"1|1",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("8",		"100",	"rs08",	"A",	"C",	".",	".",		".",	"GT",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("9",		"100",	"rs09",	"A",	"C",	".",	".",		".",	"GT",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"1|1",	"0|0"),
+		concat("10",	"100",	"rs10",	"A",	"C",	".",	".",		".",	"GT",	"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"1|1"),
+		concat("11",	"100",	"rs11",	"A",	"C",	".",	".",		".",	"GT",	"1|1",	"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0"),
 	};
 	
 	
@@ -71,33 +72,39 @@ public class AggregateQueryITCase {
 		"##INFO=<ID=AlleleFreq,Type=Float,Number=1,Description=\"Allele frequency in fraction of total alleles\">",
 		"##INFO=<ID=RefAllele,Type=Character,Number=1,Description=\"Single character REF alleles only\">",
 		"##INFO=<ID=Alts,Type=String,Number=.,Description=\"List of alt alleles\">",
+		"##INFO=<ID=SomeInt,Type=Number,Number=1,Description=\"Some integer\">",
 		"##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
-		concat("12",		"100",	"rs12",	"A",	"C",	".",	".",		"IsInDbSnp","GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0"),
-		concat("13",		"100",	"rs13",	"A",	"C",	".",	".",		"AlleleCount=100,101,102",
-																							"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0"),
-		concat("14",		"100",	"rs14",	"A",	"C",	".",	".",		"AlleleFreq=0.05",
-																							"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0"),
-		concat("15",		"100",	"rs15",	"A",	"C",	".",	".",		"RefAllele=A",
-																							"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0"),
-		concat("16",		"100",	"rs16",	"A",	"C",	".",	".",		"Alts=A,G,T,C",
-																							"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0"),
-		concat("15",		"100",	"rs15",	"A",	"C",	".",	".",		"IsInDbSnp;AlleleCount=100,200,300,AlleleFreq=0.23,RefAllele=A,Alts=A,ACCCC,GTTTCACG",
-																							"GT",		"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0")
+		concat("#CHROM","POS",	"ID",	"REF",	"ALT",	"QUAL",	"FILTER",	"INFO",	"FORMAT", "A",	"B",	"C",	"D",	"E",	"F",	"G"),
+		concat("12",	"100",	"rs12",	"A",	"C",	".",	".",		"IsInDbSnp",
+																					"GT",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0",	"1|0"),
+		concat("13",	"100",	"rs13",	"A",	"C",	".",	".",		"AlleleCount=100,101,102",
+																					"GT",	"0|1",	"0|1",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("14",	"100",	"rs14",	"A",	"C",	".",	".",		"AlleleFreq=0.05",
+																					"GT",	"1|0",	"1|0",	"0|0",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("15",	"100",	"rs15",	"A",	"C",	".",	".",		"RefAllele=A",
+																					"GT",	"0|1",	"1|0",	"1|1",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("16",	"100",	"rs16",	"A",	"C",	".",	".",		"Alts=A,G,T,C;SomeInt=3942",
+																					"GT",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0",	"0|0"),
+		concat("17",	"100",	"rs17",	"A",	"C",	".",	".",		"IsInDbSnp;AlleleCount=100,200,300;AlleleFreq=0.23;RefAllele=A;Alts=A,ACCCC,GTTTCACG",
+																					"GT",	"1|1",	"1|1",	"1|1",	"1|1",	"0|0",	"0|0",	"0|0"),
+		concat("18",	"100",	"rs18",	"A",	"C",	".",	".",		".",	"GT",	"1|1",	"1|1",	"1|1",	"1|1",	"1|0",	"0|0",	"0|0")
 	};
 	
 	
 	@BeforeClass
 	// Create a temporary VCF file and import it into Mongo
-	public static void importVcf() throws Exception {
+	public static void uploadVcfs() throws Exception {
+		sWorkspaceKey1 = uploadVcf(VCF1);
+		sWorkspaceKey2 = uploadVcf(VCF2);
+	}
+	
+	public static String uploadVcf(String[] vcfLines) throws Exception {
 		// Store the vcf text to a temporary file
 		TemporaryFolder tempFolder = new TemporaryFolder();
 		tempFolder.create();
 		
-		File vcfFile1 = tempFolder.newFile();
-		FileUtils.writeLines(vcfFile1, Arrays.asList(VCF1));
-
-		File vcfFile2 = tempFolder.newFile();
-		FileUtils.writeLines(vcfFile2, Arrays.asList(VCF1));
+		File vcfFile = tempFolder.newFile();
+		FileUtils.writeLines(vcfFile, Arrays.asList(vcfLines));
 
 		// Setup securityUserApp mock-up
 		VCFUploadResourceITCase.setupLoaderPool();
@@ -105,8 +112,8 @@ public class AggregateQueryITCase {
 		uploader.setupMocks();
 		
 		// Upload the VCF file to the Mongo database
-		sWorkspaceKey1 = uploader.uploadFile(vcfFile1);
-		//sWorkspaceKey2 = uploader.uploadFile(vcfFile2);
+		String workspaceKey = uploader.uploadFile(vcfFile);
+		return workspaceKey;
 	}
 	
 	@AfterClass
@@ -162,13 +169,19 @@ public class AggregateQueryITCase {
 	public void testSamplesInGroup8() throws Exception
 	{	testAggregate(Zygosity.homozygous, 		"C,D,E,F,G",	(minMatch=5),	VariantSelect.Normal,	""); }
 
-	@Test	// FAIL: Match at least 6 of 5 - should fail immediately since the requested number of samples is > actual # of samples 
+	@Test	// MISS: Match at least 6 of 5 - should fail immediately since the requested number of samples is > actual # of samples 
 	public void testSamplesInGroup9() throws Exception
 	{	testAggregate(Zygosity.homozygous, 		"A,B,C,D,E",	(minMatch=6),	VariantSelect.Normal,	""); }
 	
-	@Test	// FAIL: sample not in VCF
+	@Test	// MISS: sample not in VCF
 	public void testSamplesInGroup10() throws Exception
 	{	testAggregate(Zygosity.homozygous, 		"Z",			(minMatch=1),	VariantSelect.Normal,	""); }
+	
+	@Test	// Match at least 1 of 5 sample groups, where the sample name is not same case
+	public void testSamplesInGroup11() throws Exception
+	{	testAggregate(Zygosity.homozygous, 		"e",			(minMatch=1),	VariantSelect.Normal,	"rs11"); }
+	
+	
 	
 	//------------------------------------------------------------------------------------------------------------------------
 	// Test samples not in group
@@ -198,72 +211,186 @@ public class AggregateQueryITCase {
 	public void testSamplesNotInGroup6() throws Exception
 	{	testAggregate(Zygosity.heterozygous,	"B",			(minMatch=1),	VariantSelect.Inverse,	"rs01,rs02,rs07,rs08,rs09,rs10,rs11"); }
 
+	
+	
+	
 	//------------------------------------------------------------------------------------------------------------------------
 	// Test both INFO and sample-in-group fields
 	//------------------------------------------------------------------------------------------------------------------------
 	
-	// Test: try a field even tho INFO only has "."  (MISS)
+	@Test	/** Test "Samples in group" and match on INFO field - one flag (TRUE) and one sample */
+	public void testSampleGroupsAndInfoFields1() throws Exception {
+		addInfoFields( new InfoFlagFilter("IsInDbSnp", true) );
+		testAggregate(Zygosity.heterozygous,	"G",			(minMatch=1),	VariantSelect.Normal,	"rs12");
+	}
 	
-	// Test: try a flag when the flag is not set on the line  (MISS)
+	@Test	/** Test "Samples in group" and match on INFO field - one flag and one sample, where flag is FALSE */
+	public void testSampleGroupsAndInfoFields2() throws Exception {
+		addInfoFields( new InfoFlagFilter("IsInDbSnp", false) );
+		testAggregate(Zygosity.homozygous,		"D",			(minMatch=1),	VariantSelect.Normal,	"rs16");
+	}
 	
-	// Test: try one of 3 values in same field  - Ex: AlleleCount = 100  (MATCH)
-	
-	// Test: try 1 row match via INFO, but none via sample group  (MISS)
-	
-	// Test: try 1 row match via sample group, but none via INFO field  (MISS)
-	
-	// Test: try matching 3 INFO fields (+ one sample group)  (MATCH)  
-	
-	// Test: try matching 3 INFO fields (+ one sample group), but only 1 INFO field matches query  (MISS)
-	
-	// Test: Apply 2 different filters to same INFO field (along with one sample group) - Ex: AlleleFreq > 0.1 and AlleleFreq <= 0.2  (MATCH)
+	@Test	/** 1 INFO field that does NOT match because INFO is ".", 1 sample-group that DOES match - MISS */
+	public void testSampleGroupsAndInfoFields3() throws Exception {
+		addInfoFields( new InfoFlagFilter("IsInDbSnp", true));
+		testAggregate(Zygosity.heterozygous,	"E",			(minMatch=1),	VariantSelect.Normal,	"");
+	}
 
-	// Test: Apply 2 different filters to same INFO field (along with one sample group) - Ex: AlleleFreq > 0.1 and AlleleFreq <= 0.2  (MISS)
-	
-	// Test: Apply 2 filters - 1 to each of two different INFO fields (+ one sample group) - Ex: AlleleFreq > 0.3 and RefAllele = C   (MATCH)
-	
-	@Test
-	/** Test "Samples in group" and match on INFO field - one flag and one sample */
-	public void testSampleGroupsAndInfoFields1() {
-		//addInfoFields( )
-		// TODO: Add all other tests here..........................
-		
-		/** Match - on 2 INFO fields and at least 2 of 5 sample groups */
-		fail("Not implemented yet");
+	@Test 	/** 1 row match via INFO, but none via sample group - (MISS) */
+	public void testSampleGroupsAndInfoFields4() throws Exception {
+		addInfoFields( new InfoStringFilter("RefAllele", toList("A"), "=", false));
+		testAggregate(Zygosity.heterozygous,	"E",			(minMatch=1),	VariantSelect.Normal,	"");
 	}
 	
-	@Test
-	/** Miss - need to match 2 of 5 INFO and 2 of 5 samples, but only 1 of each matched */
-	public void miss_2info_sample_butNoneMatch() {
-		
+	@Test 	/** No match in INFO, but 1 row match via sample group -  (MISS) */
+	public void testSampleGroupsAndInfoFields5() throws Exception {
+		addInfoFields( new InfoStringFilter("RefAllele", toList("C"), "=", false));
+		testAggregate(Zygosity.homozygous,		"C",			(minMatch=1),	VariantSelect.Normal,	"");
+	}
+
+	@Test	/** Match 3 INFO fields (+ one sample group)  - (MATCH) */  
+	public void testSampleGroupsAndInfoFields6() throws Exception {
+		addInfoFields( new InfoStringFilter("RefAllele", toList("A"), "=", false),
+					   new InfoNumberFilter("AlleleFreq", 0.23, ">=", false),
+					   new InfoFlagFilter("IsInDbSnp", true)  );
+		testAggregate(Zygosity.homozygous,		"C",			(minMatch=1),	VariantSelect.Normal,	"rs15");
+	}
+
+	@Test 	/** Try matching 2 INFO fields (+ one sample group), but only 1 INFO field matches query - (MISS) */
+	public void testSampleGroupsAndInfoFields7() throws Exception {
+		addInfoFields( new InfoStringFilter("RefAllele", toList("A"), "=", false),
+				   	   new InfoNumberFilter("AlleleFreq", 0.23, "<", false)  );
+		testAggregate(Zygosity.homozygous,		"C",			(minMatch=1),	VariantSelect.Normal,	"");
+	}
+
+	@Test 	/** Apply 2 different filters to same INFO field (along with one sample group) - Ex: AlleleFreq > 0.1 and AlleleFreq <= 0.2  (MATCH) */
+	public void testSampleGroupsAndInfoFields8() throws Exception {
+		addInfoFields( new InfoNumberFilter("AlleleFreq", 0.2, ">", false),
+					   new InfoNumberFilter("AlleleFreq", 0.25, "<", false) );
+		testAggregate(Zygosity.homozygous,		"C",			(minMatch=1),	VariantSelect.Normal,	"rs15");
+	}
+
+	@Test	/** Apply 2 different filters to same INFO field (along with one sample group) - Ex: AlleleFreq > 0.1 and AlleleFreq <= 0.2  (MISS) */
+	public void testSampleGroupsAndInfoFields9() throws Exception {
+		addInfoFields( new InfoNumberFilter("AlleleFreq", 0.2, "<", false),
+					   new InfoNumberFilter("AlleleFreq", 0.25, ">", false) );
+		testAggregate(Zygosity.homozygous,		"C",			(minMatch=1),	VariantSelect.Normal,	"");
+	}
+
+	@Test 	/** Apply an INFO filter and an inverse sample-group filter - should AND normal INFO with reverse sample-group logic - (MATCH) */
+	public void testSampleGroupsAndInfoFields10() throws Exception {
+		addInfoFields( new InfoNumberFilter("AlleleCount", 102.0, "=", false) );
+		testAggregate(Zygosity.either,			"C",			(minMatch=1),	VariantSelect.Inverse,	"rs13");
 	}
 	
-	@Test
-	/** Miss - need to match 2 of 5 INFO and 2 of 5 samples; 2 INFO match, but only 1 sample */
-	public void miss_2infoMatch_1sampleMatchButNeed2of5() {
-		
+	@Test	/** Test: 2 INFO filters match, but sample-group does not - MISS */
+	public void testSampleGroupsAndInfoFields11() throws Exception {
+		addInfoFields( new InfoNumberFilter("AlleleCount", 200.0, "=", false),
+					   new InfoStringFilter("Alts", toList("A","ACCCC"), "=", false));
+		testAggregate(Zygosity.heterozygous,	"C",			(minMatch=1),	VariantSelect.Normal,	"");
+	}
+
+
+	
+	
+	//------------------------------------------------------------------------------------------------------------------------
+	// INFO-only  (use the old code to test this first, before we update it to a shared method)
+	//------------------------------------------------------------------------------------------------------------------------
+
+	@Test	/** Test flag of different case (IsInDbSnp vs isInDbSNP) - MISS */
+	public void testInfo1() throws Exception {
+		addInfoFields( new InfoFlagFilter("isInDbSNP", true) );
+		verifyQueryResults(mQuery, "");
+		fail("Should we match even if case not correct????");
 	}
 	
-	@Test
-	/** Miss - need to match 2 of 5 INFO and 2 of 5 samples; only 1 of 5 INFO match, but 2 samples match */
-	public void miss_1infoMatchButNeed2_2sampleMatch() {
-		
+	@Test	/** Test String value where the value is a different case - MISS */
+	public void testInfo2() throws Exception {
+		addInfoFields( new InfoStringFilter("RefAllele", toList("a"), "=", false) );
+		verifyQueryResults(mQuery, "");
+		fail("Should we match even if case not correct????");
 	}
+
+	@Test	/** Test Number where 102 should equal 102.0 - MATCH */
+	public void testInfo3() throws Exception {
+		addInfoFields( new InfoNumberFilter("SomeInt", 3942.0, "=", false) );
+		verifyQueryResults(mQuery, "rs16");
+	}
+
+	@Test	/** INFO string field match on 1 of 3 values - MATCH 2 */
+	public void testInfo4() throws Exception {
+		addInfoFields( new InfoStringFilter("Alts", toList("A"), "=", false) );
+		verifyQueryResults(mQuery, "rs16,rs17");
+	}
+
+	@Test	/** INFO string field match on 2 of 3 values in one filter - MATCH 1 */
+	public void testInfo5() throws Exception {
+		addInfoFields( new InfoStringFilter("Alts", toList("A","G"), "=", false) );
+		verifyQueryResults(mQuery, "rs16");
+	}
+
+	@Test	/** INFO Number field match on 2 of 3 values in two filters - MATCH 1 */
+	public void testInfo6() throws Exception {
+		addInfoFields( new InfoNumberFilter("AlleleCount", 100.0, "=", false),
+					   new InfoNumberFilter("AlleleCount", 102.0, "=", false)  );
+		verifyQueryResults(mQuery, "rs13");
+	}
+
+
+	@Test 	/** INFO Number field match on 1 of 3 values in same field  - Ex: AlleleCount = 100 - MATCH 1 */
+	public void testInfo7() throws Exception {
+		addInfoFields( new InfoNumberFilter("AlleleCount", 300.0, "=", false) );
+		verifyQueryResults(mQuery, "rs17");
+	}
+
+	@Test  	/** Test include nulls for string field - MATCH 5 (there will be two that don't match because they are explicitly defined.  The others should match by default. */
+	public void testInfo8() throws Exception {
+		addInfoFields( new InfoStringFilter("RefAllele", toList("C"), "=", true) );
+		verifyQueryResults(mQuery, "rs12,rs13,rs14,rs16,rs18");
+	}
+
+	@Test  	/** Test include nulls for string field that doesn't exist - MATCH ALL */
+	public void testInfo9() throws Exception {
+		addInfoFields( new InfoStringFilter("BadField", toList("C"), "=", true) );
+		verifyQueryResults(mQuery, "rs12,rs13,rs14,rs15,rs16,rs17,rs18");
+	}
+
+	@Test  	/** INFO String field - match all in array - MATCH 1 */
+	public void testInfo10() throws Exception {
+		addInfoFields( new InfoStringFilter("Alts", toList("A","G","T","C"), "=", true) );
+		verifyQueryResults(mQuery, "rs16");
+	}
+
+	@Test  	/** INFO String field - match all in array, but in different order  - MATCH 1*/
+	public void testInfo11() throws Exception {
+		addInfoFields( new InfoStringFilter("Alts", toList("C","A","T","G"), "=", true) );
+		verifyQueryResults(mQuery, "rs16");
+	}
+
+	@Test	/** 2 INFO filters on two different variants, but that match independently but not together - MISS (the filters will be AND'D and therefore not accept either/or)*/
+	public void testInfo12() throws Exception {
+		addInfoFields( new InfoStringFilter("RefAllele", toList("A"), "=", true),
+					   new InfoNumberFilter("AlleleFreq", 0.05, "=", false)  );
+		verifyQueryResults(mQuery, "");
+	}
+	
+
 
 	//------------------------------------------------------------------------------------------------------------------------
 
-	@Test
-	/** INFO search only - no sample groups (should use old logic) */
-	public void infoOnly1() {
-		
-	}
 	
 	
+	//===========================================================================================================================================
+	// Helper methods
 	//===========================================================================================================================================
 	
 	protected void testAggregate(Zygosity zygosity, String sampleNamesStr, int atLeastMatch, VariantSelect selection, String rsIdsExpectedStr) throws Exception
 	{
 		addSampleGroups(mQuery, Arrays.asList(sampleNamesStr.split(",")), zygosity, selection.equals(VariantSelect.Normal), atLeastMatch);
+		verifyQueryResults(mQuery, rsIdsExpectedStr);
+	}
+	
+	protected void verifyQueryResults(Querry query, String rsIdsExpectedStr) throws Exception {
 		String resultsJson = execQuery(mQuery);
 		
 		List<String> rsIdsResults = getRsIdsFromResults(resultsJson);
@@ -331,10 +458,27 @@ public class AggregateQueryITCase {
 	}
 	
 	/** Add INFO-fields to an already built Querry object	 */
-	protected void addInfoFields(ArrayList<InfoFlagFilter> flagFilters,  ArrayList<InfoNumberFilter> numFilters, ArrayList<InfoStringFilter> strFilters) {
+	protected void addInfoFields(Object... infoFilters) {
+		ArrayList<InfoFlagFilter> flagFilters  = new ArrayList<InfoFlagFilter>();
+		ArrayList<InfoNumberFilter> numFilters = new ArrayList<InfoNumberFilter>();
+		ArrayList<InfoStringFilter> strFilters = new ArrayList<InfoStringFilter>();
+		
+		for(int i = 0; i < infoFilters.length; i++) {
+			Object filter = infoFilters[i];
+			if( filter instanceof InfoFlagFilter )
+				flagFilters.add((InfoFlagFilter)(filter));
+			else if( filter instanceof InfoNumberFilter )
+				numFilters.add((InfoNumberFilter)(filter));
+			else if( filter instanceof InfoStringFilter )
+				strFilters.add((InfoStringFilter)(filter));
+		}
+		
 		mQuery.setInfoFlagFilters(flagFilters);
 		mQuery.setInfoNumberFilters(numFilters);
 		mQuery.setInfoStringFilters(strFilters);
+		
+		// Use the 2nd VCF file since that contains the INFO fields
+		mQuery.setWorkspace(sWorkspaceKey2);
 	}
 	
 	protected String execQuery(Querry query) throws Exception {
@@ -365,6 +509,14 @@ public class AggregateQueryITCase {
 		
 		
 		return results;
+	}
+	
+	/** Converts a list of objects to an ArrayList (NOTE: ArrayList is necessary to pass to INFO field filters, instead of List) */
+	private ArrayList toList(Object... objs) {
+		ArrayList list = new ArrayList();
+		for(int i=0; i < objs.length; i++)
+			list.add(objs[i]);
+		return list;
 	}
 	
 	
