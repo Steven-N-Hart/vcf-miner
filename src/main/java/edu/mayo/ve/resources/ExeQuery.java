@@ -24,14 +24,13 @@ import java.util.List;
  * Time: 2:00 PM
  * To change this template use File | Settings | File Templates.
  */
-@Path("/ExeQuery")
+@Path("/ve/eq")
 public class ExeQuery {
     Mongo m = MongoConnection.getMongo();
     Gson gson = new Gson();
 
     //canidate function to replace handleBasicQuerry and handleBasicQuerry2 below (makes them a lot more simple!)
     @POST
-    @Path("/ve/eq")
     @Produces("application/json")
     @Consumes(MediaType.APPLICATION_JSON)
     public String handleBasicQuery(Querry q) throws Exception {
@@ -107,7 +106,7 @@ public class ExeQuery {
     //@Path("/ve/eq")
     //@Produces("application/json")
     //@Consumes(MediaType.APPLICATION_JSON)
-    private String handleBasicQuerry(Querry q){
+    public String handleBasicQuerry(Querry q){
         DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(q.getWorkspace());
         DBObject query = q.createQuery();
