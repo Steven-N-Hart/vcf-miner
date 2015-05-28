@@ -34,6 +34,34 @@ public class AggregateQueryITCase {
 
 	protected enum Zygosity { homozygous, heterozygous, either };
 	protected enum VariantSelect { Normal, Inverse };
+	protected enum OpNum { 
+		EQ		(""),		// ==   (equals is an empty string in this case)
+		GT		("$gt"),	// >
+		GTE		("$gte"),	// >=
+		LT		("$lt"),	// <
+		LTE		("$lte"),	// <=
+		NEQ		("$ne");	// !=
+		
+		private final String operator;
+		private OpNum(String op) { operator = op; }
+		public  String toString() { return operator; }
+	};
+	
+	protected enum OpStr {
+		/* Matches arrays that contain all elements specified in the query. */
+		All		("$all"),
+		/* Matches any of the values that exist in an array specified in the query. */
+		Any		("$in"),
+		/* Matches all values that are not equal to the value specified in the query. */
+		AllNotEq("$ne"),
+		/* Matches values that do not exist in an array specified to the query. */
+		AllNotIn("$nin");
+		
+		private final String operator;
+		private OpStr(String op) { operator = op; }
+		public  String toString() { return operator; }	
+	};
+
 	
 	protected Querry mQuery = null;
 	private int minMatch = 0;
@@ -311,74 +339,129 @@ public class AggregateQueryITCase {
 	
 	@Test	/** Test String value where the value is a different case - MISS (INFO field values are case sensitive) */
 	public void testInfo2() throws Exception {
-		addInfoFields( new InfoStringFilter("RefAllele", toList("a"), "=", false) );
+		addInfoFields( new InfoStringFilter("RefAllele", toList("a"), OpStr.All.toString(), false) );
 		verifyQueryResults(mQuery, "");
 	}
 
-	@Test	/** Test Number where 3942 should equal 3942.0 - MATCH */
-	public void testInfo3() throws Exception {
-		addInfoFields( new InfoNumberFilter("SomeInt", 3942.0, "", false) );
+	@Test	/** Test Number where 3942 should equal 3942.0 - MATCH 1 */
+	public void testInfo3a() throws Exception {
+		addInfoFields( new InfoNumberFilter("SomeInt", 3942.0, OpNum.EQ.toString(), false) );
 		verifyQueryResults(mQuery, "rs16");
 	}
 
-	@Test	/** INFO string field match on 1 of 3 values - MATCH 2 */
+	@Test	/** Test Number >= 3942 and <= 3942 - MATCH 1 */
+	public void testInfo3b() throws Exception {
+		addInfoFields( new InfoNumberFilter("SomeInt", 3942.0, OpNum.GTE.toString(), false),
+					   new InfoNumberFilter("SomeInt", 3942.0, OpNum.LTE.toString(), false));
+		verifyQueryResults(mQuery, "rs16");
+	}
+
+	@Test	/** Test Number > 3941 and < 3943 - MATCH 1 */
+	public void testInfo3c() throws Exception {
+		addInfoFields( new InfoNumberFilter("SomeInt", 3941.0, OpNum.GT.toString(), false),
+				   	   new InfoNumberFilter("SomeInt", 3943.0, OpNum.LT.toString(), false));
+	verifyQueryResults(mQuery, "rs16");
+	}
+
+	@Test	/** Test Number != 10 - MATCH */
+	public void testInfo3d() throws Exception {
+		addInfoFields( new InfoNumberFilter("SomeInt", 10.0, OpNum.NEQ.toString(), false) );
+		verifyQueryResults(mQuery, "rs16");
+	}
+
+	@Test	/** Test Number != 3942 - MISS */
+	public void testInfo3e() throws Exception {
+		addInfoFields( new InfoNumberFilter("SomeInt", 3942.0, OpNum.NEQ.toString(), false) );
+		verifyQueryResults(mQuery, "");
+	}
+
+	@Test	/** INFO string field match on 1 of the values - MATCH 2 */
 	public void testInfo4() throws Exception {
-		addInfoFields( new InfoStringFilter("INFO.Alts", toList("A"), "$in", false) );
+		addInfoFields( new InfoStringFilter("Alts", toList("A"), OpStr.Any.toString(), false) );
 		verifyQueryResults(mQuery, "rs16,rs17");
 	}
 
-	@Test	/** INFO string field match on 2 of 3 values in one filter - MATCH 1 */
-	public void testInfo5() throws Exception {
-		addInfoFields( new InfoStringFilter("INFO.Alts", toList("A","G"), "$in", false) );
+	@Test	/** INFO string field match on 2 of the values in one filter - MATCH 1 */
+	public void testInfo5a() throws Exception {
+		addInfoFields( new InfoStringFilter("Alts", toList("A","G"), OpStr.Any.toString(), false) );
 		verifyQueryResults(mQuery, "rs16");
+	}
+
+	@Test	/** INFO string field match when the 2 values do NOT occur in the Alts list - MATCH 1 */
+	public void testInfo5b() throws Exception {
+		addInfoFields( new InfoStringFilter("Alts", toList("G", "T"), OpStr.AllNotIn.toString(), false) );
+		verifyQueryResults(mQuery, "rs17");
+		// TODO: ????? Is this the correct use of this operator?????
 	}
 
 	@Test	/** INFO Number field match on 2 of 3 values in two filters - MATCH 1 */
 	public void testInfo6() throws Exception {
-		addInfoFields( new InfoNumberFilter("AlleleCount", 100.0, "", false),
-					   new InfoNumberFilter("AlleleCount", 102.0, "", false)  );
+		addInfoFields( new InfoNumberFilter("AlleleCount", 100.0, OpNum.EQ.toString(), false),
+					   new InfoNumberFilter("AlleleCount", 102.0, OpNum.EQ.toString(), false)  );
 		verifyQueryResults(mQuery, "rs13");
 	}
 
 
 	@Test 	/** INFO Number field match on 1 of 3 values in same field  - Ex: AlleleCount = 100 - MATCH 1 */
 	public void testInfo7() throws Exception {
-		addInfoFields( new InfoNumberFilter("AlleleCount", 300.0, "", false) );
+		addInfoFields( new InfoNumberFilter("AlleleCount", 300.0, OpNum.EQ.toString(), false) );
 		verifyQueryResults(mQuery, "rs17");
 	}
 
 	@Test  	/** Test include nulls for string field - MATCH 5 (there will be two that don't match because they are explicitly defined.  The others should match by default. */
 	public void testInfo8() throws Exception {
-		addInfoFields( new InfoStringFilter("RefAllele", toList("C"), "=", true) );
+		addInfoFields( new InfoStringFilter("RefAllele", toList("C"), OpStr.All.toString(), true) );
 		verifyQueryResults(mQuery, "rs12,rs13,rs14,rs16,rs18");
 	}
 
 	@Test  	/** Test include nulls for string field that doesn't exist - MATCH ALL */
 	public void testInfo9() throws Exception {
-		addInfoFields( new InfoStringFilter("BadField", toList("C"), "=", true) );
+		addInfoFields( new InfoStringFilter("BadField", toList("C"), OpStr.All.toString(), true) );
 		verifyQueryResults(mQuery, "rs12,rs13,rs14,rs15,rs16,rs17,rs18");
 	}
 
 	@Test  	/** INFO String field - match all in array - MATCH 1 */
 	public void testInfo10() throws Exception {
-		addInfoFields( new InfoStringFilter("Alts", toList("A","G","T","C"), "$in", true) );
+		addInfoFields( new InfoStringFilter("Alts", toList("A","G","T","C"), OpStr.All.toString(), true) );
 		verifyQueryResults(mQuery, "rs16");
 	}
 
 	@Test  	/** INFO String field - match all in array, but in different order  - MATCH 1*/
 	public void testInfo11() throws Exception {
-		addInfoFields( new InfoStringFilter("Alts", toList("C","A","T","G"), "$in", true) );
+		addInfoFields( new InfoStringFilter("Alts", toList("C","A","T","G"), OpStr.All.toString(), true) );
+		verifyQueryResults(mQuery, "rs16");
+	}
+
+	@Test  	/** INFO String field - match all in array, but using 4 different filters And'd together to accomplish the same thing  - MATCH 1*/
+	public void testInfo11b() throws Exception {
+		addInfoFields( new InfoStringFilter("Alts", toList("C"), OpStr.Any.toString(), false),
+					   new InfoStringFilter("Alts", toList("A"), OpStr.Any.toString(), false),
+					   new InfoStringFilter("Alts", toList("T"), OpStr.Any.toString(), false),
+					   new InfoStringFilter("Alts", toList("G"), OpStr.Any.toString(), false)	   
+				);
 		verifyQueryResults(mQuery, "rs16");
 	}
 
 	@Test	/** 2 INFO filters on two different variants, but that match independently but not together - MISS (the filters will be AND'D and therefore not accept either/or)*/
 	public void testInfo12() throws Exception {
-		addInfoFields( new InfoStringFilter("RefAllele", toList("A"), "=", true),
-					   new InfoNumberFilter("AlleleFreq", 0.05, "=", false)  );
+		addInfoFields( new InfoStringFilter("RefAllele", toList("A"), OpStr.Any.toString(), true),
+					   new InfoNumberFilter("AlleleFreq", 0.05, OpNum.EQ.toString(), false)  );
 		verifyQueryResults(mQuery, "");
 	}
 	
+	@Test  	/** INFO String field - reject if "T" occurs in the alts array - MATCH 1*/
+	public void testInfo13() throws Exception {
+		addInfoFields( new InfoStringFilter("Alts", toList("T"), OpStr.AllNotIn.toString(), true) );
+		verifyQueryResults(mQuery, "rs17");
+		// TODO: ????? Is this the correct use of this operator?????
+	}
 
+	@Test  	/** INFO String field - reject if all alts occur in the alts array - MATCH 1*/
+	public void testInfo14() throws Exception {
+		addInfoFields( new InfoStringFilter("Alts", toList("A","G","T","C"), OpStr.AllNotEq.toString(), true) );
+		verifyQueryResults(mQuery, "rs17");
+		// TODO: ????? Is this the correct use of this operator?????
+	}
 
 	//------------------------------------------------------------------------------------------------------------------------
 
