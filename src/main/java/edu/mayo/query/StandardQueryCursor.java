@@ -27,12 +27,12 @@ public class StandardQueryCursor implements QueryCursorInterface{
 
     @Override
     public boolean hasNext() {
-        return false;
+        return cursor.hasNext();
     }
 
     @Override
     public DBObject next() {
-        return null;
+        return cursor.next();
     }
 
     public Long countResults(){
