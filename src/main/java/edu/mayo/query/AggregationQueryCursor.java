@@ -14,21 +14,28 @@ public class AggregationQueryCursor implements QueryCursorInterface {
     List<DBObject> stages;
     Cursor cursor;
 
-    public AggregationQueryCursor(DBCollection col, Querry q){
+    private long count;
+
+    public AggregationQueryCursor(DBCollection col, Querry q) throws InterruptedException {
         this.col = col;
         this.query = q;
         setup();
     }
 
-    public void setup(){
+    public void setup() throws InterruptedException {
         // construct a pipeline of stages
         stages = QueryBuilder.buildAggregationPipeline(query);
 
+        // prior to adding a $limit stage, lets get the total count of ALL variants that pass
+        // get count in separate thread
+        CountThread countThread = new CountThread(col, stages);
+        countThread.start();
+        // wait for separate thread to finish
+        countThread.join();
+        count = ((long) countThread.getCount());
 
-        // limit number of results
+        // now add the $limit stage to limit number of results to what the user/client specified
         stages.add(new BasicDBObject("$limit", query.getNumberResults()));
-
-
 
         // run aggregation pipeline that returns a cursor to the result collection
         AggregationOptions aggregationOptions = AggregationOptions.builder()
@@ -49,17 +56,12 @@ public class AggregationQueryCursor implements QueryCursorInterface {
     }
 
     @Override
-    public Long countResults() throws Exception {
-        // get count in separate thread
-        CountThread countThread = new CountThread(col, stages);
-        countThread.start();
-        // wait for separate thread to finish
-        countThread.join();
-        return ((long) countThread.getCount());
+    public Long countResults() {
+        return count;
     }
 
     @Override
-    public void reset() {
+    public void reset() throws InterruptedException {
         setup();
     }
 

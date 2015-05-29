@@ -19,7 +19,7 @@ public class QueryFactory {
 
     }
 
-    public QueryCursorInterface makeCursor(DBCollection col, Querry q){
+    public QueryCursorInterface makeCursor(DBCollection col, Querry q) throws InterruptedException {
         if (q.getSampleGroups().size() >= 1) {
             return new AggregationQueryCursor(col, q);
         }else {

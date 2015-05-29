@@ -24,13 +24,13 @@ public interface QueryCursorInterface {
      * Need to throw an exception here, because some implementations need to throw exceptions.
      * @return the number of results in the database that match the querry object
      */
-    public Long countResults() throws Exception;
+    public Long countResults();
 
     /**
      * reset the internal state of the cursor so that it starts at the top of the result set again
      * @return
      */
-    public void reset();
+    public void reset() throws InterruptedException;
 
     public DBCollection getCol();
     public void setCol(DBCollection col);

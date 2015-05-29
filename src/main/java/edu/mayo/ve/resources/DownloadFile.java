@@ -127,7 +127,7 @@ public class DownloadFile {
         }
     }
 
-    private void writeData(OutputStream output, final QuerryDownload q) throws IOException, WebApplicationException {
+    private void writeData(OutputStream output, final QuerryDownload q) throws IOException, WebApplicationException, InterruptedException {
         int i = 0;
         DB db = MongoConnection.getDB();
         DBCollection col = db.getCollection(q.getWorkspace());
