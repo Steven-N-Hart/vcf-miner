@@ -7,7 +7,7 @@
 
 ### VCF-Miner installation for Mac and PC users
 
-1.	Install [boot2docker](http://boot2docker.io/).  
+1.	Install [boot2docker](http://boot2docker.io/)
  *	Note: for Windows installers on 64-bit machines see [this](http://stackoverflow.com/questions/20647610/verr-vmx-msr-vmxon-disabled-when-starting-an-image-from-oracle-virtual-box) thread
 
 2.	Download and double click the installer 
