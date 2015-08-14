@@ -20,7 +20,7 @@
  *	If Chrome launches and the page isn’t displayed, wait another minute and refresh
  *	If you don’t have chrome point your browser to http://192.168.59.103:8888/vcf-miner/
 
-For Linux users
+## VCF-Miner installation or Linux users
 1.	In a terminal, type the following:
 > docker run -e NO_LDAP=1 -d -p 8888:8080 stevenhart/vcf-miner:latest /home/start.sh
 
