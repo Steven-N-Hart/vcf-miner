@@ -5,7 +5,7 @@
  * [VCF-Miner Homepage](http://bioinformaticstools.mayo.edu/research/vcf-miner/) 
  
 
-## VCF-Miner installation for Mac and PC users
+### VCF-Miner installation for Mac and PC users
 
 1.	Install [boot2docker](http://boot2docker.io/).  
  *	Note: for Windows installers on 64-bit machines see [this](http://stackoverflow.com/questions/20647610/verr-vmx-msr-vmxon-disabled-when-starting-an-image-from-oracle-virtual-box) thread
@@ -19,13 +19,13 @@
  *	If Chrome launches and the page isn’t displayed, wait another minute and refresh
  *	If you don’t have chrome point your browser to http://192.168.59.103:8888/vcf-miner/
 
-## VCF-Miner installation or Linux users
+### VCF-Miner installation or Linux users
 1.	In a terminal, type the following:
 > docker run -e NO_LDAP=1 -d -p 8888:8080 stevenhart/vcf-miner:latest /home/start.sh
 
 2.	Open a browser to http://192.168.59.103:8888/vcf-miner/
 
-Reminders: 
+**Reminders:** 
  * Doesn’t work on Internet Explorer
 
 ```
