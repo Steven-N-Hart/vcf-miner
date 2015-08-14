@@ -14,7 +14,7 @@
  * <a href="https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.bat" download> PC </a>or
  * <a href="https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.command" download> Mac </a>
 
-3.	Chrome will automatically be launched after 60 seconds
+3.	Chrome will automatically be launched after 60 seconds  
  *	The first time you use it, it will take longer because it needs to download the image
  *	If Chrome launches and the page isn’t displayed, wait another minute and refresh
  *	If you don’t have chrome point your browser to http://192.168.59.103:8888/vcf-miner/
