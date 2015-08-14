@@ -6,9 +6,8 @@
  * [VCF-Miner Homepage](http://bioinformaticstools.mayo.edu/research/vcf-miner/) 
  
 
-VCF-Miner installation using
+VCF-Miner installation for Mac and PC users
 
-For Mac and PC users
 1.	Install [boot2docker](http://boot2docker.io/).  
  *	Note: for Windows installers on 64-bit machines see [this](http://stackoverflow.com/questions/20647610/verr-vmx-msr-vmxon-disabled-when-starting-an-image-from-oracle-virtual-box) thread
 
