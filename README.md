@@ -12,7 +12,7 @@ For Mac and PC users
 a.	Note: for Windows installers on 64-bit machines see [this](http://stackoverflow.com/questions/20647610/verr-vmx-msr-vmxon-disabled-when-starting-an-image-from-oracle-virtual-box) thread
 
 2.	Download and double click the installer 
-* <a href="https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.bat" download> PC </a>
+ * <a href="https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.bat" download> PC </a>
 
 b.	[Mac] (https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.command)
 
