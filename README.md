@@ -28,5 +28,6 @@ For Linux users
 
 Reminders: 
  * Doesn’t work on Internet Explorer
+ 
 > Username: Admin
 > Password: temppass
