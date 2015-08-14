@@ -1,5 +1,5 @@
 
-# Getting VCF-Miner started with <img src="http://blog.phusion.nl/wp-content/uploads/2013/11/docker.png" width="70" height="50" alt="Docker">
+# Getting VCF-Miner started with [Docker](https://www.docker.com/)
 
 **Relevant links:**
  * [VCF-Miner Homepage](http://bioinformaticstools.mayo.edu/research/vcf-miner/) 
@@ -11,8 +11,8 @@
  *	Note: for Windows installers on 64-bit machines see [this](http://stackoverflow.com/questions/20647610/verr-vmx-msr-vmxon-disabled-when-starting-an-image-from-oracle-virtual-box) thread
 
 2.	Download and double click the installer 
- * <a href="https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.bat" download> PC </a>or
- * <a href="https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.command" download> Mac </a>
+ * [PC](https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.bat) or
+ * [Mac](https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.command)
 
 3.	Chrome will automatically be launched after 60 seconds  
  *	The first time you use it, it will take longer because it needs to download the image
