@@ -2,14 +2,15 @@
  # Getting VCF-Miner started with <img src="http://blog.phusion.nl/wp-content/uploads/2013/11/docker.png" width="70" height="50" alt="Docker">
 
 **Relevant links:**
- [VCF-Miner Homepage](http://bioinformaticstools.mayo.edu/research/vcf-miner/) 
+
+ * [VCF-Miner Homepage](http://bioinformaticstools.mayo.edu/research/vcf-miner/) 
  
 
 VCF-Miner installation using
 
 For Mac and PC users
 1.	Install [boot2docker](http://boot2docker.io/).  
-a.	Note: for Windows installers on 64-bit machines see [this](http://stackoverflow.com/questions/20647610/verr-vmx-msr-vmxon-disabled-when-starting-an-image-from-oracle-virtual-box) thread
+ *	Note: for Windows installers on 64-bit machines see [this](http://stackoverflow.com/questions/20647610/verr-vmx-msr-vmxon-disabled-when-starting-an-image-from-oracle-virtual-box) thread
 
 2.	Download and double click the installer 
  * <a href="https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.bat" download> PC </a>or
