@@ -12,8 +12,9 @@ For Mac and PC users
 a.	Note: for Windows installers on 64-bit machines see [this](http://stackoverflow.com/questions/20647610/verr-vmx-msr-vmxon-disabled-when-starting-an-image-from-oracle-virtual-box) thread
 
 2.	Download and double click the installer 
-a.	<a href="https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.bat" download> PC </a>
-b.	[Mac] (hhttps://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.command)
+* <a download="https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.bat"> PC </a>
+
+b.	[Mac] (https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.command)
 
 3.	Chrome will automatically be launched after 60seconds
 a.	The first time you use it, it will take longer because it needs to download the image
