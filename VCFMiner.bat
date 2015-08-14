@@ -8,7 +8,7 @@ set DOCKER_HOST=tcp://%VAR%:2376
 set DOCKER_CERT_PATH=C:\Users\%username%\.boot2docker\certs\boot2docker-vm
 set DOCKER_TLS_VERIFY=1
 set tmpname=VCFMINER_%random%
-docker run --name=%tmpname% -d -p 8888:8080 stevenhart/vcf-miner:v4.0.1 
+docker run --name=%tmpname% -d -p 8888:8080 stevenhart/vcf-miner:latest 
 SLEEP 60
 start chrome %VAR%:8888/vcf-miner/
 PAUSE
