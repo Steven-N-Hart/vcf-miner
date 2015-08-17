@@ -11,6 +11,7 @@
  *	Note: for Windows installers on 64-bit machines see [this](http://stackoverflow.com/questions/20647610/verr-vmx-msr-vmxon-disabled-when-starting-an-image-from-oracle-virtual-box) thread
 
 2.	Download and double click the installer 
+ * Right-click and `Save File As`
  * [PC](https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.bat) or
  * [Mac](https://raw.githubusercontent.com/Steven-N-Hart/vcf-miner/master/VCFMiner.command)
 
