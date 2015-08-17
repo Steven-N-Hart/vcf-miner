@@ -15,7 +15,7 @@ $(/usr/local/bin/boot2docker shellinit)
 
 boot2docker start
 VCF_MINER=VCFMINER_$RANDOM
-docker run -d -p 8888:8080 --name=$VCF_MINER stevenhart/vcf-miner:latest
+docker run -e NO_LDAP=1 -d -p 8888:8080 --name=$VCF_MINER stevenhart/vcf-miner:latest
 open -a "Google Chrome" http://`boot2docker ip`:8888/vcf-miner/
 read -p "Press [Enter] key to stop VCF Miner..."
 docker kill $VCF_MINER
