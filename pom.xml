@@ -5,7 +5,7 @@
     <groupId>edu.mayo.mongo_svr</groupId>
     <artifactId>mongo_view</artifactId>
     <packaging>war</packaging>
-    <version>4.0.2-SNAPSHOT</version>
+    <version>4.0.2</version>
 
 
     <build>
@@ -13,9 +13,9 @@
     </build>
 
     <scm>
-        <connection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mongo_view/trunk</connection>
-        <developerConnection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mongo_view/trunk</developerConnection>
-        <url>https://bsisvn.mayo.edu/main/projects/m/mongo_view/trunk</url>
+        <connection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mongo_view/tags/mongo_view-4.0.2</connection>
+        <developerConnection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mongo_view/tags/mongo_view-4.0.2</developerConnection>
+        <url>https://bsisvn.mayo.edu/main/projects/m/mongo_view/tags/mongo_view-4.0.2</url>
     </scm>
 
     <!-- Distribution through Nexus -->
