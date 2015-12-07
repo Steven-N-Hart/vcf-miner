@@ -12,7 +12,7 @@
         <dependency>
             <groupId>edu.mayo</groupId>
             <artifactId>mayo-commons-mongodb</artifactId>
-            <version>3.0.8</version>
+            <version>3.0.9</version>
         </dependency>
         <!-- Web Application Support -->
         <dependency>
