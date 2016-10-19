@@ -5,7 +5,7 @@
  * [VCF-Miner Homepage](http://bioinformaticstools.mayo.edu/research/vcf-miner/) 
  
 
-### VCF-Miner installation for Mac and PC users
+### VCF-Miner installation using Docker for Mac and PC users
 
 1.	Install [boot2docker](http://boot2docker.io/)
  *	Note: for Windows installers on 64-bit machines see [this](http://stackoverflow.com/questions/20647610/verr-vmx-msr-vmxon-disabled-when-starting-an-image-from-oracle-virtual-box) thread
@@ -33,3 +33,34 @@
 Username: Admin
 Password: temppass
 ```
+
+## Installing on bare metal
+
+Before you begin, make sure you have the following dependencies:
+* [Apache Maven](https://maven.apache.org/)
+* Java JDK
+* Java JRE 
+* [Apache Tomcat](http://tomcat.apache.org/)
+
+```
+apt-get update
+apt-get install -y maven default-jre default-jdk tomcat7 maven
+```
+Next, run the install script
+```
+sh install.sh
+```
+
+You should have 3 WAR files now.
+```
+./mongo_svr-4.0.3/target/mongo_svr-4.0.3.war
+./mongo_view-4.0.3/target/vcf-miner.war
+./securityuserapp.war
+```
+Next start tomcat
+
+
+
+follow the UI
+#security, svr, then vcf-miner .war
+
