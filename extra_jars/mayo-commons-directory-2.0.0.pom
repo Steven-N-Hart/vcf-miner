@@ -1,0 +1,104 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>edu.mayo</groupId>
+        <artifactId>mayo-commons-parent</artifactId>
+        <version>0.0.1</version>
+    </parent>
+
+    <groupId>edu.mayo.commons</groupId>
+    <artifactId>mayo-commons-directory</artifactId>
+    <version>2.0.0</version>
+    <name>Commons Directory</name>
+    <description>Library of utilities to assist with access directory resources at Mayo (e.g. ActiveDirectory)
+    </description>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-5</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <configuration>
+                    <formats>
+                        <format>html</format>
+                        <format>xml</format>
+                    </formats>
+                </configuration>
+                <version>2.4</version>
+            </plugin>
+        </plugins>
+    </reporting>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>mayo-nexus</id>
+            <url>http://nexus.mayo.edu/content/groups/public/</url>
+            <name>Mayo Nexus with Mayo-specific releases</name>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>mayo-nexus-snapshots</id>
+            <url>http://nexus.mayo.edu/content/groups/public-snapshots/</url>
+            <name>Mayo Nexus with Mayo-specific snapshots</name>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <!-- Source Control Management -->
+    <scm>
+        <!-- SCM setup -->
+        <connection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mayo-commons/tags/mayo-commons-directory/2.0.0
+        </connection>
+        <developerConnection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mayo-commons/tags/mayo-commons-directory/2.0.0
+        </developerConnection>
+        <url>https://bsisvn.mayo.edu/main/projects/m/mayo-commons/tags/mayo-commons-directory/2.0.0</url>
+    </scm>
+</project>

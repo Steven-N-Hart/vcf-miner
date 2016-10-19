@@ -1,0 +1,131 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>edu.mayo</groupId>
+  <artifactId>securityuserapp</artifactId>
+  <version>0.0.11</version>
+  <name>SecurityUserMgmtApp</name>
+  <description>Handle authentication, authorization, and user management for multiple apps</description>
+
+    <parent>
+        <groupId>edu.mayo</groupId>
+        <artifactId>mayo-commons-parent</artifactId>
+        <version>0.0.4</version>
+    </parent>
+
+  <!-- Force build to Java 1.6 compatibility -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+	 <groupId>org.apache.maven.plugins</groupId>
+	 <artifactId>maven-javadoc-plugin</artifactId>
+	 <version>2.9.1</version>
+      </plugin>
+    </plugins>
+  </build>
+  
+  
+  <dependencies>
+  
+    <!-- Jersey - thru Mayo Commons Webapp -->
+    <dependency>
+      <groupId>edu.mayo</groupId>
+      <artifactId>webapp_commons</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+
+      <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-test-framework</artifactId>
+          <version>1.11</version>
+          <type>pom</type>
+      </dependency>
+
+      <dependency>
+          <groupId>com.sun.jersey.jersey-test-framework</groupId>
+          <artifactId>jersey-test-framework-grizzly2</artifactId>
+          <version>1.11</version>
+          <scope>test</scope>
+      </dependency>
+
+    <!-- CSV Reader and Writer -->
+    <dependency>
+	  <groupId>net.sf.opencsv</groupId>
+	  <artifactId>opencsv</artifactId>
+	  <version>2.0</version>
+    </dependency>
+    
+    <!-- LDAP wrapper for Mayo LDAP -->
+    <dependency>
+      <groupId>edu.mayo.commons</groupId>
+      <artifactId>mayo-commons-directory</artifactId>
+      <version>2.0.0</version>
+    </dependency>
+    
+    <!-- Gson JSON parser -->
+    <dependency>
+	  <groupId>com.google.code.gson</groupId>
+	  <artifactId>gson</artifactId>
+	  <version>2.2.4</version>
+    </dependency>
+    
+    <!-- jbcrypt - Java implementation of OpenBSD's Blowfish password hashing
+     	 http://code.google.com/p/jbcrypt/ -->
+    <dependency>
+      <groupId>org.mindrot</groupId>
+      <artifactId>jbcrypt</artifactId>
+      <version>0.3m</version>
+    </dependency>
+
+      <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.11</version>
+          <scope>test</scope>
+      </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>mayo-nexus</id>
+            <url>http://nexus.mayo.edu/content/groups/public/</url>
+            <name>Mayo Nexus with Mayo-specific releases</name>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>mayo-nexus-snapshots</id>
+            <url>http://nexus.mayo.edu/content/groups/public-snapshots/</url>
+            <name>Mayo Nexus with Mayo-specific snapshots</name>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <!-- Source Control Management -->
+    <scm>
+        <!-- SCM setup -->
+        <connection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mayo-commons/tags/securityuserapp/0.0.11
+        </connection>
+        <developerConnection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mayo-commons/tags/securityuserapp/0.0.11
+        </developerConnection>
+        <url>https://bsisvn.mayo.edu/main/projects/m/mayo-commons/tags/securityuserapp/0.0.11</url>
+    </scm>
+</project>

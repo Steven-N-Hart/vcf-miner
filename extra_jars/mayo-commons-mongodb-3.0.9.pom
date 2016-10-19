@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+   		<artifactId>mayo-commons-parent</artifactId>
+   		<groupId>edu.mayo</groupId>
+   		<version>0.0.5</version>
+   	</parent>
+
+    <artifactId>mayo-commons-mongodb</artifactId>
+    <version>3.0.9</version>
+
+    <dependencies>
+        <!--
+            Need a way to get SystemProperties.  current options are pipes, and web_commons
+            I will inherit from pipes, because this library also has some good ETL (Extract Transform Load) stuff, so it needs pipes anyway
+        -->
+        <dependency>
+            <groupId>edu.mayo</groupId>
+            <artifactId>pipes</artifactId>
+            <version>3.0.14</version>
+        </dependency>
+        <!-- concurency support for background loading of files into the MongoDB instance -->
+        <dependency>
+            <groupId>edu.mayo</groupId>
+            <artifactId>mayo-commons-concurrency</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- MongoDB SUPPORT -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>2.13.3</version>
+        </dependency>
+    </dependencies>
+    
+    <!-- Distribution through Nexus -->
+    <distributionManagement>
+        <repository>
+            <id>mayo-nexus-bsi</id>
+            <name> Mayo Internal BSI Nexus releases</name>
+            <url>http://nexus.mayo.edu/content/repositories/hsr_bsi/</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>mayo-nexus-bsi</id>
+            <name>Mayo Internal BSI Nexus snapshots</name>
+            <url>http://nexus.mayo.edu/content/repositories/hsr_bsi-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <!-- runs functional tests -->
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- force the complile to java 1.6 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>mayo-nexus</id>
+            <url>http://nexus.mayo.edu/content/groups/public/</url>
+            <name>Mayo Nexus with Mayo-specific releases</name>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>mayo-nexus-snapshots</id>
+            <url>http://nexus.mayo.edu/content/groups/public-snapshots/</url>
+            <name>Mayo Nexus with Mayo-specific snapshots</name>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <!-- Source Control Management. Copy this into child projects -->
+    <scm>
+        <!-- SCM setup -->
+        <connection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mayo-commons/tags/mayo-commons-mongodb/3.0.9</connection>
+        <developerConnection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mayo-commons/tags/mayo-commons-mongodb/3.0.9</developerConnection>
+        <url>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mayo-commons/tags/mayo-commons-mongodb/3.0.9</url>
+    </scm>
+
+</project>
