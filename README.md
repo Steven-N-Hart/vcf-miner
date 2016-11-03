@@ -83,6 +83,7 @@ export JAVA_HOME=/usr/share/doc/default-jdk
 ```
 Copy WAR files into tomcat directory
 ```
+chown -R tomcat7:tomcat7 /local2/tmp/ 
 cp ./securityuserapp.war /var/lib/tomcat7/webapps/
 cp ./mongo_svr-4.0.3/target/mongo_svr-4.0.3.war /var/lib/tomcat7/webapps/
 cp ./mongo_view-4.0.3/target/vcf-miner.war /var/lib/tomcat7/webapps/
@@ -92,7 +93,7 @@ Finally, start tomcat
 ```
 #mkdir -p /usr/share/tomcat7/logs/
 
-service tomcat7 restart
+service tomcat7 start
 ```
 
 Now open your browser to `http://server_IP_address:8080/vcf-miner/` (but obviously using your IP address instead)
