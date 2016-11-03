@@ -52,7 +52,7 @@ It tells docker to create a ubuntu virtual environment, opened with the `bash` p
 Make sure you are up to date.
 ```
 apt-get update
-apt-get install -y maven default-jre default-jdk tomcat7 tomcat7-admin maven git vim
+apt-get install -y maven default-jre default-jdk tomcat7 tomcat7-admin maven git vim mongodb
 ```
 
 Next, download this repository
@@ -75,6 +75,7 @@ Set the default admins for tomcat by uncommenting these values in the `/etc/tomc
 <role rolename="manager-gui"/>
 <user username="tomcat" password="tomcat" roles="manager-gui"/>
 # Note, these must be between the <tomcat-users> and </tomcat-users> tags
+#perl -p -i -e 's/<tomcat-users>/<tomcat-users>\n<role rolename=\"manager-gui\"\/>\n<user username=\"tomcat\" password=\"tomcat\" roles=\"manager-gui\"\/>/' /etc/tomcat7/tomcat-users.xml
 ```
 Set your JAVA_HOME variable
 ```
@@ -89,7 +90,8 @@ cp ./mongo_view-4.0.3/target/vcf-miner.war /var/lib/tomcat7/webapps/
 
 Finally, start tomcat
 ```
-mkdir -p /usr/share/tomcat7/logs/
+#mkdir -p /usr/share/tomcat7/logs/
+
 service tomcat7 restart
 ```
 
