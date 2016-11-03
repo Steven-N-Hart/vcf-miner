@@ -1,5 +1,6 @@
 #!/bin/bash
 cd extra_jars
+mkdir -p /local2/tmp
 mvn install:install-file -Dfile=mayo-commons-mongodb-3.0.9.jar -DpomFile=mayo-commons-mongodb-3.0.9.pom
 mvn install:install-file -Dfile=securityuserapp-0.0.11.jar -DpomFile=securityuserapp-0.0.11.pom
 mvn install:install-file -Dfile=webapp_commons-1.0.0.jar -DpomFile=webapp_commons-1.0.0.pom

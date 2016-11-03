@@ -34,7 +34,7 @@ Username: Admin
 Password: temppass
 ```
 
-## Installing on bare metal
+## Installing on bare metal ubuntu or [Docker](https://www.docker.com/)
 
 Before you begin, make sure you have the following dependencies:
 * [Apache Maven](https://maven.apache.org/)
@@ -42,9 +42,23 @@ Before you begin, make sure you have the following dependencies:
 * Java JRE 
 * [Apache Tomcat](http://tomcat.apache.org/)
 
+If you are doing this on Docker, then run this command first:
+```
+docker run -it -p 8080:8080  ubuntu:latest bash
+```
+It tells docker to create a ubuntu virtual environment, opened with the `bash` prompt, with port 8080 exposed.  Otherwise, all steps are identical between docker and Ubuntu installation.
+
+
+Make sure you are up to date.
 ```
 apt-get update
-apt-get install -y maven default-jre default-jdk tomcat7 maven
+apt-get install -y maven default-jre default-jdk tomcat7 tomcat7-admin maven git vim
+```
+
+Next, download this repository
+```
+git clone https://github.com/Steven-N-Hart/vcf-miner.git
+cd vcf-miner
 ```
 Next, run the install script
 ```
@@ -52,15 +66,36 @@ sh install.sh
 ```
 
 You should have 3 WAR files now.
+ * mongo_svr-4.0.3/target/mongo_svr-4.0.3.war
+ * mongo_view-4.0.3/target/vcf-miner.war
+ * securityuserapp.war
+
+Set the default admins for tomcat by uncommenting these values in the `/etc/tomcat7/tomcat-users.xml` file
 ```
-./mongo_svr-4.0.3/target/mongo_svr-4.0.3.war
-./mongo_view-4.0.3/target/vcf-miner.war
-./securityuserapp.war
+<role rolename="manager-gui"/>
+<user username="tomcat" password="tomcat" roles="manager-gui"/>
+# Note, these must be between the <tomcat-users> and </tomcat-users> tags
 ```
-Next start tomcat
+Set your JAVA_HOME variable
+```
+export JAVA_HOME=/usr/share/doc/default-jdk
+```
+Copy WAR files into tomcat directory
+```
+cp ./securityuserapp.war /var/lib/tomcat7/webapps/
+cp ./mongo_svr-4.0.3/target/mongo_svr-4.0.3.war /var/lib/tomcat7/webapps/
+cp ./mongo_view-4.0.3/target/vcf-miner.war /var/lib/tomcat7/webapps/
+```
 
+Finally, start tomcat
+```
+mkdir -p /usr/share/tomcat7/logs/
+service tomcat7 restart
+```
 
+Now open your browser to `http://server_IP_address:8080/vcf-miner/` (but obviously using your IP address instead)
+ * Username: Admin
+ * Password: temppass
 
-follow the UI
-#security, svr, then vcf-miner .war
+You are all set!
 
