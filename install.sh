@@ -20,4 +20,4 @@ cd ../
 cd mongo_view-4.0.3
 mvn clean package
 cd ..
-mv mongo_svr-4.0.3/target/mongo_svr*.war mongo_svr-*/target/mongo_svr.war
+mv mongo_svr-4.0.3/target/mongo_svr-4.0.3.war mongo_svr-4.0.3/target/mongo_svr.war
