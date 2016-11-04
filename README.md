@@ -44,11 +44,14 @@ Before you begin, make sure you have the following dependencies:
 
 If you are doing this on Docker, then run this command first:
 ```
-docker run -it -p 8080:8080  ubuntu:latest bash
+docker run -it -e NO_LDAP=1 -p 8080:8080  ubuntu:latest bash
 ```
 It tells docker to create a ubuntu virtual environment, opened with the `bash` prompt, with port 8080 exposed.  Otherwise, all steps are identical between docker and Ubuntu installation.
 
-
+otherwise, you need to export this variable to turn off LDAP authentication
+```
+export NO_LDAP=1 
+```
 Make sure you are up to date.
 ```
 apt-get update
@@ -66,16 +69,17 @@ sh install.sh
 ```
 
 You should have 3 WAR files now.
- * mongo_svr-4.0.3/target/mongo_svr-4.0.3.war
+ * mongo_svr-4.0.3/target/mongo_svr.war
  * mongo_view-4.0.3/target/vcf-miner.war
  * securityuserapp.war
 
 Set the default admins for tomcat by uncommenting these values in the `/etc/tomcat7/tomcat-users.xml` file
 ```
-<role rolename="manager-gui"/>
-<user username="tomcat" password="tomcat" roles="manager-gui"/>
+#<role rolename="manager-gui"/>
+#<user username="tomcat" password="tomcat" roles="manager-gui"/>
 # Note, these must be between the <tomcat-users> and </tomcat-users> tags
-#perl -p -i -e 's/<tomcat-users>/<tomcat-users>\n<role rolename=\"manager-gui\"\/>\n<user username=\"tomcat\" password=\"tomcat\" roles=\"manager-gui\"\/>/' /etc/tomcat7/tomcat-users.xml
+
+perl -p -i -e 's/<tomcat-users>/<tomcat-users>\n<role rolename=\"manager-gui\"\/>\n<user username=\"tomcat\" password=\"tomcat\" roles=\"manager-gui\"\/>/' /etc/tomcat7/tomcat-users.xml
 ```
 Set your JAVA_HOME variable
 ```
@@ -85,14 +89,12 @@ Copy WAR files into tomcat directory
 ```
 chown -R tomcat7:tomcat7 /local2/tmp/ 
 cp ./securityuserapp.war /var/lib/tomcat7/webapps/
-cp ./mongo_svr-4.0.3/target/mongo_svr-4.0.3.war /var/lib/tomcat7/webapps/
+cp ./mongo_svr-4.0.3/target/mongo_svr.war /var/lib/tomcat7/webapps/
 cp ./mongo_view-4.0.3/target/vcf-miner.war /var/lib/tomcat7/webapps/
 ```
 
 Finally, start tomcat
 ```
-#mkdir -p /usr/share/tomcat7/logs/
-
 service tomcat7 start
 ```
 
