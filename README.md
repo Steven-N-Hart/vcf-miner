@@ -7,21 +7,20 @@
 
 ### VCF-Miner installation using Docker 
 
-1.	In a terminal, clone the repository:
+In a terminal, clone the repository:
 ```
 git clone https://github.com/Steven-N-Hart/vcf-miner.git
+
 ```
-2. Next, build the image
+Next, build the image
 ```
 docker build -t vcfminer . # Dont forget the '.'!
 ```
-3. Run the image
+Run the image
 ``` 
 docker run -e NO_LDAP=1 -d  -p 8888:8080 -v $PWD:/home -w /home  test sh ./start.sh
 ```
-4.	Open a browser to http://your-ip:8888/vcf-miner/
-
-
+Open a browser to http://your-ip:8888/vcf-miner/
 
 ```
 Username: Admin
