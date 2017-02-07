@@ -18,7 +18,7 @@ docker build -t vcfminer . # Dont forget the '.'!
 ```
 Run the image
 ``` 
-docker run -e NO_LDAP=1 -d  -p 8888:8080 -v $PWD:/home -w /home  test sh ./start.sh
+docker run -e NO_LDAP=1 -d  -p 8888:8080 -v $PWD:/home -w /home vcfminer sh ./start.sh
 ```
 Open a browser to http://your-ip:8888/vcf-miner/
 
