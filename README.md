@@ -10,7 +10,7 @@
 In a terminal, clone the repository:
 ```
 git clone https://github.com/Steven-N-Hart/vcf-miner.git
-
+cd vcf-miner
 ```
 Next, build the image
 ```
