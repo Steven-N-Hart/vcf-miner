@@ -86,8 +86,8 @@ Copy WAR files into tomcat directory
 ```
 chown -R tomcat7:tomcat7 /local2/tmp/ 
 cp ./securityuserapp.war /var/lib/tomcat7/webapps/
-cp ./mongo_svr-4.0.3/target/mongo_svr.war /var/lib/tomcat7/webapps/
-cp ./mongo_view-4.0.3/target/vcf-miner.war /var/lib/tomcat7/webapps/
+cp ./mongo_svr.war /var/lib/tomcat7/webapps/
+cp ./vcf-miner.war /var/lib/tomcat7/webapps/
 ```
 
 Finally, start tomcat
