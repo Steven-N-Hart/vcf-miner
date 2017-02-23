@@ -17,7 +17,7 @@ RUN mv apache-tomcat-7.0.62 /usr/local
 RUN chmod 775 /usr/local/apache-tomcat-7.0.62/bin/*sh
 
 #Delpoy VCF MINER war files
-COPY *war /usr/local/apache-tomcat-7.0.62/webapps/
+COPY *.war /usr/local/apache-tomcat-7.0.62/webapps/
 
 
 #Allow automatic disabling of security app
@@ -26,10 +26,10 @@ RUN jar -xf /home/securityuserapp-no-ldap.war  WEB-INF/classes/appProperties/sec
 RUN sed -i 's/IsUseLdap=true/IsUseLdap=false/' WEB-INF/classes/appProperties/securityUserApp.properties
 RUN jar -uf /home/securityuserapp-no-ldap.war WEB-INF/classes/appProperties/securityUserApp.properties
 
-RUN echo -e '#!/bin/bash\nmkdir -p /local2/tmp\nif [ -n "$NO_LDAP" ]\n then \n/bin/cp /home/securityuserapp-no-ldap.war /usr/local/apache-tomcat-7.0.62/webapps/securityuserapp.war\nfi\n' > /home/start.sh
-RUN echo -e '/usr/local/apache-tomcat-7.0.62/bin/catalina.sh run &\nmongod --storageEngine wiredTiger' >> /home/start.sh
+RUN echo -e '#!/bin/bash\nmkdir -p /local2/tmp\nif [ -n "$NO_LDAP" ]\n then \n/bin/cp /home/securityuserapp-no-ldap.war /usr/local/apache-tomcat-7.0.62/webapps/securityuserapp.war\nfi\n' > start.sh
+RUN echo -e '/usr/local/apache-tomcat-7.0.62/bin/catalina.sh run &\nmongod --storageEngine wiredTiger' >> start.sh
 
 
-RUN chmod 775 /home/start.sh
+RUN chmod 775 ./start.sh
 
-CMD /home/start.sh
+CMD ./start.sh
