@@ -88,7 +88,7 @@ cp mongo_svr.war /usr/local/apache-tomcat-7.0.62/webapps/
 cp vcf-miner.war /usr/local/apache-tomcat-7.0.62/webapps/
 ```
 
-# Copy the security war into the tomcat space:
+Copy the security war into the tomcat space:
 ```
 cp securityuserappNoLDAP.war /usr/local/apache-tomcat-7.0.62/webapps/securityuserapp.war
 # unless you are using LDAP, then cp securityuserapp.war /usr/local/apache-tomcat-7.0.62/webapps/
