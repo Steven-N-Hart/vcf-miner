@@ -2,9 +2,6 @@
 ####################
 ## Script Options ##
 ####################
-SERVER="http://rcftomprod1:8886"
-#SERVER="http://roecad001a.mayo.edu:8080"
-#SERVER="http://ngsqvm01.mayo.edu:8080"
 usage ()
 {
 cat << EOF

@@ -1,9 +1,0 @@
-##fileformat=VCFv4.1
-##INFO=<ID=INFO1,Number=1,Type=String,Description="String info field">
-##INFO=<ID=INFO2,Number=1,Type=Flag,Description="Flag info field">
-##INFO=<ID=INFO3,Number=1,Type=Integer,Description="Integer info field">
-##INFO=<ID=INFO4,Number=1,Type=Float,Description="Float info field">
-##FORMAT=<ID=FORMAT1,Number=1,Type=Integer,Description="Integer format field">
-##FORMAT=<ID=FORMAT2,Number=1,Type=String,Description="String format field">
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE1
-chr1	756258	BND_qdnezqbk	T	]chr1:756327]T	2.38	PASS	INFO1=abcdef;INFO2;INFO3=123;INFO4=0.123	FORMAT1:FORMAT2	23:ABC
