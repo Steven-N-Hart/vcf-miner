@@ -33,75 +33,35 @@ Password: temppass
 
 ## Installing on bare metal centos6 or [Docker](https://www.docker.com/)
 ```
-yum install -y java-1.7.0-openjdk.x86_64 java-1.7.0-openjdk-devel wget tar unzip
-wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
-yum install -y apache-maven
-```
+USER=example_user
 
-Download VCF Miner
-```
-wget https://github.com/Steven-N-Hart/vcf-miner/archive/master.zip
-unzip master.zip
-cd vcf-miner-master/
-```
+# Note you may need sudo access to install on bare metal
+yum install -y java-1.7.0-openjdk.x86_64 java-1.7.0-openjdk-devel wget tar git
+wget -O /home/${USER}/mongodb.tgz https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel62-3.0.3.tgz
+tar -zxvf /home/${USER}/mongodb.tgz -C /home/${USER}
+cp /home/${USER}/mongodb-linux-x86_64-rhel62-3.0.3/bin/* /bin
 
-Add missing packages
-```
-cd extra_jars
-mvn install:install-file -Dfile=mayo-commons-mongodb-3.0.9.jar -DpomFile=mayo-commons-mongodb-3.0.9.pom
-mvn install:install-file -Dfile=securityuserapp-0.0.11.jar -DpomFile=securityuserapp-0.0.11.pom
-mvn install:install-file -Dfile=webapp_commons-1.0.0.jar -DpomFile=webapp_commons-1.0.0.pom
-mvn install:install-file -Dfile=mayo-commons-concurrency-1.0.0.jar -DpomFile=mayo-commons-concurrency-1.0.0.pom
-mvn install:install-file -Dfile=mayo-commons-directory-2.0.0.jar -DpomFile=mayo-commons-directory-2.0.0.pom
-mvn install:install-file -Dfile=mayo-commons-exec-0.0.7.jar -DpomFile=mayo-commons-exec-0.0.7.pom
-mvn install:install-file -Dfile=mayo-commons-mq-1.0.5.jar -DpomFile=mayo-commons-mq-1.0.5.pom
-mvn install:install-file -Dfile=pipes-3.0.14.jar -DpomFile=pipes-3.0.14.pom
-cd ..
-```
+mkdir -p /data/db /data/mongo
+chmod 775 -R /data/mongo /data/db 
 
-Install mongodb
-```
-wget -O /home/mongodb.tgz https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel62-3.0.3.tgz
-tar -zxvf /home/mongodb.tgz -C /home/
-cp /home/mongodb-linux-x86_64-rhel62-3.0.3/bin/* /bin
-```
-
-Create directries and tomcat user
-```
-mkdir -p /data/db /data/mongo /local2/tmp
-chmod 775 -R /data/mongo /data/db /local2/tmp 
-useradd tomcat7
-chown -R tomcat7:tomcat7 /local2/tmp/
-```
-
-Get tomcat
-```
+#Get tomcat
 wget http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.62/bin/apache-tomcat-7.0.62.tar.gz
 tar xvzf apache-tomcat-7.0.62.tar.gz
 mv apache-tomcat-7.0.62 /usr/local
 chmod 775 /usr/local/apache-tomcat-7.0.62/bin/*sh
-```
 
-Delpoy VCF MINER war files
-```
-cp mongo_svr.war /usr/local/apache-tomcat-7.0.62/webapps/
-cp vcf-miner.war /usr/local/apache-tomcat-7.0.62/webapps/
-```
+#Delpoy VCF MINER war files
+git clone https://github.com/Steven-N-Hart/vcf-miner.git
+cd vcf-miner
+cp *.war /usr/local/apache-tomcat-7.0.62/webapps/
 
-Copy the security war into the tomcat space:
-```
-cp securityuserappNoLDAP.war /usr/local/apache-tomcat-7.0.62/webapps/securityuserapp.war
-# unless you are using LDAP, then cp securityuserapp.war /usr/local/apache-tomcat-7.0.62/webapps/
-```
 
-Start the webserver
-```
-/usr/local/apache-tomcat-7.0.62/bin/catalina.sh start
-```
-Start the moongodb server
+#If you want to not use LDAP (cp securityuserapp-no-ldap.war /usr/local/apache-tomcat-7.0.62/webapps/securityuserapp.war)
 
-```
-mongod --storageEngine wiredTiger
+echo -e '/usr/local/apache-tomcat-7.0.62/bin/catalina.sh &\nmongod --storageEngine wiredTiger' > start.sh
+chmod 775 ./start.sh
+./start.sh
+
 ```
 
 
