@@ -140,7 +140,7 @@ public class DownloadFile {
             DBObject next = documents.next();
             int j=0;
             for(String field : q.getReturnFields()){
-                output.write(format(field, next));
+                output.write(format(field, next).getBytes());
                 j++;
                 if(j== q.getReturnFields().size()){
                     output.write("\n".getBytes());
@@ -151,18 +151,24 @@ public class DownloadFile {
         }
     }
 
-    public byte[] format(String key, DBObject dbo){
+    public String format(String key, DBObject dbo){
         //System.out.println(key);
         //System.out.println(dbo.toString());
         //?? String newkey = key.replaceAll("\\.", "_");
         if(key.contains(".")){
             int start = key.indexOf(".");
-            String prefix = key.substring(start+1);
-            String suffix = key.substring(0,start);
-            return format(prefix, (DBObject) dbo.get(suffix));
+            String prefix = key.substring(0,start); // usually INFO or FORMAT
+            String suffix = key.substring(start+1); // sub-field under INFO or FORMAT
+
+            if (dbo.containsField(prefix)) {
+                return format(suffix, (DBObject) dbo.get(prefix));
+            } else {
+                // value is absent in ResultSet, fetch the proper formatting for NULL
+                return formatPrimative(null);
+            }
         }
         Object o = dbo.get(key);
-        return formatPrimative(o).getBytes();
+        return formatPrimative(o);
 
     }
 
