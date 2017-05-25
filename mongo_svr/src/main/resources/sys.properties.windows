@@ -1,0 +1,40 @@
+## Properties for Windows deployment
+hostname = localhost
+mongo_server = localhost
+mongo_port = 27017
+mongo_user =
+mongo_password =
+mongo_database = vcf_miner_dev
+TEMPDIR = /Mayo/temp
+securityuserapp_server = localhost
+securityuserapp_port = 8181
+
+##global properties for all configurations...
+#value for the number of strings that a type-ahead collection can contain. The default is greater than the number of protein encoding genes
+type_ahead_overrun = 25000
+load_samples = false
+
+sample_meta_collection = samplemetacollection
+
+# The number of concurrent imports allowed
+num_workers = 5
+# The number of concurrent range updates allowed
+num_workers_range = 4
+
+#Values for INFINITY, 1/INFINITY, NotANumber ect that work in both the javascript importer AND java.
+Double_MAX_VALUE = 1.0e308
+Double_MIN_VALUE = 1.0e-307
+Double_NEGATIVE_INFINITY = -1.0e307
+NaN_KEY = NaN
+
+# Key lengths greater than this threshold will be reduced down to a 32 character
+# length via MD5 checksum.
+MAP_REDUCE_KEY_HASH_THRESHOLD=32
+
+# Run Range Query filter as background process if Variants in database > variant threshold AND base-pairs in user-specified range > base-pair threshold 
+# Set variant count threshold for Range Query Filter
+rangeThresholdVariants=20000
+# Set base-pair threshold for Range Query Filter
+rangeThresholdBasePairs=500000
+# Set range count threshold for Range Query Filter
+rangeThresholdRanges=100

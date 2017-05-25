@@ -1,0 +1,1627 @@
+<!doctype html>
+<html lang="us">
+<head>
+    <link rel="shortcut icon" href="img/favicon.ico">
+
+	<meta charset="utf-8">
+	<title>VCF-Miner</title>
+
+    <link rel="stylesheet" type="text/css" href="jquery.layout-1.3.0-rc30.79/layout-default-latest.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap-2.3.2/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="ColReorder-1.1.2/css/dataTables.colReorder.css">
+    <link rel="stylesheet" type="text/css" href="DataTables-1.10.2/media/css/jquery.dataTables.css">
+
+    <link rel="stylesheet" href="chosen-0.10.0/chosen.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap-modal-2.1/css/bootstrap-modal.css">
+    <link rel="stylesheet" type="text/css" href="Acquisio-bootstrap-dropdown-checkbox-5f2ad8d/css/bootstrap-dropdown-checkbox.css">
+    <link rel="stylesheet" type="text/css" href="font-awesome-4.0.3/css/font-awesome.css">
+    <!--<link rel="stylesheet" type="text/css" href="typeahead-0.9.3/typeahead.css">-->
+    <link rel="stylesheet" type="text/css" href="typeahead-0.9.3/typeahead.js-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap-wysihtml5-0.0.2/bootstrap-wysihtml5.css">
+
+    <style>
+        /*workaround for navbar overlapping site by 40 pixels */
+        /*body { padding-top: 40px; }*/
+
+        body .wide-modal {
+            /* new custom width */
+            width: 1024px;
+            /* must be half of the width, minus scrollbar on the left (30px) */
+            margin-left: -512px;
+        }
+
+        body .modal-256wide {
+            /* new custom width */
+            width: 256px;
+            /* must be half of the width, minus scrollbar on the left (30px) */
+            margin-left: -128px;
+        }
+
+        body .modal-350wide {
+            /* new custom width */
+            width: 350px;
+            /* must be half of the width, minus scrollbar on the left (30px) */
+            margin-left: -175px;
+        }
+
+        body .modal-800wide {
+            /* new custom width */
+            width: 800px;
+            /* must be half of the width, minus scrollbar on the left (30px) */
+            margin-left: -400px;
+        }
+
+        body .modal-600wide {
+            /* new custom width */
+            width: 600px;
+            /* must be half of the width, minus scrollbar on the left (30px) */
+            margin-left: -300px;
+        }
+
+        .ellipsis{
+            width: 300px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .sample_filter_region {
+            margin-left: 10px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+
+    <!-- underscorejs templates -->
+
+    <div id="placeholder-range-query-tab-layout-template"></div>
+
+    <script id="login-layout-template" type="text/template">
+
+        <div class="container-fluid hero-unit">
+            <div class="row-fluid">
+                <!-- column 1 has logo and branding-->
+                <div class="span6">
+                    <div class="text-center">
+                        <h1>VCF-Miner</h1>
+                        <br>
+                        <img src="img/vcf-miner.png"/>
+                    </div>
+                </div>
+
+                <!-- column 2 has login stuff -->
+                <div class="span6">
+                    <div style="display:table-cell;vertical-align:middle;">
+                            <!-- spacer -->
+                            <br><br><br><br><br><br><br>
+
+                            <form id="login_form" action="#" onsubmit="return false;" class="form-horizontal">
+                                <div class="control-group">
+                                    <label class="control-label text-left" for="login_username_field">Username</label>
+                                    <div class="controls">
+                                        <input id="login_username_field" name="login_username_field" type="text" class="input-medium"/>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="login_password_field">Password</label>
+                                    <div class="controls">
+                                        <input id="login_password_field" name="login_password_field" type="password" class="input-medium"/>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="controls">
+                                        <!--<label class="checkbox">-->
+                                        <!--<input type="checkbox"> Remember me-->
+                                        <!--</label>-->
+                                        <button class="btn btn-primary login">Login</button>
+                                    </div>
+                                </div>
+
+                            </form>
+                            <div id="loginMessageRegion"></div>
+                            <p>
+                                <small>The funding was provided by the <a target="_blank" href="http://mayoresearch.mayo.edu/center-for-individualized-medicine/">Center for Individualized Medicine</a> at Mayo Clinic.</small>
+                            </p>
+                            <p>
+                                <small><a target="_blank" href="license.html">Terms and Conditions of Use</a></small>
+                            </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script id="login-failed-layout-template" type="text/template">
+        <div class="alert alert-error text-center">
+            <strong>Login Failed</strong>
+        </div>
+    </script>
+
+    <script id="session-expired-layout-template" type="text/template">
+        <div class="alert alert-info text-center">
+            <strong>Your session has expired.  Please login again.</strong>
+        </div>
+    </script>
+
+    <script id="main-layout-template" type="text/template">
+
+        <div class="jquery-ui-container-div" style="width:100%; height:100%; overflow:hidden; position:absolute;">
+
+            <!-- NORTH -->
+            <div class="ui-layout-north" style="padding:0;">
+                <div id="mainHeaderRegion"></div>
+            </div>
+
+            <!-- CENTER -->
+            <div class="ui-layout-center" style="padding:0; overflow:auto;">
+                <div id="homeRegion"></div>
+                <div id="settingsRegion"></div>
+                <div id="dataRegion"></div>
+                <div id="userRegion"></div>
+            </div>
+        </div>
+
+    </script>
+
+    <script id="main-header-layout-template" type="text/template">
+
+        <!-- Navigation bar -->
+        <div class="navbar navbar-inverse navbar-static-top">
+            <div class="navbar-inner">
+                <div class="nav-collapse collapse">
+                    <div class="pull-left"><a class="brand">VCF-Miner</a></div>
+                    <ul class="nav">
+                        <li class="active"><a id="home_tab"><i class="fa fa-home"></i> Home</a></li>
+                        <li id="navbar_tab_advanced" class="hide"><a id="settings_tab"><i class="fa fa-gears"></i> Advanced</a></li>
+
+                        <!-- hidden at the start because no VCF has been loaded yet -->
+                        <li id="navbar_tab_table" class="hide"><a id="table_tab">SET_BY_JAVASCRIPT</a></li>
+                    </ul>
+                    <div id="mainHeaderUserRegion"></div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script id="main-header-user-layout-template" type="text/template">
+        <ul class="nav pull-right">
+            <li><a id="user_tab"><i class="fa fa-user"></i> <%=nameFirst%> <%=nameLast%></a></li>
+            <li><a class="logout"><i class="fa fa-sign-out"></i> Logout</a></li>
+        </ul>
+    </script>
+
+    <script id="user-info-layout-template" type="text/template">
+        <div class="hero-unit">
+            <div class="well">
+                <h2>User Information</h2>
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label"><strong>First</strong></label>
+                        <div class="controls">
+                            <span><%=nameFirst%></span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label"><strong>Last</strong></label>
+                        <div class="controls">
+                            <span><%=nameLast%></span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label"><strong>User</strong></label>
+                        <div class="controls">
+                            <span><%=username%></span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label"><strong>E-mail</strong></label>
+                        <div class="controls">
+                            <a href= "mailto:<%=email%>" ><%=email%></a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </script>
+
+    <script id="home-layout-template" type="text/template">
+        <div class="hero-unit">
+            <table>
+                <tr>
+                    <td style="white-space:nowrap;">
+                        <div class="pull-left">
+                            <div class="row-fluid">
+                                <h3>Getting started</h3>
+                            </div>
+                            <div class="row-fluid">
+                                <div class="container-fluid">
+                                    <ol>
+                                        <li>
+                                            <button title="Import a new VCF file into the system" class="btn btn-primary" onclick="$('#add_workspace_modal').modal();">Import</button>
+                                            a new <a target="_blank" href="http://samtools.github.io/hts-specs/VCFv4.1.pdf">Variant Call Format (VCF)</a> file
+                                        </li>
+                                        <li>
+                                            Analyze an existing VCF file in the list below<br/><br/>
+                                        </li>
+                                    </ol>
+                                </div>
+                            </div>
+                            <div class="row-fluid">
+                                <div class="well">
+                                    <div class="pull-left">
+                                        <div id="workspaceGroupRegion"></div>
+                                    </div>
+
+                                    <!-- the CSS style "row" conflicts between Bootstrap and DataTables adding a "-20px" left margin -->
+                                    <!-- compensate by wrapping in DIV container with a "20px" left margin -->
+                                    <div style="margin-left:20px;">
+                                        <div id="workspaceRegion"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row-fluid">
+                                <br/>
+                            </div>
+                            <div class="row-fluid">
+                                <p>
+                                    <small>The funding was provided by the <a target="_blank" href="http://mayoresearch.mayo.edu/center-for-individualized-medicine/">Center for Individualized Medicine</a> at Mayo Clinic.</small>
+                                </p>
+                                <p>
+                                    <small><a target="_blank" href="license.html">Terms and Conditions of Use</a></small>
+                                </p>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </script>
+
+    <script id="workspace-group-dropdown-template" type="text/template">
+        <p>Showing <select disabled="true">
+            <option value='ALL_GROUPS'>All VCF Files</option> <!-- Special Group that represents a union of all groups -->
+            <% _.each(items, function(item){ %>
+                <option value='<%=item.id%>'>
+                    <% if(item.groupName.substring(item.groupName.length - 11) == ".solo.group"){ %>
+                    My Imported VCF files
+                    <% } else { %>
+                    <%=item.groupName%>
+                    <% } %>
+                </option>
+            <% }); %>
+        </select> <img src="img/loading.gif" width="30"/> <span>Loading</span>
+        </p>
+    </script>
+
+    <script id="settings-layout-template" type="text/template">
+        <div class="hero-unit">
+            <div class="well">
+                <h2>General</h2>
+
+                <form id="settings_general_form" class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label" for="max_filtered_variants_field">MAX Displayed
+                            Variants</label>
+
+                        <div class="controls">
+                            <input class="input-mini" name="max_filtered_variants_field"
+                                   id="max_filtered_variants_field" value="1000">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="popover_time_field">Popup Display Time (Seconds)</label>
+
+                        <div class="controls">
+                            <input class="input-mini" name="popover_time_field" id="popover_time_field" value="3">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="max_filter_values_field">Typeahead Limit</label>
+
+                        <div class="controls">
+                            <input class="input-mini" name="max_filter_values_field" id="max_filter_values_field"
+                                   value="25">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="well">
+                <h2>Indexes</h2>
+
+                <div class='row-fluid checkbox'><label><input type='checkbox' id='show_missing_index_warnings'> Show
+                    warnings when adding a Filter on an non-indexed column</label></div>
+                <div class="row-fluid">
+                    <div class="span6" id="indexes_status_div"></div>
+                </div>
+                <div class="well">
+                    <h3>INFO</h3>
+
+                    <div class="container-fluid pre-scrollable">
+                        <div class="row-fluid">
+                            <div class="pull-left" id="info_indexes_table_div"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="well">
+                    <h3>FORMAT</h3>
+
+                    <div class="container-fluid pre-scrollable">
+                        <div class="row-fluid">
+                            <div class="pull-left" id="format_indexes_table_div"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script id="data-layout-template" type="text/template">
+
+        <div id="add_filter_modal" data-backdrop="static" class="modal modal-800wide hide fade"></div>
+
+        <!-- JQUERY-UI Layout -->
+        <!-- NOTE: the following CSS attributes ARE REQUIRED
+             Documented at http://stackoverflow.com/questions/5520463/ui-layout-jquery-plugin
+             width:  100%; height: 100%; overflow: hidden; position:absolute;
+        -->
+        <div id="jquery-ui-container" style="width:  100%; height: 100%; overflow: hidden; position:absolute;">
+
+            <!-- WEST -->
+            <div class="ui-layout-west">
+
+                <div class="navbar" style="width:100%">
+                    <div class="navbar-inner">
+                        <span class="brand">Analysis</span>
+                        <ul class="nav">
+                            <li>
+                                <a id="drop1" title="Analysis Actions" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-gear"></i> Actions <i class="fa fa-caret-down"></i></a>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+                                    <li title="Open a saved Analysis" role="presentation"><a class="showSearchDialog" role="menuitem" tabindex="-1"><i class="fa fa-folder-open-o"></i> Open</a></li>
+                                    <!--<li role="presentation" title="Start over with a new Analysis" role="presentation"><a class="searchNew" role="menuitem" tabindex="-1"><i class="fa fa-refresh"></i> Reset</a></li>-->
+                                    <!--<li title="Change the Search name" role="presentation"><a class="searchNameChange" role="menuitem" tabindex="-1"><i class="fa fa-pencil"></i> Rename</a></li>-->
+                                    <li title="Save this Analysis" role="presentation"><a class="searchSave" role="menuitem" tabindex="-1"><i class="fa fa-save"></i> Save</a></li>
+                                    <li title="Delete this Analysis" role="presentation"><a class="searchDelete" role="menuitem" tabindex="-1"><i class="fa fa-times"></i> Delete</a></li>
+                                    <li role="presentation" class="divider"></li>
+                                    <li title="Export this Analysis to a file" role="presentation"><a class="searchExport" role="menuitem" tabindex="-1"><i class="fa fa-download"></i> Export to a file</a></li>
+                                    <li title="Import a previously exported Analysis file" role="presentation"><a class="searchImport" role="menuitem" tabindex="-1"><i class="fa fa-upload"></i> Import from a file</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="nav pull-right">
+                            <li><a id="analysis_resize" title="Expand to fit"><i class="fa fa-expand"></i> Fit</a></li>
+                            <li><a id="west-closer" title="Hide"><i class="fa fa-arrow-left"></i> Hide</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- NOTE: the following <div> uses ui-layout-ignore to avoid being auto-sized by the jQuery UI layout plugin -->
+                <div id="ignore_autosize_div" class="ui-layout-ignore" style="float:left;margin:0px;padding:0px;">
+                    <ul class="nav nav-list">
+                        <div>
+                                <br>
+                                <div id="searchNameRegion"></div>
+                                <br>
+
+                                <div id="searchDescriptionRegion"></div>
+                                <br>
+
+                                <div class="well">
+                                    <div id="searchFiltersRegion"></div>
+                                    <br>
+
+                                    <button title="Add Filter to your Analysis" class="btn btn-primary"
+                                            id="show_add_filter_dialog_button">Add Filter
+                                    </button>
+                                </div>
+
+                                <div id="searchSaveRegion"></div>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- CENTER -->
+            <div class="ui-layout-center">
+
+                <div class="navbar">
+                    <div class="navbar-inner">
+                        <span class="brand">Variants</span>
+                        <ul class="nav pull-right">
+                            <li><a id="columns_button" title="Show/Hide Table Columns"><i class="fa fa-columns"></i> Columns</a></li>
+                            <li><a id="export_button" title="Export Table as Tab-Delimited file"><i class="fa fa-download"></i> Export</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <button id="west-opener" title="Show Analysis" type="button" class="hide btn btn-mini"><i class="fa fa-arrow-right"></i> Show Analysis</button>
+
+                <div id="variantDataRegion" style="padding-left: 35px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;"></div>
+
+            </div>
+        </div>
+    </script>
+
+    <script id="sample-filter-tab-layout-template" type="text/template">
+        <form id="sample_tab_form" action="">
+            <div class="container-fluid" id="pallet_view">
+                <!-- This warning is hidden by default.  javascript will enable if warranted -->
+                <div class="row-fluid hide" id="no_format_annotation_warning">
+                    <div class="span12 alert">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <table>
+                            <tr>
+                                <td><i class="fa fa-warning fa-2x"></i></td>
+                                <td><strong>Missing FORMAT Annotation</strong></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <p>No FORMAT fields were detected. Double check your original VCF file for the
+                                        following:</p>
+                                    <ul>
+                                        <li>One or more lines in the VCF file header that are prefixed with ##FORMAT, 1 per
+                                            FORMAT annotation type
+                                        </li>
+                                        <li>9th column titled FORMAT describing the field structure and delimiters</li>
+                                        <li>Columns 10 and up that contain the FORMAT data</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row-fluid"> <!-- help row -->
+                    <a class="accordion-toggle pull-right" data-toggle="collapse" data-parent="#accordion2"
+                       href="#sample_filter_help">
+                        <i class="fa fa-question-circle"></i> Help
+                    </a>
+                </div>
+                <div id="sample_filter_help" class="collapse alert-info">
+                    <table>
+                        <tr>
+                            <td><i class="fa fa-info-circle fa-2x"></i></td>
+                            <td><strong>Overview</strong></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <p>Filters in this tab are derived from the SAMPLE columns of VCF files.
+                                    The FORMAT column is used to define the information contained within each subsequent
+                                    genotype column, which consists of a colon separated list of fields.
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa fa-book fa-2x"></i></td>
+                            <td>
+                                <strong>Example</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <p>The FORMAT field GT:GQ:DP indicates that the samples contain information regarding the
+                                    genotype, genotype quality and read depth for each sample. Let's say each sample has an
+                                    entry for depth of coverage and there are 3 samples in your VCF. SampleA DP=20, SampleB
+                                    DP=25, and SampleC DP=10. VCF-miner is capable of querying numeric values such as these.
+                                    If you apply the MAX DP >=20 filter, the entire row will be returned. If you apply the
+                                    MIN DP >=20 filter, then the row will NOT be returned because the minimum DP in this row
+                                    is 10.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa fa-wrench fa-2x"></i></td>
+                            <td>
+                                <strong>Technical Point</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <p>For VCF-Miner to recognize arbitrary key:value pairs, there must be properly formatted
+                                    both in this field and in the Meta-information lines.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="row-fluid"> <!-- header row -->
+                    <div class="span4"><h4>Filter</h4></div>
+                    <div class="span2"></div>
+                    <div class="span5"><h4>Value</h4></div>
+                </div>
+                <div class="row-fluid"> <!-- divider -->
+                    <div class="span4">
+                        <hr>
+                    </div>
+                    <div class="span2"></div>
+                    <div class="span5">
+                        <hr>
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <div class="span4">
+                        <select class="span4" id="sample_field_min_max_list">
+                            <option value='max'>MAX</option>
+                            <option value='min'>MIN</option>
+                        </select>
+                        <select class="span8" id="sample_field_list">
+                            <!-- Dynamically added by javascript -->
+                        </select>
+                    </div>
+                    <div class="span2">
+                        <select class="span12" id="sample_field_op_list">
+                            <option value='eq'>=</option>
+                            <option value='gt'>&gt;</option>
+                            <option value='gteq'>&#x2265;</option>
+                            <option value='lt'>&lt;</option>
+                            <option value='lteq'>&#x2264;</option>
+                            <option value='ne'>&#x2260;</option>
+                        </select>
+                    </div>
+                    <div class="span5">
+                        <div class="row-fluid" id="sample_value_div">
+                            <input name='sample_filter_value' class='input-mini' value='0'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="info-filter-tab-layout-template" type="text/template">
+        <form id="info_tab_form" action="">
+            <div class="container-fluid" id="info_filter_table">
+                <!-- This warning is hidden by default.  javascript will enable if warranted -->
+                <div class="row-fluid hide" id="no_info_annotation_warning">
+                    <div class="span12 alert">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <table>
+                            <tr>
+                                <td><i class="fa fa-warning fa-2x"></i></td>
+                                <td><strong>Missing INFO Annotation</strong></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <p>No INFO fields were detected. Double check your original VCF file for the
+                                        following:</p>
+                                    <ul>
+                                        <li>One or more lines in the VCF file header that are prefixed with ##INFO, 1 per
+                                            INFO annotation type
+                                        </li>
+                                        <li>8th column titled INFO containing the INFO annotation data</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row-fluid"> <!-- help row -->
+                    <a class="accordion-toggle pull-right" data-toggle="collapse" data-parent="#accordion2"
+                       href="#info_filter_help">
+                        <i class="fa fa-question-circle"></i> Help
+                    </a>
+                </div>
+                <div id="info_filter_help" class="collapse alert-info">
+                    <table>
+                        <tr>
+                            <td><i class="fa fa-info-circle fa-2x"></i></td>
+                            <td><strong>Overview</strong></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <p>Filters in this tab are derived from the INFO column of VCF files. Annotations found in
+                                    this column are variant specific, not sample specific. For example, the gene name in the
+                                    info field may be GENE=TP53. No matter what sample has the variant - they would all
+                                    refer to TP53.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa fa-wrench fa-2x"></i></td>
+                            <td>
+                                <strong>Technical Point</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <p>For VCF-Miner to recognize arbitrary key:value pairs, there must be properly formatted
+                                    both in this field and in the Meta-information lines.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="row-fluid"> <!-- header row -->
+                    <div class="span4"><h4>Filter</h4></div>
+                    <div class="span2"></div>
+                    <div class="span6"><h4>Value</h4></div>
+                </div>
+                <div class="row-fluid"> <!-- divider -->
+                    <div class="span4">
+                        <hr>
+                    </div>
+                    <div class="span2"></div>
+                    <div class="span6">
+                        <hr>
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <div class="span4">
+                        <select class="span12" id="info_field_list">
+                            <!-- Dynamically added by javascript -->
+                        </select>
+                    </div>
+                    <div class="span2">
+                        <select class="span12" id="info_operator_list">
+                            <!-- Dynamically added by javascript -->
+                        </select>
+                    </div>
+                    <div class="span6" id="info_value_div">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="custom-filter-tab-layout-template" type="text/template">
+
+        <div id="create_group_modal" data-backdrop="static" class="modal hide fade"></div>
+
+        <form id="custom_tab_form" action="">
+            <div class="container-fluid" id="custom_view">
+                <div class="row-fluid"> <!-- help row -->
+                    <a class="accordion-toggle pull-right" data-toggle="collapse" data-parent="#accordion2"
+                       href="#custom_filter_help">
+                        <i class="fa fa-question-circle"></i> Help
+                    </a>
+                </div>
+                <div id="custom_filter_help" class="collapse alert-info">
+                    <table>
+                        <tr>
+                            <td><i class="fa fa-info-circle fa-2x"></i></td>
+                            <td><strong>Variants in Group</strong></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <p>This filter allows you to select variants that are present in the group's samples.
+                                    To begin, create a new group or select one that was previously created using the
+                                    drop-down. You can also specify the zygosity information, and if that criteria should
+                                    apply to a minimum number of samples in the group.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa fa-info-circle fa-2x"></i></td>
+                            <td>
+                                <strong>Variants not in Group</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <p>This is the inverse logic of the "Variants in Group". It will allow you to
+                                    exclude variants that are present in the group's samples.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa fa-info-circle fa-2x"></i></td>
+                            <td>
+                                <strong>Alternate Allele Depth</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <p>VCF Files typically have a reserved field called "AD". It has a comma separated
+                                    list of values for the number of reads supporting the reference allele (in the
+                                    first position), followed by a list of reads supporting each alternative allele.
+                                    By specifying a minimum of 5 alternate supporting reads, you are ensuring that at
+                                    least 1 sample contains at least 5 alternate supporting reads.
+                                    <i>Note: If your VCF file does not contain the AD field, this query will not work!</i>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="row-fluid"> <!-- content area -->
+                    <div class="span4">
+                        <!-- header row -->
+                        <div class="row-fluid"><h4>Filter</h4></div>
+                        <!-- horizontal rule row -->
+                        <div class="row-fluid">
+                            <hr>
+                        </div>
+                        <!-- information row -->
+                        <div class="row-fluid">
+                            <select class="span12" id="custom_field_list">
+                                <!-- Dynamically added by javascript -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="span8 hide" id="group_div">
+                        <!-- header row -->
+                        <div class="row-fluid">
+                            <div class="span2"></div>
+                            <div class="span10"><h4>Value</h4></div>
+                        </div>
+                        <!-- horizontal rule row -->
+                        <div class="row-fluid">
+                            <div class="span2"></div>
+                            <div class="span10">
+                                <div class="span12">
+                                    <hr>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- information row -->
+                        <div class="row-fluid">
+                            <div class="span2">
+                                <select class="span12">
+                                    <option value='eq'>=</option>
+                                </select>
+                            </div>
+                            <div class="span10">
+                                <div class="row-fluid">
+                                    <div class="span12"> <!-- group column -->
+                                        <div class="row-fluid">
+                                            <div class="span7">
+                                                <!--<div class="input-append">-->
+                                                    <select class="input-large" id="group_list" name="group_list"></select>
+                                                <!--</div>-->
+                                                <div class="row-fluid" id="group_sample_count"></div>
+                                                <div class="row-fluid">
+                                                    <select class="input-large" id="group_sample_names_list" size="5">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="span5">
+                                                <button id="new_group_button" title="Create a new group of samples" type="button" class="btn">Create Group</button>
+                                            </div>
+                                        </div>
+                                        <h5>Genotype</h5>
+                                        <div class="row-fluid">
+
+                                            <div>
+                                                <label class="radio"><input type="radio" name="genotype" value="either" checked>Either</label>
+                                                <label class="radio"><input type="radio" name="genotype" value="het">Heterozygous</label>
+                                                <label class="radio"><input type="radio" name="genotype" value="hom">Homozygous</label>
+                                            </div>
+                                        </div>
+                                        <h5>Sample Matches</h5>
+                                        <div class="row-fluid">
+                                            <div class="span5">
+                                                <span style="float:left; display:inline; margin-right:5px; line-height:--px;"> Minimum # of matches </span>
+                                            </div>
+                                            <div class="span7">
+                                                <input name="at_least_x_samples" class="input-mini">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span8 hide" id="alt_ad_div">
+                        <!-- header row -->
+                        <div class="row-fluid">
+                            <div class="span2"></div>
+                            <div class="span10"><h4>Value</h4></div>
+                        </div>
+                        <!-- horizontal rule row -->
+                        <div class="row-fluid">
+                            <div class="span2"></div>
+                            <div class="span10">
+                                <div class="span12">
+                                    <hr>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- information row -->
+                        <div class="row-fluid">
+                            <div class="span2">
+                                <select class="span12">
+                                    <option value='gteq'>&#x2265;</option>
+                                </select>
+                            </div>
+                            <div class="span10">
+                                <input class="input-mini" value='0' name="alt_ad_value_field" id="alt_ad_value_field">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="add-filter-dialog-layout-template" type="text/template">
+        <div class="modal-header">
+            <button type="button" class="close cancel" aria-hidden="true">×</button>
+            <h3 id="add_filter_label">Add Filter</h3>
+        </div>
+        <div class="modal-body">
+            <div class="container-fluid">
+                <div class="row-fluid"> <!-- tabs -->
+                    <div class="span12">
+                        <ul class="nav nav-tabs" id="add_filter_tabs">
+                            <li><a href="#tab_content_info">Annotation</a></li>
+                            <li><a href="#tab_content_sample">Sample</a></li>
+                            <li><a href="#tab_content_custom">Custom</a></li>
+                            <li><a href="#tab_content_range">Range</a></li>
+                            <!-- TODO -- DISABLED SUBSET
+                            <li><a href="#tab_content_subset">Subset</a></li>
+                            -->
+                        </ul>
+                    </div>
+                </div>
+                <div class="row-fluid"> <!-- tab content pane -->
+                    <div class="span12">
+                        <div class="tab-content">
+                            <div class="tab-pane" id="tab_content_sample"> <!-- SAMPLE tab -->
+                                <div id="tab_content_sample_region"></div>
+                            </div>
+                            <div class="tab-pane active" id="tab_content_info"> <!-- info tab -->
+                                <div id="tab_content_info_region"></div>
+                            </div>
+                            <div class="tab-pane" id="tab_content_custom"> <!-- CUSTOM tab -->
+                                <div id="tab_content_custom_region"></div>
+                            </div>
+                            <div class="tab-pane" id="tab_content_range"> <!-- RANGE tab -->
+                                <div id="tab_content_range_region"></div>
+                            </div>
+                            <!-- TODO -- DISABLED SUBSET
+                            <div class="tab-pane" id="tab_content_subset">
+                                <div id="tab_content_subset_region"></div>
+                            </div>
+                            -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div id="filterActionButtons" style="display:inline;">
+                <button class="btn btn-primary" aria-hidden="true" id="run_filter">Run Filter</button>
+                <button class="btn btn-primary hide" aria-hidden="true" id="run_combo_filter">Run Filter(s)</button>
+                <button class="btn" aria-hidden="true" id="add_another_filter">Add Another Filter</button>
+            </div>
+            <div id="rangeActionButtons" style="display:inline;">
+                <button class="btn btn-primary" aria-hidden="true" id="createRangeAnnotation">Create Range Annotation</button>
+            </div>
+            <button class="btn cancel" aria-hidden="true" id="add_filter_close">Cancel</button>
+        </div>
+    </script>
+
+    <script id="create-group-dialog-layout-template" type="text/template">
+
+        <form id="create_group_form" action="">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3>Create Group</h3>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row-fluid control-group">
+                        <div class="span3">Group Name:</div>
+                        <div class="span9"><input id="group_name_field" name="group_name_field" type="text"></div>
+                    </div>
+                    <div class="row-fluid"> <!-- divider -->
+                        <div class="span12">
+                            <hr>
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span5"> <!-- available samples column -->
+                            <div class="row-fluid">
+                                <div class="span12">
+                                    Available Samples
+                                </div>
+                            </div>
+                            <div class="row-fluid">
+                                <div class="span12">
+                                    <select id="available_samples_list" size="15" multiple="multiple"
+                                            class="span12"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span2"> <!-- button column -->
+                            <div class="container-fluid">
+                                <div class="row-fluid">
+                                    <div class="span12"></div>
+                                </div>
+                                <div class="row-fluid">
+                                    <div class="span12"></div>
+                                </div>
+                                <div class="row-fluid">
+                                    <div class="span12"></div>
+                                </div>
+                                <div class="row-fluid">
+                                    <div class="span12"></div>
+                                </div>
+                                <div class="row-fluid">
+                                    <div class="span12">
+                                        <button type="button" class="btn add-samples"><i class="icon-chevron-right"></i></button>
+                                    </div>
+                                </div>
+                                <div class="row-fluid">
+                                    <div class="span12"></div>
+                                </div>
+                                <div class="row-fluid">
+                                    <div class="span12">
+                                        <button type="button" class="btn remove-samples"><i class="icon-chevron-left"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span5"> <!-- group samples column -->
+                            <div class="row-fluid">
+                                <div class="span12">
+                                    Group Samples
+                                </div>
+                            </div>
+                            <div class="row-fluid">
+                                <div class="span12">
+                                    <select id="group_samples_list" size="15" multiple="multiple" class="span12"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" aria-hidden="true" id="new_group_apply">Create</button>
+                <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+            </div>
+        </form>
+    </script>
+
+    <script id="show-errors-dialog-layout-template" type="text/template">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3>Warning Log</h3>
+        </div>
+        <div class="modal-body">
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    Preview the first <input type="number" min="1" value="25" class="input-mini"/> lines
+                    <span class="pull-right"><strong>VCF File:</strong> <%=alias%></span>
+                </div>
+                <div class="row-fluid">
+                    <textarea rows="15" wrap="off" style="width:100%;"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary download" title="Download entire warning log">Download</button>
+            <button class="btn" data-dismiss="modal">Close</button>
+        </div>
+    </script>
+
+    <!-- the workspaceKey table -->
+    <script id="workspace-table-template" type="text/html">
+
+        <div id="errors_modal" data-backdrop="static" class="modal hide fade wide-modal"></div>
+
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Variants</th>
+                <th></th>
+            </tr>
+            </thead>
+
+            <!-- want to insert collection items, here -->
+            <tbody></tbody>
+        </table>
+    </script>
+
+    <script id="search-name-template" type="text/template">
+        <div class="row-fluid">
+            <div class="span12">
+                <div id="search_rename_div" class="hide">
+                    <input type="text" class="input-large">
+                </div>
+                <div id="search_name_div">
+                    <!--<span class="lead"><%=name%> </span><small><a class="" href="#" title="Edit Name">Edit</a></small>-->
+                    <h3 title="Analysis Name" style="display:inline;white-space:normal;"><%=name%> </h3><small><a class="searchNameChange" href="#" title="Edit Name">Edit</a></small>
+                    <!--<a class="searchNameChange lead" title="Click to edit the name"><%=name%></a>-->
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script id="search-description-template" type="text/template">
+         <div class="row-fluid">
+            <div class="span12">
+                <div id="search_desc_div">
+                    <small title="Analysis Description"><%=description%> </small> <small><a class="searchDescriptionChange" href="#" title="Edit Description">Edit</a></small>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script id="search-save-template" type="text/template">
+        <div class="row-fluid">
+            <% if(saved && (timestamp != undefined)){%><small>Last saved <%=getDateString(timestamp)%></small><%}%>
+            <% if(!saved){%><button class="btn btn-success searchSave"><i class="fa fa-save"></i> Save Changes</button></p><%}%>
+        </div>
+    </script>
+
+    <!-- single row in the search table -->
+    <script id="search-row-template" type="text/template">
+        <span class="label"><td><%=name%></td></span>
+        <!--<span class="label"><td><%=user%></td></span>-->
+        <span class="label"><td><%=getDateString(timestamp)%></td></span>
+        <td><button title="Run this Analysis" type="button" class="btn open">Run</button></td>
+    </script>
+
+    <!-- the search table -->
+    <script id="search-table-template" type="text/html">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <!--<th>User</th>-->
+                <th>Last Saved</th>
+                <th></th>
+            </tr>
+            </thead>
+
+            <!-- want to insert collection items, here -->
+            <tbody></tbody>
+        </table>
+    </script>
+
+    <!-- single row in the search filter table -->
+    <script id="search-filter-step-row-template" type="text/template">
+        <!-- FILTER COLUMN -->
+        <td style="padding-top:5px;padding-bottom:5px;border-bottom:1pt solid silver;">
+            <% _.each(filters.models, function(filter) { %>
+                <table>
+                    <tr>
+                        <td style="vertical-align: text-top;"> <%=filter.get('displayName')%> </td>
+                        <td style="vertical-align: text-top;padding-left:10px;padding-right:10px;"> <%=filter.get('displayOperator')%> </td>
+                        <td style="vertical-align: text-top;"> <%=filter.get('displayValue')%> </td>
+                    </tr>
+                </table>
+            <% }); %>
+        </td>
+
+        <!-- VARIANT COLUMN -->
+        <td class="text-center" style="padding-top:5px;padding-bottom:5px;border-bottom:1pt solid silver;">
+            <% if(numMatches != null){ %><span class="badge badge-info" id="<%=id%>_num_matches_label" style="vertical-align: text-top;"><%=numMatches%></span><%}%>
+        </td>
+
+        <!-- ACTION COLUMN -->
+        <td style="padding-top:5px;padding-bottom:5px;border-bottom:1pt solid silver;">
+            <button title="Remove filter from your Analysis" type="button" class="btn btn-mini remove" id="<%=id%>_remove_button" style="vertical-align: text-top;<% if(!removable){%> display: none <%}%>"><i class="icon-remove"></i></button>
+        </td>
+    </script>
+
+    <!-- the search filter table -->
+    <script id="search-filter-step-table-template" type="text/html">
+        <table>
+            <thead>
+                <tr>
+                    <!--<th colspan="3">Filter</th>-->
+                    <th class="text-left" style="width: 100%;border-bottom:1pt solid silver;"><h4>Filter</h4></th>
+                    <th class="text-left" style="border-bottom:1pt solid silver;"><h4>Variants</h4></th>
+                    <th style="border-bottom:1pt solid silver;"></th>
+                </tr>
+            </thead>
+
+            <!-- want to insert collection items, here -->
+            <tbody></tbody>
+        </table>
+    </script>
+
+    <script id="variant-table-template" type="text/template">
+        <table id="variant_table" class="table table-striped table-bordered">
+        </table>
+    </script>
+
+    <script id="config-variant-table-col-template" type="text/template">
+        <tr id='<%=id%>_col_row' type='data_row'>
+            <td><input data-col-id='<%=id%>' class="input-mini toggle-visibility" type="checkbox" checked="true"/></td>
+            <span class="label"><td><%=displayName%></td></span>
+            <span class="label"><td><%=description%></td></span>
+        </tr>
+    </script>
+
+    <script id="warning-popover-template" type="text/template">
+        <div class="alert alert-block">
+            <h4>Warning!</h4>
+            <%=message%>
+        </div>
+    </script>
+
+    <!-------------------------------------------------------------------------
+        Overall layout for the subset tab.
+    -------------------------------------------------------------------------->
+    <script id="subset-tab-layout-template" type="text/template">
+        <div class="row-fluid control-group"> <!-- NAME row -->
+            <div class="span1">Name:</div>
+            <div class="span11"><input id="subset_name_field" name="subset_name_field" class="input-large" type="text" value=""  style="width: 500px;"></div>
+        </div>
+        <div class="row-fluid">
+
+            <div class="row-fluid"> <!-- FILTER row -->
+                <div id="sampleFiltersRegion"></div>
+            </div>
+
+            <div class="row-fluid"> <!-- SELECTION row -->
+                <div id="sampleSelectionRegion"></div>
+            </div>
+
+        </div>
+    </script>
+
+    <!-------------------------------------------------------------------------
+        Overall layout for the sample filterSteps region.
+    -------------------------------------------------------------------------->
+    <script id="sample-filters-layout-template" type="text/template">
+
+        <div class="accordion" id="accordion2">
+            <div class="accordion-group">
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                        Filters
+                    </a>
+                </div>
+                <div id="collapseOne" class="accordion-body collapse in">
+                    <div class="accordion-inner">
+
+                        <div class="row-fluid">
+                            <!-- Marionette Region for the sample filter table -->
+                            <div id="sampleFilterTableRegion"></div>
+                        </div>
+
+                        <div class="row-fluid">
+                            <button title="Apply the sample filters" class="btn btn-primary apply">Apply Sample Filters</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </script>
+
+
+
+
+    <!-------------------------------------------------------------------------
+        table that contains the sample filterSteps (1 row per filter)
+    -------------------------------------------------------------------------->
+    <script id="sample-filter-table-template" type="text/html">
+        <table class="table">
+
+            <!-- want to insert collection items, here -->
+            <tbody></tbody>
+
+        </table>
+    </script>
+
+    <!-------------------------------------------------------------------------
+        empty sample filter table
+    -------------------------------------------------------------------------->
+    <script id="sample-filter-table-empty-template" type="text/template">
+        <div>
+            <button title="Adds a new sample filter" type="button" class="btn btn-small addFilter"><i class="icon-plus"></i></button>
+            Add a new sample filter
+        </div>
+    </script>
+
+    <!-------------------------------------------------------------------------
+        single row in the sample filter table
+    -------------------------------------------------------------------------->
+    <script id="sample-filter-row-template" type="text/template">
+
+        <div class="row-fluid" style="overflow: hidden;   margin-bottom: 5px;">
+            <!-- dropdown for the sample medatadata field -->
+            <!-- this controls which region gets shown dynamically -->
+            <select id="fieldDropdown" class="input-medium" style="float: left;">
+                <option value="none" title="Select a field">Select a field</option>
+                <!-- other options added dynamically by the Marionette ItemView -->
+            </select>
+
+            <!-- region for boolean fields -->
+            <div id="booleanRegion" class="sample_filter_region" style="float: left; margin-left: 20px; margin-right: 10px; margin-top: 0px;">
+                <label class='radio inline'><input type='radio' name='boolean_group' value="true" CHECKED> True</label>
+                <br/>
+                <label class='radio inline'><input type='radio' name='boolean_group' value="false"> False</label>
+            </div>
+
+            <!-- region for string fields -->
+            <div id="stringRegion" class="sample_filter_region" style="float: left;">
+                <div style="float: left;">
+                    <select id="stringComparatorDropdown" name='stringComparatorDropdown' class="input-mini" style="float: left;">
+                        <option value="none" title="Select a comparator">Select a comparator</option>
+                        <option value="=" title="Equals" SELECTED>=</option>
+                        <option value="!=" title="Not Equals">&#x2260;</option>
+                    </select>
+                </div>
+
+                <!-- Fancy dropdown combobox that allows the user to select multiples values using checkboxes in front of each line
+                     NOTE: This will only be for lists <= 25 items (only one of 'dropdown' or 'typeahead' will be visible at any given time)
+                -->
+                <div class='dropdown' id='sample_metadata_dropdown_checkbox'  style="float: left; padding-left: 10px;"></div>
+
+                <!-- Type-Ahead that allows the user to select multiples values after typing the first several characters that displays a list of matching values
+                     NOTE: This will only be for lists > 25 items (only one of 'dropdown' or 'typeahead' will be visible at any given time)
+                -->
+                <div class='typeahead' id='sample_metadata_typeahead'  style="float: left; padding-left: 10px;">
+                    <!-- TODO:  This textarea will be replaced with the type-ahead functionality!!! -->
+                    <textarea rows="8" cols="50">(Type-ahead string values to be inserted here...)</textarea>
+                </div>
+            </div>
+
+            <!-- region for number fields -->
+            <div id="numberRegion" class="sample_filter_region" style="float: left;">
+                <select id="numberComparatorDropdown" class="input-mini"  name="numberComparatorDropdown">
+                    <option value="=" title="Equals" SELECTED>=</option>
+                    <option value="!=" title="Not Equals">&#x2260;</option>
+                    <option value=">" title="Greater Than">&gt;</option>
+                    <option value=">=" title="Greater Than Or Equal To">&#x2265;</option>
+                    <option value="<" title="Less Than">&lt;</option>
+                    <option value="<=" title="Less Than Or Equal To">&#x2264;</option>
+                </select>
+                <input id="numberValue" type="text" value="" class="input-small"  name="numberValue"/>
+            </div>
+
+            <button title="Remove this filter" type="button" class="btn btn-small removeFilter" style="margin-left: 10px; margin-right: 3px;  float: left;"><i class="icon-remove"></i></button>
+
+            <!-- button is hidden by default, made visible by the ItemView based on model's isLast -->
+            <button title="Adds a new sample filter" type="button" class="hide btn btn-small addFilter" style="float: left;"><i class="icon-plus"></i></button>
+        </div>
+
+    </script>
+
+    <!---------------------------------------------------------------------------------------------------------------------------------
+    Samples table at the bottom of the "Subset" tab (lets you select individual samples after applying filterSteps on the sample values)
+    ----------------------------------------------------------------------------------------------------------------------------------->
+    <script id="sample-selection-layout-template" type="text/template">
+        <div class="container-fluid">
+            <table id="samplesTable"></table>
+        </div>
+    </script>
+
+    <!-------------------------------------------------------------------------
+        import 3rd party JS libs
+    -------------------------------------------------------------------------->
+    <script src="jquery-1.10.1/jquery-1.10.1.js"></script>
+    <script src="jquery-ui-1.10.3/ui/jquery-ui.js"></script>
+    <script src="jquery.layout-1.3.0-rc30.79/jquery.layout-latest.js"></script>
+    <script src="jquery-validation-1.11.1/jquery.validate.js"></script>
+    <script src="jquery-validation-1.11.1/additional-methods.js"></script>
+    <script src="jquery.base64-0.0.2/jquery.base64.js"></script>
+    <script src="bootstrap-2.3.2/js/bootstrap.js"></script>
+    <script src="typeahead-0.9.3/typeahead.js"></script>
+    <script src="DataTables-1.10.2/media/js/jquery.dataTables.js"></script>
+    <script src="DataTables-1.10.2/media/js/dataTables.bootstrap.js"></script>
+    <script src="ColReorder-1.1.2/js/dataTables.colReorder.js"></script>
+    <script src="underscore-1.4.4/underscore.js"></script>
+    <script src="backbone-1.1.2/backbone.js"></script>
+    <script src="backbone.marionette-1.7.0/backbone.marionette.js"></script>
+    <script src="backbone.stickit_0.8.0/backbone.stickit.js"></script>
+    <script src="backbone.localStorage-1.1.5/backbone.localStorage-min.js"></script>
+    <script src="bootstrap-modal-2.1/js/bootstrap-modalmanager.js"></script>
+    <script src="bootstrap-modal-2.1/js/bootstrap-modal.js"></script>
+    <script src="bootstrap-filestyle-1.0.3/js/bootstrap-filestyle.min.js"></script>
+    <script src="moment-2.4.0/moment.min.js"></script>
+    <script src="Acquisio-bootstrap-dropdown-checkbox-5f2ad8d/js/bootstrap-dropdown-checkbox.js"></script>
+    <script src="xing-wysihtml5-0.3.0/wysihtml5-0.3.0.js"></script>
+    <script src="bootstrap-wysihtml5-0.0.2/bootstrap-wysihtml5.js"></script>
+    <script src="DataTables-UltimateDateTimeSorting/dataTables.moment.js"></script>
+
+    <!-------------------------------------------------------------------------
+        import our JS files
+    -------------------------------------------------------------------------->
+    <script src="js/models/SampleMetadataField.js"></script>
+    <script src="js/models/SampleFilter.js"></script>
+    <script src="js/models/Sample.js"></script>
+    <script src="js/collections/SampleMetadataFieldList.js"></script>
+    <script src="js/collections/SampleFilterList.js"></script>
+    <script src="js/collections/SampleList.js"></script>
+    <script src="js/views/SampleFilterRowView.js"></script>
+    <script src="js/views/SampleFilterTableEmptyView.js"></script>
+    <script src="js/views/SampleFilterTableView.js"></script>
+    <script src="js/views/SampleFilterLayout.js"></script>
+    <script src="js/views/SampleSelectionLayout.js"></script>
+    <script src="js/views/SubsetFilterTabLayout.js"></script>
+    <script src="js/controllers/SubsetController.js"></script>
+
+    <script src="js/models/VCFDataField.js" type="text/javascript"></script>
+    <script src="js/collections/VCFDataFieldList.js" type="text/javascript"></script>
+
+    <script src="js/models/DatabaseIndex.js" type="text/javascript"></script>
+    <script src="js/collections/DatabaseIndexList.js" type="text/javascript"></script>
+    <script src="js/DatabaseIndexController.js" type="text/javascript"></script>
+    <script src="js/views/IndexTableView.js" type="text/javascript"></script>
+    <script src="js/views/IndexTableRowView.js" type="text/javascript"></script>
+    <script src="js/models/IndexesStatus.js" type="text/javascript"></script>
+    <script src="js/views/IndexesStatusView.js" type="text/javascript"></script>
+
+    <script src="js/models/Workspace.js" type="text/javascript"></script>
+    <script src="js/collections/WorkspaceList.js" type="text/javascript"></script>
+
+    <script src="js/views/IndexTableView.js" type="text/javascript"></script>
+    <script src="js/views/IndexTableRowView.js" type="text/javascript"></script>
+
+    <script src="js/models/FilterStep.js" type="text/javascript"></script>
+    <script src="js/models/Filter.js" type="text/javascript"></script>
+    <script src="js/models/GroupFilter.js" type="text/javascript"></script>
+    <script src="js/models/AltAlleleDepthFilter.js" type="text/javascript"></script>
+    <script src="js/collections/FilterStepList.js" type="text/javascript"></script>
+    <script src="js/collections/FilterList.js" type="text/javascript"></script>
+
+    <script src="js/models/SampleGroup.js" type="text/javascript"></script>
+    <script src="js/collections/SampleGroupList.js" type="text/javascript"></script>
+    <script src="js/views/GroupListView.js" type="text/javascript"></script>
+
+    <script src="js/ConfirmDialog.js" type="text/javascript"></script>
+    <script src="js/MessageDialog.js" type="text/javascript"></script>
+
+    <script src="js/models/VariantTableColumn.js" type="text/javascript"></script>
+    <script src="js/models/VariantTableRow.js" type="text/javascript"></script>
+    <script src="js/collections/VariantTableColumnList.js" type="text/javascript"></script>
+    <script src="js/collections/VariantTableRowList.js" type="text/javascript"></script>
+    <script src="js/views/VariantTableConfigColumnsView.js" type="text/javascript"></script>
+    <script src="js/views/VariantTableColumnView.js" type="text/javascript"></script>
+    <script src="js/views/VariantTableDataView.js" type="text/javascript"></script>
+
+    <script src="js/mongo_util.js" type="text/javascript"></script>
+    <script src="js/customized-bootstrap-dropdown-checkbox.js" type="text/javascript"></script>
+
+    <!-- Marionette Application -->
+    <script src="js/AJAXRequestException.js"></script>
+    <script src="js/models/User.js"></script>
+    <script src="js/models/UserGroup.js"></script>
+    <script src="js/models/Search.js"></script>
+    <script src="js/collections/UserGroupList.js"></script>
+    <script src="js/collections/SearchList.js"></script>
+    <script src="js/views/LoginLayout.js"></script>
+    <script src="js/views/MainLayout.js"></script>
+    <script src="js/views/HomeLayout.js"></script>
+    <script src="js/views/UserInformationLayout.js"></script>
+    <script src="js/views/WorkspaceDropdownView.js"></script>
+    <script src="js/views/SettingsLayout.js"></script>
+    <script src="js/views/DataLayout.js"></script>
+    <script src="js/views/AddFilterDialogLayout.js"></script>
+    <script src="js/views/SampleFilterTabLayout.js"></script>
+    <script src="js/views/InfoFilterTabLayout.js"></script>
+    <script src="js/views/CustomFilterTabLayout.js"></script>
+    <script src="js/views/MainHeaderLayout.js"></script>
+    <script src="js/views/MainHeaderUserLayout.js"></script>
+    <script src="js/views/CreateGroupDialogLayout.js"></script>
+    <script src="js/views/ShowErrorsDialogLayout.js"></script>
+    <script src="js/views/SearchTableRowView.js"></script>
+    <script src="js/views/SearchTableView.js"></script>
+    <script src="js/views/SearchFilterRowView.js"></script>
+    <script src="js/views/SearchFilterTableView.js"></script>
+    <script src="js/views/SearchNameView.js"></script>
+    <script src="js/views/SearchDescriptionView.js"></script>
+    <script src="js/views/SearchSaveView.js"></script>
+    <script src="js/views/WorkspaceTableRowView.js"></script>
+    <script src="js/views/WorkspaceTableView.js"></script>
+    <script src="js/controllers/SecurityController.js"></script>
+    <script src="js/controllers/SearchController.js"></script>
+    <script src="js/controllers/SettingsController.js"></script>
+    <script src="js/controllers/VariantDataController.js"></script>
+    <script src="js/controllers/WorkspaceController.js"></script>
+    <script src="js/controllers/AddFilterController.js"></script>
+    <script src="js/models/RangeQuery.js"></script>
+    <script src="js/controllers/RangeQueryController.js"></script>
+    <script src="js/views/RangeQueryFilterTabLayout.js"></script>
+    <script src="js/MongoApp.js"></script>
+
+    <script type="text/javascript">
+        $( document ).ready(function() {
+
+            //test for MSIE x.x;
+            if (/MSIE (\d+\.\d+);/.test(navigator.userAgent)) {
+                window.location = "not_supported.html"
+            }
+            else {
+
+                // Load the rangeQueryFilterTab.html file into the "rangeQueryFilterTab" div in the index.html file
+                // NOTE: This MUST be loaded before trying to perform any operations on the div elements in the html!!!!
+                $("#placeholder-range-query-tab-layout-template").load("rangeQueryFilterTab.html", function( response, status, xhr ) {
+                    if ( status == "error" ) {
+                        alert( xhr.status + " " + xhr.statusText );
+                    }
+                });
+
+                <!-- Start Marionette Application -->
+                MongoApp.start();
+            }
+
+        });
+    </script>
+
+</head>
+<body>
+
+    <!-- Marionette Region for communicating warnings/errors to user-->
+    <div id="mainMessageRegion"></div>
+
+    <!-- Marionette Region for entire single page app -->
+    <div id="mainRegion"></div>
+
+</body>
+
+<!-- Modal -->
+<div id="confirm_modal" data-backdrop="static" class="modal hide fade" tabindex="-1" role="dialog"
+     aria-labelledby="confirm_label" aria-hidden="true">
+    <div class="modal-header">
+        <h3 id="confirm_label"><!-- added by javascript --></h3>
+    </div>
+    <div class="modal-body">
+        <!-- added by javascript -->
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" aria-hidden="true" id="confirm_modal_ok">Ok</button>
+        <button class="btn" id="confirm_modal_cancel">Cancel</button>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="message_modal" data-backdrop="static" class="modal hide fade" tabindex="-1" role="dialog"
+     aria-labelledby="message_label" aria-hidden="true">
+    <div class="modal-header">
+        <h3 id="message_label"><!-- added by javascript --></h3>
+    </div>
+    <div class="modal-body">
+        <!-- added by javascript -->
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" aria-hidden="true" id="message_modal_ok">Ok</button>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="columns_modal" data-backdrop="static" class="modal hide fade wide-modal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Customize Columns</h3>
+    </div>
+    <div class="modal-body">
+        <div class="pre-scrollable">
+            <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered"
+                   id="config_columns_table">
+                <tr>
+                    <td><input class="input-mini toggle-all-visibility" type="checkbox"/></td>
+                    <td>Name</td>
+                    <td>Description</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true" id="column_dialog_close">Close</button>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="add_workspace_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <form id="import_vcf_form" action="" class="form-horizontal">
+        <div class="modal-header">
+            <h3>Import VCF File</h3>
+        </div>
+        <div class="modal-body">
+            <div class="control-group">
+                <label class="control-label" for="vcf_file_upload">File</label>
+
+                <div class="controls">
+                    <input id="vcf_file_upload" name="vcf_file_upload" type="file" class="filestyle"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="vcf_name_field">Name</label>
+
+                <div class="controls">
+                    <input type="text" id="vcf_name_field" name="vcf_name_field" placeholder="user defined name">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" aria-hidden="true" id="import_workspace_button">Import
+            </button>
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        </div>
+    </form>
+</div>
+
+<div id="import_search_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <form id="import_search_form" action="" class="form-horizontal">
+        <div class="modal-header">
+            <h3>Import Analysis</h3>
+        </div>
+        <div class="modal-body">
+            <div class="control-group">
+                <label class="control-label" for="vcf_file_upload">File</label>
+
+                <div class="controls">
+                    <input id="search_file_upload" name="search_file_upload" type="file" class="filestyle"/>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" aria-hidden="true" id="import_search_button">Import</button>
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        </div>
+    </form>
+</div>
+
+
+<!-- Modal -->
+<div id="searches_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>Analyses</h3>
+    </div>
+    <div class="modal-body">
+        <div class="pre-scrollable" id="searchTableRegion"></div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="upload_vcf_progress_modal" data-backdrop="static" class="modal modal-350wide hide fade" tabindex="-1"
+     role="dialog" aria-labelledby="select_vcf_label" aria-hidden="true">
+    <div class="modal-header">
+        <h3 id="select_vcf_label">Upload Status</h3>
+    </div>
+    <div class="modal-body">
+        <div class="progress progress-striped active">
+            <div id="progress" class="bar" style="width: 0%;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-header">
+        <h3>Running Filters.  Please wait...</h3>
+    </div>
+    <div class="modal-body"></div>
+</div>
+
+<!-- Modal -->
+<div id="server_error_modal" data-backdrop="static" class="modal wide-modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-header">
+        <h3>Server Error</h3>
+    </div>
+    <div class="modal-body">
+        <!-- scrollpane because Tomcat can return a lengthy error page -->
+        <div class="pre-scrollable">
+            <div id="server_error_message_container">
+                <!-- added by javascript -->
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>
+
+<div id="client_error_modal" data-backdrop="static" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-header">
+        <h3>Error</h3>
+    </div>
+    <div class="modal-body">
+        <!-- added by javascript -->
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>
+
+</html>

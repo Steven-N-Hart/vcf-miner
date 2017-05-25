@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>edu.mayo.mongo_svr</groupId>
+    <artifactId>mongo_view</artifactId>
+    <packaging>war</packaging>
+    <version>4.0.4-SNAPSHOT</version>
+
+
+    <build>
+        <finalName>vcf-miner</finalName>
+    </build>
+
+    <scm>
+        <connection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mongo_view/trunk</connection>
+        <developerConnection>scm:svn:https://bsisvn.mayo.edu/main/projects/m/mongo_view/trunk</developerConnection>
+        <url>https://bsisvn.mayo.edu/main/projects/m/mongo_view/trunk</url>
+    </scm>
+
+    <!-- Distribution through Nexus -->
+    <distributionManagement>
+        <repository>
+            <id>mayo-nexus-bsi</id>
+            <name>Mayo Internal BSI Nexus releases</name>
+            <url>http://nexus.mayo.edu/content/repositories/hsr_bsi/</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>mayo-nexus-bsi</id>
+            <name>Mayo Internal BSI Nexus snapshots</name>
+            <url>http://nexus.mayo.edu/content/repositories/hsr_bsi-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+</project>
