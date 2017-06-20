@@ -25,4 +25,4 @@ RUN echo -e '/usr/local/apache-tomcat-7.0.62/bin/catalina.sh run &\nmongod --sto
 
 RUN chmod 775 ./start.sh
 
-ENTRYPOINT /start.sh
+ENTRYPOINT start.sh
