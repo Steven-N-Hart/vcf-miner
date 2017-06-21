@@ -23,6 +23,8 @@ COPY vcf-miner.war /usr/local/apache-tomcat-7.0.62/webapps/
 RUN echo -e '#!/bin/bash\nmkdir -p /local2/tmp\nif [ -n "$NO_LDAP" ]\n then \n/bin/cp /home/securityuserapp-no-ldap.war /usr/local/apache-tomcat-7.0.62/webapps/securityuserapp.war\nfi\n' > start.sh
 RUN echo -e '/usr/local/apache-tomcat-7.0.62/bin/catalina.sh run &\nmongod --storageEngine wiredTiger' >> start.sh
 
+EXPOSE 8888
+
 RUN chmod 775 ./start.sh
 
 ENTRYPOINT ./start.sh
