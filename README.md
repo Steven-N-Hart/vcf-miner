@@ -18,7 +18,10 @@ docker build -t vcfminer . # Dont forget the '.'!
 ```
 Run the image
 ``` 
-docker run -e NO_LDAP=1 -d  -p 8888:8080 -v $PWD:/home -w /home vcfminer sh ./start.sh
+docker run -d  -p 8888:8080 vcfmin
+# To activate LDAP use:
+# docker run -e LDAP=1 -d  -p 8888:8080 vcfminer
+# note you will need IT help integrating with your existing LDAP!
 ```
 Open a browser to http://your-ip:8888/vcf-miner/
 

@@ -1,4 +1,4 @@
-FROM centos:6
+FROM centos:7
 MAINTAINER Steven N Hart, PhD
 # docker run -d -p 8888:8080 stevenhart/vcf-miner:v4.0.1 /home/start.sh 
 RUN yum install -y java-1.7.0-openjdk.x86_64 java-1.7.0-openjdk-devel wget tar git
@@ -22,8 +22,9 @@ RUN git clone https://github.com/Steven-N-Hart/vcf-miner.git && cd vcf-miner
 #Delpoy VCF MINER war files
 RUN cp /vcf-miner/mongo_svr.war /usr/local/apache-tomcat-7.0.62/webapps/
 RUN cp /vcf-miner/vcf-miner.war /usr/local/apache-tomcat-7.0.62/webapps/
+RUN cp /vcf-miner/securityuserappNoLDAP.war /usr/local/apache-tomcat-7.0.62/webapps/securityuserapp.war
 
-EXPOSE 8888
+EXPOSE 8080
 
 RUN chmod 775 /vcf-miner/start.sh
 
