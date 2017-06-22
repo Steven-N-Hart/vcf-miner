@@ -1,12 +1,23 @@
 
 # Getting VCF-Miner started with [Docker](https://www.docker.com/)
 
+
+Type this into your commandline
+```
+docker run -d -p 8888:8080 stevenhart/vcf-miner
+```
+Alternatively, if you want to use a GUI:
+1. Install and open [Kitematic](https://kitematic.com/)
+2. Search for `stevenhart/vcf-miner`
+3. Click `Create`
+
 **Relevant links:**
  * [VCF-Miner Homepage](http://bioinformaticstools.mayo.edu/research/vcf-miner/) 
  
-
+# More advanced usage
 ### VCF-Miner installation using Docker 
 
+# Build locally
 In a terminal, clone the repository:
 ```
 git clone https://github.com/Steven-N-Hart/vcf-miner.git
@@ -18,7 +29,7 @@ docker build -t vcfminer . # Dont forget the '.'!
 ```
 Run the image
 ``` 
-docker run -d  -p 8888:8080 vcfmin
+docker run -d  -p 8888:8080 vcfminer
 # To activate LDAP use:
 # docker run -e LDAP=1 -d  -p 8888:8080 vcfminer
 # note you will need IT help integrating with your existing LDAP!
